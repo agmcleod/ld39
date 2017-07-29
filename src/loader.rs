@@ -4,7 +4,7 @@ use std::fs::File;
 use std::io::Result;
 use std::io::prelude::Read;
 
-pub fn gfx_load_texture<F, R>(path: &str, factory: &mut F) -> gfx::handle::ShaderResourceView<R, [f32; 4]>
+pub fn gfx_load_texture<F, R>(path: &str, factory: &F) -> gfx::handle::ShaderResourceView<R, [f32; 4]>
     where F: gfx::Factory<R>,
           R: gfx::Resources
 {

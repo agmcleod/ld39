@@ -1,6 +1,14 @@
 {"frames": [
 
 {
+	"filename": "coal.png",
+	"frame": {"x":330,"y":2,"w":32,"h":32},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
+	"sourceSize": {"w":32,"h":32}
+},
+{
 	"filename": "powerbar.png",
 	"frame": {"x":68,"y":2,"w":260,"h":32},
 	"rotated": false,
@@ -21,8 +29,8 @@
 	"version": "1.0",
 	"image": "assets.png",
 	"format": "RGBA8888",
-	"size": {"w":330,"h":68},
+	"size": {"w":364,"h":68},
 	"scale": "1",
-	"smartupdate": "$TexturePacker:SmartUpdate:67a7d93319beaf73daaba6d11cdc1c82:f06ac53eb2e297e11a68a4ad7000bdc6:a759b6bbc8381ac9c472b28f589ad0d6$"
+	"smartupdate": "$TexturePacker:SmartUpdate:935858639df34cd83caeadb775693f92:d0b87c252b645fc3b0c78e607fb1de03:a759b6bbc8381ac9c472b28f589ad0d6$"
 }
 }

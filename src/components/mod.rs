@@ -1,19 +1,25 @@
 mod animation_sheet;
 mod camera;
+mod coal_count;
 mod color;
 mod current_power;
 mod input;
 mod power_bar;
+mod resources;
 mod sprite;
+mod text;
 mod tile;
 mod transform;
 
 pub use self::animation_sheet::*;
 pub use self::camera::*;
+pub use self::coal_count::*;
 pub use self::color::*;
 pub use self::current_power::*;
 pub use self::input::*;
 pub use self::power_bar::*;
+pub use self::resources::*;
 pub use self::sprite::*;
+pub use self::text::*;
 pub use self::tile::*;
 pub use self::transform::*;

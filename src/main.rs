@@ -9,6 +9,8 @@ extern crate serde;
 extern crate serde_derive;
 extern crate serde_json;
 
+extern crate rusttype;
+
 mod components;
 mod loader;
 mod renderer;
@@ -16,9 +18,10 @@ mod spritesheet;
 mod systems;
 mod utils;
 
+use std::sync::Arc;
 use std::ops::{DerefMut};
-
-use components::{AnimationSheet, Camera, Color, CurrentPower, Input, PowerBar, Sprite, Tile, Transform};
+use rusttype::{FontCollection, Font, Scale, point, PositionedGlyph};
+use components::{AnimationSheet, Camera, CoalCount, Color, CurrentPower, Input, PowerBar, Resources, Sprite, Text, Tile, Transform};
 use specs::{DispatcherBuilder, Join, World};
 use renderer::{ColorFormat, DepthFormat};
 use spritesheet::Spritesheet;
@@ -26,14 +29,17 @@ use glutin::{Event, ElementState, MouseButton, VirtualKeyCode, WindowEvent};
 use glutin::GlContext;
 use gfx::Device;
 
-fn setup_world(world: &mut World, window: &glutin::Window) {
+fn setup_world<R>(world: &mut World, window: &glutin::Window, font: &Arc<Font<'static>>) where R: gfx::Resources {
     world.add_resource::<Camera>(Camera(renderer::get_ortho()));
     world.add_resource::<Input>(Input::new(window.hidpi_factor(), vec![VirtualKeyCode::W, VirtualKeyCode::A, VirtualKeyCode::S, VirtualKeyCode::D]));
     world.register::<PowerBar>();
     world.register::<CurrentPower>();
     world.register::<Color>();
     world.register::<AnimationSheet>();
+    world.register::<CoalCount>();
+    world.register::<Resources>();
     world.register::<Sprite>();
+    world.register::<Text<R>>();
     world.register::<Tile>();
     world.register::<Transform>();
     world.create_entity()
@@ -45,6 +51,18 @@ fn setup_world(world: &mut World, window: &glutin::Window) {
         .with(CurrentPower{})
         .with(Transform::new(674, 580, CurrentPower::get_max_with(), 24, 0.0, 1.0, 1.0))
         .with(Color([0.0, 1.0, 0.0, 1.0]));
+
+    world.create_entity()
+        .with(CoalCount{})
+        .with(Transform::new(670, 500, 32, 32, 0.0, 1.0, 1.0))
+        .with(Sprite{ frame_name: "coal.png".to_string(), visible: true });
+
+    let text: Text<R> = Text::new(font.clone(), 32.0);
+    world.create_entity()
+        .with(CoalCount{})
+        .with(Transform::new(720, 500, 32, 32, 0.0, 1.0, 1.0))
+        .with(text);
+
     for row in 0i32..10i32 {
         for col in 0i32..10i32 {
             world.create_entity()
@@ -67,7 +85,6 @@ fn main() {
         gfx_window_glutin::init::<ColorFormat, DepthFormat>(builder, context, &events_loop);
 
     let mut world = World::new();
-    setup_world(&mut world, &window);
 
     let mut dispatcher = DispatcherBuilder::new()
         .add(systems::AnimationSystem::new(), "animation_system", &[])
@@ -84,7 +101,13 @@ fn main() {
 
     let asset_data = loader::read_text_from_file("./resources/assets.json").unwrap();
     let spritesheet: Spritesheet = serde_json::from_str(asset_data.as_ref()).unwrap();
-    let asset_texture = loader::gfx_load_texture("./resources/assets.png", &mut factory);
+    let asset_texture = loader::gfx_load_texture("./resources/assets.png", &factory);
+
+    let font_data = include_bytes!("../resources/MunroSmall.ttf");
+    let font_collection = FontCollection::from_bytes(font_data as &[u8]);
+    let font = Arc::new(font_collection.into_font().unwrap());
+
+    setup_world(&mut world, &window, &font);
 
     let mut running = true;
     while running {
