@@ -18,7 +18,7 @@ mod utils;
 
 use std::ops::{DerefMut};
 
-use components::{AnimationSheet, Camera, Input, Power, Sprite, Tile, Transform};
+use components::{AnimationSheet, Camera, Color, CurrentPower, Input, PowerBar, Sprite, Tile, Transform};
 use specs::{DispatcherBuilder, Join, World};
 use renderer::{ColorFormat, DepthFormat};
 use spritesheet::Spritesheet;
@@ -29,15 +29,22 @@ use gfx::Device;
 fn setup_world(world: &mut World, window: &glutin::Window) {
     world.add_resource::<Camera>(Camera(renderer::get_ortho()));
     world.add_resource::<Input>(Input::new(window.hidpi_factor(), vec![VirtualKeyCode::W, VirtualKeyCode::A, VirtualKeyCode::S, VirtualKeyCode::D]));
-    world.register::<Power>();
+    world.register::<PowerBar>();
+    world.register::<CurrentPower>();
+    world.register::<Color>();
     world.register::<AnimationSheet>();
     world.register::<Sprite>();
     world.register::<Tile>();
     world.register::<Transform>();
     world.create_entity()
-        .with(Power::new())
+        .with(PowerBar::new())
         .with(Transform::new(670, 576, 260, 32, 0.0, 1.0, 1.0))
         .with(Sprite{ frame_name: "powerbar.png".to_string(), visible: true });
+
+    world.create_entity()
+        .with(CurrentPower{})
+        .with(Transform::new(674, 580, CurrentPower::get_max_with(), 24, 0.0, 1.0, 1.0))
+        .with(Color([0.0, 1.0, 0.0, 1.0]));
     for row in 0i32..10i32 {
         for col in 0i32..10i32 {
             world.create_entity()
@@ -127,15 +134,20 @@ fn main() {
         let sprites = world.read::<Sprite>();
         let transforms = world.read::<Transform>();
         let animation_sheets = world.read::<AnimationSheet>();
+        let colors = world.read::<Color>();
 
         for (sprite, transform) in (&sprites, &transforms).join() {
             if sprite.visible {
-                basic.render(&mut encoder, &world, &mut factory, &transform, &sprite.frame_name, &spritesheet, &asset_texture);
+                basic.render(&mut encoder, &world, &mut factory, &transform, Some(&sprite.frame_name), &spritesheet, None, &asset_texture);
             }
         }
 
         for (animation_sheet, transform) in (&animation_sheets, &transforms).join() {
-            basic.render(&mut encoder, &world, &mut factory, &transform, animation_sheet.get_current_frame(), &spritesheet, &asset_texture);
+            basic.render(&mut encoder, &world, &mut factory, &transform, Some(animation_sheet.get_current_frame()), &spritesheet, None, &asset_texture);
+        }
+
+        for (color, transform) in (&colors, &transforms).join() {
+            basic.render(&mut encoder, &world, &mut factory, &transform, None, &spritesheet, Some(color.0), &asset_texture);
         }
 
         encoder.flush(&mut device);
