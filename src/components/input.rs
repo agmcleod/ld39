@@ -1,6 +1,5 @@
-extern crate specs;
 use std::collections::HashMap;
-use specs::Component;
+use specs::{Component, HashMapStorage};
 use glutin::VirtualKeyCode;
 
 #[derive(Debug)]
@@ -28,5 +27,5 @@ impl Input {
 }
 
 impl Component for Input {
-    type Storage = specs::HashMapStorage<Input>;
+    type Storage = HashMapStorage<Input>;
 }

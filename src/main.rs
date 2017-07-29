@@ -18,7 +18,7 @@ mod utils;
 
 use std::ops::{DerefMut};
 
-use components::{AnimationSheet, Camera, Input, Sprite, Tile, Transform};
+use components::{AnimationSheet, Camera, Input, Power, Sprite, Tile, Transform};
 use specs::{DispatcherBuilder, Join, World};
 use renderer::{ColorFormat, DepthFormat};
 use spritesheet::Spritesheet;
@@ -29,14 +29,19 @@ use gfx::Device;
 fn setup_world(world: &mut World, window: &glutin::Window) {
     world.add_resource::<Camera>(Camera(renderer::get_ortho()));
     world.add_resource::<Input>(Input::new(window.hidpi_factor(), vec![VirtualKeyCode::W, VirtualKeyCode::A, VirtualKeyCode::S, VirtualKeyCode::D]));
+    world.register::<Power>();
     world.register::<AnimationSheet>();
     world.register::<Sprite>();
     world.register::<Tile>();
     world.register::<Transform>();
+    world.create_entity()
+        .with(Power::new())
+        .with(Transform::new(670, 576, 260, 32, 0.0, 1.0, 1.0))
+        .with(Sprite{ frame_name: "powerbar.png".to_string(), visible: true });
     for row in 0i32..10i32 {
         for col in 0i32..10i32 {
             world.create_entity()
-                .with(Transform::new(64 * col, 64 * row, 64, 64, 0.0, 0.0, 0.0))
+                .with(Transform::new(64 * col, 64 * row, 64, 64, 0.0, 1.0, 1.0))
                 .with(Sprite{ frame_name: "tiles.png".to_string(), visible: true })
                 .with(Tile{});
         }
@@ -59,6 +64,7 @@ fn main() {
 
     let mut dispatcher = DispatcherBuilder::new()
         .add(systems::AnimationSystem::new(), "animation_system", &[])
+        .add(systems::PowerUsage::new(), "power_system", &[])
         .build();
 
     let target = renderer::WindowTargets{

@@ -3,8 +3,7 @@ use specs::{WriteStorage, Join, System};
 use components::{AnimationSheet};
 use utils::math;
 
-pub struct AnimationSystem {
-}
+pub struct AnimationSystem;
 
 impl AnimationSystem {
     pub fn new() -> AnimationSystem {
