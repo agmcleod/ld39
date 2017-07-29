@@ -10,6 +10,7 @@ extern crate serde_derive;
 extern crate serde_json;
 
 mod components;
+mod loader;
 mod renderer;
 mod spritesheet;
 mod systems;
@@ -17,9 +18,10 @@ mod utils;
 
 use std::ops::{DerefMut};
 
-use components::{AnimationSheet, Camera, Input, Sprite, Transform};
+use components::{AnimationSheet, Camera, Input, Sprite, Tile, Transform};
 use specs::{DispatcherBuilder, Join, World};
 use renderer::{ColorFormat, DepthFormat};
+use spritesheet::Spritesheet;
 use glutin::{Event, ElementState, MouseButton, VirtualKeyCode, WindowEvent};
 use glutin::GlContext;
 use gfx::Device;
@@ -29,14 +31,24 @@ fn setup_world(world: &mut World, window: &glutin::Window) {
     world.add_resource::<Input>(Input::new(window.hidpi_factor(), vec![VirtualKeyCode::W, VirtualKeyCode::A, VirtualKeyCode::S, VirtualKeyCode::D]));
     world.register::<AnimationSheet>();
     world.register::<Sprite>();
+    world.register::<Tile>();
     world.register::<Transform>();
+    for row in 0i32..10i32 {
+        for col in 0i32..10i32 {
+            world.create_entity()
+                .with(Transform::new(64 * col, 64 * row, 64, 64, 0.0, 0.0, 0.0))
+                .with(Sprite{ frame_name: "tiles.png".to_string(), visible: true })
+                .with(Tile{});
+        }
+    }
 }
 
 fn main() {
     let mut events_loop = glutin::EventsLoop::new();
+    let dim = renderer::get_dimensions();
     let builder = glutin::WindowBuilder::new()
         .with_title("ld39".to_string())
-        .with_dimensions(800, 600);
+        .with_dimensions(dim[0] as u32, dim[1] as u32);
     let context = glutin::ContextBuilder::new();
 
     let (window, mut device, mut factory, main_color, mut main_depth) =
@@ -56,6 +68,10 @@ fn main() {
 
     let mut encoder: gfx::Encoder<_, _> = factory.create_command_buffer().into();
     let mut basic = renderer::Basic::new(&mut factory, &target);
+
+    let asset_data = loader::read_text_from_file("./resources/assets.json").unwrap();
+    let spritesheet: Spritesheet = serde_json::from_str(asset_data.as_ref()).unwrap();
+    let asset_texture = loader::gfx_load_texture("./resources/assets.png", &mut factory);
 
     let mut running = true;
     while running {
@@ -106,15 +122,15 @@ fn main() {
         let transforms = world.read::<Transform>();
         let animation_sheets = world.read::<AnimationSheet>();
 
-        // for (sprite, transform) in (&sprites, &transforms).join() {
-        //     if sprite.visible {
-        //         basic.render(&mut encoder, &world, &mut factory, &transform, &sprite.frame_name, &spritesheet, &asset_texture);
-        //     }
-        // }
+        for (sprite, transform) in (&sprites, &transforms).join() {
+            if sprite.visible {
+                basic.render(&mut encoder, &world, &mut factory, &transform, &sprite.frame_name, &spritesheet, &asset_texture);
+            }
+        }
 
-        // for (animation_sheet, transform) in (&animation_sheets, &transforms).join() {
-        //     basic.render(&mut encoder, &world, &mut factory, &transform, animation_sheet.get_current_frame(), &spritesheet, &asset_texture);
-        // }
+        for (animation_sheet, transform) in (&animation_sheets, &transforms).join() {
+            basic.render(&mut encoder, &world, &mut factory, &transform, animation_sheet.get_current_frame(), &spritesheet, &asset_texture);
+        }
 
         encoder.flush(&mut device);
 

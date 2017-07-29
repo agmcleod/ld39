@@ -1,5 +1,3 @@
-extern crate specs;
-
 use specs::{VecStorage, Component};
 
 pub struct Sprite {
