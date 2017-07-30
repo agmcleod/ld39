@@ -6,6 +6,7 @@ pub struct Text {
     pub offset: Point<f32>,
     pub new_data: bool,
     pub text: String,
+    pub visible: bool,
 }
 
 impl Text {
@@ -19,6 +20,7 @@ impl Text {
             offset: offset,
             new_data: false,
             text: "".to_string(),
+            visible: true
         }
     }
 
@@ -28,6 +30,7 @@ impl Text {
             offset: offset,
             new_data: false,
             text: "".to_string(),
+            visible: true,
         }
     }
 

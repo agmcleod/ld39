@@ -111,13 +111,8 @@ fn setup_world(world: &mut World, window: &glutin::Window, font: &Arc<Font<'stat
         .with(Sprite{ frame_name: "sell.png".to_string(), visible: true });
 
     // upgrade stuff
-    world.create_entity()
-        .with(Button::new("upgrade".to_string(), ["refinery_button_1.png".to_string(), "refinery_button_2.png".to_string()]))
-        .with(Transform::new(670, 90, 64, 64, 0.0, 1.0, 1.0))
-        .with(Upgrade::new())
-        .with(Sprite{ frame_name: "refinery_1.png".to_string(), visible: true });
-
     let mut text = Text::new(&font, 32.0);
+    text.visible = false;
     text.set_text(format!("{}", Upgrade::new().get_cost()));
     world.create_entity()
         .with(UpgradeCost{})
@@ -189,7 +184,7 @@ fn main() {
         .add(systems::TileSelection{}, "tile_selection", &[])
         .add(systems::ButtonHover{}, "button_hover", &[])
         .add(systems::SellEnergy{}, "sell_energy", &["button_hover"])
-        .add(systems::BuildGatherer{}, "build_gatherer", &["button_hover"])
+        .add(systems::BuildGatherer{ built_one: false }, "build_gatherer", &["button_hover"])
         .add(systems::Gathering{}, "gathering", &[])
         .add(systems::UpgradeResource{}, "upgrade_resource", &[])
         .build();
@@ -351,7 +346,7 @@ fn main() {
                 transform.size.y = entry.height;
             }
 
-            if text.text != "" {
+            if text.text != "" && text.visible {
                 basic.render(&mut encoder, &world, &mut factory, &transform, None, &spritesheet, Some(color.0), Some(&glyph_cache.get(&text.text).unwrap().view));
             }
         }
