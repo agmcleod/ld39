@@ -28,7 +28,7 @@ use std::io::BufReader;
 use std::fs::File;
 use std::path::Path;
 use rusttype::{FontCollection, Font, Scale, point, PositionedGlyph};
-use components::{AnimationSheet, BuildCost, Button, Camera, ClickSound, ResourceCount, Color, CurrentPower, Gatherer, GathererType, HighlightTile, Input, PowerBar, Rect, Resources, ResourceType, SelectedTile, SellCost, Sprite, Text, Tile, Transform, Upgrade, UpgradeCost};
+use components::{AnimationSheet, BuildCost, Button, Camera, ClickSound, ResourceCount, Color, CurrentPower, Gatherer, GathererType, HighlightTile, Input, PowerBar, Rect, Resources, ResourceType, SelectedTile, SellCost, Sprite, Text, Tile, Transform, Upgrade, UpgradeCost, WinCount};
 use specs::{DispatcherBuilder, Join, World};
 use renderer::{ColorFormat, DepthFormat};
 use spritesheet::Spritesheet;
@@ -68,6 +68,7 @@ fn setup_world(world: &mut World, window: &glutin::Window, font: &Arc<Font<'stat
     world.register::<Transform>();
     world.register::<Upgrade>();
     world.register::<UpgradeCost>();
+    world.register::<WinCount>();
     world.create_entity()
         .with(PowerBar::new())
         .with(Transform::new(670, 576, 260, 32, 0.0, 1.0, 1.0))

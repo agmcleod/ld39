@@ -20,6 +20,7 @@ mod tile;
 mod transform;
 mod upgrade;
 mod upgrade_cost;
+mod win_count;
 
 pub use self::animation_sheet::*;
 pub use self::build_cost::*;
@@ -43,3 +44,4 @@ pub use self::tile::*;
 pub use self::transform::*;
 pub use self::upgrade::*;
 pub use self::upgrade_cost::*;
+pub use self::win_count::*;

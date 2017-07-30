@@ -1,6 +1,6 @@
 use std::ops::{Deref, DerefMut};
 use specs::{Entities, Fetch, FetchMut, Join, ReadStorage, WriteStorage, System};
-use components::{BuildCost, Button, Color, Gatherer, GathererType, Input, Resources, ResourceCount, ResourceType, Sprite, Text, Transform, Upgrade, UpgradeCost};
+use components::{BuildCost, Button, Color, Gatherer, GathererType, Input, Resources, ResourceCount, ResourceType, Sprite, Text, Transform, Upgrade, UpgradeCost, WinCount};
 use rusttype::{Point, Scale};
 
 pub struct UpgradeResource;
@@ -19,10 +19,11 @@ impl<'a> System<'a> for UpgradeResource {
         WriteStorage<'a, Transform>,
         WriteStorage<'a, Upgrade>,
         ReadStorage<'a, UpgradeCost>,
+        WriteStorage<'a, WinCount>,
     );
 
     fn run(&mut self, data: Self::SystemData) {
-        let (entities, build_cost_storage, mut button_storage, mut color_storage, input_storage, mut resources_storage, mut resource_count_storage, mut sprite_storage, mut text_storage, mut transform_storage, mut upgrade_storage, upgrade_cost_storage) = data;
+        let (entities, build_cost_storage, mut button_storage, mut color_storage, input_storage, mut resources_storage, mut resource_count_storage, mut sprite_storage, mut text_storage, mut transform_storage, mut upgrade_storage, upgrade_cost_storage, mut win_count_storage) = data;
 
         let input: &Input = input_storage.deref();
         let resources: &mut Resources = resources_storage.deref_mut();
@@ -87,8 +88,6 @@ impl<'a> System<'a> for UpgradeResource {
                 "sun.png".to_string()
             };
 
-            println!("{:?} {:?}", text_scale_to_copy, text_point_to_copy);
-
             let new_resource_count = entities.create();
             resource_count_storage.insert(new_resource_count, ResourceCount{ resource_type: resources.current_type });
             transform_storage.insert(new_resource_count, Transform::new(670, y, 32, 32, 0.0, 1.0, 1.0));
@@ -99,6 +98,17 @@ impl<'a> System<'a> for UpgradeResource {
             transform_storage.insert(new_resource_count, Transform::new(720, y, 32, 32, 0.0, 1.0, 1.0));
             text_storage.insert(new_resource_count, Text::new_from(text_scale_to_copy.unwrap(), text_point_to_copy.unwrap()));
             color_storage.insert(new_resource_count, Color([0.0, 1.0, 0.0, 1.0]));
+
+            // display win requirements
+            if resources.current_type == ResourceType::Clean {
+                let win_count = entities.create();
+                win_count_storage.insert(win_count, WinCount{ count: 12 });
+                transform_storage.insert(win_count, Transform::new(670, 370, 32, 32, 0.0, 1.0, 1.0));
+                let mut text = Text::new_from(text_scale_to_copy.unwrap(), text_point_to_copy.unwrap());
+                text.set_text("Build 12 solar plants".to_string());
+                text_storage.insert(win_count, text);
+                color_storage.insert(win_count, Color([0.0, 1.0, 0.0, 1.0]));
+            }
         }
 
         if resource_type_changed {

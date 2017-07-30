@@ -1,6 +1,6 @@
 use std::ops::{Deref, DerefMut};
 use specs::{Entities, Fetch, FetchMut, Join, ReadStorage, WriteStorage, System};
-use components::{AnimationSheet, Button, ClickSound, Gatherer, GathererType, Input, Resources, SelectedTile, Sprite, Text, Transform, Upgrade, UpgradeCost};
+use components::{AnimationSheet, Button, ClickSound, Gatherer, GathererType, Input, Resources, ResourceType, SelectedTile, Sprite, Text, Transform, Upgrade, UpgradeCost, WinCount};
 
 pub struct BuildGatherer {
     pub built_one: bool,
@@ -21,10 +21,11 @@ impl<'a> System<'a> for BuildGatherer {
         WriteStorage<'a, Transform>,
         WriteStorage<'a, Upgrade>,
         ReadStorage<'a, UpgradeCost>,
+        WriteStorage<'a, WinCount>,
     );
 
     fn run(&mut self, data: Self::SystemData) {
-        let (mut animation_sheet_storage, mut button_storage, mut click_sound_storage, entities, mut gatherer_storage, input_storage, mut resources_storage, mut selected_tile_storage, mut sprite_storage, mut text_storage, mut transform_storage, mut upgrade_storage, upgrade_cost_storage) = data;
+        let (mut animation_sheet_storage, mut button_storage, mut click_sound_storage, entities, mut gatherer_storage, input_storage, mut resources_storage, mut selected_tile_storage, mut sprite_storage, mut text_storage, mut transform_storage, mut upgrade_storage, upgrade_cost_storage, mut win_count_storage) = data;
 
         let resources: &mut Resources = resources_storage.deref_mut();
         let input: &Input = input_storage.deref();
@@ -61,6 +62,20 @@ impl<'a> System<'a> for BuildGatherer {
             gatherer_storage.insert(gatherer_entity, gatherer);
             animation_sheet_storage.insert(gatherer_entity, anim);
             transform_storage.insert(gatherer_entity, Transform::new(selected_tile_x, selected_tile_y, 64, 64, 0.0, 1.0, 1.0));
+
+            if resources.get_current_type() == ResourceType::Clean {
+                for (text, win_count) in (&mut text_storage, &mut win_count_storage).join() {
+                    win_count.count -= 1;
+                    let message = if win_count.count > 1 {
+                        format!("Build {} solar plants", win_count.count)
+                    } else if win_count.count == 1 {
+                        "Build 1 solar plant".to_string()
+                    } else {
+                        "Were saved!".to_string()
+                    };
+                    text.set_text(message);
+                }
+            }
 
             if !self.built_one {
                 self.built_one = true;
