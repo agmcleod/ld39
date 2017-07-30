@@ -2,7 +2,7 @@ use std::cmp;
 use specs::{Component, HashMapStorage};
 
 #[derive(Copy, Clone)]
-enum ResourceType {
+pub enum ResourceType {
     Coal,
     Oil,
     Clean,
@@ -46,9 +46,11 @@ impl Resources {
     pub fn get_resources(&mut self, amount: usize) -> usize {
         let current_type = self.current_type.clone();
         let current_amount = current_type.get_current_amount(self);
+
         if *current_amount == 0 {
             return 0
         }
+
         if amount > *current_amount {
             let cp = *current_amount as f32;
             *current_amount = 0;
@@ -60,6 +62,22 @@ impl Resources {
 
         *current_amount -= amount;
         (amount as f32 * current_type.get_ratio()).round() as usize
+    }
+
+    pub fn get_resources_to_buy(&mut self, amount: usize) -> usize {
+        let current_type = self.current_type.clone();
+        let current_amount = current_type.get_current_amount(self);
+
+        if *current_amount < amount {
+            return 0
+        }
+
+        *current_amount -= amount;
+        amount
+    }
+
+    pub fn get_current_type(&self) -> &ResourceType {
+        &self.current_type
     }
 }
 

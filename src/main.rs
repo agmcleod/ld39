@@ -24,7 +24,7 @@ use std::collections::HashMap;
 use std::sync::Arc;
 use std::ops::{DerefMut};
 use rusttype::{FontCollection, Font, Scale, point, PositionedGlyph};
-use components::{AnimationSheet, Button, Camera, CoalCount, Color, CurrentPower, HighlightTile, Input, PowerBar, Rect, Resources, SelectedTile, Sprite, Text, Tile, Transform};
+use components::{AnimationSheet, Button, Camera, CoalCount, Color, CurrentPower, Gatherer, HighlightTile, Input, PowerBar, Rect, Resources, SelectedTile, Sprite, Text, Tile, Transform};
 use specs::{DispatcherBuilder, Join, World};
 use renderer::{ColorFormat, DepthFormat};
 use spritesheet::Spritesheet;
@@ -41,6 +41,7 @@ fn setup_world(world: &mut World, window: &glutin::Window, font: &Arc<Font<'stat
     world.register::<CurrentPower>();
     world.register::<Color>();
     world.register::<CoalCount>();
+    world.register::<Gatherer>();
     world.register::<HighlightTile>();
     world.register::<PowerBar>();
     world.register::<Rect>();
@@ -88,8 +89,22 @@ fn setup_world(world: &mut World, window: &glutin::Window, font: &Arc<Font<'stat
 
     world.create_entity()
         .with(Button::new("sell".to_string(), ["sell.png".to_string(), "sell_hover.png".to_string()]))
-        .with(Transform::new(790, 32, 96, 32, 0.0, 1.0, 1.0))
+        .with(Transform::new(820, 32, 96, 32, 0.0, 1.0, 1.0))
         .with(Sprite{ frame_name: "sell.png".to_string(), visible: true });
+
+    let mut text = Text::new(&font, 32.0);
+    text.set_text("20".to_string());
+    world.create_entity()
+        .with(Transform::new(775, 32, 0, 0, 0.0, 1.0, 1.0))
+        .with(text)
+        .with(Color([0.0, 1.0, 0.0, 1.0]));
+
+    let mut text = Text::new(&font, 32.0);
+    text.set_text("10".to_string());
+    world.create_entity()
+        .with(Transform::new(925, 32, 0, 0, 0.0, 1.0, 1.0))
+        .with(text)
+        .with(Color([0.0, 1.0, 0.0, 1.0]));
 
     for row in 0i32..10i32 {
         for col in 0i32..10i32 {
@@ -120,7 +135,8 @@ fn main() {
         .add(systems::PowerUsage::new(), "power_system", &[])
         .add(systems::TileSelection{}, "tile_selection", &[])
         .add(systems::ButtonHover{}, "button_hover", &[])
-        .add(systems::SellEnergy{}, "sell_energy", &[])
+        .add(systems::SellEnergy{}, "sell_energy", &["button_hover"])
+        .add(systems::BuildGatherer{}, "build_gatherer", &["button_hover"])
         .build();
 
     let target = renderer::WindowTargets{
