@@ -1,11 +1,12 @@
 use std::ops::Deref;
-use specs::{WriteStorage, Fetch, Join, System};
-use components::{HighlightTile, Input, SelectedTile, Tile, Transform};
+use specs::{ReadStorage, WriteStorage, Fetch, Join, System};
+use components::{Gatherer, HighlightTile, Input, SelectedTile, Tile, Transform};
 
 pub struct TileSelection;
 
 impl<'a> System<'a> for TileSelection {
     type SystemData = (
+        ReadStorage<'a, Gatherer>,
         WriteStorage<'a, HighlightTile>,
         Fetch<'a, Input>,
         WriteStorage<'a, SelectedTile>,
@@ -13,7 +14,7 @@ impl<'a> System<'a> for TileSelection {
     );
 
     fn run(&mut self, data: Self::SystemData) {
-        let (mut hightlight_tile_storage, input_storage, mut selected_tile_storage, mut transform_storage) = data;
+        let (gatherer_storage, mut hightlight_tile_storage, input_storage, mut selected_tile_storage, mut transform_storage) = data;
 
         let input: &Input = input_storage.deref();
         let mouse_x = input.mouse_pos.0;
@@ -34,10 +35,21 @@ impl<'a> System<'a> for TileSelection {
         }
 
         if input.mouse_pressed && within_grid {
-            for (selected_tile, transform) in (&mut selected_tile_storage, &mut transform_storage).join() {
-                selected_tile.visible = true;
-                transform.pos.x = tile_mouse_x;
-                transform.pos.y = tile_mouse_y;
+            let mut collisions = false;
+
+            for (_, transform) in (&gatherer_storage, &mut transform_storage).join() {
+                if transform.pos.x == tile_mouse_x && transform.pos.y == tile_mouse_y {
+                    collisions = true;
+                    break
+                }
+            }
+
+            if !collisions {
+                for (selected_tile, transform) in (&mut selected_tile_storage, &mut transform_storage).join() {
+                    selected_tile.visible = true;
+                    transform.pos.x = tile_mouse_x;
+                    transform.pos.y = tile_mouse_y;
+                }
             }
         }
     }
