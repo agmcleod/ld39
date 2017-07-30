@@ -24,7 +24,7 @@ use std::collections::HashMap;
 use std::sync::Arc;
 use std::ops::{DerefMut};
 use rusttype::{FontCollection, Font, Scale, point, PositionedGlyph};
-use components::{AnimationSheet, Camera, CoalCount, Color, CurrentPower, HighlightTile, Input, PowerBar, Rect, Resources, SelectedTile, Sprite, Text, Tile, Transform};
+use components::{AnimationSheet, Button, Camera, CoalCount, Color, CurrentPower, HighlightTile, Input, PowerBar, Rect, Resources, SelectedTile, Sprite, Text, Tile, Transform};
 use specs::{DispatcherBuilder, Join, World};
 use renderer::{ColorFormat, DepthFormat};
 use spritesheet::Spritesheet;
@@ -37,6 +37,7 @@ fn setup_world(world: &mut World, window: &glutin::Window, font: &Arc<Font<'stat
     world.add_resource::<Input>(Input::new(window.hidpi_factor(), vec![VirtualKeyCode::W, VirtualKeyCode::A, VirtualKeyCode::S, VirtualKeyCode::D]));
     world.add_resource::<Resources>(Resources::new());
     world.register::<AnimationSheet>();
+    world.register::<Button>();
     world.register::<CurrentPower>();
     world.register::<Color>();
     world.register::<CoalCount>();
@@ -80,6 +81,16 @@ fn setup_world(world: &mut World, window: &glutin::Window, font: &Arc<Font<'stat
         .with(Transform::new(0, 0, 64, 64, 0.0, 1.0, 1.0))
         .with(Color([1.0, 1.0, 1.0, 0.6]));
 
+    world.create_entity()
+        .with(Button::new("build".to_string(), ["build.png".to_string(), "build_hover.png".to_string()]))
+        .with(Transform::new(670, 32, 96, 32, 0.0, 1.0, 1.0))
+        .with(Sprite{ frame_name: "build.png".to_string(), visible: true });
+
+    world.create_entity()
+        .with(Button::new("sell".to_string(), ["sell.png".to_string(), "sell_hover.png".to_string()]))
+        .with(Transform::new(790, 32, 96, 32, 0.0, 1.0, 1.0))
+        .with(Sprite{ frame_name: "sell.png".to_string(), visible: true });
+
     for row in 0i32..10i32 {
         for col in 0i32..10i32 {
             let size = Tile::get_size();
@@ -108,6 +119,8 @@ fn main() {
         .add(systems::AnimationSystem::new(), "animation_system", &[])
         .add(systems::PowerUsage::new(), "power_system", &[])
         .add(systems::TileSelection{}, "tile_selection", &[])
+        .add(systems::ButtonHover{}, "button_hover", &[])
+        .add(systems::SellEnergy{}, "sell_energy", &[])
         .build();
 
     let target = renderer::WindowTargets{

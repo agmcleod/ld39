@@ -17,6 +17,13 @@ impl Transform {
             scale: Vector2{ x: scale_x, y: scale_y },
         }
     }
+
+    pub fn contains(&self, x: &i32, y: &i32) -> bool {
+        let w = self.size.x as i32;
+        let h = self.size.y as i32;
+        self.pos.x <= *x && self.pos.x + w >= *x &&
+        self.pos.y <= *y && self.pos.y + h >= *y
+    }
 }
 
 impl Component for Transform {

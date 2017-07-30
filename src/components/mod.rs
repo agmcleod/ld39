@@ -1,4 +1,5 @@
 mod animation_sheet;
+mod button;
 mod camera;
 mod coal_count;
 mod color;
@@ -15,6 +16,7 @@ mod tile;
 mod transform;
 
 pub use self::animation_sheet::*;
+pub use self::button::*;
 pub use self::camera::*;
 pub use self::coal_count::*;
 pub use self::color::*;

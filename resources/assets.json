@@ -1,8 +1,24 @@
 {"frames": [
 
 {
+	"filename": "build.png",
+	"frame": {"x":362,"y":2,"w":96,"h":32},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":96,"h":32},
+	"sourceSize": {"w":96,"h":32}
+},
+{
+	"filename": "build_hover.png",
+	"frame": {"x":264,"y":2,"w":96,"h":32},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":96,"h":32},
+	"sourceSize": {"w":96,"h":32}
+},
+{
 	"filename": "coal.png",
-	"frame": {"x":330,"y":2,"w":32,"h":32},
+	"frame": {"x":460,"y":2,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
@@ -10,11 +26,27 @@
 },
 {
 	"filename": "powerbar.png",
-	"frame": {"x":68,"y":2,"w":260,"h":32},
+	"frame": {"x":2,"y":68,"w":260,"h":32},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":260,"h":32},
 	"sourceSize": {"w":260,"h":32}
+},
+{
+	"filename": "sell.png",
+	"frame": {"x":166,"y":2,"w":96,"h":32},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":96,"h":32},
+	"sourceSize": {"w":96,"h":32}
+},
+{
+	"filename": "sell_hover.png",
+	"frame": {"x":68,"y":2,"w":96,"h":32},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":96,"h":32},
+	"sourceSize": {"w":96,"h":32}
 },
 {
 	"filename": "tiles.png",
@@ -29,8 +61,8 @@
 	"version": "1.0",
 	"image": "assets.png",
 	"format": "RGBA8888",
-	"size": {"w":364,"h":68},
+	"size": {"w":512,"h":128},
 	"scale": "1",
-	"smartupdate": "$TexturePacker:SmartUpdate:935858639df34cd83caeadb775693f92:d0b87c252b645fc3b0c78e607fb1de03:a759b6bbc8381ac9c472b28f589ad0d6$"
+	"smartupdate": "$TexturePacker:SmartUpdate:5e60e082762f5fb47f6e69e79a79706c:af7ed55ad1ee61b50b23a58a1b4e7fda:a759b6bbc8381ac9c472b28f589ad0d6$"
 }
 }
