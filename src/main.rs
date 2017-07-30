@@ -133,7 +133,7 @@ fn create_click_sound(endpoint: &rodio::Endpoint) -> Decoder<BufReader<File>> {
     rodio::Decoder::new(BufReader::new(audio_file)).unwrap()
 }
 
-fn play_music(endpoint: &rodio::Endpoint) {
+fn play_music(endpoint: &rodio::Endpoint) -> rodio::Sink {
     let sink = rodio::Sink::new(&endpoint);
 
     let music_file = File::open(&Path::new("./resources/ld39.wav")).unwrap();
@@ -141,7 +141,7 @@ fn play_music(endpoint: &rodio::Endpoint) {
     sink.append(source.repeat_infinite());
 
     sink.play();
-    sink.detach();
+    sink
 }
 
 fn main() {
@@ -187,7 +187,7 @@ fn main() {
     let audio_endpoint = rodio::get_default_endpoint().unwrap();
     let click_sound_source = create_click_sound(&audio_endpoint);
     let click_sound_source = click_sound_source.buffered();
-    play_music(&audio_endpoint);
+    let music = play_music(&audio_endpoint);
 
     setup_world(&mut world, &window, &font);
 
@@ -332,4 +332,6 @@ fn main() {
         window.swap_buffers().unwrap();
         device.cleanup();
     }
+
+    music.stop();
 }
