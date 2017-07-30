@@ -137,6 +137,7 @@ fn main() {
         .add(systems::ButtonHover{}, "button_hover", &[])
         .add(systems::SellEnergy{}, "sell_energy", &["button_hover"])
         .add(systems::BuildGatherer{}, "build_gatherer", &["button_hover"])
+        .add(systems::Gathering{}, "gathering", &[])
         .build();
 
     let target = renderer::WindowTargets{

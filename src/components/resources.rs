@@ -1,5 +1,6 @@
 use std::cmp;
 use specs::{Component, HashMapStorage};
+use components::GathererType;
 
 #[derive(Copy, Clone)]
 pub enum ResourceType {
@@ -78,6 +79,20 @@ impl Resources {
 
     pub fn get_current_type(&self) -> &ResourceType {
         &self.current_type
+    }
+
+    pub fn increase_type_for_gatherer_type(&mut self, gatherer_type: &GathererType) {
+        match *gatherer_type {
+            GathererType::Coal => {
+                self.coal += 1;
+            },
+            GathererType::Oil => {
+                self.oil += 1;
+            },
+            GathererType::Clean => {
+                self.clean += 1;
+            },
+        }
     }
 }
 

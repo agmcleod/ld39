@@ -1,3 +1,4 @@
+use std::time::Instant;
 use specs::{Component, VecStorage};
 use components::ResourceType;
 
@@ -35,12 +36,14 @@ impl GathererType {
 
 pub struct Gatherer {
     pub gatherer_type: GathererType,
+    pub gather_tick: Instant,
 }
 
 impl Gatherer {
     pub fn new(resource_type: &ResourceType) -> Gatherer {
         Gatherer{
             gatherer_type: GathererType::get_type_for_resources_type(resource_type),
+            gather_tick: Instant::now(),
         }
     }
 }
