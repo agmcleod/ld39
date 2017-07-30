@@ -1,6 +1,7 @@
 mod animation_sheet;
 mod button;
 mod camera;
+mod click_sound;
 mod coal_count;
 mod color;
 mod current_power;
@@ -20,6 +21,7 @@ pub use self::animation_sheet::*;
 pub use self::button::*;
 pub use self::camera::*;
 pub use self::coal_count::*;
+pub use self::click_sound::*;
 pub use self::color::*;
 pub use self::current_power::*;
 pub use self::gatherer::*;

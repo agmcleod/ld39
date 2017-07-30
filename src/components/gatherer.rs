@@ -9,7 +9,7 @@ pub enum GathererType {
 }
 
 impl GathererType {
-    fn get_type_for_resources_type(resource_type: &ResourceType) -> GathererType {
+    pub fn get_type_for_resources_type(resource_type: &ResourceType) -> GathererType {
         match *resource_type {
             ResourceType::Coal => GathererType::Coal,
             ResourceType::Oil => GathererType::Oil,

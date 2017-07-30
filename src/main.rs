@@ -7,6 +7,7 @@ extern crate specs;
 extern crate cgmath;
 extern crate serde;
 extern crate image;
+extern crate rodio;
 #[macro_use]
 extern crate serde_derive;
 extern crate serde_json;
@@ -23,19 +24,24 @@ mod utils;
 use std::collections::HashMap;
 use std::sync::Arc;
 use std::ops::{DerefMut};
+use std::io::BufReader;
+use std::fs::File;
+use std::path::Path;
 use rusttype::{FontCollection, Font, Scale, point, PositionedGlyph};
-use components::{AnimationSheet, Button, Camera, CoalCount, Color, CurrentPower, Gatherer, HighlightTile, Input, PowerBar, Rect, Resources, SelectedTile, Sprite, Text, Tile, Transform};
+use components::{AnimationSheet, Button, Camera, ClickSound, CoalCount, Color, CurrentPower, Gatherer, GathererType, HighlightTile, Input, PowerBar, Rect, Resources, SelectedTile, Sprite, Text, Tile, Transform};
 use specs::{DispatcherBuilder, Join, World};
 use renderer::{ColorFormat, DepthFormat};
 use spritesheet::Spritesheet;
 use glutin::{Event, ElementState, MouseButton, VirtualKeyCode, WindowEvent};
 use glutin::GlContext;
 use gfx::{Device, Factory};
+use rodio::Source;
 
-fn setup_world(world: &mut World, window: &glutin::Window, font: &Arc<Font<'static>>) {
+fn setup_world(world: &mut World, window: &glutin::Window, font: &Arc<Font<'static>>, click_sound: rodio::Sink) {
     world.add_resource::<Camera>(Camera(renderer::get_ortho()));
     world.add_resource::<Input>(Input::new(window.hidpi_factor(), vec![VirtualKeyCode::W, VirtualKeyCode::A, VirtualKeyCode::S, VirtualKeyCode::D]));
     world.add_resource::<Resources>(Resources::new());
+    world.add_resource::<ClickSound>(ClickSound{ sound: click_sound });
     world.register::<AnimationSheet>();
     world.register::<Button>();
     world.register::<CurrentPower>();
@@ -92,13 +98,15 @@ fn setup_world(world: &mut World, window: &glutin::Window, font: &Arc<Font<'stat
         .with(Transform::new(820, 32, 96, 32, 0.0, 1.0, 1.0))
         .with(Sprite{ frame_name: "sell.png".to_string(), visible: true });
 
+    // build
     let mut text = Text::new(&font, 32.0);
-    text.set_text("20".to_string());
+    text.set_text(format!("{}", GathererType::Coal.get_build_cost()));
     world.create_entity()
         .with(Transform::new(775, 32, 0, 0, 0.0, 1.0, 1.0))
         .with(text)
         .with(Color([0.0, 1.0, 0.0, 1.0]));
 
+    // sell
     let mut text = Text::new(&font, 32.0);
     text.set_text("10".to_string());
     world.create_entity()
@@ -115,6 +123,25 @@ fn setup_world(world: &mut World, window: &glutin::Window, font: &Arc<Font<'stat
                 .with(Tile{});
         }
     }
+}
+
+fn create_click_sound(endpoint: &rodio::Endpoint) -> rodio::Sink {
+    let sink = rodio::Sink::new(&endpoint);
+
+    let audio_file = File::open(&Path::new("./resources/click.wav")).unwrap();
+    sink.append(rodio::Decoder::new(BufReader::new(audio_file)).unwrap());
+    sink
+}
+
+fn play_music(endpoint: &rodio::Endpoint) -> rodio::Sink {
+    let sink = rodio::Sink::new(&endpoint);
+
+    let music_file = File::open(&Path::new("./resources/ld39.wav")).unwrap();
+    let source = rodio::Decoder::new(BufReader::new(music_file)).unwrap();
+    sink.append(source.repeat_infinite());
+
+    sink.play();
+    sink
 }
 
 fn main() {
@@ -157,7 +184,12 @@ fn main() {
     let font = Arc::new(font_collection.into_font().unwrap());
     let mut glyph_cache: HashMap<String, gfx::handle::ShaderResourceView<gfx_device_gl::Resources, [f32; 4]>> = HashMap::new();
 
-    setup_world(&mut world, &window, &font);
+    let audio_endpoint = rodio::get_default_endpoint().unwrap();
+    let click_sound = create_click_sound(&audio_endpoint);
+    play_music(&audio_endpoint);
+
+    setup_world(&mut world, &window, &font, click_sound);
+
 
     let mut running = true;
     while running {

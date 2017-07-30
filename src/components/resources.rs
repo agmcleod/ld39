@@ -77,8 +77,8 @@ impl Resources {
         amount
     }
 
-    pub fn get_current_type(&self) -> &ResourceType {
-        &self.current_type
+    pub fn get_current_type(&self) -> ResourceType {
+        self.current_type
     }
 
     pub fn increase_type_for_gatherer_type(&mut self, gatherer_type: &GathererType) {

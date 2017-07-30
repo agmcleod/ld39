@@ -1,19 +1,22 @@
 use std::ops::{Deref, DerefMut};
-use specs::{Fetch, FetchMut, Join, ReadStorage, WriteStorage, System};
-use components::{Input, Button, PowerBar, Resources};
+use specs::{Fetch, FetchMut, Join, WriteStorage, System};
+use components::{ClickSound, Input, Button, PowerBar, Resources};
 
 pub struct SellEnergy;
 
 impl<'a> System<'a> for SellEnergy {
     type SystemData = (
         WriteStorage<'a, Button>,
+        Fetch<'a, ClickSound>,
         Fetch<'a, Input>,
         WriteStorage<'a, PowerBar>,
         FetchMut<'a, Resources>,
     );
 
     fn run(&mut self, data: Self::SystemData) {
-        let (mut button_storage, input_storage, mut power_bar_storage, mut resources_storage) = data;
+        let (mut button_storage, click_sound_storage, input_storage, mut power_bar_storage, mut resources_storage) = data;
+
+        let click_sound: &ClickSound = click_sound_storage.deref();
 
         let input: &Input = input_storage.deref();
         let resources: &mut Resources = resources_storage.deref_mut();
@@ -21,6 +24,7 @@ impl<'a> System<'a> for SellEnergy {
         let mut sell_button_clicked = false;
         for button in (&mut button_storage).join() {
             if button.name == "sell".to_string() && button.clicked(&input) {
+                click_sound.sound.play();
                 sell_button_clicked = true;
             }
         }
