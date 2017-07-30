@@ -1,6 +1,6 @@
 use std::ops::DerefMut;
 use std::time::Instant;
-use components::{CoalCount, CurrentPower, PowerBar, Resources, Text, Transform};
+use components::{ResourceCount, CurrentPower, PowerBar, Resources, Text, Transform};
 use specs::{FetchMut, ReadStorage, WriteStorage, Join, System};
 use utils::math;
 
@@ -18,7 +18,7 @@ impl PowerUsage {
 
 impl<'b> System<'b> for PowerUsage {
     type SystemData = (
-        ReadStorage<'b, CoalCount>,
+        ReadStorage<'b, ResourceCount>,
         ReadStorage<'b, CurrentPower>,
         FetchMut<'b, Resources>,
         WriteStorage<'b, PowerBar>,
@@ -27,7 +27,7 @@ impl<'b> System<'b> for PowerUsage {
     );
 
     fn run(&mut self, data: Self::SystemData) {
-        let (coal_count_storage, current_power_storage, mut resources_storage, mut power_storage, mut text_storage, mut transform_storage) = data;
+        let (resource_count_storage, current_power_storage, mut resources_storage, mut power_storage, mut text_storage, mut transform_storage) = data;
         let resources: &mut Resources = resources_storage.deref_mut();
 
         let mut power_left = 0;
@@ -48,8 +48,8 @@ impl<'b> System<'b> for PowerUsage {
             transform.size.x = width as u16;
         }
 
-        for (_, text) in (&coal_count_storage, &mut text_storage).join() {
-            let new_text = format!("{}", resources.coal);
+        for (resource_count, text) in (&resource_count_storage, &mut text_storage).join() {
+            let new_text = format!("{}", resources.get_amount_for_type(&resource_count.resource_type));
             if new_text != text.text {
                 text.set_text(new_text);
             }

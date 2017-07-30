@@ -30,7 +30,7 @@ impl<'a> System<'a> for SellEnergy {
         }
 
         if sell_button_clicked {
-            let amount = resources.get_resources(10);
+            let amount = resources.get_resources(10) / 2;
             for power_bar in (&mut power_bar_storage).join() {
                 power_bar.add_power(amount);
             }

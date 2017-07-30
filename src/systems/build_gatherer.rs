@@ -37,7 +37,7 @@ impl<'a> System<'a> for BuildGatherer {
         let mut selected_tile_y = 0;
         for (selected_tile, transform) in (&mut selected_tile_storage, &transform_storage).join() {
             let amount = GathererType::get_type_for_resources_type(&resources.get_current_type()).get_build_cost();
-            if button_pressed && selected_tile.visible && resources.get_resources_to_buy(amount) > 0 {
+            if button_pressed && selected_tile.visible && resources.get_resources(amount) > 0 {
                 selected_tile.visible = false;
                 create = true;
 
@@ -50,7 +50,7 @@ impl<'a> System<'a> for BuildGatherer {
             let gatherer = Gatherer::new(&resources.get_current_type());
             let mut anim = AnimationSheet::new(1.0);
             anim.add_animation("default".to_string(), gatherer.gatherer_type.get_frames());
-            anim.current_animation = "default".to_string();
+            anim.set_current_animation("default".to_string());
             let gatherer_entity = entities.create();
             gatherer_storage.insert(gatherer_entity, gatherer);
             animation_sheet_storage.insert(gatherer_entity, anim);

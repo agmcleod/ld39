@@ -60,7 +60,7 @@ impl<R> Basic<R>
         let texels = [[0xff, 0xff, 0xff, 0xff]];
         let (_, texture_view) = factory.create_texture_immutable::<gfx::format::Rgba8>(
             texture::Kind::D2(1, 1, texture::AaMode::Single), &[&texels]
-            ).unwrap();
+        ).unwrap();
 
         let sinfo = texture::SamplerInfo::new(
             texture::FilterMethod::Bilinear,

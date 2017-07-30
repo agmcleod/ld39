@@ -34,8 +34,8 @@ impl AnimationSheet {
             .get(self.current_index).unwrap()
     }
 
-    pub fn set_current_animation(&mut self, frame_name: String) {
-        self.current_animation = frame_name;
+    pub fn set_current_animation(&mut self, name: String) {
+        self.current_animation = name;
         self.current_index = 0;
     }
 }

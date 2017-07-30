@@ -28,7 +28,7 @@ use std::io::BufReader;
 use std::fs::File;
 use std::path::Path;
 use rusttype::{FontCollection, Font, Scale, point, PositionedGlyph};
-use components::{AnimationSheet, Button, Camera, ClickSound, CoalCount, Color, CurrentPower, Gatherer, GathererType, HighlightTile, Input, PowerBar, Rect, Resources, SelectedTile, Sprite, Text, Tile, Transform};
+use components::{AnimationSheet, BuildCost, Button, Camera, ClickSound, ResourceCount, Color, CurrentPower, Gatherer, GathererType, HighlightTile, Input, PowerBar, Rect, Resources, ResourceType, SelectedTile, SellCost, Sprite, Text, Tile, Transform, Upgrade, UpgradeCost};
 use specs::{DispatcherBuilder, Join, World};
 use renderer::{ColorFormat, DepthFormat};
 use spritesheet::Spritesheet;
@@ -38,25 +38,36 @@ use gfx::{Device, Factory};
 use rodio::Source;
 use rodio::decoder::Decoder;
 
+#[derive(Debug)]
+struct GlyphCacheEntry{
+    view: gfx::handle::ShaderResourceView<gfx_device_gl::Resources, [f32; 4]>,
+    width: u16,
+    height: u16,
+}
+
 fn setup_world(world: &mut World, window: &glutin::Window, font: &Arc<Font<'static>>) {
     world.add_resource::<Camera>(Camera(renderer::get_ortho()));
     world.add_resource::<Input>(Input::new(window.hidpi_factor(), vec![VirtualKeyCode::W, VirtualKeyCode::A, VirtualKeyCode::S, VirtualKeyCode::D]));
     world.add_resource::<Resources>(Resources::new());
     world.add_resource::<ClickSound>(ClickSound{ play: false });
     world.register::<AnimationSheet>();
+    world.register::<BuildCost>();
     world.register::<Button>();
     world.register::<CurrentPower>();
     world.register::<Color>();
-    world.register::<CoalCount>();
+    world.register::<ResourceCount>();
     world.register::<Gatherer>();
     world.register::<HighlightTile>();
     world.register::<PowerBar>();
     world.register::<Rect>();
+    world.register::<SellCost>();
     world.register::<SelectedTile>();
     world.register::<Sprite>();
     world.register::<Text>();
     world.register::<Tile>();
     world.register::<Transform>();
+    world.register::<Upgrade>();
+    world.register::<UpgradeCost>();
     world.create_entity()
         .with(PowerBar::new())
         .with(Transform::new(670, 576, 260, 32, 0.0, 1.0, 1.0))
@@ -69,12 +80,12 @@ fn setup_world(world: &mut World, window: &glutin::Window, font: &Arc<Font<'stat
         .with(Color([0.0, 1.0, 0.0, 1.0]));
 
     world.create_entity()
-        .with(CoalCount{})
+        .with(ResourceCount{ resource_type: ResourceType::Coal })
         .with(Transform::new(670, 500, 32, 32, 0.0, 1.0, 1.0))
         .with(Sprite{ frame_name: "coal.png".to_string(), visible: true });
 
     world.create_entity()
-        .with(CoalCount{})
+        .with(ResourceCount{ resource_type: ResourceType::Coal })
         .with(Transform::new(720, 500, 32, 32, 0.0, 1.0, 1.0))
         .with(Text::new(&font, 32.0))
         .with(Color([0.0, 1.0, 0.0, 1.0]));
@@ -99,10 +110,26 @@ fn setup_world(world: &mut World, window: &glutin::Window, font: &Arc<Font<'stat
         .with(Transform::new(820, 32, 96, 32, 0.0, 1.0, 1.0))
         .with(Sprite{ frame_name: "sell.png".to_string(), visible: true });
 
+    // upgrade stuff
+    world.create_entity()
+        .with(Button::new("upgrade".to_string(), ["refinery_button_1.png".to_string(), "refinery_button_2.png".to_string()]))
+        .with(Transform::new(670, 90, 64, 64, 0.0, 1.0, 1.0))
+        .with(Upgrade::new())
+        .with(Sprite{ frame_name: "refinery_1.png".to_string(), visible: true });
+
+    let mut text = Text::new(&font, 32.0);
+    text.set_text(format!("{}", Upgrade::new().get_cost()));
+    world.create_entity()
+        .with(UpgradeCost{})
+        .with(text)
+        .with(Transform::new(750, 100, 32, 32, 0.0, 1.0, 1.0))
+        .with(Color([0.0, 1.0, 0.0, 1.0]));
+
     // build
     let mut text = Text::new(&font, 32.0);
     text.set_text(format!("{}", GathererType::Coal.get_build_cost()));
     world.create_entity()
+        .with(BuildCost{})
         .with(Transform::new(775, 32, 0, 0, 0.0, 1.0, 1.0))
         .with(text)
         .with(Color([0.0, 1.0, 0.0, 1.0]));
@@ -111,6 +138,7 @@ fn setup_world(world: &mut World, window: &glutin::Window, font: &Arc<Font<'stat
     let mut text = Text::new(&font, 32.0);
     text.set_text("10".to_string());
     world.create_entity()
+        .with(SellCost{})
         .with(Transform::new(925, 32, 0, 0, 0.0, 1.0, 1.0))
         .with(text)
         .with(Color([0.0, 1.0, 0.0, 1.0]));
@@ -126,17 +154,15 @@ fn setup_world(world: &mut World, window: &glutin::Window, font: &Arc<Font<'stat
     }
 }
 
-fn create_click_sound(endpoint: &rodio::Endpoint) -> Decoder<BufReader<File>> {
-    let sink = rodio::Sink::new(&endpoint);
-
-    let audio_file = File::open(&Path::new("./resources/click.wav")).unwrap();
+fn create_click_sound() -> Decoder<BufReader<File>> {
+    let audio_file = File::open(&Path::new("./resources/click.ogg")).unwrap();
     rodio::Decoder::new(BufReader::new(audio_file)).unwrap()
 }
 
 fn play_music(endpoint: &rodio::Endpoint) -> rodio::Sink {
     let sink = rodio::Sink::new(&endpoint);
 
-    let music_file = File::open(&Path::new("./resources/ld39.wav")).unwrap();
+    let music_file = File::open(&Path::new("./resources/ld39.ogg")).unwrap();
     let source = rodio::Decoder::new(BufReader::new(music_file)).unwrap();
     sink.append(source.repeat_infinite());
 
@@ -165,6 +191,7 @@ fn main() {
         .add(systems::SellEnergy{}, "sell_energy", &["button_hover"])
         .add(systems::BuildGatherer{}, "build_gatherer", &["button_hover"])
         .add(systems::Gathering{}, "gathering", &[])
+        .add(systems::UpgradeResource{}, "upgrade_resource", &[])
         .build();
 
     let target = renderer::WindowTargets{
@@ -182,11 +209,10 @@ fn main() {
     let font_data = include_bytes!("../resources/MunroSmall.ttf");
     let font_collection = FontCollection::from_bytes(font_data as &[u8]);
     let font = Arc::new(font_collection.into_font().unwrap());
-    let mut glyph_cache: HashMap<String, gfx::handle::ShaderResourceView<gfx_device_gl::Resources, [f32; 4]>> = HashMap::new();
+    let mut glyph_cache: HashMap<String, GlyphCacheEntry> = HashMap::new();
 
     let audio_endpoint = rodio::get_default_endpoint().unwrap();
-    let click_sound_source = create_click_sound(&audio_endpoint);
-    let click_sound_source = click_sound_source.buffered();
+    let click_sound_source = create_click_sound().buffered();
     let music = play_music(&audio_endpoint);
 
     setup_world(&mut world, &window, &font);
@@ -311,20 +337,23 @@ fn main() {
                         }
                     }
 
-                    transform.size.x = width as u16;
-                    transform.size.y = pixel_height as u16;
-
                     let kind = gfx::texture::Kind::D2(
                         width as gfx::texture::Size,
                         pixel_height as gfx::texture::Size,
                         gfx::texture::AaMode::Single,
                     );
-                    let (_, view) = factory.create_texture_immutable_u8::<ColorFormat>(kind, &[&pixel_data]).unwrap();
-                    glyph_cache.insert(text.text.clone(), view);
+                    let tex = factory.create_texture_immutable_u8::<ColorFormat>(kind, &[&pixel_data]);
+                    let (_, view) = tex.unwrap();
+                    glyph_cache.insert(text.text.clone(), GlyphCacheEntry{ view: view, width: width as u16, height: pixel_height as u16 });
                 }
+                let entry = glyph_cache.get(&text.text).unwrap();
+                transform.size.x = entry.width;
+                transform.size.y = entry.height;
             }
 
-            basic.render(&mut encoder, &world, &mut factory, &transform, None, &spritesheet, Some(color.0), Some(glyph_cache.get(&text.text).unwrap()));
+            if text.text != "" {
+                basic.render(&mut encoder, &world, &mut factory, &transform, None, &spritesheet, Some(color.0), Some(&glyph_cache.get(&text.text).unwrap().view));
+            }
         }
 
         encoder.flush(&mut device);

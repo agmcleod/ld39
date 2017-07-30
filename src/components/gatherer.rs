@@ -19,16 +19,16 @@ impl GathererType {
 
     pub fn get_build_cost(&self) -> usize {
         match *self {
-            GathererType::Coal => 15,
-            GathererType::Oil => 25,
-            GathererType::Clean => 50,
+            GathererType::Coal => 18,
+            GathererType::Oil => 35,
+            GathererType::Clean => 75,
         }
     }
 
     pub fn get_frames(&self) -> Vec<String> {
         match *self {
             GathererType::Coal => vec!["wheelbarrel.png".to_string()],
-            GathererType::Oil => vec!["refinery.png".to_string()],
+            GathererType::Oil => vec!["refinery_1.png".to_string(), "refinery_2.png".to_string(), "refinery_3.png".to_string(), "refinery_4.png".to_string(), "refinery_5.png".to_string(), "refinery_6.png".to_string(), "refinery_7.png".to_string(), "refinery_8.png".to_string()],
             GathererType::Clean => vec!["plant.png".to_string()],
         }
     }

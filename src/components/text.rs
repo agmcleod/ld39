@@ -22,6 +22,15 @@ impl Text {
         }
     }
 
+    pub fn new_from(scale: Scale, offset: Point<f32>) -> Text {
+        Text{
+            scale: scale,
+            offset: offset,
+            new_data: false,
+            text: "".to_string(),
+        }
+    }
+
     pub fn calc_text_width(&self, glyphs: &[PositionedGlyph]) -> f32 {
         glyphs.last().unwrap().pixel_bounding_box().unwrap().max.x as f32
     }

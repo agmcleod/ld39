@@ -5,6 +5,7 @@ mod gathering;
 mod power_usage;
 mod sell_energy;
 mod tile_selection;
+mod upgrade_resource;
 
 pub use self::animation_system::*;
 pub use self::build_gatherer::*;
@@ -13,3 +14,4 @@ pub use self::gathering::*;
 pub use self::power_usage::*;
 pub use self::sell_energy::*;
 pub use self::tile_selection::*;
+pub use self::upgrade_resource::*;

@@ -2,7 +2,7 @@ use std::cmp;
 use specs::{Component, HashMapStorage};
 use components::GathererType;
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub enum ResourceType {
     Coal,
     Oil,
@@ -10,20 +10,8 @@ pub enum ResourceType {
 }
 
 impl ResourceType {
-    fn get_ratio(&self) -> f32 {
-        match *self {
-            ResourceType::Coal => 0.3,
-            ResourceType::Oil => 0.6,
-            ResourceType::Clean => 1.0,
-        }
-    }
-
-    fn get_current_amount<'a>(&self, resources: &'a mut Resources) -> &'a mut usize {
-        match *self {
-            ResourceType::Coal => &mut resources.coal,
-            ResourceType::Oil => &mut resources.oil,
-            ResourceType::Clean => &mut resources.clean,
-        }
+    fn get_current_amount(&self, resources: &Resources) -> usize {
+        resources.coal + resources.oil + resources.clean
     }
 }
 
@@ -31,7 +19,7 @@ pub struct Resources {
     pub coal: usize,
     pub oil: usize,
     pub clean: usize,
-    current_type: ResourceType,
+    pub current_type: ResourceType,
 }
 
 impl Resources {
@@ -45,36 +33,45 @@ impl Resources {
     }
 
     pub fn get_resources(&mut self, amount: usize) -> usize {
-        let current_type = self.current_type.clone();
-        let current_amount = current_type.get_current_amount(self);
+        let coal = self.coal;
+        let oil = self.oil;
+        let clean = self.clean;
 
-        if *current_amount == 0 {
+        if amount > coal + oil + clean {
             return 0
         }
 
-        if amount > *current_amount {
-            let cp = *current_amount as f32;
-            *current_amount = 0;
-            return cmp::max(
-                (cp * current_type.get_ratio()).round() as usize
-                , 1
-            )
+        let mut m_amount = amount;
+        if coal > m_amount {
+            self.coal -= m_amount;
+            return amount
+        } else {
+            self.coal = 0;
+            m_amount -= coal;
         }
 
-        *current_amount -= amount;
-        (amount as f32 * current_type.get_ratio()).round() as usize
+        if oil > m_amount {
+            self.oil -= m_amount;
+            return amount
+        } else {
+            self.oil = 0;
+            m_amount -= oil;
+        }
+
+        self.clean -= m_amount;
+        return amount
     }
 
-    pub fn get_resources_to_buy(&mut self, amount: usize) -> usize {
-        let current_type = self.current_type.clone();
-        let current_amount = current_type.get_current_amount(self);
+    pub fn get_amount(&mut self) -> usize {
+        self.current_type.get_current_amount(self)
+    }
 
-        if *current_amount < amount {
-            return 0
+    pub fn get_amount_for_type(&self, resource_type: &ResourceType) -> usize {
+        match *resource_type {
+            ResourceType::Coal => self.coal,
+            ResourceType::Oil => self.oil,
+            ResourceType::Clean => self.clean,
         }
-
-        *current_amount -= amount;
-        amount
     }
 
     pub fn get_current_type(&self) -> ResourceType {
@@ -87,10 +84,10 @@ impl Resources {
                 self.coal += 1;
             },
             GathererType::Oil => {
-                self.oil += 1;
+                self.oil += 2;
             },
             GathererType::Clean => {
-                self.clean += 1;
+                self.clean += 4;
             },
         }
     }
