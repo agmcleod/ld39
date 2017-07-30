@@ -1,10 +1,12 @@
 #[macro_use]
 extern crate gfx;
+extern crate gfx_device_gl;
 extern crate gfx_window_glutin;
 extern crate glutin;
 extern crate specs;
 extern crate cgmath;
 extern crate serde;
+extern crate image;
 #[macro_use]
 extern crate serde_derive;
 extern crate serde_json;
@@ -18,18 +20,19 @@ mod spritesheet;
 mod systems;
 mod utils;
 
+use std::collections::HashMap;
 use std::sync::Arc;
 use std::ops::{DerefMut};
 use rusttype::{FontCollection, Font, Scale, point, PositionedGlyph};
-use components::{AnimationSheet, Camera, CoalCount, Color, CurrentPower, Input, PowerBar, Resources, Sprite, Text, Tile, Transform};
+use components::{AnimationSheet, Camera, CoalCount, Color, CurrentPower, Input, PowerBar, Rect, Resources, Sprite, Text, Tile, Transform};
 use specs::{DispatcherBuilder, Join, World};
 use renderer::{ColorFormat, DepthFormat};
 use spritesheet::Spritesheet;
 use glutin::{Event, ElementState, MouseButton, VirtualKeyCode, WindowEvent};
 use glutin::GlContext;
-use gfx::Device;
+use gfx::{Device, Factory};
 
-fn setup_world<R>(world: &mut World, window: &glutin::Window, font: &Arc<Font<'static>>) where R: gfx::Resources {
+fn setup_world(world: &mut World, window: &glutin::Window, font: &Arc<Font<'static>>) {
     world.add_resource::<Camera>(Camera(renderer::get_ortho()));
     world.add_resource::<Input>(Input::new(window.hidpi_factor(), vec![VirtualKeyCode::W, VirtualKeyCode::A, VirtualKeyCode::S, VirtualKeyCode::D]));
     world.register::<PowerBar>();
@@ -37,9 +40,10 @@ fn setup_world<R>(world: &mut World, window: &glutin::Window, font: &Arc<Font<'s
     world.register::<Color>();
     world.register::<AnimationSheet>();
     world.register::<CoalCount>();
+    world.register::<Rect>();
     world.register::<Resources>();
     world.register::<Sprite>();
-    world.register::<Text<R>>();
+    world.register::<Text>();
     world.register::<Tile>();
     world.register::<Transform>();
     world.create_entity()
@@ -50,6 +54,7 @@ fn setup_world<R>(world: &mut World, window: &glutin::Window, font: &Arc<Font<'s
     world.create_entity()
         .with(CurrentPower{})
         .with(Transform::new(674, 580, CurrentPower::get_max_with(), 24, 0.0, 1.0, 1.0))
+        .with(Rect{})
         .with(Color([0.0, 1.0, 0.0, 1.0]));
 
     world.create_entity()
@@ -57,11 +62,11 @@ fn setup_world<R>(world: &mut World, window: &glutin::Window, font: &Arc<Font<'s
         .with(Transform::new(670, 500, 32, 32, 0.0, 1.0, 1.0))
         .with(Sprite{ frame_name: "coal.png".to_string(), visible: true });
 
-    let text: Text<R> = Text::new(font.clone(), 32.0);
     world.create_entity()
         .with(CoalCount{})
         .with(Transform::new(720, 500, 32, 32, 0.0, 1.0, 1.0))
-        .with(text);
+        .with(Text::new(&font, 32.0))
+        .with(Color([0.0, 1.0, 0.0, 1.0]));
 
     for row in 0i32..10i32 {
         for col in 0i32..10i32 {
@@ -101,11 +106,12 @@ fn main() {
 
     let asset_data = loader::read_text_from_file("./resources/assets.json").unwrap();
     let spritesheet: Spritesheet = serde_json::from_str(asset_data.as_ref()).unwrap();
-    let asset_texture = loader::gfx_load_texture("./resources/assets.png", &factory);
+    let asset_texture = loader::gfx_load_texture("./resources/assets.png", &mut factory);
 
     let font_data = include_bytes!("../resources/MunroSmall.ttf");
     let font_collection = FontCollection::from_bytes(font_data as &[u8]);
     let font = Arc::new(font_collection.into_font().unwrap());
+    let mut glyph_cache: HashMap<String, gfx::handle::ShaderResourceView<gfx_device_gl::Resources, [f32; 4]>> = HashMap::new();
 
     setup_world(&mut world, &window, &font);
 
@@ -155,22 +161,69 @@ fn main() {
         encoder.clear_depth(&target.depth, 1.0);
 
         let sprites = world.read::<Sprite>();
-        let transforms = world.read::<Transform>();
+        let mut transforms = world.write::<Transform>();
         let animation_sheets = world.read::<AnimationSheet>();
         let colors = world.read::<Color>();
+        let mut texts = world.write::<Text>();
+        let rects = world.read::<Rect>();
 
         for (sprite, transform) in (&sprites, &transforms).join() {
             if sprite.visible {
-                basic.render(&mut encoder, &world, &mut factory, &transform, Some(&sprite.frame_name), &spritesheet, None, &asset_texture);
+                basic.render(&mut encoder, &world, &mut factory, &transform, Some(&sprite.frame_name), &spritesheet, None, Some(&asset_texture));
             }
         }
 
         for (animation_sheet, transform) in (&animation_sheets, &transforms).join() {
-            basic.render(&mut encoder, &world, &mut factory, &transform, Some(animation_sheet.get_current_frame()), &spritesheet, None, &asset_texture);
+            basic.render(&mut encoder, &world, &mut factory, &transform, Some(animation_sheet.get_current_frame()), &spritesheet, None, Some(&asset_texture));
         }
 
-        for (color, transform) in (&colors, &transforms).join() {
-            basic.render(&mut encoder, &world, &mut factory, &transform, None, &spritesheet, Some(color.0), &asset_texture);
+        for (color, transform, rect) in (&colors, &transforms, &rects).join() {
+            basic.render(&mut encoder, &world, &mut factory, &transform, None, &spritesheet, Some(color.0), None);
+        }
+
+        for (color, transform, text) in (&colors, &mut transforms, &mut texts).join() {
+            if text.new_data {
+                text.new_data = false;
+                if !glyph_cache.contains_key(&text.text) {
+                    let glyphs: Vec<_> = font.layout(text.text.as_ref(), text.scale, text.offset).collect();
+                    let pixel_height = text.scale.y.ceil() as usize;
+                    let width = text.calc_text_width(&glyphs) as usize;
+                    let mut pixel_data = vec![0u8; 4 * width * pixel_height];
+                    let mapping_scale = 255.0;
+                    for g in glyphs {
+                        if let Some(bb) = g.pixel_bounding_box() {
+                            // v is the amount of the pixel covered
+                            // by the glyph, in the range 0.0 to 1.0
+                            g.draw(|x, y, v| {
+                                let v = (v * mapping_scale + 0.5) as u8;
+                                let x = x as i32 + bb.min.x;
+                                let y = y as i32 + bb.min.y;
+                                // There's still a possibility that the glyph clips the boundaries of the bitmap
+                                if v > 0 && x >= 0 && x < width as i32 && y >= 0 && y < pixel_height as i32 {
+                                    let i = (x as usize + y as usize * width) * 4;
+                                    pixel_data[i] = 255;
+                                    pixel_data[i + 1] = 255;
+                                    pixel_data[i + 2] = 255;
+                                    pixel_data[i + 3] = v;
+                                }
+                            })
+                        }
+                    }
+
+                    transform.size.x = width as u16;
+                    transform.size.y = pixel_height as u16;
+
+                    let kind = gfx::texture::Kind::D2(
+                        width as gfx::texture::Size,
+                        pixel_height as gfx::texture::Size,
+                        gfx::texture::AaMode::Single,
+                    );
+                    let (_, view) = factory.create_texture_immutable_u8::<ColorFormat>(kind, &[&pixel_data]).unwrap();
+                    glyph_cache.insert(text.text.clone(), view);
+                }
+            }
+
+            basic.render(&mut encoder, &world, &mut factory, &transform, None, &spritesheet, Some(color.0), Some(glyph_cache.get(&text.text).unwrap()));
         }
 
         encoder.flush(&mut device);

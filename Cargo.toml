@@ -7,6 +7,7 @@ authors = ["Aaron"]
 specs = "0.9.3"
 glutin = "0.9.2"
 gfx = "0.16.1"
+gfx_device_gl = "0.14.1"
 gfx_window_glutin = "0.17.0"
 cgmath = "0.14.0"
 image = "0.14.0"

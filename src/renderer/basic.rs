@@ -89,7 +89,7 @@ impl<R> Basic<R>
         frame_name: Option<&String>,
         spritesheet: &Spritesheet,
         color: Option<[f32; 4]>,
-        texture: &gfx::handle::ShaderResourceView<R, [f32; 4]>)
+        texture: Option<&gfx::handle::ShaderResourceView<R, [f32; 4]>>)
         where R: gfx::Resources, C: gfx::CommandBuffer<R>, F: gfx::Factory<R>
     {
         use std::ops::Deref;
@@ -103,8 +103,8 @@ impl<R> Basic<R>
 
         let mut tx = 0.0;
         let mut ty = 0.0;
-        let mut tx2 = 0.0;
-        let mut ty2 = 0.0;
+        let mut tx2 = 1.0;
+        let mut ty2 = 1.0;
 
         if let Some(frame_name) = frame_name {
             let region = spritesheet.frames.iter().filter(|frame|
@@ -118,12 +118,15 @@ impl<R> Basic<R>
             ty2 = (region.frame.y as f32 + region.frame.h as f32) / sh;
         }
 
-        let tex: (gfx::handle::ShaderResourceView<R, [f32; 4]>, gfx::handle::Sampler<R>);
+        let tex: (gfx::handle::ShaderResourceView<R, [f32; 4]>, gfx::handle::Sampler<R>) = if let Some(texture) = texture {
+            (texture.clone(), factory.create_sampler_linear())
+        } else {
+            self.color_texture.clone()
+        };
+
         let color = if let Some(color) = color {
-            tex = self.color_texture.clone();
             color
         } else {
-            tex = (texture.clone(), factory.create_sampler_linear());
             [1.0; 4]
         };
 

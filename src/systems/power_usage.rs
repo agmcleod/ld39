@@ -1,5 +1,5 @@
 use std::time::Instant;
-use components::{CurrentPower, PowerBar, Transform};
+use components::{CoalCount, CurrentPower, PowerBar, Resources, Text, Transform};
 use specs::{ReadStorage, WriteStorage, Join, System};
 use utils::math;
 
@@ -15,15 +15,18 @@ impl PowerUsage {
     }
 }
 
-impl<'a> System<'a> for PowerUsage {
+impl<'b> System<'b> for PowerUsage {
     type SystemData = (
-        ReadStorage<'a, CurrentPower>,
-        WriteStorage<'a, PowerBar>,
-        WriteStorage<'a, Transform>,
+        ReadStorage<'b, CoalCount>,
+        ReadStorage<'b, CurrentPower>,
+        ReadStorage<'b, Resources>,
+        WriteStorage<'b, PowerBar>,
+        WriteStorage<'b, Text>,
+        WriteStorage<'b, Transform>,
     );
 
     fn run(&mut self, data: Self::SystemData) {
-        let (current_power_storage, mut power_storage, mut transform_storage) = data;
+        let (coal_count_storage, current_power_storage, resources_storage, mut power_storage, mut text_storage, mut transform_storage) = data;
 
         let mut power_left = 0;
         for power_bar in (&mut power_storage).join() {
@@ -41,6 +44,18 @@ impl<'a> System<'a> for PowerUsage {
         for (_, transform) in (&current_power_storage, &mut transform_storage).join() {
             let width = CurrentPower::get_max_with() as f32 * (power_left as f32 / 100.0);
             transform.size.x = width as u16;
+        }
+
+        let mut coal_count = 0;
+        for resources in (resources_storage).join() {
+            coal_count = resources.coal;
+        }
+
+        for (_, text) in (&coal_count_storage, &mut text_storage).join() {
+            let new_text = format!("{}", coal_count);
+            if new_text != text.text {
+                text.set_text(new_text);
+            }
         }
     }
 }

@@ -1,9 +1,9 @@
 use specs::{Component, HashMapStorage};
 
 pub struct Resources {
-    coal: usize,
-    oil: usize,
-    power: usize,
+    pub coal: usize,
+    pub oil: usize,
+    pub power: usize,
 }
 
 impl Resources {
