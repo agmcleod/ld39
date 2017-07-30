@@ -24,7 +24,7 @@ use std::collections::HashMap;
 use std::sync::Arc;
 use std::ops::{DerefMut};
 use rusttype::{FontCollection, Font, Scale, point, PositionedGlyph};
-use components::{AnimationSheet, Camera, CoalCount, Color, CurrentPower, Input, PowerBar, Rect, Resources, Sprite, Text, Tile, Transform};
+use components::{AnimationSheet, Camera, CoalCount, Color, CurrentPower, HighlightTile, Input, PowerBar, Rect, Resources, SelectedTile, Sprite, Text, Tile, Transform};
 use specs::{DispatcherBuilder, Join, World};
 use renderer::{ColorFormat, DepthFormat};
 use spritesheet::Spritesheet;
@@ -35,13 +35,15 @@ use gfx::{Device, Factory};
 fn setup_world(world: &mut World, window: &glutin::Window, font: &Arc<Font<'static>>) {
     world.add_resource::<Camera>(Camera(renderer::get_ortho()));
     world.add_resource::<Input>(Input::new(window.hidpi_factor(), vec![VirtualKeyCode::W, VirtualKeyCode::A, VirtualKeyCode::S, VirtualKeyCode::D]));
-    world.register::<PowerBar>();
+    world.add_resource::<Resources>(Resources::new());
+    world.register::<AnimationSheet>();
     world.register::<CurrentPower>();
     world.register::<Color>();
-    world.register::<AnimationSheet>();
     world.register::<CoalCount>();
+    world.register::<HighlightTile>();
+    world.register::<PowerBar>();
     world.register::<Rect>();
-    world.register::<Resources>();
+    world.register::<SelectedTile>();
     world.register::<Sprite>();
     world.register::<Text>();
     world.register::<Tile>();
@@ -68,10 +70,21 @@ fn setup_world(world: &mut World, window: &glutin::Window, font: &Arc<Font<'stat
         .with(Text::new(&font, 32.0))
         .with(Color([0.0, 1.0, 0.0, 1.0]));
 
+    world.create_entity()
+        .with(HighlightTile{ visible: false })
+        .with(Transform::new(0, 0, 64, 64, 0.0, 1.0, 1.0))
+        .with(Color([1.0, 1.0, 1.0, 0.3]));
+
+    world.create_entity()
+        .with(SelectedTile{ visible: false })
+        .with(Transform::new(0, 0, 64, 64, 0.0, 1.0, 1.0))
+        .with(Color([1.0, 1.0, 1.0, 0.6]));
+
     for row in 0i32..10i32 {
         for col in 0i32..10i32 {
+            let size = Tile::get_size();
             world.create_entity()
-                .with(Transform::new(64 * col, 64 * row, 64, 64, 0.0, 1.0, 1.0))
+                .with(Transform::new(size * col, size * row, size as u16, size as u16, 0.0, 1.0, 1.0))
                 .with(Sprite{ frame_name: "tiles.png".to_string(), visible: true })
                 .with(Tile{});
         }
@@ -94,6 +107,7 @@ fn main() {
     let mut dispatcher = DispatcherBuilder::new()
         .add(systems::AnimationSystem::new(), "animation_system", &[])
         .add(systems::PowerUsage::new(), "power_system", &[])
+        .add(systems::TileSelection{}, "tile_selection", &[])
         .build();
 
     let target = renderer::WindowTargets{
@@ -164,6 +178,8 @@ fn main() {
         let mut transforms = world.write::<Transform>();
         let animation_sheets = world.read::<AnimationSheet>();
         let colors = world.read::<Color>();
+        let highlight_tiles = world.read::<HighlightTile>();
+        let selected_tiles = world.read::<SelectedTile>();
         let mut texts = world.write::<Text>();
         let rects = world.read::<Rect>();
 
@@ -177,7 +193,19 @@ fn main() {
             basic.render(&mut encoder, &world, &mut factory, &transform, Some(animation_sheet.get_current_frame()), &spritesheet, None, Some(&asset_texture));
         }
 
-        for (color, transform, rect) in (&colors, &transforms, &rects).join() {
+        for (highlight_tile, color, transform) in (&highlight_tiles, &colors, &transforms).join() {
+            if highlight_tile.visible {
+                basic.render(&mut encoder, &world, &mut factory, &transform, None, &spritesheet, Some(color.0), None);
+            }
+        }
+
+        for (selected_tile, color, transform) in (&selected_tiles, &colors, &transforms).join() {
+            if selected_tile.visible {
+                basic.render(&mut encoder, &world, &mut factory, &transform, None, &spritesheet, Some(color.0), None);
+            }
+        }
+
+        for (color, transform, _) in (&colors, &transforms, &rects).join() {
             basic.render(&mut encoder, &world, &mut factory, &transform, None, &spritesheet, Some(color.0), None);
         }
 

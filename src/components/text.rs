@@ -1,4 +1,3 @@
-use std::sync::Arc;
 use specs::{Component, VecStorage};
 use rusttype::{Font, PositionedGlyph, Scale, point, Point};
 
