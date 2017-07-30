@@ -2,7 +2,7 @@
 
 {
 	"filename": "build.png",
-	"frame": {"x":362,"y":2,"w":96,"h":32},
+	"frame": {"x":330,"y":2,"w":96,"h":32},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":96,"h":32},
@@ -10,7 +10,7 @@
 },
 {
 	"filename": "build_hover.png",
-	"frame": {"x":264,"y":2,"w":96,"h":32},
+	"frame": {"x":264,"y":36,"w":96,"h":32},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":96,"h":32},
@@ -18,7 +18,7 @@
 },
 {
 	"filename": "coal.png",
-	"frame": {"x":460,"y":2,"w":32,"h":32},
+	"frame": {"x":264,"y":70,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
@@ -34,7 +34,7 @@
 },
 {
 	"filename": "sell.png",
-	"frame": {"x":166,"y":2,"w":96,"h":32},
+	"frame": {"x":232,"y":2,"w":96,"h":32},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":96,"h":32},
@@ -42,7 +42,7 @@
 },
 {
 	"filename": "sell_hover.png",
-	"frame": {"x":68,"y":2,"w":96,"h":32},
+	"frame": {"x":134,"y":2,"w":96,"h":32},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":96,"h":32},
@@ -50,6 +50,14 @@
 },
 {
 	"filename": "tiles.png",
+	"frame": {"x":68,"y":2,"w":64,"h":64},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":64,"h":64},
+	"sourceSize": {"w":64,"h":64}
+},
+{
+	"filename": "wheelbarrel.png",
 	"frame": {"x":2,"y":2,"w":64,"h":64},
 	"rotated": false,
 	"trimmed": false,
@@ -63,6 +71,6 @@
 	"format": "RGBA8888",
 	"size": {"w":512,"h":128},
 	"scale": "1",
-	"smartupdate": "$TexturePacker:SmartUpdate:5e60e082762f5fb47f6e69e79a79706c:af7ed55ad1ee61b50b23a58a1b4e7fda:a759b6bbc8381ac9c472b28f589ad0d6$"
+	"smartupdate": "$TexturePacker:SmartUpdate:1f9c88749efb21f0415a1692138b4057:f73acea38adec16eb96183ed09a54f33:a759b6bbc8381ac9c472b28f589ad0d6$"
 }
 }
