@@ -1,8 +1,7 @@
-use rodio::Sink;
 use specs::{Component, HashMapStorage};
 
 pub struct ClickSound {
-    pub sound: Sink,
+    pub play: bool,
 }
 
 impl Component for ClickSound {

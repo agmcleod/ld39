@@ -36,12 +36,13 @@ use glutin::{Event, ElementState, MouseButton, VirtualKeyCode, WindowEvent};
 use glutin::GlContext;
 use gfx::{Device, Factory};
 use rodio::Source;
+use rodio::decoder::Decoder;
 
-fn setup_world(world: &mut World, window: &glutin::Window, font: &Arc<Font<'static>>, click_sound: rodio::Sink) {
+fn setup_world(world: &mut World, window: &glutin::Window, font: &Arc<Font<'static>>) {
     world.add_resource::<Camera>(Camera(renderer::get_ortho()));
     world.add_resource::<Input>(Input::new(window.hidpi_factor(), vec![VirtualKeyCode::W, VirtualKeyCode::A, VirtualKeyCode::S, VirtualKeyCode::D]));
     world.add_resource::<Resources>(Resources::new());
-    world.add_resource::<ClickSound>(ClickSound{ sound: click_sound });
+    world.add_resource::<ClickSound>(ClickSound{ play: false });
     world.register::<AnimationSheet>();
     world.register::<Button>();
     world.register::<CurrentPower>();
@@ -125,15 +126,14 @@ fn setup_world(world: &mut World, window: &glutin::Window, font: &Arc<Font<'stat
     }
 }
 
-fn create_click_sound(endpoint: &rodio::Endpoint) -> rodio::Sink {
+fn create_click_sound(endpoint: &rodio::Endpoint) -> Decoder<BufReader<File>> {
     let sink = rodio::Sink::new(&endpoint);
 
     let audio_file = File::open(&Path::new("./resources/click.wav")).unwrap();
-    sink.append(rodio::Decoder::new(BufReader::new(audio_file)).unwrap());
-    sink
+    rodio::Decoder::new(BufReader::new(audio_file)).unwrap()
 }
 
-fn play_music(endpoint: &rodio::Endpoint) -> rodio::Sink {
+fn play_music(endpoint: &rodio::Endpoint) {
     let sink = rodio::Sink::new(&endpoint);
 
     let music_file = File::open(&Path::new("./resources/ld39.wav")).unwrap();
@@ -141,7 +141,7 @@ fn play_music(endpoint: &rodio::Endpoint) -> rodio::Sink {
     sink.append(source.repeat_infinite());
 
     sink.play();
-    sink
+    sink.detach();
 }
 
 fn main() {
@@ -185,11 +185,11 @@ fn main() {
     let mut glyph_cache: HashMap<String, gfx::handle::ShaderResourceView<gfx_device_gl::Resources, [f32; 4]>> = HashMap::new();
 
     let audio_endpoint = rodio::get_default_endpoint().unwrap();
-    let click_sound = create_click_sound(&audio_endpoint);
+    let click_sound_source = create_click_sound(&audio_endpoint);
+    let click_sound_source = click_sound_source.buffered();
     play_music(&audio_endpoint);
 
-    setup_world(&mut world, &window, &font, click_sound);
-
+    setup_world(&mut world, &window, &font);
 
     let mut running = true;
     while running {
@@ -244,6 +244,17 @@ fn main() {
         let selected_tiles = world.read::<SelectedTile>();
         let mut texts = world.write::<Text>();
         let rects = world.read::<Rect>();
+
+        let mut click_sound_storage = world.write_resource::<ClickSound>();
+        let click_sound: &mut ClickSound = click_sound_storage.deref_mut();
+        if click_sound.play {
+            click_sound.play = false;
+            let sink = rodio::Sink::new(&audio_endpoint);
+
+            sink.append(click_sound_source.clone());
+            sink.play();
+            sink.detach();
+        }
 
         for (sprite, transform) in (&sprites, &transforms).join() {
             if sprite.visible {

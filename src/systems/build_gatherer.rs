@@ -8,7 +8,7 @@ impl<'a> System<'a> for BuildGatherer {
     type SystemData = (
         WriteStorage<'a, AnimationSheet>,
         WriteStorage<'a, Button>,
-        Fetch<'a, ClickSound>,
+        FetchMut<'a, ClickSound>,
         Entities<'a>,
         WriteStorage<'a, Gatherer>,
         Fetch<'a, Input>,
@@ -18,17 +18,17 @@ impl<'a> System<'a> for BuildGatherer {
     );
 
     fn run(&mut self, data: Self::SystemData) {
-        let (mut animation_sheet_storage, mut button_storage, click_sound_storage, entities, mut gatherer_storage, input_storage, mut resources_storage, mut selected_tile_storage, mut transform_storage) = data;
+        let (mut animation_sheet_storage, mut button_storage, mut click_sound_storage, entities, mut gatherer_storage, input_storage, mut resources_storage, mut selected_tile_storage, mut transform_storage) = data;
 
         let resources: &mut Resources = resources_storage.deref_mut();
         let input: &Input = input_storage.deref();
-        let click_sound: &ClickSound = click_sound_storage.deref();
+        let click_sound: &mut ClickSound = click_sound_storage.deref_mut();
 
         let mut button_pressed = false;
         for button in (&mut button_storage).join() {
             if button.name == "build".to_string() && button.clicked(&input) {
                 button_pressed = true;
-                click_sound.sound.play();
+                click_sound.play = true;
             }
         }
 
