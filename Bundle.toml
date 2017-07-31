@@ -1,0 +1,12 @@
+name = "ld39"
+identifier = "com.agmcleod.ld39"
+version = "1.0.0"
+icons = ["icon.png"]
+resources = ["resources"]
+copyright = "Copyright (c) Aaron McLeod 2017. All rights reserved."
+short_description = "LD 39 entry by Aaron McLeod"
+long_description = """
+Start with coal energy, moving up into oil and solar in order to provide enough power for the city.
+
+Building 12 solar plants wins the game!
+"""

@@ -237,12 +237,13 @@ fn main() {
                         let input_event = input;
                         let mut input_res = world.write_resource::<Input>();
                         let mut input = input_res.deref_mut();
-                        let key = input_event.virtual_keycode.unwrap();
-                        if input.pressed_keys.contains_key(&key) {
-                            match input_event.state {
-                                ElementState::Pressed => input.pressed_keys.insert(key, true),
-                                ElementState::Released => input.pressed_keys.insert(key, false),
-                            };
+                        if let Some(key) = input_event.virtual_keycode {
+                            if input.pressed_keys.contains_key(&key) {
+                                match input_event.state {
+                                    ElementState::Pressed => input.pressed_keys.insert(key, true),
+                                    ElementState::Released => input.pressed_keys.insert(key, false),
+                                };
+                            }
                         }
                     },
                     _ => {}
