@@ -1,10 +1,11 @@
 extern crate image;
 extern crate gfx;
 use std::fs::File;
+use std::path::PathBuf;
 use std::io::Result;
 use std::io::prelude::Read;
 
-pub fn gfx_load_texture<F, R>(path: &str, factory: &mut F) -> gfx::handle::ShaderResourceView<R, [f32; 4]>
+pub fn gfx_load_texture<F, R>(path: PathBuf, factory: &mut F) -> gfx::handle::ShaderResourceView<R, [f32; 4]>
     where F: gfx::Factory<R>,
           R: gfx::Resources
 {
@@ -16,7 +17,7 @@ pub fn gfx_load_texture<F, R>(path: &str, factory: &mut F) -> gfx::handle::Shade
     view
 }
 
-pub fn read_text_from_file(path: &str) -> Result<String> {
+pub fn read_text_from_file(path: PathBuf) -> Result<String> {
   let mut text = String::new();
   let mut file = try!(File::open(path));
   try!(file.read_to_string(&mut text));
