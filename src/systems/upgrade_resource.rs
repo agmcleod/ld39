@@ -28,35 +28,27 @@ impl<'a> System<'a> for UpgradeResource {
         let input: &Input = input_storage.deref();
         let resources: &mut Resources = resources_storage.deref_mut();
 
-        let mut upgrade_clicked = false;
-        for button in (&mut button_storage).join() {
-            if button.clicked(&input) {
-                upgrade_clicked = true;
-            }
-        }
-
         let mut resource_type_changed = false;
         let mut upgrade_cost = 0;
 
-        if upgrade_clicked {
-            for (entity, upgrade, button) in (&*entities, &mut upgrade_storage, &mut button_storage).join() {
-                if resources.get_resources(upgrade.get_cost()) > 0 {
-                    resources.current_type = match resources.current_type {
-                        ResourceType::Coal => ResourceType::Oil,
-                        ResourceType::Oil => ResourceType::Clean,
-                        _ => panic!("Cannot upgrade"),
-                    };
+        for (entity, upgrade, button) in (&*entities, &mut upgrade_storage, &mut button_storage).join() {
+            if button.clicked(&input) && resources.get_resources(upgrade.get_cost()) > 0 {
+                resources.current_type = match resources.current_type {
+                    ResourceType::Coal => ResourceType::Oil,
+                    ResourceType::Oil => ResourceType::Clean,
+                    _ => panic!("Cannot upgrade"),
+                };
 
-                    resource_type_changed = true;
+                resource_type_changed = true;
 
-                    if resources.current_type == ResourceType::Clean {
-                        entities.delete(entity);
-                    } else {
-                        upgrade.gatherer_type = GathererType::Clean;
-                        upgrade_cost = upgrade.get_cost();
-                        button.frames[0] = "plant_button_1.png".to_string();
-                        button.frames[1] = "plant_button_2.png".to_string();
-                    }
+                if resources.current_type == ResourceType::Clean {
+                    println!("DELETE");
+                    entities.delete(entity);
+                } else {
+                    upgrade.gatherer_type = GathererType::Clean;
+                    upgrade_cost = upgrade.get_cost();
+                    button.frames[0] = "plant_button_1.png".to_string();
+                    button.frames[1] = "plant_button_2.png".to_string();
                 }
             }
         }

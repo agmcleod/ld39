@@ -2,6 +2,7 @@ use std::time::Instant;
 use specs::{Component, VecStorage};
 use components::ResourceType;
 
+#[derive(Debug)]
 pub enum GathererType {
     Coal,
     Oil,

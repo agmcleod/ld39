@@ -2,7 +2,7 @@ use std::cmp;
 use specs::{Component, HashMapStorage};
 use components::GathererType;
 
-#[derive(Copy, Clone, PartialEq)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 pub enum ResourceType {
     Coal,
     Oil,
