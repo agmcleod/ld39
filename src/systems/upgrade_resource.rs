@@ -42,7 +42,6 @@ impl<'a> System<'a> for UpgradeResource {
                 resource_type_changed = true;
 
                 if resources.current_type == ResourceType::Clean {
-                    println!("DELETE");
                     entities.delete(entity);
                 } else {
                     upgrade.gatherer_type = GathererType::Clean;
