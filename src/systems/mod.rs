@@ -4,6 +4,7 @@ mod button_hover;
 mod gathering;
 mod power_usage;
 mod sell_energy;
+pub mod shared;
 mod tile_selection;
 mod upgrade_resource;
 

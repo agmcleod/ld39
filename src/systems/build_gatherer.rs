@@ -66,13 +66,7 @@ impl<'a> System<'a> for BuildGatherer {
             if resources.get_current_type() == ResourceType::Clean {
                 for (text, win_count) in (&mut text_storage, &mut win_count_storage).join() {
                     win_count.count -= 1;
-                    let message = if win_count.count > 1 {
-                        format!("Build {} solar plants", win_count.count)
-                    } else if win_count.count == 1 {
-                        "Build 1 solar plant".to_string()
-                    } else {
-                        "Were saved!".to_string()
-                    };
+                    let message = win_count.get_message();
                     text.set_text(message);
                 }
             }

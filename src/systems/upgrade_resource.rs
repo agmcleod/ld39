@@ -2,13 +2,14 @@ use std::ops::{Deref, DerefMut};
 use specs::{Entities, Fetch, FetchMut, Join, ReadStorage, WriteStorage, System};
 use components::{BuildCost, Button, Color, Gatherer, GathererType, Input, Resources, ResourceCount, ResourceType, Sprite, Text, Transform, Upgrade, UpgradeCost, WinCount};
 use rusttype::{Point, Scale};
+use systems;
 
 pub struct UpgradeResource;
 
 impl<'a> System<'a> for UpgradeResource {
     type SystemData = (
         Entities<'a>,
-        WriteStorage<'a, BuildCost>,
+        ReadStorage<'a, BuildCost>,
         WriteStorage<'a, Button>,
         WriteStorage<'a, Color>,
         Fetch<'a, Input>,
@@ -52,12 +53,7 @@ impl<'a> System<'a> for UpgradeResource {
             }
         }
 
-        for (text, _) in (&mut text_storage, &build_cost_storage).join() {
-            let new_text = format!("{}", Gatherer::new(&resources.current_type).gatherer_type.get_build_cost());
-            if new_text != text.text {
-                text.set_text(new_text);
-            }
-        }
+        systems::shared::update_text(format!("{}", Gatherer::new(&resources.current_type).gatherer_type.get_build_cost()), &mut text_storage, &build_cost_storage);
 
         let mut added_new_resource_ui = false;
         let mut text_scale_to_copy: Option<Scale> = None;
@@ -103,12 +99,7 @@ impl<'a> System<'a> for UpgradeResource {
         }
 
         if resource_type_changed {
-            for (text, _) in (&mut text_storage, &upgrade_cost_storage).join() {
-                let new_text = format!("{}", upgrade_cost);
-                if new_text != text.text {
-                    text.set_text(new_text);
-                }
-            }
+            systems::shared::update_text(format!("{}", upgrade_cost), &mut text_storage, &upgrade_cost_storage);
         }
     }
 }
