@@ -17,6 +17,7 @@ extern crate rusttype;
 mod components;
 mod loader;
 mod renderer;
+mod scene;
 mod spritesheet;
 mod systems;
 mod utils;
@@ -29,17 +30,18 @@ use std::fs::File;
 use std::path::{Path, PathBuf};
 use rusttype::{FontCollection, Font, Scale, point, PositionedGlyph};
 use components::{AnimationSheet, BuildCost, Button, Camera, ClickSound, ResourceCount, Color, CurrentPower, Gatherer, GathererType, HighlightTile, Input, PowerBar, Rect, Resources, ResourceType, SelectedTile, SellCost, Sprite, Text, Tile, Transform, Upgrade, UpgradeCost, WinCount};
-use specs::{DispatcherBuilder, Join, World};
+use specs::{DispatcherBuilder, Entity, Join, World, ReadStorage, WriteStorage};
 use renderer::{ColorFormat, DepthFormat};
 use spritesheet::Spritesheet;
 use glutin::{Event, ElementState, MouseButton, VirtualKeyCode, WindowEvent};
 use glutin::GlContext;
-use gfx::{Device, Factory};
+use gfx::{Device};
 use rodio::Source;
 use rodio::decoder::Decoder;
+use scene::Scene;
+use scene::node::Node;
 
-
-fn setup_world(world: &mut World, window: &glutin::Window, font: &Arc<Font<'static>>) {
+fn setup_world(world: &mut World, window: &glutin::Window, font: &Arc<Font<'static>>) -> Scene {
     world.add_resource::<Camera>(Camera(renderer::get_ortho()));
     world.add_resource::<Input>(Input::new(window.hidpi_factor(), vec![VirtualKeyCode::W, VirtualKeyCode::A, VirtualKeyCode::S, VirtualKeyCode::D]));
     world.add_resource::<Resources>(Resources::new());
@@ -63,85 +65,118 @@ fn setup_world(world: &mut World, window: &glutin::Window, font: &Arc<Font<'stat
     world.register::<Upgrade>();
     world.register::<UpgradeCost>();
     world.register::<WinCount>();
-    world.create_entity()
+
+    let mut scene = Scene::new();
+
+    let mut tile_nodes: Vec<Node> = Vec::with_capacity(100);
+    for row in 0i32..10i32 {
+        for col in 0i32..10i32 {
+            let size = Tile::get_size();
+            let tile = world.create_entity()
+                .with(Transform::new(size * col, size * row, size as u16, size as u16, 0.0, 1.0, 1.0))
+                .with(Sprite{ frame_name: "tiles.png".to_string(), visible: true })
+                .with(Tile{})
+                .build();
+
+            tile_nodes.push(Node::new(Some(tile), None));
+        }
+    }
+
+    scene.nodes.push(Node::new(None, Some(tile_nodes)));
+
+    let entity = world.create_entity()
         .with(PowerBar::new())
         .with(Transform::new(670, 576, 260, 32, 0.0, 1.0, 1.0))
-        .with(Sprite{ frame_name: "powerbar.png".to_string(), visible: true });
+        .with(Sprite{ frame_name: "powerbar.png".to_string(), visible: true })
+        .build();
+    scene.nodes.push(Node::new(Some(entity), None));
 
-    world.create_entity()
+    let entity = world.create_entity()
         .with(CurrentPower{})
         .with(Transform::new(674, 580, CurrentPower::get_max_with(), 24, 0.0, 1.0, 1.0))
         .with(Rect{})
-        .with(Color([0.0, 1.0, 0.0, 1.0]));
+        .with(Color([0.0, 1.0, 0.0, 1.0]))
+        .build();
+    scene.nodes.push(Node::new(Some(entity), None));
 
-    world.create_entity()
+    let entity = world.create_entity()
         .with(ResourceCount{ resource_type: ResourceType::Coal })
         .with(Transform::new(670, 500, 32, 32, 0.0, 1.0, 1.0))
-        .with(Sprite{ frame_name: "coal.png".to_string(), visible: true });
+        .with(Sprite{ frame_name: "coal.png".to_string(), visible: true })
+        .build();
+    scene.nodes.push(Node::new(Some(entity), None));
 
-    world.create_entity()
+    let entity = world.create_entity()
         .with(ResourceCount{ resource_type: ResourceType::Coal })
         .with(Transform::new(720, 500, 32, 32, 0.0, 1.0, 1.0))
         .with(Text::new(&font, 32.0))
-        .with(Color([0.0, 1.0, 0.0, 1.0]));
+        .with(Color([0.0, 1.0, 0.0, 1.0]))
+        .build();
+    scene.nodes.push(Node::new(Some(entity), None));
 
-    world.create_entity()
+    let entity = world.create_entity()
         .with(HighlightTile{ visible: false })
         .with(Transform::new(0, 0, 64, 64, 0.0, 1.0, 1.0))
-        .with(Color([1.0, 1.0, 1.0, 0.3]));
+        .with(Color([1.0, 1.0, 1.0, 0.3]))
+        .build();
+    scene.nodes.push(Node::new(Some(entity), None));
 
-    world.create_entity()
+    let entity = world.create_entity()
         .with(SelectedTile{ visible: false })
         .with(Transform::new(0, 0, 64, 64, 0.0, 1.0, 1.0))
-        .with(Color([1.0, 1.0, 1.0, 0.6]));
+        .with(Color([1.0, 1.0, 1.0, 0.6]))
+        .build();
+    scene.nodes.push(Node::new(Some(entity), None));
 
-    world.create_entity()
+    let entity = world.create_entity()
         .with(Button::new("build".to_string(), ["build.png".to_string(), "build_hover.png".to_string()]))
         .with(Transform::new(670, 32, 96, 32, 0.0, 1.0, 1.0))
-        .with(Sprite{ frame_name: "build.png".to_string(), visible: true });
+        .with(Sprite{ frame_name: "build.png".to_string(), visible: true })
+        .build();
+    scene.nodes.push(Node::new(Some(entity), None));
 
-    world.create_entity()
+    let entity = world.create_entity()
         .with(Button::new("sell".to_string(), ["sell.png".to_string(), "sell_hover.png".to_string()]))
         .with(Transform::new(820, 32, 96, 32, 0.0, 1.0, 1.0))
-        .with(Sprite{ frame_name: "sell.png".to_string(), visible: true });
+        .with(Sprite{ frame_name: "sell.png".to_string(), visible: true })
+        .build();
+    scene.nodes.push(Node::new(Some(entity), None));
 
     // upgrade stuff
     let mut text = Text::new(&font, 32.0);
     text.visible = false;
     text.set_text(format!("{}", Upgrade::new().get_cost()));
-    world.create_entity()
+    let entity = world.create_entity()
         .with(UpgradeCost{})
         .with(text)
         .with(Transform::new(750, 100, 32, 32, 0.0, 1.0, 1.0))
-        .with(Color([0.0, 1.0, 0.0, 1.0]));
+        .with(Color([0.0, 1.0, 0.0, 1.0]))
+        .build();
+    scene.nodes.push(Node::new(Some(entity), None));
 
     // build
     let mut text = Text::new(&font, 32.0);
     text.set_text(format!("{}", GathererType::Coal.get_build_cost()));
-    world.create_entity()
+    let entity = world.create_entity()
         .with(BuildCost{})
         .with(Transform::new(775, 32, 0, 0, 0.0, 1.0, 1.0))
         .with(text)
-        .with(Color([0.0, 1.0, 0.0, 1.0]));
+        .with(Color([0.0, 1.0, 0.0, 1.0]))
+        .build();
+    scene.nodes.push(Node::new(Some(entity), None));
 
     // sell
     let mut text = Text::new(&font, 32.0);
     text.set_text("10".to_string());
-    world.create_entity()
+    let entity = world.create_entity()
         .with(SellCost{})
         .with(Transform::new(925, 32, 0, 0, 0.0, 1.0, 1.0))
         .with(text)
-        .with(Color([0.0, 1.0, 0.0, 1.0]));
+        .with(Color([0.0, 1.0, 0.0, 1.0]))
+        .build();
+    scene.nodes.push(Node::new(Some(entity), None));
 
-    for row in 0i32..10i32 {
-        for col in 0i32..10i32 {
-            let size = Tile::get_size();
-            world.create_entity()
-                .with(Transform::new(size * col, size * row, size as u16, size as u16, 0.0, 1.0, 1.0))
-                .with(Sprite{ frame_name: "tiles.png".to_string(), visible: true })
-                .with(Tile{});
-        }
-    }
+    scene
 }
 
 fn create_click_sound(root_path: &PathBuf) -> Decoder<BufReader<File>> {
@@ -158,6 +193,107 @@ fn play_music(root_path: &PathBuf, endpoint: &rodio::Endpoint) -> rodio::Sink {
 
     sink.play();
     sink
+}
+
+fn render_entity<R: gfx::Resources, C: gfx::CommandBuffer<R>, F: gfx::Factory<R>>(
+    basic: &mut renderer::Basic<R>,
+    encoder: &mut gfx::Encoder<R, C>,
+    world: &World,
+    factory: &mut F,
+    spritesheet: &Spritesheet,
+    asset_texture: &gfx::handle::ShaderResourceView<R, [f32; 4]>,
+    font: &Font,
+    glyph_cache: &mut HashMap<String, renderer::text::GlyphCacheEntry<R>>,
+    entity: &Entity,
+    sprite_storage: &ReadStorage<Sprite>,
+    transform_storage: &mut WriteStorage<Transform>,
+    animation_storage: &ReadStorage<AnimationSheet>,
+    color_storage: &ReadStorage<Color>,
+    highlight_tile_storage: &ReadStorage<HighlightTile>,
+    selected_tile_storage: &ReadStorage<SelectedTile>,
+    text_storage: &mut WriteStorage<Text>,
+    rect_storage: &ReadStorage<Rect>,
+    ) {
+
+    if let (Some(sprite), Some(transform)) = (sprite_storage.get(*entity), transform_storage.get_mut(*entity)) {
+        if sprite.visible {
+            basic.render(encoder, world, factory, &transform, Some(&sprite.frame_name), spritesheet, None, Some(asset_texture));
+        }
+    }
+
+    if let (Some(animation), Some(transform)) = (animation_storage.get(*entity), transform_storage.get_mut(*entity)) {
+        basic.render(encoder, world, factory, &transform, Some(animation.get_current_frame()), spritesheet, None, Some(asset_texture));
+    }
+
+    // maybe refactor these to use rect logic. Need more generic "i am visible"
+    if let (Some(highlight_tile), Some(color), Some(transform)) = (highlight_tile_storage.get(*entity), color_storage.get(*entity), transform_storage.get_mut(*entity)) {
+        if highlight_tile.visible {
+            basic.render(encoder, world, factory, &transform, None, spritesheet, Some(color.0), None);
+        }
+    }
+
+    if let (Some(selected_tile), Some(color), Some(transform)) = (selected_tile_storage.get(*entity), color_storage.get(*entity), transform_storage.get_mut(*entity)) {
+        if selected_tile.visible {
+            basic.render(encoder, world, factory, &transform, None, spritesheet, Some(color.0), None);
+        }
+    }
+
+    if let (Some(color), Some(transform), Some(_)) = (color_storage.get(*entity), transform_storage.get_mut(*entity), rect_storage.get(*entity)) {
+        basic.render(encoder, world, factory, &transform, None, spritesheet, Some(color.0), None);
+    }
+
+    if let (Some(color), Some(transform), Some(text)) = (color_storage.get(*entity), transform_storage.get_mut(*entity), text_storage.get_mut(*entity)) {
+        if text.new_data {
+            text.new_data = false;
+            if !glyph_cache.contains_key(&text.text) {
+                renderer::text::create_texture_from_glyph(glyph_cache, &font, text, factory);
+            }
+            let entry = glyph_cache.get(&text.text).unwrap();
+            transform.size.x = entry.width;
+            transform.size.y = entry.height;
+        }
+
+        if text.text != "" && text.visible {
+            basic.render(encoder, world, factory, &transform, None, spritesheet, Some(color.0), Some(&glyph_cache.get(&text.text).unwrap().view));
+        }
+    }
+}
+
+fn render_node<R: gfx::Resources, C: gfx::CommandBuffer<R>, F: gfx::Factory<R>>(
+    node: &Node,
+    basic: &mut renderer::Basic<R>,
+    encoder: &mut gfx::Encoder<R, C>,
+    world: &World,
+    factory: &mut F,
+    spritesheet: &Spritesheet,
+    asset_texture: &gfx::handle::ShaderResourceView<R, [f32; 4]>,
+    font: &Font,
+    glyph_cache: &mut HashMap<String, renderer::text::GlyphCacheEntry<R>>,
+    sprites: &ReadStorage<Sprite>,
+    transforms: &mut WriteStorage<Transform>,
+    animation_sheets: &ReadStorage<AnimationSheet>,
+    colors: &ReadStorage<Color>,
+    highlight_tiles: &ReadStorage<HighlightTile>,
+    selected_tiles: &ReadStorage<SelectedTile>,
+    texts: &mut WriteStorage<Text>,
+    rects: &ReadStorage<Rect>,
+    ) {
+    if let Some(entity) = node.entity {
+        render_entity(
+            basic, encoder, world, factory, spritesheet, asset_texture,
+            font, glyph_cache,
+            &entity, sprites, transforms, animation_sheets, colors, highlight_tiles, selected_tiles, texts, rects
+        );
+    }
+
+    for node in &node.sub_nodes {
+        render_node(
+            node,
+            basic, encoder, world, factory, spritesheet, asset_texture,
+            font, glyph_cache,
+            sprites, transforms, animation_sheets, colors, highlight_tiles, selected_tiles, texts, rects
+        );
+    }
 }
 
 fn main() {
@@ -213,7 +349,7 @@ fn main() {
     let click_sound_source = create_click_sound(&exe_path).buffered();
     let music = play_music(&exe_path, &audio_endpoint);
 
-    setup_world(&mut world, &window, &font);
+    let scene = setup_world(&mut world, &window, &font);
 
     let mut running = true;
     while running {
@@ -282,46 +418,11 @@ fn main() {
             sink.detach();
         }
 
-        for (sprite, transform) in (&sprites, &transforms).join() {
-            if sprite.visible {
-                basic.render(&mut encoder, &world, &mut factory, &transform, Some(&sprite.frame_name), &spritesheet, None, Some(&asset_texture));
-            }
-        }
-
-        for (animation_sheet, transform) in (&animation_sheets, &transforms).join() {
-            basic.render(&mut encoder, &world, &mut factory, &transform, Some(animation_sheet.get_current_frame()), &spritesheet, None, Some(&asset_texture));
-        }
-
-        for (highlight_tile, color, transform) in (&highlight_tiles, &colors, &transforms).join() {
-            if highlight_tile.visible {
-                basic.render(&mut encoder, &world, &mut factory, &transform, None, &spritesheet, Some(color.0), None);
-            }
-        }
-
-        for (selected_tile, color, transform) in (&selected_tiles, &colors, &transforms).join() {
-            if selected_tile.visible {
-                basic.render(&mut encoder, &world, &mut factory, &transform, None, &spritesheet, Some(color.0), None);
-            }
-        }
-
-        for (color, transform, _) in (&colors, &transforms, &rects).join() {
-            basic.render(&mut encoder, &world, &mut factory, &transform, None, &spritesheet, Some(color.0), None);
-        }
-
-        for (color, transform, text) in (&colors, &mut transforms, &mut texts).join() {
-            if text.new_data {
-                text.new_data = false;
-                if !glyph_cache.contains_key(&text.text) {
-                    renderer::text::create_texture_from_glyph(&mut glyph_cache, &font, text, &mut factory);
-                }
-                let entry = glyph_cache.get(&text.text).unwrap();
-                transform.size.x = entry.width;
-                transform.size.y = entry.height;
-            }
-
-            if text.text != "" && text.visible {
-                basic.render(&mut encoder, &world, &mut factory, &transform, None, &spritesheet, Some(color.0), Some(&glyph_cache.get(&text.text).unwrap().view));
-            }
+        for node in &scene.nodes {
+            render_node(node,
+            &mut basic, &mut encoder, &world, &mut factory, &spritesheet, &asset_texture,
+            &font, &mut glyph_cache,
+            &sprites, &mut transforms, &animation_sheets, &colors, &highlight_tiles, &selected_tiles, &mut texts, &rects);
         }
 
         encoder.flush(&mut device);
