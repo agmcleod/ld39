@@ -23,7 +23,7 @@ mod systems;
 mod utils;
 
 use std::collections::HashMap;
-use std::sync::Arc;
+use std::sync::{Arc, Mutex};
 use std::ops::{DerefMut};
 use std::io::BufReader;
 use std::fs::File;
@@ -317,17 +317,6 @@ fn main() {
 
     let mut world = World::new();
 
-    let mut dispatcher = DispatcherBuilder::new()
-        .add(systems::AnimationSystem::new(), "animation_system", &[])
-        .add(systems::PowerUsage::new(), "power_system", &[])
-        .add(systems::TileSelection{}, "tile_selection", &[])
-        .add(systems::ButtonHover{}, "button_hover", &[])
-        .add(systems::SellEnergy{}, "sell_energy", &["button_hover"])
-        .add(systems::BuildGatherer{ built_one: false }, "build_gatherer", &["button_hover"])
-        .add(systems::Gathering{}, "gathering", &[])
-        .add(systems::UpgradeResource{}, "upgrade_resource", &[])
-        .build();
-
     let target = renderer::WindowTargets{
         color: main_color,
         depth: main_depth,
@@ -350,6 +339,18 @@ fn main() {
     let music = play_music(&exe_path, &audio_endpoint);
 
     let scene = setup_world(&mut world, &window, &font);
+    let scene = Arc::new(Mutex::new(scene));
+
+    let mut dispatcher = DispatcherBuilder::new()
+        .add(systems::AnimationSystem::new(), "animation_system", &[])
+        .add(systems::PowerUsage::new(), "power_system", &[])
+        .add(systems::TileSelection{}, "tile_selection", &[])
+        .add(systems::ButtonHover{}, "button_hover", &[])
+        .add(systems::SellEnergy{}, "sell_energy", &["button_hover"])
+        .add(systems::BuildGatherer{ built_one: false, scene: scene.clone() }, "build_gatherer", &["button_hover"])
+        .add(systems::Gathering{}, "gathering", &[])
+        .add(systems::UpgradeResource{}, "upgrade_resource", &[])
+        .build();
 
     let mut running = true;
     while running {
@@ -417,6 +418,8 @@ fn main() {
             sink.play();
             sink.detach();
         }
+
+        let scene = scene.lock().unwrap();
 
         for node in &scene.nodes {
             render_node(node,

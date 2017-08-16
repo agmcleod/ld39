@@ -1,9 +1,13 @@
 use std::ops::{Deref, DerefMut};
 use specs::{Entities, Fetch, FetchMut, Join, ReadStorage, WriteStorage, System};
 use components::{AnimationSheet, Button, ClickSound, Gatherer, GathererType, Input, Resources, ResourceType, SelectedTile, Sprite, Text, Transform, Upgrade, UpgradeCost, WinCount};
+use std::sync::{Arc, Mutex};
+use scene::Scene;
+use scene::node::Node;
 
 pub struct BuildGatherer {
     pub built_one: bool,
+    pub scene: Arc<Mutex<Scene>>,
 }
 
 impl<'a> System<'a> for BuildGatherer {
@@ -63,6 +67,9 @@ impl<'a> System<'a> for BuildGatherer {
             animation_sheet_storage.insert(gatherer_entity, anim);
             transform_storage.insert(gatherer_entity, Transform::new(selected_tile_x, selected_tile_y, 64, 64, 0.0, 1.0, 1.0));
 
+            let mut scene = self.scene.lock().unwrap();
+            scene.nodes.push(Node::new(Some(gatherer_entity), None));
+
             if resources.get_current_type() == ResourceType::Clean {
                 for (text, win_count) in (&mut text_storage, &mut win_count_storage).join() {
                     win_count.count -= 1;
@@ -78,6 +85,8 @@ impl<'a> System<'a> for BuildGatherer {
                 transform_storage.insert(upgrade_button_entity, Transform::new(670, 90, 64, 64, 0.0, 1.0, 1.0));
                 upgrade_storage.insert(upgrade_button_entity, Upgrade::new());
                 sprite_storage.insert(upgrade_button_entity, Sprite{ frame_name: "refinery_1.png".to_string(), visible: true });
+
+                scene.nodes.push(Node::new(Some(upgrade_button_entity), None));
 
                 for (_, text) in (&upgrade_cost_storage, &mut text_storage).join() {
                     text.visible = true;
