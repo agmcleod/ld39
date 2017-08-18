@@ -57,6 +57,22 @@
 	"sourceSize": {"w":64,"h":64}
 },
 {
+	"filename": "power-btn-hover.png",
+	"frame": {"x":362,"y":2,"w":96,"h":32},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":96,"h":32},
+	"sourceSize": {"w":96,"h":32}
+},
+{
+	"filename": "power-btn.png",
+	"frame": {"x":264,"y":200,"w":96,"h":32},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":96,"h":32},
+	"sourceSize": {"w":96,"h":32}
+},
+{
 	"filename": "powerbar.png",
 	"frame": {"x":2,"y":200,"w":260,"h":32},
 	"rotated": false,
@@ -145,22 +161,6 @@
 	"sourceSize": {"w":64,"h":64}
 },
 {
-	"filename": "sell.png",
-	"frame": {"x":362,"y":2,"w":96,"h":32},
-	"rotated": false,
-	"trimmed": false,
-	"spriteSourceSize": {"x":0,"y":0,"w":96,"h":32},
-	"sourceSize": {"w":96,"h":32}
-},
-{
-	"filename": "sell_hover.png",
-	"frame": {"x":264,"y":200,"w":96,"h":32},
-	"rotated": false,
-	"trimmed": false,
-	"spriteSourceSize": {"x":0,"y":0,"w":96,"h":32},
-	"sourceSize": {"w":96,"h":32}
-},
-{
 	"filename": "sun.png",
 	"frame": {"x":460,"y":2,"w":32,"h":32},
 	"rotated": false,
@@ -191,6 +191,6 @@
 	"format": "RGBA8888",
 	"size": {"w":512,"h":256},
 	"scale": "1",
-	"smartupdate": "$TexturePacker:SmartUpdate:a1dbb573be4e4b8fe3222ebae850a36e:f48e61ed006d05626fde07d2d64676db:a759b6bbc8381ac9c472b28f589ad0d6$"
+	"smartupdate": "$TexturePacker:SmartUpdate:60b89d08ca227cbd6fb0d25f58d9cc43:b866fda65e745bd3772190b556f9fa0c:a759b6bbc8381ac9c472b28f589ad0d6$"
 }
 }

@@ -136,7 +136,7 @@ fn setup_world(world: &mut World, window: &glutin::Window, font: &Arc<Font<'stat
     scene.nodes.push(Node::new(Some(entity), None));
 
     let entity = world.create_entity()
-        .with(Button::new("sell".to_string(), ["sell.png".to_string(), "sell_hover.png".to_string()]))
+        .with(Button::new("power-btn".to_string(), ["power-btn.png".to_string(), "power-btn-hover.png".to_string()]))
         .with(Transform::new(820, 32, 96, 32, 0.0, 1.0, 1.0))
         .with(Sprite{ frame_name: "sell.png".to_string(), visible: true })
         .build();
