@@ -77,12 +77,12 @@ impl<'a> System<'a> for UpgradeResource {
 
             let new_resource_count = entities.create();
             resource_count_storage.insert(new_resource_count, ResourceCount{ resource_type: resources.current_type });
-            transform_storage.insert(new_resource_count, Transform::new(670, y, 32, 32, 0.0, 1.0, 1.0));
+            transform_storage.insert(new_resource_count, Transform::new(670, y, 0, 32, 32, 0.0, 1.0, 1.0));
             sprite_storage.insert(new_resource_count, Sprite{ frame_name: frame_name, visible: true });
 
             let new_resource_count = entities.create();
             resource_count_storage.insert(new_resource_count, ResourceCount{ resource_type: resources.current_type });
-            transform_storage.insert(new_resource_count, Transform::new(720, y, 32, 32, 0.0, 1.0, 1.0));
+            transform_storage.insert(new_resource_count, Transform::new(720, y, 0, 32, 32, 0.0, 1.0, 1.0));
             text_storage.insert(new_resource_count, Text::new_from(text_scale_to_copy.unwrap(), text_point_to_copy.unwrap()));
             color_storage.insert(new_resource_count, Color([0.0, 1.0, 0.0, 1.0]));
 
@@ -90,7 +90,7 @@ impl<'a> System<'a> for UpgradeResource {
             if resources.current_type == ResourceType::Clean {
                 let win_count = entities.create();
                 win_count_storage.insert(win_count, WinCount{ count: 12 });
-                transform_storage.insert(win_count, Transform::new(670, 370, 32, 32, 0.0, 1.0, 1.0));
+                transform_storage.insert(win_count, Transform::new(670, 370, 0, 32, 32, 0.0, 1.0, 1.0));
                 let mut text = Text::new_from(text_scale_to_copy.unwrap(), text_point_to_copy.unwrap());
                 text.set_text("Build 12 solar plants".to_string());
                 text_storage.insert(win_count, text);

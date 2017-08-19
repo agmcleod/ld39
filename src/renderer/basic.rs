@@ -12,7 +12,7 @@ use spritesheet::{Frame, Spritesheet};
 
 gfx_defines!{
     vertex Vertex {
-        pos: [f32; 2] = "a_Pos",
+        pos: [f32; 3] = "a_Pos",
         uv: [f32; 2] = "a_Uv",
         color: [f32; 4] = "a_Color",
     }
@@ -98,6 +98,7 @@ impl<R> Basic<R>
         let camera = camera_res.deref();
         let x = transform.pos.x as f32;
         let y = transform.pos.y as f32;
+        let z = transform.pos.z as f32;
         let w = transform.size.x as f32;
         let h = transform.size.y as f32;
 
@@ -132,22 +133,22 @@ impl<R> Basic<R>
 
         let data: Vec<Vertex> = vec![
             Vertex{
-                pos: [x, y],
+                pos: [x, y, z],
                 uv: [tx, ty2],
                 color: color,
             },
             Vertex{
-                pos: [x + w, y],
+                pos: [x + w, y, z],
                 uv: [tx2, ty2],
                 color: color,
             },
             Vertex{
-                pos: [x + w, y + h],
+                pos: [x + w, y + h, z],
                 uv: [tx2, ty],
                 color: color,
             },
             Vertex{
-                pos: [x, y + h],
+                pos: [x, y + h, z],
                 uv: [tx, ty],
                 color: color,
             }

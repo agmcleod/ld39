@@ -1,6 +1,6 @@
 #version 150 core
 
-in vec2 a_Pos;
+in vec3 a_Pos;
 in vec2 a_Uv;
 in vec4 a_Color;
 
@@ -14,6 +14,6 @@ uniform b_Projection {
 
 void main() {
     v_Uv = a_Uv;
-    gl_Position = u_Proj * u_Model * vec4(a_Pos, 0.0, 1.0);
+    gl_Position = u_Proj * u_Model * vec4(a_Pos, 1.0);
     t_Color = a_Color;
 }

@@ -73,7 +73,7 @@ fn setup_world(world: &mut World, window: &glutin::Window, font: &Arc<Font<'stat
         for col in 0i32..10i32 {
             let size = Tile::get_size();
             let tile = world.create_entity()
-                .with(Transform::new(size * col, size * row, size as u16, size as u16, 0.0, 1.0, 1.0))
+                .with(Transform::new(size * col, size * row, 1, size as u16, size as u16, 0.0, 1.0, 1.0))
                 .with(Sprite{ frame_name: "tiles.png".to_string(), visible: true })
                 .with(Tile{})
                 .build();
@@ -86,14 +86,14 @@ fn setup_world(world: &mut World, window: &glutin::Window, font: &Arc<Font<'stat
 
     let entity = world.create_entity()
         .with(PowerBar::new())
-        .with(Transform::new(670, 576, 260, 32, 0.0, 1.0, 1.0))
+        .with(Transform::new(670, 576, 1, 260, 32, 0.0, 1.0, 1.0))
         .with(Sprite{ frame_name: "powerbar.png".to_string(), visible: true })
         .build();
     scene.nodes.push(Node::new(Some(entity), None));
 
     let entity = world.create_entity()
         .with(CurrentPower{})
-        .with(Transform::new(674, 580, CurrentPower::get_max_with(), 24, 0.0, 1.0, 1.0))
+        .with(Transform::new(674, 580, 0, CurrentPower::get_max_with(), 24, 0.0, 1.0, 1.0))
         .with(Rect{})
         .with(Color([0.0, 1.0, 0.0, 1.0]))
         .build();
@@ -101,14 +101,14 @@ fn setup_world(world: &mut World, window: &glutin::Window, font: &Arc<Font<'stat
 
     let entity = world.create_entity()
         .with(ResourceCount{ resource_type: ResourceType::Coal })
-        .with(Transform::new(670, 500, 32, 32, 0.0, 1.0, 1.0))
+        .with(Transform::new(670, 500, 0, 32, 32, 0.0, 1.0, 1.0))
         .with(Sprite{ frame_name: "coal.png".to_string(), visible: true })
         .build();
     scene.nodes.push(Node::new(Some(entity), None));
 
     let entity = world.create_entity()
         .with(ResourceCount{ resource_type: ResourceType::Coal })
-        .with(Transform::new(720, 500, 32, 32, 0.0, 1.0, 1.0))
+        .with(Transform::new(720, 500, 0, 32, 32, 0.0, 1.0, 1.0))
         .with(Text::new(&font, 32.0))
         .with(Color([0.0, 1.0, 0.0, 1.0]))
         .build();
@@ -116,28 +116,28 @@ fn setup_world(world: &mut World, window: &glutin::Window, font: &Arc<Font<'stat
 
     let entity = world.create_entity()
         .with(HighlightTile{ visible: false })
-        .with(Transform::new(0, 0, 64, 64, 0.0, 1.0, 1.0))
+        .with(Transform::new(0, 0, 0, 64, 64, 0.0, 1.0, 1.0))
         .with(Color([1.0, 1.0, 1.0, 0.3]))
         .build();
     scene.nodes.push(Node::new(Some(entity), None));
 
     let entity = world.create_entity()
         .with(SelectedTile{ visible: false })
-        .with(Transform::new(0, 0, 64, 64, 0.0, 1.0, 1.0))
+        .with(Transform::new(0, 0, 0, 64, 64, 0.0, 1.0, 1.0))
         .with(Color([1.0, 1.0, 1.0, 0.6]))
         .build();
     scene.nodes.push(Node::new(Some(entity), None));
 
     let entity = world.create_entity()
         .with(Button::new("build".to_string(), ["build.png".to_string(), "build_hover.png".to_string()]))
-        .with(Transform::new(670, 32, 96, 32, 0.0, 1.0, 1.0))
+        .with(Transform::new(670, 32, 0, 96, 32, 0.0, 1.0, 1.0))
         .with(Sprite{ frame_name: "build.png".to_string(), visible: true })
         .build();
     scene.nodes.push(Node::new(Some(entity), None));
 
     let entity = world.create_entity()
         .with(Button::new("power-btn".to_string(), ["power-btn.png".to_string(), "power-btn-hover.png".to_string()]))
-        .with(Transform::new(820, 32, 96, 32, 0.0, 1.0, 1.0))
+        .with(Transform::new(820, 32, 0, 96, 32, 0.0, 1.0, 1.0))
         .with(Sprite{ frame_name: "sell.png".to_string(), visible: true })
         .build();
     scene.nodes.push(Node::new(Some(entity), None));
@@ -149,7 +149,7 @@ fn setup_world(world: &mut World, window: &glutin::Window, font: &Arc<Font<'stat
     let entity = world.create_entity()
         .with(UpgradeCost{})
         .with(text)
-        .with(Transform::new(750, 100, 32, 32, 0.0, 1.0, 1.0))
+        .with(Transform::new(750, 100, 0, 32, 32, 0.0, 1.0, 1.0))
         .with(Color([0.0, 1.0, 0.0, 1.0]))
         .build();
     scene.nodes.push(Node::new(Some(entity), None));
@@ -159,7 +159,7 @@ fn setup_world(world: &mut World, window: &glutin::Window, font: &Arc<Font<'stat
     text.set_text(format!("{}", GathererType::Coal.get_build_cost()));
     let entity = world.create_entity()
         .with(BuildCost{})
-        .with(Transform::new(775, 32, 0, 0, 0.0, 1.0, 1.0))
+        .with(Transform::new(775, 32, 0, 0, 0, 0.0, 1.0, 1.0))
         .with(text)
         .with(Color([0.0, 1.0, 0.0, 1.0]))
         .build();
@@ -170,7 +170,7 @@ fn setup_world(world: &mut World, window: &glutin::Window, font: &Arc<Font<'stat
     text.set_text("10".to_string());
     let entity = world.create_entity()
         .with(SellCost{})
-        .with(Transform::new(925, 32, 0, 0, 0.0, 1.0, 1.0))
+        .with(Transform::new(925, 32, 0, 0, 0, 0.0, 1.0, 1.0))
         .with(text)
         .with(Color([0.0, 1.0, 0.0, 1.0]))
         .build();
@@ -397,7 +397,7 @@ fn main() {
         basic.reset_transform();
 
         encoder.clear(&target.color, [16.0 / 256.0, 14.0 / 256.0, 22.0 / 256.0, 1.0]);
-        encoder.clear_depth(&target.depth, 1.0);
+            encoder.clear_depth(&target.depth, 1.0);
 
         let sprites = world.read::<Sprite>();
         let mut transforms = world.write::<Transform>();
