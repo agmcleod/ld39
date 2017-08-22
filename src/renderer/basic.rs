@@ -58,7 +58,7 @@ impl<R> Basic<R>
         ).unwrap();
 
         let texels = [[0xff, 0xff, 0xff, 0xff]];
-        let (_, texture_view) = factory.create_texture_immutable::<gfx::format::Rgba8>(
+        let (_, texture_view) = factory.create_texture_immutable::<ColorFormat>(
             texture::Kind::D2(1, 1, texture::AaMode::Single), &[&texels]
         ).unwrap();
 
@@ -70,7 +70,7 @@ impl<R> Basic<R>
             pso: pso,
             projection: Projection{
                 model: Matrix4::identity().into(),
-                proj: get_ortho().into(),
+                proj: self::super::get_ortho().into(),
             },
             target: (*target).clone(),
             color_texture: (texture_view, factory.create_sampler(sinfo)),
@@ -169,17 +169,4 @@ impl<R> Basic<R>
         encoder.update_constant_buffer(&params.projection_cb, &self.projection);
         encoder.draw(&slice, &self.pso, &params);
     }
-}
-
-pub fn get_ortho() -> Matrix4<f32> {
-    let dim = get_dimensions();
-    cgmath::ortho(
-        0.0, dim[0],
-        0.0, dim[1],
-        0.0, 1.0,
-    )
-}
-
-pub fn get_dimensions() -> [f32; 2] {
-    [960.0, 640.0]
 }

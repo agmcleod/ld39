@@ -312,7 +312,7 @@ fn main() {
         Err(_) => PathBuf::new(),
     };
 
-    let (window, mut device, mut factory, main_color, mut main_depth) =
+    let (window, mut device, mut factory, main_color, main_depth) =
         gfx_window_glutin::init::<ColorFormat, DepthFormat>(builder, context, &events_loop);
 
     let mut world = World::new();
@@ -397,7 +397,7 @@ fn main() {
         basic.reset_transform();
 
         encoder.clear(&target.color, [16.0 / 256.0, 14.0 / 256.0, 22.0 / 256.0, 1.0]);
-            encoder.clear_depth(&target.depth, 1.0);
+        encoder.clear_depth(&target.depth, 1.0);
 
         let sprites = world.read::<Sprite>();
         let mut transforms = world.write::<Transform>();
