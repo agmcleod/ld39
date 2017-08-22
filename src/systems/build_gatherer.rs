@@ -65,7 +65,7 @@ impl<'a> System<'a> for BuildGatherer {
             let gatherer_entity = entities.create();
             gatherer_storage.insert(gatherer_entity, gatherer);
             animation_sheet_storage.insert(gatherer_entity, anim);
-            transform_storage.insert(gatherer_entity, Transform::new(selected_tile_x, selected_tile_y, 10, 64, 64, 0.0, 1.0, 1.0));
+            transform_storage.insert(gatherer_entity, Transform::new(selected_tile_x, selected_tile_y, 0, 64, 64, 0.0, 1.0, 1.0));
 
             let mut scene = self.scene.lock().unwrap();
             scene.nodes.push(Node::new(Some(gatherer_entity), None));

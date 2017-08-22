@@ -27,6 +27,7 @@ gfx_defines!{
         projection_cb: gfx::ConstantBuffer<Projection> = "b_Projection",
         tex: gfx::TextureSampler<[f32; 4]> = "t_Texture",
         out: gfx::BlendTarget<ColorFormat> = ("Target0", gfx::state::ColorMask::all(), gfx::preset::blend::ALPHA),
+        depth: gfx::DepthTarget<DepthFormat> = gfx::preset::depth::LESS_EQUAL_WRITE,
     }
 }
 
@@ -162,6 +163,7 @@ impl<R> Basic<R>
             projection_cb: factory.create_constant_buffer(1),
             tex: tex,
             out: self.target.color.clone(),
+            depth: self.target.depth.clone(),
         };
 
         self.projection.proj = (*camera).0.into();
