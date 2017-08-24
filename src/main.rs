@@ -19,6 +19,7 @@ mod loader;
 mod renderer;
 mod scene;
 mod spritesheet;
+mod state;
 mod systems;
 mod utils;
 
@@ -40,8 +41,10 @@ use rodio::Source;
 use rodio::decoder::Decoder;
 use scene::Scene;
 use scene::node::Node;
+use state::play_state::PlayState;
+use state::StateManager;
 
-fn setup_world(world: &mut World, window: &glutin::Window, font: &Arc<Font<'static>>) -> Scene {
+fn setup_world(world: &mut World, window: &glutin::Window) {
     world.add_resource::<Camera>(Camera(renderer::get_ortho()));
     world.add_resource::<Input>(Input::new(window.hidpi_factor(), vec![VirtualKeyCode::W, VirtualKeyCode::A, VirtualKeyCode::S, VirtualKeyCode::D]));
     world.add_resource::<Resources>(Resources::new());
@@ -65,118 +68,6 @@ fn setup_world(world: &mut World, window: &glutin::Window, font: &Arc<Font<'stat
     world.register::<Upgrade>();
     world.register::<UpgradeCost>();
     world.register::<WinCount>();
-
-    let mut scene = Scene::new();
-
-    let mut tile_nodes: Vec<Node> = Vec::with_capacity(100);
-    for row in 0i32..10i32 {
-        for col in 0i32..10i32 {
-            let size = Tile::get_size();
-            let tile = world.create_entity()
-                .with(Transform::new(size * col, size * row, 1, size as u16, size as u16, 0.0, 1.0, 1.0))
-                .with(Sprite{ frame_name: "tiles.png".to_string(), visible: true })
-                .with(Tile{})
-                .build();
-
-            tile_nodes.push(Node::new(Some(tile), None));
-        }
-    }
-
-    scene.nodes.push(Node::new(None, Some(tile_nodes)));
-
-    let entity = world.create_entity()
-        .with(PowerBar::new())
-        .with(Transform::new(670, 576, 1, 260, 32, 0.0, 1.0, 1.0))
-        .with(Sprite{ frame_name: "powerbar.png".to_string(), visible: true })
-        .build();
-    scene.nodes.push(Node::new(Some(entity), None));
-
-    let entity = world.create_entity()
-        .with(CurrentPower{})
-        .with(Transform::new(674, 580, 0, CurrentPower::get_max_with(), 24, 0.0, 1.0, 1.0))
-        .with(Rect{})
-        .with(Color([0.0, 1.0, 0.0, 1.0]))
-        .build();
-    scene.nodes.push(Node::new(Some(entity), None));
-
-    let entity = world.create_entity()
-        .with(ResourceCount{ resource_type: ResourceType::Coal })
-        .with(Transform::new(670, 500, 0, 32, 32, 0.0, 1.0, 1.0))
-        .with(Sprite{ frame_name: "coal.png".to_string(), visible: true })
-        .build();
-    scene.nodes.push(Node::new(Some(entity), None));
-
-    let entity = world.create_entity()
-        .with(ResourceCount{ resource_type: ResourceType::Coal })
-        .with(Transform::new(720, 500, 0, 32, 32, 0.0, 1.0, 1.0))
-        .with(Text::new(&font, 32.0))
-        .with(Color([0.0, 1.0, 0.0, 1.0]))
-        .build();
-    scene.nodes.push(Node::new(Some(entity), None));
-
-    let entity = world.create_entity()
-        .with(HighlightTile{ visible: false })
-        .with(Transform::new(0, 0, 0, 64, 64, 0.0, 1.0, 1.0))
-        .with(Color([1.0, 1.0, 1.0, 0.3]))
-        .build();
-    scene.nodes.push(Node::new(Some(entity), None));
-
-    let entity = world.create_entity()
-        .with(SelectedTile{ visible: false })
-        .with(Transform::new(0, 0, 0, 64, 64, 0.0, 1.0, 1.0))
-        .with(Color([1.0, 1.0, 1.0, 0.6]))
-        .build();
-    scene.nodes.push(Node::new(Some(entity), None));
-
-    let entity = world.create_entity()
-        .with(Button::new("build".to_string(), ["build.png".to_string(), "build_hover.png".to_string()]))
-        .with(Transform::new(670, 32, 0, 96, 32, 0.0, 1.0, 1.0))
-        .with(Sprite{ frame_name: "build.png".to_string(), visible: true })
-        .build();
-    scene.nodes.push(Node::new(Some(entity), None));
-
-    let entity = world.create_entity()
-        .with(Button::new("power-btn".to_string(), ["power-btn.png".to_string(), "power-btn-hover.png".to_string()]))
-        .with(Transform::new(820, 32, 0, 96, 32, 0.0, 1.0, 1.0))
-        .with(Sprite{ frame_name: "sell.png".to_string(), visible: true })
-        .build();
-    scene.nodes.push(Node::new(Some(entity), None));
-
-    // upgrade stuff
-    let mut text = Text::new(&font, 32.0);
-    text.visible = false;
-    text.set_text(format!("{}", Upgrade::new().get_cost()));
-    let entity = world.create_entity()
-        .with(UpgradeCost{})
-        .with(text)
-        .with(Transform::new(750, 100, 0, 32, 32, 0.0, 1.0, 1.0))
-        .with(Color([0.0, 1.0, 0.0, 1.0]))
-        .build();
-    scene.nodes.push(Node::new(Some(entity), None));
-
-    // build
-    let mut text = Text::new(&font, 32.0);
-    text.set_text(format!("{}", GathererType::Coal.get_build_cost()));
-    let entity = world.create_entity()
-        .with(BuildCost{})
-        .with(Transform::new(775, 32, 0, 0, 0, 0.0, 1.0, 1.0))
-        .with(text)
-        .with(Color([0.0, 1.0, 0.0, 1.0]))
-        .build();
-    scene.nodes.push(Node::new(Some(entity), None));
-
-    // sell
-    let mut text = Text::new(&font, 32.0);
-    text.set_text("10".to_string());
-    let entity = world.create_entity()
-        .with(SellCost{})
-        .with(Transform::new(925, 32, 0, 0, 0, 0.0, 1.0, 1.0))
-        .with(text)
-        .with(Color([0.0, 1.0, 0.0, 1.0]))
-        .build();
-    scene.nodes.push(Node::new(Some(entity), None));
-
-    scene
 }
 
 fn create_click_sound(root_path: &PathBuf) -> Decoder<BufReader<File>> {
@@ -338,8 +229,12 @@ fn main() {
     let click_sound_source = create_click_sound(&exe_path).buffered();
     let music = play_music(&exe_path, &audio_endpoint);
 
-    let scene = setup_world(&mut world, &window, &font);
-    let scene = Arc::new(Mutex::new(scene));
+    setup_world(&mut world, &window);
+
+    let mut state_manager = StateManager::new();
+    let play_state = PlayState::new(&font);
+    state_manager.add_state("play_state".to_string(), Box::new(play_state));
+    state_manager.swap_state("play_state".to_string(), &mut world);
 
     let mut dispatcher = DispatcherBuilder::new()
         .add(systems::AnimationSystem::new(), "animation_system", &[])
@@ -347,7 +242,7 @@ fn main() {
         .add(systems::TileSelection{}, "tile_selection", &[])
         .add(systems::ButtonHover{}, "button_hover", &[])
         .add(systems::SellEnergy{}, "sell_energy", &["button_hover"])
-        .add(systems::BuildGatherer{ built_one: false, scene: scene.clone() }, "build_gatherer", &["button_hover"])
+        .add(systems::BuildGatherer{ built_one: false, scene: state_manager.get_current_scene() }, "build_gatherer", &["button_hover"])
         .add(systems::Gathering{}, "gathering", &[])
         .add(systems::UpgradeResource{}, "upgrade_resource", &[])
         .build();
@@ -419,6 +314,7 @@ fn main() {
             sink.detach();
         }
 
+        let scene = state_manager.get_current_scene();
         let scene = scene.lock().unwrap();
 
         for node in &scene.nodes {
