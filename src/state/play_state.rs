@@ -27,7 +27,8 @@ impl State for PlayState {
     }
 
     fn setup(&mut self, world: &mut World) {
-        let mut scene = Scene::new();
+        let mut scene = self.scene.lock().unwrap();
+        scene.clear();
 
         let mut tile_nodes: Vec<Node> = Vec::with_capacity(100);
         for row in 0i32..10i32 {
@@ -138,7 +139,5 @@ impl State for PlayState {
             .with(Color([0.0, 1.0, 0.0, 1.0]))
             .build();
         scene.nodes.push(Node::new(Some(entity), None));
-
-        self.scene = Arc::new(Mutex::new(scene));
     }
 }

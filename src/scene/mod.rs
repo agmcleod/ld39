@@ -11,4 +11,8 @@ impl Scene {
             nodes: vec![],
         }
     }
+
+    pub fn clear(&mut self) {
+        self.nodes.clear();
+    }
 }
