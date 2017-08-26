@@ -1,27 +1,45 @@
 use std::sync::{Arc, Mutex};
-use specs::World;
+use specs::{Dispatcher, DispatcherBuilder, World};
 use scene::Scene;
 use scene::node::Node;
 use state::State;
 use rusttype::Font;
 
 use components::{BuildCost, Button, Color, CurrentPower, GathererType, HighlightTile, PowerBar, Rect, ResourceCount, ResourceType, SelectedTile, SellCost, Sprite, Text, Tile, Transform, Upgrade, UpgradeCost};
+use systems;
 
-pub struct PlayState {
+pub struct PlayState<'a> {
+    dispatcher: Dispatcher<'a, 'a>,
     scene: Arc<Mutex<Scene>>,
     font: Arc<Font<'static>>,
 }
 
-impl PlayState {
-    pub fn new(font: &Arc<Font<'static>>) -> PlayState {
-        PlayState{
-            scene: Arc::new(Mutex::new(Scene::new())),
+impl <'a>PlayState<'a> {
+    pub fn new(font: &Arc<Font<'static>>) -> PlayState<'a> {
+        let scene = Arc::new(Mutex::new(Scene::new()));
+
+        let dispatcher = DispatcherBuilder::new()
+            .add(systems::AnimationSystem::new(), "animation_system", &[])
+            .add(systems::PowerUsage::new(), "power_system", &[])
+            .add(systems::TileSelection{}, "tile_selection", &[])
+            .add(systems::ButtonHover{}, "button_hover", &[])
+            .add(systems::SellEnergy{}, "sell_energy", &["button_hover"])
+            .add(systems::BuildGatherer{ built_one: false, scene: scene.clone() }, "build_gatherer", &["button_hover"])
+            .add(systems::Gathering{}, "gathering", &[])
+            .add(systems::UpgradeResource{}, "upgrade_resource", &[])
+            .build();
+
+        let ps = PlayState{
+            dispatcher: dispatcher,
+            scene: scene,
             font: font.clone(),
-        }
+        };
+
+        ps
     }
 }
 
-impl State for PlayState {
+impl <'a>State for PlayState<'a> {
     fn get_scene(&self) -> Arc<Mutex<Scene>> {
         self.scene.clone()
     }
@@ -139,5 +157,9 @@ impl State for PlayState {
             .with(Color([0.0, 1.0, 0.0, 1.0]))
             .build();
         scene.nodes.push(Node::new(Some(entity), None));
+    }
+
+    fn update(&mut self, world: &mut World) {
+        self.dispatcher.dispatch(&mut world.res);
     }
 }

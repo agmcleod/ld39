@@ -11,6 +11,7 @@ use scene::node::Node;
 pub trait State {
     fn setup(&mut self, world: &mut World) {}
     fn get_scene(&self) -> Arc<Mutex<Scene>>;
+    fn update(&mut self, &mut World);
 }
 
 pub struct StateManager {
@@ -71,5 +72,9 @@ impl StateManager {
 
         self.current_state = name;
         self.states.get_mut(&self.current_state).unwrap().setup(world);
+    }
+
+    pub fn update(&mut self, world: &mut World) {
+        self.states.get_mut(&self.current_state).unwrap().update(world);
     }
 }

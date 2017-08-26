@@ -24,14 +24,14 @@ mod systems;
 mod utils;
 
 use std::collections::HashMap;
-use std::sync::{Arc, Mutex};
+use std::sync::Arc;
 use std::ops::{DerefMut};
 use std::io::BufReader;
 use std::fs::File;
 use std::path::{Path, PathBuf};
-use rusttype::{FontCollection, Font, Scale, point, PositionedGlyph};
-use components::{AnimationSheet, BuildCost, Button, Camera, ClickSound, ResourceCount, Color, CurrentPower, Gatherer, GathererType, HighlightTile, Input, PowerBar, Rect, Resources, ResourceType, SelectedTile, SellCost, Sprite, Text, Tile, Transform, Upgrade, UpgradeCost, WinCount};
-use specs::{DispatcherBuilder, Entity, Join, World, ReadStorage, WriteStorage};
+use rusttype::{FontCollection, Font};
+use components::{AnimationSheet, BuildCost, Button, Camera, ClickSound, ResourceCount, Color, CurrentPower, Gatherer, HighlightTile, Input, PowerBar, Rect, Resources, SelectedTile, SellCost, Sprite, Text, Tile, Transform, Upgrade, UpgradeCost, WinCount};
+use specs::{Entity, World, ReadStorage, WriteStorage};
 use renderer::{ColorFormat, DepthFormat};
 use spritesheet::Spritesheet;
 use glutin::{Event, ElementState, MouseButton, VirtualKeyCode, WindowEvent};
@@ -39,7 +39,6 @@ use glutin::GlContext;
 use gfx::{Device};
 use rodio::Source;
 use rodio::decoder::Decoder;
-use scene::Scene;
 use scene::node::Node;
 use state::play_state::PlayState;
 use state::StateManager;
@@ -236,17 +235,6 @@ fn main() {
     state_manager.add_state("play_state".to_string(), Box::new(play_state));
     state_manager.swap_state("play_state".to_string(), &mut world);
 
-    let mut dispatcher = DispatcherBuilder::new()
-        .add(systems::AnimationSystem::new(), "animation_system", &[])
-        .add(systems::PowerUsage::new(), "power_system", &[])
-        .add(systems::TileSelection{}, "tile_selection", &[])
-        .add(systems::ButtonHover{}, "button_hover", &[])
-        .add(systems::SellEnergy{}, "sell_energy", &["button_hover"])
-        .add(systems::BuildGatherer{ built_one: false, scene: state_manager.get_current_scene() }, "build_gatherer", &["button_hover"])
-        .add(systems::Gathering{}, "gathering", &[])
-        .add(systems::UpgradeResource{}, "upgrade_resource", &[])
-        .build();
-
     let mut running = true;
     while running {
         events_loop.poll_events(|event| {
@@ -286,7 +274,7 @@ fn main() {
             }
         });
 
-        dispatcher.dispatch(&mut world.res);
+        state_manager.update(&mut world);
         world.maintain();
 
         basic.reset_transform();
