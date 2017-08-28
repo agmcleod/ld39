@@ -2,26 +2,26 @@ use std::sync::{Arc, Mutex};
 use specs::{Dispatcher, DispatcherBuilder, World};
 use scene::Scene;
 use scene::node::Node;
-use state::{StateManager, State};
+use state::State;
 use rusttype::Font;
+use std::ops::DerefMut;
 
-use components::{BuildCost, Button, Color, CurrentPower, GathererType, HighlightTile, PowerBar, Rect, ResourceCount, ResourceType, SelectedTile, SellCost, Sprite, Text, Tile, Transform, Upgrade, UpgradeCost};
+use components::{BuildCost, Button, Color, CurrentPower, GathererType, HighlightTile, PowerBar, Rect, ResourceCount, Resources, ResourceType, SelectedTile, SellCost, Sprite, Text, Tile, Transform, Upgrade, UpgradeCost};
 use systems;
 
 pub struct PlayState<'a> {
     dispatcher: Dispatcher<'a, 'a>,
     scene: Arc<Mutex<Scene>>,
     font: Arc<Font<'static>>,
-    state_manager: Arc<Mutex<StateManager>>,
 }
 
 impl <'a>PlayState<'a> {
-    pub fn new(font: &Arc<Font<'static>>, state_manager: Arc<Mutex<StateManager>>) -> PlayState<'a> {
+    pub fn new(font: &Arc<Font<'static>>) -> PlayState<'a> {
         let scene = Arc::new(Mutex::new(Scene::new()));
 
         let dispatcher = DispatcherBuilder::new()
             .add(systems::AnimationSystem::new(), "animation_system", &[])
-            .add(systems::PowerUsage::new(state_manager.clone()), "power_system", &[])
+            .add(systems::PowerUsage::new(), "power_system", &[])
             .add(systems::TileSelection{}, "tile_selection", &[])
             .add(systems::ButtonHover{}, "button_hover", &[])
             .add(systems::SellEnergy{}, "sell_energy", &["button_hover"])
@@ -34,10 +34,13 @@ impl <'a>PlayState<'a> {
             dispatcher: dispatcher,
             scene: scene,
             font: font.clone(),
-            state_manager: state_manager,
         };
 
         ps
+    }
+
+    pub fn get_name() -> String {
+        "play_state".to_string()
     }
 }
 
@@ -63,6 +66,11 @@ impl <'a>State for PlayState<'a> {
                 tile_nodes.push(Node::new(Some(tile), None));
             }
         }
+
+        let mut resources_storage = world.write_resource::<Resources>();
+        let mut resources: &mut Resources = resources_storage.deref_mut();
+
+        resources.reset();
 
         let font = &self.font;
 

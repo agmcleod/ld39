@@ -91,6 +91,13 @@ impl Resources {
             },
         }
     }
+
+    pub fn reset(&mut self) {
+        self.coal = 50;
+        self.oil = 0;
+        self.clean = 0;
+        self.current_type = ResourceType::Coal;
+    }
 }
 
 impl Component for Resources {

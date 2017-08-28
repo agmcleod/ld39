@@ -8,6 +8,8 @@ use std::collections::HashMap;
 use scene::Scene;
 use scene::node::Node;
 
+use components::StateChange;
+
 pub trait State {
     fn setup(&mut self, world: &mut World);
     fn get_scene(&self) -> Arc<Mutex<Scene>>;
@@ -16,13 +18,13 @@ pub trait State {
 
 pub struct StateManager {
     current_state: String,
-    states: HashMap<String, Box<State + Send>>,
+    states: HashMap<String, Box<State>>,
     pub restart_next_frame: bool,
 }
 
 impl StateManager {
     pub fn new() -> StateManager {
-        let states: HashMap<String, Box<State + Send>> = HashMap::new();
+        let states: HashMap<String, Box<State>> = HashMap::new();
         StateManager{
             current_state: "".to_string(),
             states: HashMap::new(),
@@ -30,11 +32,11 @@ impl StateManager {
         }
     }
 
-    pub fn add_state(&mut self, name: String, state: Box<State + Send>) {
+    pub fn add_state(&mut self, name: String, state: Box<State>) {
         self.states.insert(name, state);
     }
 
-    fn cleanup_state (&self, state: &Box<State + Send>, world: &mut World) {
+    fn cleanup_state (&self, state: &Box<State>, world: &mut World) {
         let scene = state.get_scene();
         let scene = scene.lock().unwrap();
         for node in &scene.nodes {
@@ -54,6 +56,14 @@ impl StateManager {
 
     pub fn get_current_scene(&self) -> Arc<Mutex<Scene>> {
         self.states.get(&self.current_state).unwrap().get_scene()
+    }
+
+    pub fn process_state_change(&mut self, state_change: &mut StateChange, world: &mut World) {
+        if state_change.action != "" && state_change.state != "" {
+            if state_change.action == "restart" {
+                self.restart_current_state(world);
+            }
+        }
     }
 
     pub fn restart_current_state(&mut self, world: &mut World) {

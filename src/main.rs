@@ -24,13 +24,13 @@ mod systems;
 mod utils;
 
 use std::collections::HashMap;
-use std::sync::{Arc, Mutex};
+use std::sync::Arc;
 use std::ops::{DerefMut};
 use std::io::BufReader;
 use std::fs::File;
 use std::path::{Path, PathBuf};
 use rusttype::{FontCollection, Font};
-use components::{AnimationSheet, BuildCost, Button, Camera, ClickSound, ResourceCount, Color, CurrentPower, Gatherer, HighlightTile, Input, PowerBar, Rect, Resources, SelectedTile, SellCost, Sprite, Text, Tile, Transform, Upgrade, UpgradeCost, WinCount};
+use components::{AnimationSheet, BuildCost, Button, Camera, ClickSound, ResourceCount, Color, CurrentPower, Gatherer, HighlightTile, Input, PowerBar, Rect, Resources, SelectedTile, SellCost, Sprite, StateChange, Text, Tile, Transform, Upgrade, UpgradeCost, WinCount};
 use specs::{Entity, World, ReadStorage, WriteStorage};
 use renderer::{ColorFormat, DepthFormat};
 use spritesheet::Spritesheet;
@@ -45,6 +45,7 @@ use state::StateManager;
 
 fn setup_world(world: &mut World, window: &glutin::Window) {
     world.add_resource::<Camera>(Camera(renderer::get_ortho()));
+    world.add_resource::<StateChange>(StateChange::new());
     world.add_resource::<Input>(Input::new(window.hidpi_factor(), vec![VirtualKeyCode::W, VirtualKeyCode::A, VirtualKeyCode::S, VirtualKeyCode::D]));
     world.add_resource::<Resources>(Resources::new());
     world.add_resource::<ClickSound>(ClickSound{ play: false });
@@ -231,13 +232,9 @@ fn main() {
     setup_world(&mut world, &window);
 
     let mut state_manager = StateManager::new();
-    let state_manager = Arc::new(Mutex::new(state_manager));
-    let play_state = PlayState::new(&font, state_manager.clone());
-    {
-        let mut state_manager = state_manager.lock().unwrap();
-        state_manager.add_state("play_state".to_string(), Box::new(play_state));
-        state_manager.swap_state("play_state".to_string(), &mut world);
-    }
+    let play_state = PlayState::new(&font);
+    state_manager.add_state(PlayState::get_name(), Box::new(play_state));
+    state_manager.swap_state(PlayState::get_name(), &mut world);
 
     let mut running = true;
     while running {
@@ -278,7 +275,7 @@ fn main() {
             }
         });
 
-        state_manager.lock().unwrap().update(&mut world);
+        state_manager.update(&mut world);
         world.maintain();
 
         basic.reset_transform();
@@ -286,40 +283,52 @@ fn main() {
         encoder.clear(&target.color, [16.0 / 256.0, 14.0 / 256.0, 22.0 / 256.0, 1.0]);
         encoder.clear_depth(&target.depth, 1.0);
 
-        let sprites = world.read::<Sprite>();
-        let mut transforms = world.write::<Transform>();
-        let animation_sheets = world.read::<AnimationSheet>();
-        let colors = world.read::<Color>();
-        let highlight_tiles = world.read::<HighlightTile>();
-        let selected_tiles = world.read::<SelectedTile>();
-        let mut texts = world.write::<Text>();
-        let rects = world.read::<Rect>();
+        {
+            let sprites = world.read::<Sprite>();
+            let mut transforms = world.write::<Transform>();
+            let animation_sheets = world.read::<AnimationSheet>();
+            let colors = world.read::<Color>();
+            let highlight_tiles = world.read::<HighlightTile>();
+            let selected_tiles = world.read::<SelectedTile>();
+            let mut texts = world.write::<Text>();
+            let rects = world.read::<Rect>();
 
-        let mut click_sound_storage = world.write_resource::<ClickSound>();
-        let click_sound: &mut ClickSound = click_sound_storage.deref_mut();
-        if click_sound.play {
-            click_sound.play = false;
-            let sink = rodio::Sink::new(&audio_endpoint);
+            let mut click_sound_storage = world.write_resource::<ClickSound>();
+            let click_sound: &mut ClickSound = click_sound_storage.deref_mut();
+            if click_sound.play {
+                click_sound.play = false;
+                let sink = rodio::Sink::new(&audio_endpoint);
 
-            sink.append(click_sound_source.clone());
-            sink.play();
-            sink.detach();
+                sink.append(click_sound_source.clone());
+                sink.play();
+                sink.detach();
+            }
+
+            let scene = state_manager.get_current_scene();
+            let scene = scene.lock().unwrap();
+
+            for node in &scene.nodes {
+                render_node(node,
+                &mut basic, &mut encoder, &world, &mut factory, &spritesheet, &asset_texture,
+                &font, &mut glyph_cache,
+                &sprites, &mut transforms, &animation_sheets, &colors, &highlight_tiles, &selected_tiles, &mut texts, &rects);
+            }
+
+            encoder.flush(&mut device);
+
+            window.swap_buffers().unwrap();
+            device.cleanup();
         }
 
-        let scene = state_manager.lock().unwrap().get_current_scene();
-        let scene = scene.lock().unwrap();
+        let mut state_change = {
+            let mut state_change_storage = world.write_resource::<StateChange>();
+            let mut state_change = state_change_storage.deref_mut();
+            let copy = state_change.clone();
+            state_change.reset();
+            copy
+        };
 
-        for node in &scene.nodes {
-            render_node(node,
-            &mut basic, &mut encoder, &world, &mut factory, &spritesheet, &asset_texture,
-            &font, &mut glyph_cache,
-            &sprites, &mut transforms, &animation_sheets, &colors, &highlight_tiles, &selected_tiles, &mut texts, &rects);
-        }
-
-        encoder.flush(&mut device);
-
-        window.swap_buffers().unwrap();
-        device.cleanup();
+        state_manager.process_state_change(&mut state_change, &mut world);
     }
 
     music.stop();

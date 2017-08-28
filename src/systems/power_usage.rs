@@ -1,21 +1,19 @@
 use std::ops::DerefMut;
 use std::time::Instant;
 use std::sync::{Arc, Mutex};
-use components::{ResourceCount, CurrentPower, PowerBar, Resources, Text, Transform, WinCount};
-use state::StateManager;
+use components::{ResourceCount, CurrentPower, PowerBar, Resources, StateChange, Text, Transform, WinCount};
+use state::play_state::PlayState;
 use specs::{FetchMut, ReadStorage, WriteStorage, Join, System};
 use utils::math;
 
 pub struct PowerUsage {
     instant: Instant,
-    state_manager: Arc<Mutex<StateManager>>,
 }
 
 impl PowerUsage {
-    pub fn new(state_manager: Arc<Mutex<StateManager>>) -> PowerUsage {
+    pub fn new() -> PowerUsage {
         PowerUsage{
             instant: Instant::now(),
-            state_manager: state_manager,
         }
     }
 }
@@ -24,15 +22,16 @@ impl<'b> System<'b> for PowerUsage {
     type SystemData = (
         ReadStorage<'b, ResourceCount>,
         ReadStorage<'b, CurrentPower>,
-        FetchMut<'b, Resources>,
         WriteStorage<'b, PowerBar>,
+        FetchMut<'b, Resources>,
+        FetchMut<'b, StateChange>,
         WriteStorage<'b, Text>,
         WriteStorage<'b, Transform>,
         ReadStorage<'b, WinCount>,
     );
 
     fn run(&mut self, data: Self::SystemData) {
-        let (resource_count_storage, current_power_storage, mut resources_storage, mut power_storage, mut text_storage, mut transform_storage, win_count_storage) = data;
+        let (resource_count_storage, current_power_storage, mut power_storage, mut resources_storage, mut state_change_storage, mut text_storage, mut transform_storage, win_count_storage) = data;
         let resources: &mut Resources = resources_storage.deref_mut();
 
         let mut done = false;
@@ -48,9 +47,13 @@ impl<'b> System<'b> for PowerUsage {
                 power_left = power_bar.power_left;
                 if math::get_mills(&self.instant.elapsed()) >= 0.25 {
                     self.instant = Instant::now();
-                    power_bar.power_left -= 1;
-                    if power_bar.power_left == 0 {
-                        self.state_manager.lock().unwrap().restart_next_frame = true;
+                    if power_bar.power_left > 0 {
+                        power_bar.power_left -= 1;
+                        if power_bar.power_left == 0 {
+                            let mut state_change: &mut StateChange = state_change_storage.deref_mut();
+                            state_change.state = PlayState::get_name();
+                            state_change.action = "restart".to_string();
+                        }
                     }
                 }
             }
