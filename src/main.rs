@@ -24,7 +24,7 @@ mod systems;
 mod utils;
 
 use std::collections::HashMap;
-use std::sync::Arc;
+use std::sync::{Arc, Mutex};
 use std::ops::{DerefMut};
 use std::io::BufReader;
 use std::fs::File;
@@ -231,9 +231,13 @@ fn main() {
     setup_world(&mut world, &window);
 
     let mut state_manager = StateManager::new();
-    let play_state = PlayState::new(&font);
-    state_manager.add_state("play_state".to_string(), Box::new(play_state));
-    state_manager.swap_state("play_state".to_string(), &mut world);
+    let state_manager = Arc::new(Mutex::new(state_manager));
+    let play_state = PlayState::new(&font, state_manager.clone());
+    {
+        let mut state_manager = state_manager.lock().unwrap();
+        state_manager.add_state("play_state".to_string(), Box::new(play_state));
+        state_manager.swap_state("play_state".to_string(), &mut world);
+    }
 
     let mut running = true;
     while running {
@@ -274,7 +278,7 @@ fn main() {
             }
         });
 
-        state_manager.update(&mut world);
+        state_manager.lock().unwrap().update(&mut world);
         world.maintain();
 
         basic.reset_transform();
@@ -302,7 +306,7 @@ fn main() {
             sink.detach();
         }
 
-        let scene = state_manager.get_current_scene();
+        let scene = state_manager.lock().unwrap().get_current_scene();
         let scene = scene.lock().unwrap();
 
         for node in &scene.nodes {

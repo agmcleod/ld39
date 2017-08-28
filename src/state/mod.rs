@@ -9,30 +9,32 @@ use scene::Scene;
 use scene::node::Node;
 
 pub trait State {
-    fn setup(&mut self, world: &mut World) {}
+    fn setup(&mut self, world: &mut World);
     fn get_scene(&self) -> Arc<Mutex<Scene>>;
     fn update(&mut self, &mut World);
 }
 
 pub struct StateManager {
     current_state: String,
-    states: HashMap<String, Box<State>>,
+    states: HashMap<String, Box<State + Send>>,
+    pub restart_next_frame: bool,
 }
 
 impl StateManager {
     pub fn new() -> StateManager {
-        let mut states: HashMap<String, Box<State>> = HashMap::new();
+        let states: HashMap<String, Box<State + Send>> = HashMap::new();
         StateManager{
             current_state: "".to_string(),
             states: HashMap::new(),
+            restart_next_frame: false,
         }
     }
 
-    pub fn add_state(&mut self, name: String, state: Box<State>) {
+    pub fn add_state(&mut self, name: String, state: Box<State + Send>) {
         self.states.insert(name, state);
     }
 
-    fn cleanup_state (&self, state: &Box<State>, world: &mut World) {
+    fn cleanup_state (&self, state: &Box<State + Send>, world: &mut World) {
         let scene = state.get_scene();
         let scene = scene.lock().unwrap();
         for node in &scene.nodes {

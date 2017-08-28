@@ -2,7 +2,7 @@ use std::sync::{Arc, Mutex};
 use specs::{Dispatcher, DispatcherBuilder, World};
 use scene::Scene;
 use scene::node::Node;
-use state::State;
+use state::{StateManager, State};
 use rusttype::Font;
 
 use components::{BuildCost, Button, Color, CurrentPower, GathererType, HighlightTile, PowerBar, Rect, ResourceCount, ResourceType, SelectedTile, SellCost, Sprite, Text, Tile, Transform, Upgrade, UpgradeCost};
@@ -12,15 +12,16 @@ pub struct PlayState<'a> {
     dispatcher: Dispatcher<'a, 'a>,
     scene: Arc<Mutex<Scene>>,
     font: Arc<Font<'static>>,
+    state_manager: Arc<Mutex<StateManager>>,
 }
 
 impl <'a>PlayState<'a> {
-    pub fn new(font: &Arc<Font<'static>>) -> PlayState<'a> {
+    pub fn new(font: &Arc<Font<'static>>, state_manager: Arc<Mutex<StateManager>>) -> PlayState<'a> {
         let scene = Arc::new(Mutex::new(Scene::new()));
 
         let dispatcher = DispatcherBuilder::new()
             .add(systems::AnimationSystem::new(), "animation_system", &[])
-            .add(systems::PowerUsage::new(), "power_system", &[])
+            .add(systems::PowerUsage::new(state_manager.clone()), "power_system", &[])
             .add(systems::TileSelection{}, "tile_selection", &[])
             .add(systems::ButtonHover{}, "button_hover", &[])
             .add(systems::SellEnergy{}, "sell_energy", &["button_hover"])
@@ -33,6 +34,7 @@ impl <'a>PlayState<'a> {
             dispatcher: dispatcher,
             scene: scene,
             font: font.clone(),
+            state_manager: state_manager,
         };
 
         ps

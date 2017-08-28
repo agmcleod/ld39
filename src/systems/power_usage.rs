@@ -1,17 +1,21 @@
 use std::ops::DerefMut;
 use std::time::Instant;
+use std::sync::{Arc, Mutex};
 use components::{ResourceCount, CurrentPower, PowerBar, Resources, Text, Transform, WinCount};
+use state::StateManager;
 use specs::{FetchMut, ReadStorage, WriteStorage, Join, System};
 use utils::math;
 
 pub struct PowerUsage {
     instant: Instant,
+    state_manager: Arc<Mutex<StateManager>>,
 }
 
 impl PowerUsage {
-    pub fn new() -> PowerUsage {
+    pub fn new(state_manager: Arc<Mutex<StateManager>>) -> PowerUsage {
         PowerUsage{
             instant: Instant::now(),
+            state_manager: state_manager,
         }
     }
 }
@@ -46,8 +50,7 @@ impl<'b> System<'b> for PowerUsage {
                     self.instant = Instant::now();
                     power_bar.power_left -= 1;
                     if power_bar.power_left == 0 {
-                        // end scenario
-                        panic!("lost!");
+                        self.state_manager.lock().unwrap().restart_next_frame = true;
                     }
                 }
             }
