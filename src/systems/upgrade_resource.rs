@@ -67,25 +67,6 @@ impl<'a> System<'a> for UpgradeResource {
         }
 
         if resource_type_changed && added_new_resource_ui {
-            let mut y = 460;
-            let frame_name = if resources.current_type == ResourceType::Oil {
-                "oil.png".to_string()
-            } else {
-                y = 420;
-                "sun.png".to_string()
-            };
-
-            let new_resource_count = entities.create();
-            resource_count_storage.insert(new_resource_count, ResourceCount{ resource_type: resources.current_type });
-            transform_storage.insert(new_resource_count, Transform::new(670, y, 0, 32, 32, 0.0, 1.0, 1.0));
-            sprite_storage.insert(new_resource_count, Sprite{ frame_name: frame_name, visible: true });
-
-            let new_resource_count = entities.create();
-            resource_count_storage.insert(new_resource_count, ResourceCount{ resource_type: resources.current_type });
-            transform_storage.insert(new_resource_count, Transform::new(720, y, 0, 32, 32, 0.0, 1.0, 1.0));
-            text_storage.insert(new_resource_count, Text::new_from(text_scale_to_copy.unwrap(), text_point_to_copy.unwrap()));
-            color_storage.insert(new_resource_count, Color([0.0, 1.0, 0.0, 1.0]));
-
             // display win requirements
             if resources.current_type == ResourceType::Clean {
                 let win_count = entities.create();

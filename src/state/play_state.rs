@@ -93,6 +93,7 @@ impl <'a>State for PlayState<'a> {
             .build();
         scene.nodes.push(Node::new(Some(entity), None));
 
+        // coal sprite
         let entity = world.create_entity()
             .with(ResourceCount{ resource_type: ResourceType::Coal })
             .with(Transform::new(670, 500, 0, 32, 32, 0.0, 1.0, 1.0))
@@ -100,9 +101,44 @@ impl <'a>State for PlayState<'a> {
             .build();
         scene.nodes.push(Node::new(Some(entity), None));
 
+        // coal text
         let entity = world.create_entity()
             .with(ResourceCount{ resource_type: ResourceType::Coal })
             .with(Transform::new(720, 500, 0, 32, 32, 0.0, 1.0, 1.0))
+            .with(Text::new(&font, 32.0))
+            .with(Color([0.0, 1.0, 0.0, 1.0]))
+            .build();
+        scene.nodes.push(Node::new(Some(entity), None));
+
+        // oil sprite
+        let entity = world.create_entity()
+            .with(ResourceCount{ resource_type: ResourceType::Oil })
+            .with(Transform::new(670, 460, 0, 32, 32, 0.0, 1.0, 1.0))
+            .with(Sprite{ frame_name: "oil.png".to_string(), visible: true })
+            .build();
+        scene.nodes.push(Node::new(Some(entity), None));
+
+        // oil text
+        let entity = world.create_entity()
+            .with(ResourceCount{ resource_type: ResourceType::Oil })
+            .with(Transform::new(720, 460, 0, 32, 32, 0.0, 1.0, 1.0))
+            .with(Text::new(&font, 32.0))
+            .with(Color([0.0, 1.0, 0.0, 1.0]))
+            .build();
+        scene.nodes.push(Node::new(Some(entity), None));
+
+        // solar sprite
+        let entity = world.create_entity()
+            .with(ResourceCount{ resource_type: ResourceType::Clean })
+            .with(Transform::new(670, 420, 0, 32, 32, 0.0, 1.0, 1.0))
+            .with(Sprite{ frame_name: "sun.png".to_string(), visible: true })
+            .build();
+        scene.nodes.push(Node::new(Some(entity), None));
+
+        // solar text
+        let entity = world.create_entity()
+            .with(ResourceCount{ resource_type: ResourceType::Clean })
+            .with(Transform::new(720, 420, 0, 32, 32, 0.0, 1.0, 1.0))
             .with(Text::new(&font, 32.0))
             .with(Color([0.0, 1.0, 0.0, 1.0]))
             .build();
