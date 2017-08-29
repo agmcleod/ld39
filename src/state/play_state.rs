@@ -67,10 +67,12 @@ impl <'a>State for PlayState<'a> {
             }
         }
 
-        let mut resources_storage = world.write_resource::<Resources>();
-        let mut resources: &mut Resources = resources_storage.deref_mut();
+        {
+            let mut resources_storage = world.write_resource::<Resources>();
+            let mut resources: &mut Resources = resources_storage.deref_mut();
 
-        resources.reset();
+            resources.reset();
+        }
 
         let font = &self.font;
 
