@@ -54,11 +54,13 @@ impl <'a>State for PlayState<'a> {
         scene.clear();
 
         let mut tile_nodes: Vec<Node> = Vec::with_capacity(100);
-        for row in 0i32..10i32 {
-            for col in 0i32..10i32 {
+        for row in 0..10 {
+            for col in 0..10 {
+                let col = col as f32;
+                let row = row as f32;
                 let size = Tile::get_size();
                 let tile = world.create_entity()
-                    .with(Transform::new(size * col, size * row, 1, size as u16, size as u16, 0.0, 1.0, 1.0))
+                    .with(Transform::new(size * col, size * row, 1.0, size as u16, size as u16, 0.0, 1.0, 1.0))
                     .with(Sprite{ frame_name: "tiles.png".to_string(), visible: true })
                     .with(Tile{})
                     .build();
@@ -80,14 +82,14 @@ impl <'a>State for PlayState<'a> {
 
         let entity = world.create_entity()
             .with(PowerBar::new())
-            .with(Transform::new(670, 576, 1, 260, 32, 0.0, 1.0, 1.0))
+            .with(Transform::new(670.0, 576.0, 1.0, 260, 32, 0.0, 1.0, 1.0))
             .with(Sprite{ frame_name: "powerbar.png".to_string(), visible: true })
             .build();
         scene.nodes.push(Node::new(Some(entity), None));
 
         let entity = world.create_entity()
             .with(CurrentPower{})
-            .with(Transform::new(674, 580, 0, CurrentPower::get_max_with(), 24, 0.0, 1.0, 1.0))
+            .with(Transform::new(674.0, 580.0, 0.0, CurrentPower::get_max_with(), 24, 0.0, 1.0, 1.0))
             .with(Rect{})
             .with(Color([0.0, 1.0, 0.0, 1.0]))
             .build();
@@ -96,7 +98,7 @@ impl <'a>State for PlayState<'a> {
         // coal sprite
         let entity = world.create_entity()
             .with(ResourceCount{ resource_type: ResourceType::Coal })
-            .with(Transform::new(670, 500, 0, 32, 32, 0.0, 1.0, 1.0))
+            .with(Transform::new(670.0, 500.0, 0.0, 32, 32, 0.0, 1.0, 1.0))
             .with(Sprite{ frame_name: "coal.png".to_string(), visible: true })
             .build();
         scene.nodes.push(Node::new(Some(entity), None));
@@ -104,7 +106,7 @@ impl <'a>State for PlayState<'a> {
         // coal text
         let entity = world.create_entity()
             .with(ResourceCount{ resource_type: ResourceType::Coal })
-            .with(Transform::new(720, 500, 0, 32, 32, 0.0, 1.0, 1.0))
+            .with(Transform::new(720.0, 500.0, 0.0, 32, 32, 0.0, 1.0, 1.0))
             .with(Text::new(&font, 32.0))
             .with(Color([0.0, 1.0, 0.0, 1.0]))
             .build();
@@ -113,7 +115,7 @@ impl <'a>State for PlayState<'a> {
         // oil sprite
         let entity = world.create_entity()
             .with(ResourceCount{ resource_type: ResourceType::Oil })
-            .with(Transform::new(670, 460, 0, 32, 32, 0.0, 1.0, 1.0))
+            .with(Transform::new(670.0, 460.0, 0.0, 32, 32, 0.0, 1.0, 1.0))
             .with(Sprite{ frame_name: "oil.png".to_string(), visible: true })
             .build();
         scene.nodes.push(Node::new(Some(entity), None));
@@ -121,7 +123,7 @@ impl <'a>State for PlayState<'a> {
         // oil text
         let entity = world.create_entity()
             .with(ResourceCount{ resource_type: ResourceType::Oil })
-            .with(Transform::new(720, 460, 0, 32, 32, 0.0, 1.0, 1.0))
+            .with(Transform::new(720.0, 460.0, 0.0, 32, 32, 0.0, 1.0, 1.0))
             .with(Text::new(&font, 32.0))
             .with(Color([0.0, 1.0, 0.0, 1.0]))
             .build();
@@ -130,7 +132,7 @@ impl <'a>State for PlayState<'a> {
         // solar sprite
         let entity = world.create_entity()
             .with(ResourceCount{ resource_type: ResourceType::Clean })
-            .with(Transform::new(670, 420, 0, 32, 32, 0.0, 1.0, 1.0))
+            .with(Transform::new(670.0, 420.0, 0.0, 32, 32, 0.0, 1.0, 1.0))
             .with(Sprite{ frame_name: "sun.png".to_string(), visible: true })
             .build();
         scene.nodes.push(Node::new(Some(entity), None));
@@ -138,7 +140,7 @@ impl <'a>State for PlayState<'a> {
         // solar text
         let entity = world.create_entity()
             .with(ResourceCount{ resource_type: ResourceType::Clean })
-            .with(Transform::new(720, 420, 0, 32, 32, 0.0, 1.0, 1.0))
+            .with(Transform::new(720.0, 420.0, 0.0, 32, 32, 0.0, 1.0, 1.0))
             .with(Text::new(&font, 32.0))
             .with(Color([0.0, 1.0, 0.0, 1.0]))
             .build();
@@ -146,28 +148,21 @@ impl <'a>State for PlayState<'a> {
 
         let entity = world.create_entity()
             .with(HighlightTile{ visible: false })
-            .with(Transform::new(0, 0, 0, 64, 64, 0.0, 1.0, 1.0))
+            .with(Transform::new(0.0, 0.0, 0.0, 64, 64, 0.0, 1.0, 1.0))
             .with(Color([1.0, 1.0, 1.0, 0.3]))
             .build();
         scene.nodes.push(Node::new(Some(entity), None));
 
         let entity = world.create_entity()
             .with(SelectedTile{ visible: false })
-            .with(Transform::new(0, 0, 0, 64, 64, 0.0, 1.0, 1.0))
+            .with(Transform::new(0.0, 0.0, 0.0, 64, 64, 0.0, 1.0, 1.0))
             .with(Color([1.0, 1.0, 1.0, 0.6]))
             .build();
         scene.nodes.push(Node::new(Some(entity), None));
 
         let entity = world.create_entity()
-            .with(Button::new("build".to_string(), ["build.png".to_string(), "build_hover.png".to_string()]))
-            .with(Transform::new(670, 32, 0, 96, 32, 0.0, 1.0, 1.0))
-            .with(Sprite{ frame_name: "build.png".to_string(), visible: true })
-            .build();
-        scene.nodes.push(Node::new(Some(entity), None));
-
-        let entity = world.create_entity()
             .with(Button::new("power-btn".to_string(), ["power-btn.png".to_string(), "power-btn-hover.png".to_string()]))
-            .with(Transform::new(820, 32, 0, 96, 32, 0.0, 1.0, 1.0))
+            .with(Transform::new(770.0, 32.0, 0.0, 96, 32, 0.0, 1.0, 1.0))
             .with(Sprite{ frame_name: "sell.png".to_string(), visible: true })
             .build();
         scene.nodes.push(Node::new(Some(entity), None));
@@ -179,7 +174,7 @@ impl <'a>State for PlayState<'a> {
         let entity = world.create_entity()
             .with(UpgradeCost{})
             .with(text)
-            .with(Transform::new(750, 100, 0, 32, 32, 0.0, 1.0, 1.0))
+            .with(Transform::new(750.0, 100.0, 0.0, 32, 32, 0.0, 1.0, 1.0))
             .with(Color([0.0, 1.0, 0.0, 1.0]))
             .build();
         scene.nodes.push(Node::new(Some(entity), None));
@@ -189,7 +184,7 @@ impl <'a>State for PlayState<'a> {
         text.set_text(format!("{}", GathererType::Coal.get_build_cost()));
         let entity = world.create_entity()
             .with(BuildCost{})
-            .with(Transform::new(775, 32, 0, 0, 0, 0.0, 1.0, 1.0))
+            .with(Transform::new(775.0, 32.0, 0.0, 0, 0, 0.0, 1.0, 1.0))
             .with(text)
             .with(Color([0.0, 1.0, 0.0, 1.0]))
             .build();
@@ -200,7 +195,7 @@ impl <'a>State for PlayState<'a> {
         text.set_text("10".to_string());
         let entity = world.create_entity()
             .with(SellCost{})
-            .with(Transform::new(925, 32, 0, 0, 0, 0.0, 1.0, 1.0))
+            .with(Transform::new(925.0, 32.0, 0.0, 0, 0, 0.0, 1.0, 1.0))
             .with(text)
             .with(Color([0.0, 1.0, 0.0, 1.0]))
             .build();

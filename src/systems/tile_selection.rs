@@ -18,11 +18,11 @@ impl<'a> System<'a> for TileSelection {
 
         let input: &Input = input_storage.deref();
         let mouse_x = input.mouse_pos.0;
-        let mouse_y = 640 - input.mouse_pos.1;
-        let within_grid = mouse_x >= 0 && mouse_x <= 640 && mouse_y >= 0 && mouse_y <= 640;
+        let mouse_y = 640.0 - input.mouse_pos.1;
+        let within_grid = mouse_x >= 0.0 && mouse_x <= 640.0 && mouse_y >= 0.0 && mouse_y <= 640.0;
         let tile_size = Tile::get_size();
-        let tile_mouse_x = mouse_x / tile_size * tile_size;
-        let tile_mouse_y = mouse_y / tile_size * tile_size;
+        let tile_mouse_x = (mouse_x / tile_size).floor() * tile_size;
+        let tile_mouse_y = (mouse_y / tile_size).floor() * tile_size;
 
         for (hightlight_tile, transform) in (&mut hightlight_tile_storage, &mut transform_storage).join() {
             if within_grid {

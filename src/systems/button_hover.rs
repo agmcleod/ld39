@@ -18,7 +18,7 @@ impl<'a> System<'a> for ButtonHover {
         let input: &Input = input_storage.deref();
 
         let mouse_x = input.mouse_pos.0;
-        let mouse_y = 640 - input.mouse_pos.1;
+        let mouse_y = 640.0 - input.mouse_pos.1;
 
         for (button, sprite, transform) in (&mut button_storage, &mut sprite_storage, &transform_storage).join() {
             if transform.contains(&mouse_x, &mouse_y) {

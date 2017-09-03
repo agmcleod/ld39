@@ -244,8 +244,8 @@ fn main() {
                     WindowEvent::MouseMoved{ position: (x, y), .. } => {
                         let mut input_res = world.write_resource::<Input>();
                         let mut input = input_res.deref_mut();
-                        input.mouse_pos.0 = (x as f32 / input.hidpi_factor) as i32;
-                        input.mouse_pos.1 = (y as f32 / input.hidpi_factor) as i32;
+                        input.mouse_pos.0 = x as f32 / input.hidpi_factor;
+                        input.mouse_pos.1 = y as f32 / input.hidpi_factor;
                     },
                     WindowEvent::MouseInput{ button: MouseButton::Left, state, .. } => {
                         let mut input_res = world.write_resource::<Input>();
@@ -318,6 +318,7 @@ fn main() {
 
             window.swap_buffers().unwrap();
             device.cleanup();
+            basic.reset_transform();
         }
 
         let mut state_change = {

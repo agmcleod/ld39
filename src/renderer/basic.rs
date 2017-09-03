@@ -4,7 +4,7 @@ extern crate specs;
 
 use specs::World;
 use renderer::{ColorFormat, DepthFormat};
-use cgmath::{SquareMatrix, Matrix4, Vector3};
+use cgmath::{SquareMatrix, Matrix4, Transform};
 use gfx::traits::FactoryExt;
 use gfx::texture;
 use components;
@@ -40,6 +40,7 @@ pub struct WindowTargets<R: gfx::Resources> {
 pub struct Basic<R: gfx::Resources> {
     pso: gfx::PipelineState<R, pipe::Meta>,
     projection: Projection,
+    model: Matrix4<f32>,
     target: WindowTargets<R>,
     color_texture: (gfx::handle::ShaderResourceView<R, [f32; 4]>, gfx::handle::Sampler<R>),
 }
@@ -73,6 +74,7 @@ impl<R> Basic<R>
                 model: Matrix4::identity().into(),
                 proj: self::super::get_ortho().into(),
             },
+            model: Matrix4::identity(),
             target: (*target).clone(),
             color_texture: (texture_view, factory.create_sampler(sinfo)),
         }
@@ -97,9 +99,8 @@ impl<R> Basic<R>
 
         let camera_res = world.read_resource::<components::Camera>();
         let camera = camera_res.deref();
-        let x = transform.pos.x as f32;
-        let y = transform.pos.y as f32;
-        let z = transform.pos.z as f32;
+        let y = transform.pos.y;
+        let z = transform.pos.z;
         let w = transform.size.x as f32;
         let h = transform.size.y as f32;
 
@@ -134,22 +135,22 @@ impl<R> Basic<R>
 
         let data: Vec<Vertex> = vec![
             Vertex{
-                pos: [x, y, z],
+                pos: [0.0, 0.0, z],
                 uv: [tx, ty2],
                 color: color,
             },
             Vertex{
-                pos: [x + w, y, z],
+                pos: [w, 0.0, z],
                 uv: [tx2, ty2],
                 color: color,
             },
             Vertex{
-                pos: [x + w, y + h, z],
+                pos: [w, h, z],
                 uv: [tx2, ty],
                 color: color,
             },
             Vertex{
-                pos: [x, y + h, z],
+                pos: [0.0, h, z],
                 uv: [tx, ty],
                 color: color,
             }
@@ -167,8 +168,13 @@ impl<R> Basic<R>
         };
 
         self.projection.proj = (*camera).0.into();
+        let transform = Matrix4::from_translation(transform.pos);
+        self.model = self.model.concat(&transform);
+        self.projection.model = self.model.into();
 
         encoder.update_constant_buffer(&params.projection_cb, &self.projection);
         encoder.draw(&slice, &self.pso, &params);
+
+        self.model = self.model.concat(&transform.inverse_transform().unwrap());
     }
 }

@@ -3,8 +3,8 @@ use specs::{VecStorage, Component};
 pub struct Tile;
 
 impl Tile {
-    pub fn get_size() -> i32 {
-        64
+    pub fn get_size() -> f32 {
+        64.0
     }
 }
 

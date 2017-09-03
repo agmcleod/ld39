@@ -6,7 +6,7 @@ use glutin::VirtualKeyCode;
 pub struct Input {
     pub hidpi_factor: f32,
     pub pressed_keys: HashMap<VirtualKeyCode, bool>,
-    pub mouse_pos: (i32, i32),
+    pub mouse_pos: (f32, f32),
     pub mouse_pressed: bool,
 }
 
@@ -20,7 +20,7 @@ impl Input {
         Input{
             hidpi_factor: hidpi_factor,
             pressed_keys: key_map,
-            mouse_pos: (0, 0),
+            mouse_pos: (0.0, 0.0),
             mouse_pressed: false
         }
     }
