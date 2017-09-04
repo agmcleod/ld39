@@ -1,6 +1,6 @@
 use std::ops::{Deref, DerefMut};
 use specs::{Entities, Fetch, FetchMut, Join, ReadStorage, WriteStorage, System};
-use components::{AnimationSheet, Button, ClickSound, Gatherer, GathererType, Input, Resources, ResourceType, SelectedTile, Sprite, Text, Transform, Upgrade, UpgradeCost, WinCount};
+use components::{AnimationSheet, Button, ClickSound, Gatherer, GathererType, Input, Resources, ResourceType, SelectedTile, Sprite, Text, Transform, Upgrade, UpgradeCost, Wallet, WinCount};
 use std::sync::{Arc, Mutex};
 use scene::Scene;
 use scene::node::Node;
@@ -25,15 +25,17 @@ impl<'a> System<'a> for BuildGatherer {
         WriteStorage<'a, Transform>,
         WriteStorage<'a, Upgrade>,
         ReadStorage<'a, UpgradeCost>,
+        FetchMut<'a, Wallet>,
         WriteStorage<'a, WinCount>,
     );
 
     fn run(&mut self, data: Self::SystemData) {
-        let (mut animation_sheet_storage, mut button_storage, mut click_sound_storage, entities, mut gatherer_storage, input_storage, mut resources_storage, mut selected_tile_storage, mut sprite_storage, mut text_storage, mut transform_storage, mut upgrade_storage, upgrade_cost_storage, mut win_count_storage) = data;
+        let (mut animation_sheet_storage, mut button_storage, mut click_sound_storage, entities, mut gatherer_storage, input_storage, mut resources_storage, mut selected_tile_storage, mut sprite_storage, mut text_storage, mut transform_storage, mut upgrade_storage, upgrade_cost_storage, mut wallet_storage, mut win_count_storage) = data;
 
         let resources: &mut Resources = resources_storage.deref_mut();
         let input: &Input = input_storage.deref();
         let click_sound: &mut ClickSound = click_sound_storage.deref_mut();
+        let wallet: &mut Wallet = wallet_storage.deref_mut();
 
         let mut button_pressed = false;
         for button in (&mut button_storage).join() {
@@ -48,7 +50,7 @@ impl<'a> System<'a> for BuildGatherer {
         let mut selected_tile_y = 0.0;
         for (selected_tile, transform) in (&mut selected_tile_storage, &transform_storage).join() {
             let amount = GathererType::get_type_for_resources_type(&resources.get_current_type()).get_build_cost();
-            if button_pressed && selected_tile.visible && resources.get_resources(amount) > 0 {
+            if button_pressed && selected_tile.visible && wallet.spend(amount) {
                 selected_tile.visible = false;
                 create = true;
 

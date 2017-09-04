@@ -30,7 +30,7 @@ use std::io::BufReader;
 use std::fs::File;
 use std::path::{Path, PathBuf};
 use rusttype::{FontCollection, Font};
-use components::{AnimationSheet, BuildCost, Button, Camera, ClickSound, ResourceCount, Color, CurrentPower, Gatherer, HighlightTile, Input, PowerBar, Rect, Resources, SelectedTile, SellCost, Sprite, StateChange, Text, Tile, Transform, Upgrade, UpgradeCost, WinCount};
+use components::{AnimationSheet, BuildCost, Button, Camera, ClickSound, ResourceCount, Color, CurrentPower, Gatherer, HighlightTile, Input, PowerBar, Rect, Resources, SelectedTile, Sprite, StateChange, Text, Tile, Transform, Upgrade, UpgradeCost, Wallet, WalletUI, WinCount};
 use specs::{Entity, World, ReadStorage, WriteStorage};
 use renderer::{ColorFormat, DepthFormat};
 use spritesheet::Spritesheet;
@@ -49,6 +49,7 @@ fn setup_world(world: &mut World, window: &glutin::Window) {
     world.add_resource::<Input>(Input::new(window.hidpi_factor(), vec![VirtualKeyCode::W, VirtualKeyCode::A, VirtualKeyCode::S, VirtualKeyCode::D]));
     world.add_resource::<Resources>(Resources::new());
     world.add_resource::<ClickSound>(ClickSound{ play: false });
+    world.add_resource::<Wallet>(Wallet::new());
     world.register::<AnimationSheet>();
     world.register::<BuildCost>();
     world.register::<Button>();
@@ -59,7 +60,6 @@ fn setup_world(world: &mut World, window: &glutin::Window) {
     world.register::<HighlightTile>();
     world.register::<PowerBar>();
     world.register::<Rect>();
-    world.register::<SellCost>();
     world.register::<SelectedTile>();
     world.register::<Sprite>();
     world.register::<Text>();
@@ -67,6 +67,7 @@ fn setup_world(world: &mut World, window: &glutin::Window) {
     world.register::<Transform>();
     world.register::<Upgrade>();
     world.register::<UpgradeCost>();
+    world.register::<WalletUI>();
     world.register::<WinCount>();
 }
 

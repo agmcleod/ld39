@@ -39,8 +39,10 @@ impl Text {
     }
 
     pub fn set_text(&mut self, text: String) {
-        self.new_data = true;
-        self.text = text;
+        if self.text != text {
+            self.new_data = true;
+            self.text = text;
+        }
     }
 }
 

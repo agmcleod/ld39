@@ -32,7 +32,7 @@ impl Resources {
         }
     }
 
-    pub fn get_resources(&mut self, amount: usize) -> usize {
+    pub fn withdraw_resources(&mut self, amount: usize) -> usize {
         let coal = self.coal;
         let oil = self.oil;
         let clean = self.clean;
@@ -60,6 +60,26 @@ impl Resources {
 
         self.clean -= m_amount;
         return amount
+    }
+
+    pub fn withdraw_all_for_type(&mut self, resource_type: ResourceType) -> usize {
+        match resource_type {
+            ResourceType::Coal => {
+                let amount = self.coal;
+                self.coal = 0;
+                amount
+            },
+            ResourceType::Oil => {
+                let amount = self.oil;
+                self.oil = 0;
+                amount
+            },
+            ResourceType::Clean => {
+                let amount = self.clean;
+                self.clean = 0;
+                amount
+            },
+        }
     }
 
     pub fn get_amount(&mut self) -> usize {

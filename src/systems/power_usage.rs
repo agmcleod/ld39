@@ -66,9 +66,7 @@ impl<'b> System<'b> for PowerUsage {
 
         for (resource_count, text) in (&resource_count_storage, &mut text_storage).join() {
             let new_text = format!("{}", resources.get_amount_for_type(&resource_count.resource_type));
-            if new_text != text.text {
-                text.set_text(new_text);
-            }
+            text.set_text(new_text);
         }
     }
 }

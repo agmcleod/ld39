@@ -6,7 +6,7 @@ use state::State;
 use rusttype::Font;
 use std::ops::DerefMut;
 
-use components::{BuildCost, Button, Color, CurrentPower, GathererType, HighlightTile, PowerBar, Rect, ResourceCount, Resources, ResourceType, SelectedTile, SellCost, Sprite, Text, Tile, Transform, Upgrade, UpgradeCost};
+use components::{BuildCost, Button, Color, CurrentPower, GathererType, HighlightTile, PowerBar, Rect, ResourceCount, Resources, ResourceType, SelectedTile, Sprite, Text, Tile, Transform, Upgrade, UpgradeCost, Wallet, WalletUI};
 use systems;
 
 pub struct PlayState<'a> {
@@ -74,6 +74,11 @@ impl <'a>State for PlayState<'a> {
             let mut resources: &mut Resources = resources_storage.deref_mut();
 
             resources.reset();
+
+            let mut wallet_storage = world.write_resource::<Wallet>();
+            let mut wallet: &mut Wallet = wallet_storage.deref_mut();
+
+            wallet.reset();
         }
 
         let font = &self.font;
@@ -146,6 +151,18 @@ impl <'a>State for PlayState<'a> {
             .build();
         scene.nodes.push(Node::new(Some(entity), None));
 
+        // money text
+        let mut text = Text::new(&font, 32.0);
+        text.set_text(format!("{}", Wallet::start_amount()));
+        let entity = world.create_entity()
+            .with(WalletUI{})
+            .with(Transform::new(720.0, 380.0, 0.0, 32, 32, 0.0, 1.0, 1.0))
+            .with(text)
+            .with(Color([0.0, 1.0, 0.0, 1.0]))
+            .build();
+        scene.nodes.push(Node::new(Some(entity), None));
+
+        // highlight
         let entity = world.create_entity()
             .with(HighlightTile{ visible: false })
             .with(Transform::new(0.0, 0.0, 0.0, 64, 64, 0.0, 1.0, 1.0))
@@ -153,6 +170,7 @@ impl <'a>State for PlayState<'a> {
             .build();
         scene.nodes.push(Node::new(Some(entity), None));
 
+        // selected
         let entity = world.create_entity()
             .with(SelectedTile{ visible: false })
             .with(Transform::new(0.0, 0.0, 0.0, 64, 64, 0.0, 1.0, 1.0))
@@ -160,6 +178,7 @@ impl <'a>State for PlayState<'a> {
             .build();
         scene.nodes.push(Node::new(Some(entity), None));
 
+        // sell button
         let entity = world.create_entity()
             .with(Button::new("power-btn".to_string(), ["power-btn.png".to_string(), "power-btn-hover.png".to_string()]))
             .with(Transform::new(770.0, 32.0, 0.0, 96, 32, 0.0, 1.0, 1.0))
@@ -175,28 +194,6 @@ impl <'a>State for PlayState<'a> {
             .with(UpgradeCost{})
             .with(text)
             .with(Transform::new(750.0, 100.0, 0.0, 32, 32, 0.0, 1.0, 1.0))
-            .with(Color([0.0, 1.0, 0.0, 1.0]))
-            .build();
-        scene.nodes.push(Node::new(Some(entity), None));
-
-        // build
-        let mut text = Text::new(&font, 32.0);
-        text.set_text(format!("{}", GathererType::Coal.get_build_cost()));
-        let entity = world.create_entity()
-            .with(BuildCost{})
-            .with(Transform::new(775.0, 32.0, 0.0, 0, 0, 0.0, 1.0, 1.0))
-            .with(text)
-            .with(Color([0.0, 1.0, 0.0, 1.0]))
-            .build();
-        scene.nodes.push(Node::new(Some(entity), None));
-
-        // sell
-        let mut text = Text::new(&font, 32.0);
-        text.set_text("10".to_string());
-        let entity = world.create_entity()
-            .with(SellCost{})
-            .with(Transform::new(925.0, 32.0, 0.0, 0, 0, 0.0, 1.0, 1.0))
-            .with(text)
             .with(Color([0.0, 1.0, 0.0, 1.0]))
             .build();
         scene.nodes.push(Node::new(Some(entity), None));

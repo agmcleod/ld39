@@ -33,7 +33,7 @@ impl<'a> System<'a> for UpgradeResource {
         let mut upgrade_cost = 0;
 
         for (entity, upgrade, button) in (&*entities, &mut upgrade_storage, &mut button_storage).join() {
-            if button.clicked(&input) && resources.get_resources(upgrade.get_cost()) > 0 {
+            if button.clicked(&input) && resources.withdraw_resources(upgrade.get_cost()) > 0 {
                 resources.current_type = match resources.current_type {
                     ResourceType::Coal => ResourceType::Oil,
                     ResourceType::Oil => ResourceType::Clean,
