@@ -151,6 +151,15 @@ impl <'a>State for PlayState<'a> {
             .build();
         scene.nodes.push(Node::new(Some(entity), None));
 
+        // money sprite
+        let entity = world.create_entity()
+            .with(WalletUI{})
+            .with(Transform::new(673.0, 380.0, 0.0, 26, 32, 0.0, 1.0, 1.0))
+            .with(Sprite{ frame_name: "dollarsign.png".to_string(), visible: true })
+            .build();
+        scene.nodes.push(Node::new(Some(entity), None));
+
+
         // money text
         let mut text = Text::new(&font, 32.0);
         text.set_text(format!("{}", Wallet::start_amount()));
