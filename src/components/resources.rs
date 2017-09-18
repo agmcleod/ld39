@@ -1,4 +1,3 @@
-use std::cmp;
 use specs::{Component, HashMapStorage};
 use components::GathererType;
 
@@ -25,7 +24,7 @@ pub struct Resources {
 impl Resources {
     pub fn new() -> Resources {
         Resources{
-            coal: 50,
+            coal: 0,
             oil: 0,
             clean: 0,
             current_type: ResourceType::Coal,

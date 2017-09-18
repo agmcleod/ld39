@@ -1,20 +1,41 @@
 use std::ops::Deref;
-use specs::{ReadStorage, WriteStorage, Fetch, Join, System};
-use components::{Gatherer, HighlightTile, Input, SelectedTile, Tile, Transform};
+use std::sync::{Arc, Mutex};
+use specs::{Entity, Entities, ReadStorage, WriteStorage, Fetch, Join, System};
+use components::{Button, Gatherer, HighlightTile, Input, Resources, SelectedTile, Sprite, Tile, Transform};
+use scene::Scene;
+use entities::build_ui;
 
-pub struct TileSelection;
+pub struct TileSelection {
+    pub scene: Arc<Mutex<Scene>>,
+    pub build_ui_entity: Option<Entity>,
+    pub mouse_processed: bool,
+}
+
+impl TileSelection {
+    pub fn new(scene: Arc<Mutex<Scene>>) -> TileSelection {
+        TileSelection{
+            scene: scene,
+            build_ui_entity: None,
+            mouse_processed: false,
+        }
+    }
+}
 
 impl<'a> System<'a> for TileSelection {
     type SystemData = (
+        WriteStorage<'a, Button>,
+        Entities<'a>,
         ReadStorage<'a, Gatherer>,
         WriteStorage<'a, HighlightTile>,
         Fetch<'a, Input>,
+        Fetch<'a, Resources>,
         WriteStorage<'a, SelectedTile>,
+        WriteStorage<'a, Sprite>,
         WriteStorage<'a, Transform>,
     );
 
     fn run(&mut self, data: Self::SystemData) {
-        let (gatherer_storage, mut hightlight_tile_storage, input_storage, mut selected_tile_storage, mut transform_storage) = data;
+        let (mut button_storage, entities, gatherer_storage, mut hightlight_tile_storage, input_storage, resource_storage, mut selected_tile_storage, mut sprite_storage, mut transform_storage) = data;
 
         let input: &Input = input_storage.deref();
         let mouse_x = input.mouse_pos.0;
@@ -34,8 +55,9 @@ impl<'a> System<'a> for TileSelection {
             }
         }
 
-        if input.mouse_pressed && within_grid {
+        if input.mouse_pressed && within_grid && !self.mouse_processed {
             let mut collisions = false;
+            self.mouse_processed = true;
 
             for (_, transform) in (&gatherer_storage, &mut transform_storage).join() {
                 if transform.pos.x == tile_mouse_x && transform.pos.y == tile_mouse_y {
@@ -50,7 +72,49 @@ impl<'a> System<'a> for TileSelection {
                     transform.pos.x = tile_mouse_x;
                     transform.pos.y = tile_mouse_y;
                 }
+
+                let mut scene = self.scene.lock().unwrap();
+
+                if let Some(build_ui_entity) = self.build_ui_entity {
+                    let mut transform = transform_storage.get_mut(build_ui_entity).unwrap();
+                    transform.pos.x = tile_mouse_x + Tile::get_size();
+                    transform.pos.y = tile_mouse_y;
+                } else {
+                    let resources: &Resources = resource_storage.deref();
+                    let node = build_ui::create(tile_mouse_x + Tile::get_size(), tile_mouse_y, &entities, &mut button_storage, &mut sprite_storage, &mut transform_storage, &resources.get_current_type());
+                    self.build_ui_entity = Some(node.entity.unwrap().clone());
+                    scene.nodes.push(node);
+                }
             }
+        } else if within_grid {
+            for selected_tile in (&selected_tile_storage).join() {
+                // clean up build UI if selected tile not visible, may want to add a flag for checking this
+                // cou;ld maybe move build_ui_entity into the selected_tile component?
+                if !selected_tile.visible {
+                    if let Some(build_ui_entity) = self.build_ui_entity {
+                        let mut scene = self.scene.lock().unwrap();
+
+                        let mut node_to_delete = -1i32;
+                        for (i, node) in scene.nodes.iter().enumerate() {
+                            if let Some(entity) = node.entity {
+                                if entity == build_ui_entity {
+                                    node_to_delete = i as i32;
+                                }
+                            }
+                        }
+
+                        if node_to_delete > -1i32 {
+                            scene.nodes.remove(node_to_delete as usize);
+                            entities.delete(build_ui_entity);
+                            self.build_ui_entity = None;
+                        }
+                    }
+                }
+            }
+        }
+
+        if !input.mouse_pressed && self.mouse_processed {
+            self.mouse_processed = false;
         }
     }
 }

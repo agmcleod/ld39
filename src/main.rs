@@ -15,6 +15,7 @@ extern crate serde_json;
 extern crate rusttype;
 
 mod components;
+mod entities;
 mod loader;
 mod renderer;
 mod scene;
@@ -30,7 +31,7 @@ use std::io::BufReader;
 use std::fs::File;
 use std::path::{Path, PathBuf};
 use rusttype::{FontCollection, Font};
-use components::{AnimationSheet, BuildCost, Button, Camera, ClickSound, ResourceCount, Color, CurrentPower, Gatherer, HighlightTile, Input, PowerBar, Rect, Resources, SelectedTile, Sprite, StateChange, Text, Tile, Transform, Upgrade, UpgradeCost, Wallet, WalletUI, WinCount};
+use components::{AnimationSheet, BuildCost, Button, Camera, ClickSound, Color, CurrentPower, Gatherer, HighlightTile, Input, PowerBar, Rect, ResourceCount, Resources, SelectedTile, Sprite, StateChange, Text, Tile, Transform, Upgrade, UpgradeCost, Wallet, WalletUI, WinCount};
 use specs::{Entity, World, ReadStorage, WriteStorage};
 use renderer::{ColorFormat, DepthFormat};
 use spritesheet::Spritesheet;
@@ -171,6 +172,9 @@ fn render_node<R: gfx::Resources, C: gfx::CommandBuffer<R>, F: gfx::Factory<R>>(
     rects: &ReadStorage<Rect>,
     ) {
     if let Some(entity) = node.entity {
+        if let Some(transform) = transforms.get(entity) {
+            basic.transform(&transform, false);
+        }
         render_entity(
             basic, encoder, world, factory, spritesheet, asset_texture,
             font, glyph_cache,
@@ -185,6 +189,12 @@ fn render_node<R: gfx::Resources, C: gfx::CommandBuffer<R>, F: gfx::Factory<R>>(
             font, glyph_cache,
             sprites, transforms, animation_sheets, colors, highlight_tiles, selected_tiles, texts, rects
         );
+    }
+
+    if let Some(entity) = node.entity {
+        if let Some(transform) = transforms.get(entity) {
+            basic.transform(&transform, true);
+        }
     }
 }
 

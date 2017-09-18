@@ -168,13 +168,17 @@ impl<R> Basic<R>
         };
 
         self.projection.proj = (*camera).0.into();
-        let transform = Matrix4::from_translation(transform.pos);
-        self.model = self.model.concat(&transform);
         self.projection.model = self.model.into();
 
         encoder.update_constant_buffer(&params.projection_cb, &self.projection);
         encoder.draw(&slice, &self.pso, &params);
+    }
 
-        self.model = self.model.concat(&transform.inverse_transform().unwrap());
+    pub fn transform(&mut self, transform: &components::Transform, undo: bool) {
+        let mut transform = Matrix4::from_translation(transform.pos);
+        if undo {
+            transform = transform.inverse_transform().unwrap();
+        }
+        self.model = self.model.concat(&transform);
     }
 }

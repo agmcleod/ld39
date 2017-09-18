@@ -39,7 +39,8 @@ impl<'a> System<'a> for BuildGatherer {
 
         let mut button_pressed = false;
         for button in (&mut button_storage).join() {
-            if button.name == "build".to_string() && button.clicked(&input) {
+            if button.name == "build-coal" && button.clicked(&input) {
+                println!("coal pressed");
                 button_pressed = true;
                 click_sound.play = true;
             }
@@ -48,6 +49,7 @@ impl<'a> System<'a> for BuildGatherer {
         let mut create = false;
         let mut selected_tile_x = 0.0;
         let mut selected_tile_y = 0.0;
+        // spend the money, and hide selected tile
         for (selected_tile, transform) in (&mut selected_tile_storage, &transform_storage).join() {
             let amount = GathererType::get_type_for_resources_type(&resources.get_current_type()).get_build_cost();
             if button_pressed && selected_tile.visible && wallet.spend(amount) {
@@ -60,6 +62,7 @@ impl<'a> System<'a> for BuildGatherer {
         }
 
         if create {
+            // create gatherer
             let gatherer = Gatherer::new(&resources.get_current_type());
             let mut anim = AnimationSheet::new(1.0);
             anim.add_animation("default".to_string(), gatherer.gatherer_type.get_frames());
@@ -72,6 +75,7 @@ impl<'a> System<'a> for BuildGatherer {
             let mut scene = self.scene.lock().unwrap();
             scene.nodes.push(Node::new(Some(gatherer_entity), None));
 
+            // update win condition
             if resources.get_current_type() == ResourceType::Clean {
                 for (text, win_count) in (&mut text_storage, &mut win_count_storage).join() {
                     win_count.count -= 1;
@@ -80,6 +84,7 @@ impl<'a> System<'a> for BuildGatherer {
                 }
             }
 
+            // create upgrade button
             if !self.built_one {
                 self.built_one = true;
                 let upgrade_button_entity = entities.create();

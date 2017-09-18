@@ -22,10 +22,10 @@ impl <'a>PlayState<'a> {
         let dispatcher = DispatcherBuilder::new()
             .add(systems::AnimationSystem::new(), "animation_system", &[])
             .add(systems::PowerUsage::new(), "power_system", &[])
-            .add(systems::TileSelection{}, "tile_selection", &[])
-            .add(systems::ButtonHover{}, "button_hover", &[])
+            .add(systems::ButtonHover{ scene: scene.clone() }, "button_hover", &[])
             .add(systems::SellEnergy{}, "sell_energy", &["button_hover"])
             .add(systems::BuildGatherer{ built_one: false, scene: scene.clone() }, "build_gatherer", &["button_hover"])
+            .add(systems::TileSelection::new(scene.clone()), "tile_selection", &["build_gatherer"])
             .add(systems::Gathering{}, "gathering", &[])
             .add(systems::UpgradeResource{}, "upgrade_resource", &[])
             .build();
@@ -191,7 +191,7 @@ impl <'a>State for PlayState<'a> {
         let entity = world.create_entity()
             .with(Button::new("power-btn".to_string(), ["power-btn.png".to_string(), "power-btn-hover.png".to_string()]))
             .with(Transform::new(770.0, 32.0, 0.0, 96, 32, 0.0, 1.0, 1.0))
-            .with(Sprite{ frame_name: "sell.png".to_string(), visible: true })
+            .with(Sprite{ frame_name: "power-btn.png".to_string(), visible: true })
             .build();
         scene.nodes.push(Node::new(Some(entity), None));
 

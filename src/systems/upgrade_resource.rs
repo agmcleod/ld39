@@ -53,7 +53,7 @@ impl<'a> System<'a> for UpgradeResource {
             }
         }
 
-        systems::shared::update_text(format!("{}", Gatherer::new(&resources.current_type).gatherer_type.get_build_cost()), &mut text_storage, &build_cost_storage);
+        systems::logic::update_text(format!("{}", Gatherer::new(&resources.current_type).gatherer_type.get_build_cost()), &mut text_storage, &build_cost_storage);
 
         let mut added_new_resource_ui = false;
         let mut text_scale_to_copy: Option<Scale> = None;
@@ -80,7 +80,7 @@ impl<'a> System<'a> for UpgradeResource {
         }
 
         if resource_type_changed {
-            systems::shared::update_text(format!("{}", upgrade_cost), &mut text_storage, &upgrade_cost_storage);
+            systems::logic::update_text(format!("{}", upgrade_cost), &mut text_storage, &upgrade_cost_storage);
         }
     }
 }
