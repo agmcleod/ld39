@@ -21,7 +21,7 @@ impl <'a>PlayState<'a> {
 
         let dispatcher = DispatcherBuilder::new()
             .add(systems::AnimationSystem::new(), "animation_system", &[])
-            .add(systems::PowerUsage::new(), "power_system", &[])
+            .add(systems::PowerUsage::new(), "power_usage", &[])
             .add(systems::ButtonHover{ scene: scene.clone() }, "button_hover", &[])
             .add(systems::SellEnergy{}, "sell_energy", &["button_hover"])
             .add(systems::BuildGatherer{ built_one: false, scene: scene.clone() }, "build_gatherer", &["button_hover"])

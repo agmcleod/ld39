@@ -8,7 +8,7 @@ use entities::build_ui;
 pub struct TileSelection {
     pub scene: Arc<Mutex<Scene>>,
     pub build_ui_entity: Option<Entity>,
-    pub mouse_processed: bool,
+    pub mouse_pressed: bool,
 }
 
 impl TileSelection {
@@ -16,7 +16,7 @@ impl TileSelection {
         TileSelection{
             scene: scene,
             build_ui_entity: None,
-            mouse_processed: false,
+            mouse_pressed: false,
         }
     }
 }
@@ -55,10 +55,12 @@ impl<'a> System<'a> for TileSelection {
             }
         }
 
-        if input.mouse_pressed && within_grid && !self.mouse_processed {
-            let mut collisions = false;
-            self.mouse_processed = true;
+        if input.mouse_pressed && within_grid && !self.mouse_pressed {
+            self.mouse_pressed = true;
+        } else if self.mouse_pressed && !input.mouse_pressed && within_grid {
+            self.mouse_pressed = false;
 
+            let mut collisions = false;
             for (_, transform) in (&gatherer_storage, &mut transform_storage).join() {
                 if transform.pos.x == tile_mouse_x && transform.pos.y == tile_mouse_y {
                     collisions = true;
@@ -113,8 +115,8 @@ impl<'a> System<'a> for TileSelection {
             }
         }
 
-        if !input.mouse_pressed && self.mouse_processed {
-            self.mouse_processed = false;
+        if !input.mouse_pressed && self.mouse_pressed {
+            self.mouse_pressed = false;
         }
     }
 }

@@ -24,6 +24,7 @@ impl Button {
             return false
         } else if !input.mouse_pressed && self.pressed {
             self.pressed = false;
+            // return on release
             if self.mouse_is_over {
                 return true
             }

@@ -1,9 +1,10 @@
 use std::ops::{Deref, DerefMut};
 use specs::{Entities, Fetch, FetchMut, Join, ReadStorage, WriteStorage, System};
-use components::{AnimationSheet, Button, ClickSound, Gatherer, GathererType, Input, Resources, ResourceType, SelectedTile, Sprite, Text, Transform, Upgrade, UpgradeCost, Wallet, WinCount};
+use components::{AnimationSheet, Button, ClickSound, Gatherer, GathererType, Input, Resources, ResourceType, SelectedTile, Sprite, Text, Transform, Upgrade, UpgradeCost, Wallet, WalletUI, WinCount};
 use std::sync::{Arc, Mutex};
 use scene::Scene;
 use scene::node::Node;
+use systems::logic;
 
 pub struct BuildGatherer {
     pub built_one: bool,
@@ -26,11 +27,12 @@ impl<'a> System<'a> for BuildGatherer {
         WriteStorage<'a, Upgrade>,
         ReadStorage<'a, UpgradeCost>,
         FetchMut<'a, Wallet>,
+        ReadStorage<'a, WalletUI>,
         WriteStorage<'a, WinCount>,
     );
 
     fn run(&mut self, data: Self::SystemData) {
-        let (mut animation_sheet_storage, mut button_storage, mut click_sound_storage, entities, mut gatherer_storage, input_storage, mut resources_storage, mut selected_tile_storage, mut sprite_storage, mut text_storage, mut transform_storage, mut upgrade_storage, upgrade_cost_storage, mut wallet_storage, mut win_count_storage) = data;
+        let (mut animation_sheet_storage, mut button_storage, mut click_sound_storage, entities, mut gatherer_storage, input_storage, mut resources_storage, mut selected_tile_storage, mut sprite_storage, mut text_storage, mut transform_storage, mut upgrade_storage, upgrade_cost_storage, mut wallet_storage, wallet_ui_storage, mut win_count_storage) = data;
 
         let resources: &mut Resources = resources_storage.deref_mut();
         let input: &Input = input_storage.deref();
@@ -40,7 +42,6 @@ impl<'a> System<'a> for BuildGatherer {
         let mut button_pressed = false;
         for button in (&mut button_storage).join() {
             if button.name == "build-coal" && button.clicked(&input) {
-                println!("coal pressed");
                 button_pressed = true;
                 click_sound.play = true;
             }
@@ -58,6 +59,7 @@ impl<'a> System<'a> for BuildGatherer {
 
                 selected_tile_x = transform.pos.x;
                 selected_tile_y = transform.pos.y;
+                logic::update_text(format!("{}", wallet.money), &mut text_storage, &wallet_ui_storage);
             }
         }
 
