@@ -1,7 +1,7 @@
 use std::ops::Deref;
 use std::sync::{Arc, Mutex};
 use specs::{Entity, Entities, ReadStorage, WriteStorage, Fetch, Join, System};
-use components::{Button, Gatherer, HighlightTile, Input, Resources, SelectedTile, Sprite, Tile, Transform};
+use components::{Button, Color, Gatherer, HighlightTile, Input, Rect, Resources, SelectedTile, Sprite, Tile, Transform};
 use scene::Scene;
 use entities::build_ui;
 
@@ -24,10 +24,12 @@ impl TileSelection {
 impl<'a> System<'a> for TileSelection {
     type SystemData = (
         WriteStorage<'a, Button>,
+        WriteStorage<'a, Color>,
         Entities<'a>,
         ReadStorage<'a, Gatherer>,
         WriteStorage<'a, HighlightTile>,
         Fetch<'a, Input>,
+        WriteStorage<'a, Rect>,
         Fetch<'a, Resources>,
         WriteStorage<'a, SelectedTile>,
         WriteStorage<'a, Sprite>,
@@ -35,7 +37,7 @@ impl<'a> System<'a> for TileSelection {
     );
 
     fn run(&mut self, data: Self::SystemData) {
-        let (mut button_storage, entities, gatherer_storage, mut hightlight_tile_storage, input_storage, resource_storage, mut selected_tile_storage, mut sprite_storage, mut transform_storage) = data;
+        let (mut button_storage, mut color_storage, entities, gatherer_storage, mut hightlight_tile_storage, input_storage, mut rect_storage, resource_storage, mut selected_tile_storage, mut sprite_storage, mut transform_storage) = data;
 
         let input: &Input = input_storage.deref();
         let mouse_x = input.mouse_pos.0;
@@ -83,7 +85,7 @@ impl<'a> System<'a> for TileSelection {
                     transform.pos.y = tile_mouse_y;
                 } else {
                     let resources: &Resources = resource_storage.deref();
-                    let node = build_ui::create(tile_mouse_x + Tile::get_size(), tile_mouse_y, &entities, &mut button_storage, &mut sprite_storage, &mut transform_storage, &resources.get_current_type());
+                    let node = build_ui::create(tile_mouse_x + Tile::get_size(), tile_mouse_y, &entities, &mut button_storage, &mut color_storage, &mut rect_storage, &mut sprite_storage, &mut transform_storage, &resources.get_current_type());
                     self.build_ui_entity = Some(node.entity.unwrap().clone());
                     scene.nodes.push(node);
                 }
