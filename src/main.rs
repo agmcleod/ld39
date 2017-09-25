@@ -102,7 +102,6 @@ fn render_entity<R: gfx::Resources, C: gfx::CommandBuffer<R>, F: gfx::Factory<R>
     transform_storage: &mut WriteStorage<Transform>,
     animation_storage: &ReadStorage<AnimationSheet>,
     color_storage: &ReadStorage<Color>,
-    highlight_tile_storage: &ReadStorage<HighlightTile>,
     selected_tile_storage: &ReadStorage<SelectedTile>,
     text_storage: &mut WriteStorage<Text>,
     rect_storage: &ReadStorage<Rect>,
@@ -118,21 +117,10 @@ fn render_entity<R: gfx::Resources, C: gfx::CommandBuffer<R>, F: gfx::Factory<R>
         basic.render(encoder, world, factory, &transform, Some(animation.get_current_frame()), spritesheet, None, Some(asset_texture));
     }
 
-    // maybe refactor these to use rect logic. Need more generic "i am visible"
-    if let (Some(highlight_tile), Some(color), Some(transform)) = (highlight_tile_storage.get(*entity), color_storage.get(*entity), transform_storage.get_mut(*entity)) {
-        if highlight_tile.visible {
+    if let (Some(color), Some(transform), Some(rect)) = (color_storage.get(*entity), transform_storage.get_mut(*entity), rect_storage.get(*entity)) {
+        if rect.visible {
             basic.render(encoder, world, factory, &transform, None, spritesheet, Some(color.0), None);
         }
-    }
-
-    if let (Some(selected_tile), Some(color), Some(transform)) = (selected_tile_storage.get(*entity), color_storage.get(*entity), transform_storage.get_mut(*entity)) {
-        if selected_tile.visible {
-            basic.render(encoder, world, factory, &transform, None, spritesheet, Some(color.0), None);
-        }
-    }
-
-    if let (Some(color), Some(transform), Some(_)) = (color_storage.get(*entity), transform_storage.get_mut(*entity), rect_storage.get(*entity)) {
-        basic.render(encoder, world, factory, &transform, None, spritesheet, Some(color.0), None);
     }
 
     if let (Some(color), Some(transform), Some(text)) = (color_storage.get(*entity), transform_storage.get_mut(*entity), text_storage.get_mut(*entity)) {
@@ -166,7 +154,6 @@ fn render_node<R: gfx::Resources, C: gfx::CommandBuffer<R>, F: gfx::Factory<R>>(
     transforms: &mut WriteStorage<Transform>,
     animation_sheets: &ReadStorage<AnimationSheet>,
     colors: &ReadStorage<Color>,
-    highlight_tiles: &ReadStorage<HighlightTile>,
     selected_tiles: &ReadStorage<SelectedTile>,
     texts: &mut WriteStorage<Text>,
     rects: &ReadStorage<Rect>,
@@ -178,7 +165,7 @@ fn render_node<R: gfx::Resources, C: gfx::CommandBuffer<R>, F: gfx::Factory<R>>(
         render_entity(
             basic, encoder, world, factory, spritesheet, asset_texture,
             font, glyph_cache,
-            &entity, sprites, transforms, animation_sheets, colors, highlight_tiles, selected_tiles, texts, rects
+            &entity, sprites, transforms, animation_sheets, colors, selected_tiles, texts, rects
         );
     }
 
@@ -187,7 +174,7 @@ fn render_node<R: gfx::Resources, C: gfx::CommandBuffer<R>, F: gfx::Factory<R>>(
             node,
             basic, encoder, world, factory, spritesheet, asset_texture,
             font, glyph_cache,
-            sprites, transforms, animation_sheets, colors, highlight_tiles, selected_tiles, texts, rects
+            sprites, transforms, animation_sheets, colors, selected_tiles, texts, rects
         );
     }
 
@@ -322,7 +309,7 @@ fn main() {
                 render_node(node,
                 &mut basic, &mut encoder, &world, &mut factory, &spritesheet, &asset_texture,
                 &font, &mut glyph_cache,
-                &sprites, &mut transforms, &animation_sheets, &colors, &highlight_tiles, &selected_tiles, &mut texts, &rects);
+                &sprites, &mut transforms, &animation_sheets, &colors, &selected_tiles, &mut texts, &rects);
             }
 
             encoder.flush(&mut device);

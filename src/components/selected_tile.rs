@@ -1,8 +1,6 @@
 use specs::{Component, HashMapStorage};
 
-pub struct SelectedTile{
-    pub visible: bool,
-}
+pub struct SelectedTile;
 
 impl Component for SelectedTile {
     type Storage = HashMapStorage<SelectedTile>;

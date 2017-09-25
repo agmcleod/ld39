@@ -61,6 +61,7 @@ impl <'a>State for PlayState<'a> {
                 let size = Tile::get_size();
                 let tile = world.create_entity()
                     .with(Transform::new(size * col, size * row, 1.0, size as u16, size as u16, 0.0, 1.0, 1.0))
+                    .with(Button::new("tiles".to_string(), ["tiles.png".to_string(), "tiles_highlight.png".to_string()]))
                     .with(Sprite{ frame_name: "tiles.png".to_string(), visible: true })
                     .with(Tile{})
                     .build();
@@ -95,7 +96,7 @@ impl <'a>State for PlayState<'a> {
         let entity = world.create_entity()
             .with(CurrentPower{})
             .with(Transform::new(674.0, 580.0, 0.0, CurrentPower::get_max_with(), 24, 0.0, 1.0, 1.0))
-            .with(Rect{})
+            .with(Rect::new())
             .with(Color([0.0, 1.0, 0.0, 1.0]))
             .build();
         scene.nodes.push(Node::new(Some(entity), None));
@@ -171,18 +172,11 @@ impl <'a>State for PlayState<'a> {
             .build();
         scene.nodes.push(Node::new(Some(entity), None));
 
-        // highlight
-        let entity = world.create_entity()
-            .with(HighlightTile{ visible: false })
-            .with(Transform::new(0.0, 0.0, 0.0, 64, 64, 0.0, 1.0, 1.0))
-            .with(Color([1.0, 1.0, 1.0, 0.3]))
-            .build();
-        scene.nodes.push(Node::new(Some(entity), None));
-
         // selected
         let entity = world.create_entity()
-            .with(SelectedTile{ visible: false })
+            .with(SelectedTile{})
             .with(Transform::new(0.0, 0.0, 0.0, 64, 64, 0.0, 1.0, 1.0))
+            .with(Rect::new_invisible())
             .with(Color([1.0, 1.0, 1.0, 0.6]))
             .build();
         scene.nodes.push(Node::new(Some(entity), None));

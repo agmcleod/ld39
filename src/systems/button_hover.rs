@@ -37,6 +37,8 @@ impl<'a> System<'a> for ButtonHover {
 
         button_entities.sort_by(|a, b| a.0.cmp(&b.0));
 
+        let mut found_button = false;
+
         for (_, button_entity) in button_entities {
             let absolute_pos = logic::get_absolute_pos(&scene, &button_entity, &transform_storage);
             let transform = transform_storage.get(button_entity).unwrap();
@@ -44,10 +46,10 @@ impl<'a> System<'a> for ButtonHover {
             let mut sprite = sprite_storage.get_mut(button_entity).unwrap();
 
             let abs_transform = Transform::new(absolute_pos.x, absolute_pos.y, 0.0, transform.size.x, transform.size.y, transform.rotation, transform.scale.x, transform.scale.y);
-            if abs_transform.contains(&mouse_x, &mouse_y) {
+            if !found_button && abs_transform.contains(&mouse_x, &mouse_y) {
                 button.mouse_is_over = true;
                 sprite.frame_name = button.get_hover_frame().clone();
-                break
+                found_button = true;
             } else {
                 button.mouse_is_over = false;
                 sprite.frame_name = button.get_default_frame().clone();

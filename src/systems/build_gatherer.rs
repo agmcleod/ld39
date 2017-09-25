@@ -1,6 +1,6 @@
 use std::ops::{Deref, DerefMut};
 use specs::{Entities, Fetch, FetchMut, Join, ReadStorage, WriteStorage, System};
-use components::{AnimationSheet, Button, ClickSound, Gatherer, GathererType, Input, Resources, ResourceType, SelectedTile, Sprite, Text, Transform, Upgrade, UpgradeCost, Wallet, WalletUI, WinCount};
+use components::{AnimationSheet, Button, ClickSound, Gatherer, GathererType, Input, Rect, Resources, ResourceType, SelectedTile, Sprite, Text, Transform, Upgrade, UpgradeCost, Wallet, WalletUI, WinCount};
 use std::sync::{Arc, Mutex};
 use scene::Scene;
 use scene::node::Node;
@@ -19,8 +19,9 @@ impl<'a> System<'a> for BuildGatherer {
         Entities<'a>,
         WriteStorage<'a, Gatherer>,
         Fetch<'a, Input>,
+        WriteStorage<'a, Rect>,
         FetchMut<'a, Resources>,
-        WriteStorage<'a, SelectedTile>,
+        ReadStorage<'a, SelectedTile>,
         WriteStorage<'a, Sprite>,
         WriteStorage<'a, Text>,
         WriteStorage<'a, Transform>,
@@ -32,7 +33,7 @@ impl<'a> System<'a> for BuildGatherer {
     );
 
     fn run(&mut self, data: Self::SystemData) {
-        let (mut animation_sheet_storage, mut button_storage, mut click_sound_storage, entities, mut gatherer_storage, input_storage, mut resources_storage, mut selected_tile_storage, mut sprite_storage, mut text_storage, mut transform_storage, mut upgrade_storage, upgrade_cost_storage, mut wallet_storage, wallet_ui_storage, mut win_count_storage) = data;
+        let (mut animation_sheet_storage, mut button_storage, mut click_sound_storage, entities, mut gatherer_storage, input_storage, mut rect_storage, mut resources_storage, mut selected_tile_storage, mut sprite_storage, mut text_storage, mut transform_storage, mut upgrade_storage, upgrade_cost_storage, mut wallet_storage, wallet_ui_storage, mut win_count_storage) = data;
 
         let resources: &mut Resources = resources_storage.deref_mut();
         let input: &Input = input_storage.deref();
@@ -51,10 +52,10 @@ impl<'a> System<'a> for BuildGatherer {
         let mut selected_tile_x = 0.0;
         let mut selected_tile_y = 0.0;
         // spend the money, and hide selected tile
-        for (selected_tile, transform) in (&mut selected_tile_storage, &transform_storage).join() {
+        for (_, rect, transform) in (&selected_tile_storage, &mut rect_storage, &transform_storage).join() {
             let amount = GathererType::get_type_for_resources_type(&resources.get_current_type()).get_build_cost();
-            if button_pressed && selected_tile.visible && wallet.spend(amount) {
-                selected_tile.visible = false;
+            if button_pressed && rect.visible && wallet.spend(amount) {
+                rect.visible = false;
                 create = true;
 
                 selected_tile_x = transform.pos.x;

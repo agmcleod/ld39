@@ -39,7 +39,7 @@ pub fn create<'a>(
 
     let container_entity = entities.create();
     color_storage.insert(container_entity, Color([0.5, 0.5, 0.5, 1.0]));
-    rect_storage.insert(container_entity, Rect{});
+    rect_storage.insert(container_entity, Rect::new());
     transform_storage.insert(container_entity, Transform::new(x, y, 0.0, 32, 32 * new_entities.len() as u16, 0.0, 1.0, 1.0));
 
     Node::new(Some(container_entity), Some(new_entities))
