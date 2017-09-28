@@ -24,7 +24,7 @@ impl<'a> System<'a> for ButtonHover {
         let input: &Input = input_storage.deref();
 
         let mouse_x = input.mouse_pos.0;
-        let mouse_y = 640.0 - input.mouse_pos.1;
+        let mouse_y = input.mouse_pos.1;
 
         let scene = self.scene.lock().unwrap();
 

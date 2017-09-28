@@ -92,7 +92,7 @@ impl<'a> System<'a> for BuildGatherer {
                 self.built_one = true;
                 let upgrade_button_entity = entities.create();
                 button_storage.insert(upgrade_button_entity, Button::new("upgrade".to_string(), ["refinery_button_1.png".to_string(), "refinery_button_2.png".to_string()]));
-                transform_storage.insert(upgrade_button_entity, Transform::new(670.0, 90.0, 0.0, 64, 64, 0.0, 1.0, 1.0));
+                transform_storage.insert(upgrade_button_entity, Transform::new(670.0, 486.0, 0.0, 64, 64, 0.0, 1.0, 1.0));
                 upgrade_storage.insert(upgrade_button_entity, Upgrade::new());
                 sprite_storage.insert(upgrade_button_entity, Sprite{ frame_name: "refinery_1.png".to_string(), visible: true });
 

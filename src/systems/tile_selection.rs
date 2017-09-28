@@ -38,8 +38,6 @@ impl<'a> System<'a> for TileSelection {
         let (mut button_storage, mut color_storage, entities, gatherer_storage, input_storage, mut rect_storage, resource_storage, selected_tile_storage, mut sprite_storage, tile_storage, mut transform_storage) = data;
 
         let input: &Input = input_storage.deref();
-        let mouse_x = input.mouse_pos.0;
-        let mouse_y = 640.0 - input.mouse_pos.1;
         let mut tile_mouse_x = 0.0;
         let mut tile_mouse_y = 0.0;
         let mut clicked = false;
