@@ -33,9 +33,9 @@ impl<'a> System<'a> for SellEnergy {
         }
 
         if sell_button_clicked {
-            let coal_amount = resources.withdraw_all_for_type(ResourceType::Coal) / 3;
-            let oil_amount = resources.withdraw_all_for_type(ResourceType::Oil) / 2;
-            let clean_amount = resources.withdraw_all_for_type(ResourceType::Clean);
+            let coal_amount = resources.withdraw_all_for_type(ResourceType::Coal) / 4;
+            let oil_amount = resources.withdraw_all_for_type(ResourceType::Oil) / 3;
+            let clean_amount = resources.withdraw_all_for_type(ResourceType::Clean) / 2;
             for power_bar in (&mut power_bar_storage).join() {
                 power_bar.add_power(coal_amount + oil_amount + clean_amount);
             }
@@ -43,7 +43,7 @@ impl<'a> System<'a> for SellEnergy {
             let mut wallet: &mut Wallet = wallet_storage.deref_mut();
 
             for (_, text) in (&mut wallet_ui_storage, &mut text_storage).join() {
-                wallet.add_money((coal_amount / 4) + (oil_amount / 3) + (clean_amount / 2));
+                wallet.add_money(coal_amount + oil_amount + clean_amount);
                 text.set_text(format!("{}", wallet.money));
             }
         }

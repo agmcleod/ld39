@@ -20,9 +20,9 @@ impl GathererType {
 
     pub fn get_build_cost(&self) -> usize {
         match *self {
-            GathererType::Coal => 18,
-            GathererType::Oil => 35,
-            GathererType::Clean => 75,
+            GathererType::Coal => 10,
+            GathererType::Oil => 15,
+            GathererType::Clean => 25,
         }
     }
 

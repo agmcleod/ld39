@@ -8,7 +8,6 @@ use entities::build_ui;
 pub struct TileSelection {
     pub scene: Arc<Mutex<Scene>>,
     pub build_ui_entity: Option<Entity>,
-    pub mouse_pressed: bool,
 }
 
 impl TileSelection {
@@ -16,7 +15,6 @@ impl TileSelection {
         TileSelection{
             scene: scene,
             build_ui_entity: None,
-            mouse_pressed: false,
         }
     }
 }
@@ -32,35 +30,39 @@ impl<'a> System<'a> for TileSelection {
         Fetch<'a, Resources>,
         ReadStorage<'a, SelectedTile>,
         WriteStorage<'a, Sprite>,
+        ReadStorage<'a, Tile>,
         WriteStorage<'a, Transform>,
     );
 
     fn run(&mut self, data: Self::SystemData) {
-        let (mut button_storage, mut color_storage, entities, gatherer_storage, input_storage, mut rect_storage, resource_storage, selected_tile_storage, mut sprite_storage, mut transform_storage) = data;
+        let (mut button_storage, mut color_storage, entities, gatherer_storage, input_storage, mut rect_storage, resource_storage, selected_tile_storage, mut sprite_storage, tile_storage, mut transform_storage) = data;
 
         let input: &Input = input_storage.deref();
         let mouse_x = input.mouse_pos.0;
         let mouse_y = 640.0 - input.mouse_pos.1;
-        let within_grid = mouse_x >= 0.0 && mouse_x <= 640.0 && mouse_y >= 0.0 && mouse_y <= 640.0;
-        let tile_size = Tile::get_size();
-        let tile_mouse_x = (mouse_x / tile_size).floor() * tile_size;
-        let tile_mouse_y = (mouse_y / tile_size).floor() * tile_size;
+        let mut tile_mouse_x = 0.0;
+        let mut tile_mouse_y = 0.0;
+        let mut clicked = false;
 
-        if input.mouse_pressed && within_grid && !self.mouse_pressed {
-            self.mouse_pressed = true;
-        } else if self.mouse_pressed && !input.mouse_pressed && within_grid {
-            self.mouse_pressed = false;
+        for (_, button, transform) in (&tile_storage, &mut button_storage, &transform_storage).join() {
+            if button.clicked(&input) {
+                tile_mouse_x = transform.pos.x;
+                tile_mouse_y = transform.pos.y;
+                clicked = true;
+            }
+        }
 
-            let mut collisions = false;
+        if clicked {
+            let mut tile_already_taken = false;
             for (_, transform) in (&gatherer_storage, &mut transform_storage).join() {
                 if transform.pos.x == tile_mouse_x && transform.pos.y == tile_mouse_y {
-                    collisions = true;
+                    tile_already_taken = true;
                     break
                 }
             }
 
-            if !collisions {
-                for (selected_tile, rect, transform) in (&selected_tile_storage, &mut rect_storage, &mut transform_storage).join() {
+            if !tile_already_taken {
+                for (_, rect, transform) in (&selected_tile_storage, &mut rect_storage, &mut transform_storage).join() {
                     rect.visible = true;
                     transform.pos.x = tile_mouse_x;
                     transform.pos.y = tile_mouse_y;
@@ -79,7 +81,7 @@ impl<'a> System<'a> for TileSelection {
                     scene.nodes.push(node);
                 }
             }
-        } else if within_grid {
+        } else {
             for (selected_tile, rect) in (&selected_tile_storage, &rect_storage).join() {
                 // clean up build UI if selected tile not visible, may want to add a flag for checking this
                 // cou;ld maybe move build_ui_entity into the selected_tile component?
@@ -104,10 +106,6 @@ impl<'a> System<'a> for TileSelection {
                     }
                 }
             }
-        }
-
-        if !input.mouse_pressed && self.mouse_pressed {
-            self.mouse_pressed = false;
         }
     }
 }
