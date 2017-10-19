@@ -37,10 +37,10 @@ impl<'a> System<'a> for SellEnergy {
             let oil_amount = resources.withdraw_all_for_type(ResourceType::Oil) / 3;
             let clean_amount = resources.withdraw_all_for_type(ResourceType::Clean) / 2;
             for power_bar in (&mut power_bar_storage).join() {
-                power_bar.add_power(coal_amount + oil_amount + clean_amount);
+                power_bar.add_power((coal_amount + oil_amount + clean_amount) * 100);
             }
 
-            let mut wallet: &mut Wallet = wallet_storage.deref_mut();
+            let wallet: &mut Wallet = wallet_storage.deref_mut();
 
             for (_, text) in (&mut wallet_ui_storage, &mut text_storage).join() {
                 wallet.add_money(coal_amount + oil_amount + clean_amount);

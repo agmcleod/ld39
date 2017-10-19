@@ -1,6 +1,6 @@
 use std::ops::{Deref, DerefMut};
 use specs::{Entities, Fetch, FetchMut, Join, ReadStorage, WriteStorage, System};
-use components::{AnimationSheet, Button, ClickSound, Gatherer, GathererType, Input, Rect, Resources, ResourceType, SelectedTile, Sprite, Text, Transform, Upgrade, UpgradeCost, Wallet, WalletUI, WinCount};
+use components::{AnimationSheet, Button, ClickSound, Gatherer, GathererType, Input, Rect, Resources, ResourceType, SelectedTile, Sprite, Text, Transform, Upgrade, UpgradeCost, Wallet, WalletUI};
 use std::sync::{Arc, Mutex};
 use scene::Scene;
 use scene::node::Node;
@@ -29,11 +29,10 @@ impl<'a> System<'a> for BuildGatherer {
         ReadStorage<'a, UpgradeCost>,
         FetchMut<'a, Wallet>,
         ReadStorage<'a, WalletUI>,
-        WriteStorage<'a, WinCount>,
     );
 
     fn run(&mut self, data: Self::SystemData) {
-        let (mut animation_sheet_storage, mut button_storage, mut click_sound_storage, entities, mut gatherer_storage, input_storage, mut rect_storage, mut resources_storage, mut selected_tile_storage, mut sprite_storage, mut text_storage, mut transform_storage, mut upgrade_storage, upgrade_cost_storage, mut wallet_storage, wallet_ui_storage, mut win_count_storage) = data;
+        let (mut animation_sheet_storage, mut button_storage, mut click_sound_storage, entities, mut gatherer_storage, input_storage, mut rect_storage, mut resources_storage, mut selected_tile_storage, mut sprite_storage, mut text_storage, mut transform_storage, mut upgrade_storage, upgrade_cost_storage, mut wallet_storage, wallet_ui_storage) = data;
 
         let resources: &mut Resources = resources_storage.deref_mut();
         let input: &Input = input_storage.deref();
@@ -77,15 +76,6 @@ impl<'a> System<'a> for BuildGatherer {
 
             let mut scene = self.scene.lock().unwrap();
             scene.nodes.push(Node::new(Some(gatherer_entity), None));
-
-            // update win condition
-            if resources.get_current_type() == ResourceType::Clean {
-                for (text, win_count) in (&mut text_storage, &mut win_count_storage).join() {
-                    win_count.count -= 1;
-                    let message = win_count.get_message();
-                    text.set_text(message);
-                }
-            }
 
             // create upgrade button
             if !self.built_one {

@@ -31,7 +31,7 @@ use std::io::BufReader;
 use std::fs::File;
 use std::path::{Path, PathBuf};
 use rusttype::{FontCollection, Font};
-use components::{AnimationSheet, BuildCost, Button, Camera, ClickSound, Color, CurrentPower, Gatherer, HighlightTile, Input, PowerBar, Rect, ResourceCount, Resources, SelectedTile, Sprite, StateChange, Text, Tile, Transform, Upgrade, UpgradeCost, Wallet, WalletUI, WinCount};
+use components::{AnimationSheet, BuildCost, Button, Camera, ClickSound, Color, CurrentPower, Gatherer, HighlightTile, Input, PowerBar, Rect, ResourceCount, Resources, SelectedTile, Sprite, StateChange, Text, Tile, Transform, Upgrade, UpgradeCost, Wallet, WalletUI};
 use specs::{Entity, World, ReadStorage, WriteStorage};
 use renderer::{ColorFormat, DepthFormat};
 use spritesheet::Spritesheet;
@@ -69,7 +69,6 @@ fn setup_world(world: &mut World, window: &glutin::Window) {
     world.register::<Upgrade>();
     world.register::<UpgradeCost>();
     world.register::<WalletUI>();
-    world.register::<WinCount>();
 }
 
 fn create_click_sound(root_path: &PathBuf) -> Decoder<BufReader<File>> {
@@ -239,13 +238,13 @@ fn main() {
                 Event::WindowEvent{ event, .. } => match event {
                     WindowEvent::MouseMoved{ position: (x, y), .. } => {
                         let mut input_res = world.write_resource::<Input>();
-                        let mut input = input_res.deref_mut();
+                        let input = input_res.deref_mut();
                         input.mouse_pos.0 = x as f32 / input.hidpi_factor;
                         input.mouse_pos.1 = y as f32 / input.hidpi_factor;
                     },
                     WindowEvent::MouseInput{ button: MouseButton::Left, state, .. } => {
                         let mut input_res = world.write_resource::<Input>();
-                        let mut input = input_res.deref_mut();
+                        let input = input_res.deref_mut();
                         match state {
                             ElementState::Pressed => input.mouse_pressed = true,
                             ElementState::Released => input.mouse_pressed = false,
@@ -255,7 +254,7 @@ fn main() {
                     WindowEvent::KeyboardInput{ input, .. } => {
                         let input_event = input;
                         let mut input_res = world.write_resource::<Input>();
-                        let mut input = input_res.deref_mut();
+                        let input = input_res.deref_mut();
                         if let Some(key) = input_event.virtual_keycode {
                             if input.pressed_keys.contains_key(&key) {
                                 match input_event.state {
@@ -284,8 +283,6 @@ fn main() {
             let mut transforms = world.write::<Transform>();
             let animation_sheets = world.read::<AnimationSheet>();
             let colors = world.read::<Color>();
-            let highlight_tiles = world.read::<HighlightTile>();
-            let selected_tiles = world.read::<SelectedTile>();
             let mut texts = world.write::<Text>();
             let rects = world.read::<Rect>();
 
@@ -319,7 +316,7 @@ fn main() {
 
         let mut state_change = {
             let mut state_change_storage = world.write_resource::<StateChange>();
-            let mut state_change = state_change_storage.deref_mut();
+            let state_change = state_change_storage.deref_mut();
             let copy = state_change.clone();
             state_change.reset();
             copy

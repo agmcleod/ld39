@@ -22,7 +22,6 @@ mod upgrade;
 mod upgrade_cost;
 mod wallet;
 mod wallet_ui;
-mod win_count;
 
 pub use self::animation_sheet::*;
 pub use self::build_cost::*;
@@ -48,4 +47,3 @@ pub use self::upgrade::*;
 pub use self::upgrade_cost::*;
 pub use self::wallet::*;
 pub use self::wallet_ui::*;
-pub use self::win_count::*;
