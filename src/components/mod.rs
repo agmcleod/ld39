@@ -18,8 +18,6 @@ mod state_change;
 mod text;
 mod tile;
 mod transform;
-mod upgrade;
-mod upgrade_cost;
 mod wallet;
 mod wallet_ui;
 
@@ -43,7 +41,5 @@ pub use self::state_change::*;
 pub use self::text::*;
 pub use self::tile::*;
 pub use self::transform::*;
-pub use self::upgrade::*;
-pub use self::upgrade_cost::*;
 pub use self::wallet::*;
 pub use self::wallet_ui::*;

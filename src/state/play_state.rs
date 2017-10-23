@@ -6,7 +6,7 @@ use state::State;
 use rusttype::Font;
 use std::ops::DerefMut;
 
-use components::{BuildCost, Button, Color, CurrentPower, GathererType, HighlightTile, PowerBar, Rect, ResourceCount, Resources, ResourceType, SelectedTile, Sprite, Text, Tile, Transform, Upgrade, UpgradeCost, Wallet, WalletUI};
+use components::{BuildCost, Button, Color, CurrentPower, GathererType, HighlightTile, PowerBar, Rect, ResourceCount, Resources, ResourceType, SelectedTile, Sprite, Text, Tile, Transform, Wallet, WalletUI};
 use systems;
 
 pub struct PlayState<'a> {
@@ -27,7 +27,6 @@ impl <'a>PlayState<'a> {
             .add(systems::BuildGatherer{ built_one: false, scene: scene.clone() }, "build_gatherer", &["button_hover"])
             .add(systems::TileSelection::new(scene.clone()), "tile_selection", &["build_gatherer"])
             .add(systems::Gathering{}, "gathering", &[])
-            .add(systems::UpgradeResource{}, "upgrade_resource", &[])
             .build();
 
         let ps = PlayState{
@@ -185,18 +184,6 @@ impl <'a>State for PlayState<'a> {
             .with(Button::new("power-btn".to_string(), ["power-btn.png".to_string(), "power-btn-hover.png".to_string()]))
             .with(Transform::new(770.0, 576.0, 0.0, 96, 32, 0.0, 1.0, 1.0))
             .with(Sprite{ frame_name: "power-btn.png".to_string(), visible: true })
-            .build();
-        scene.nodes.push(Node::new(Some(entity), None));
-
-        // upgrade stuff
-        let mut text = Text::new(&font, 32.0);
-        text.visible = false;
-        text.set_text(format!("{}", Upgrade::new().get_cost()));
-        let entity = world.create_entity()
-            .with(UpgradeCost{})
-            .with(text)
-            .with(Transform::new(750.0, 508.0, 0.0, 32, 32, 0.0, 1.0, 1.0))
-            .with(Color([0.0, 1.0, 0.0, 1.0]))
             .build();
         scene.nodes.push(Node::new(Some(entity), None));
     }

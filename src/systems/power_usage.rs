@@ -36,7 +36,7 @@ impl<'b> System<'b> for PowerUsage {
         let mut power_left = 0;
         for power_bar in (&mut power_storage).join() {
             power_left = power_bar.power_left;
-            if math::get_mills(&self.instant.elapsed()) >= 0.250 {
+            if math::get_seconds(&self.instant.elapsed()) >= 0.250 {
                 self.instant = Instant::now();
                 if power_bar.power_left > 0 {
                     power_bar.power_left -= 100;

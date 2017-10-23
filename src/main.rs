@@ -22,6 +22,7 @@ mod scene;
 mod spritesheet;
 mod state;
 mod systems;
+mod tech_tree;
 mod utils;
 
 use std::collections::HashMap;
@@ -31,7 +32,7 @@ use std::io::BufReader;
 use std::fs::File;
 use std::path::{Path, PathBuf};
 use rusttype::{FontCollection, Font};
-use components::{AnimationSheet, BuildCost, Button, Camera, ClickSound, Color, CurrentPower, Gatherer, HighlightTile, Input, PowerBar, Rect, ResourceCount, Resources, SelectedTile, Sprite, StateChange, Text, Tile, Transform, Upgrade, UpgradeCost, Wallet, WalletUI};
+use components::{AnimationSheet, BuildCost, Button, Camera, ClickSound, Color, CurrentPower, Gatherer, HighlightTile, Input, PowerBar, Rect, ResourceCount, Resources, SelectedTile, Sprite, StateChange, Text, Tile, Transform, Wallet, WalletUI};
 use specs::{Entity, World, ReadStorage, WriteStorage};
 use renderer::{ColorFormat, DepthFormat};
 use spritesheet::Spritesheet;
@@ -66,8 +67,6 @@ fn setup_world(world: &mut World, window: &glutin::Window) {
     world.register::<Text>();
     world.register::<Tile>();
     world.register::<Transform>();
-    world.register::<Upgrade>();
-    world.register::<UpgradeCost>();
     world.register::<WalletUI>();
 }
 

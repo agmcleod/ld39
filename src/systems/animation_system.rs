@@ -20,7 +20,7 @@ impl<'a> System<'a> for AnimationSystem {
         let mut animation_sheet_storage = data;
 
         for animation_sheet in (&mut animation_sheet_storage).join() {
-            if math::get_mills(&animation_sheet.time_passed.elapsed()) >= animation_sheet.frame_time {
+            if math::get_seconds(&animation_sheet.time_passed.elapsed()) >= animation_sheet.frame_time {
                 animation_sheet.current_index += 1;
                 animation_sheet.time_passed = Instant::now();
                 if animation_sheet.current_index >= animation_sheet.get_current_animation().len() {
