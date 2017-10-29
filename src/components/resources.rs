@@ -31,36 +31,7 @@ impl Resources {
         }
     }
 
-    pub fn withdraw_resources(&mut self, amount: usize) -> usize {
-        let coal = self.coal;
-        let oil = self.oil;
-        let clean = self.clean;
-
-        if amount > coal + oil + clean {
-            return 0
-        }
-
-        let mut m_amount = amount;
-        if coal > m_amount {
-            self.coal -= m_amount;
-            return amount
-        } else {
-            self.coal = 0;
-            m_amount -= coal;
-        }
-
-        if oil > m_amount {
-            self.oil -= m_amount;
-            return amount
-        } else {
-            self.oil = 0;
-            m_amount -= oil;
-        }
-
-        self.clean -= m_amount;
-        return amount
-    }
-
+    // TODO: Consider overflow
     pub fn withdraw_all_for_type(&mut self, resource_type: ResourceType) -> usize {
         match resource_type {
             ResourceType::Coal => {

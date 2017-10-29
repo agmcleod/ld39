@@ -2,7 +2,6 @@ use specs::{VecStorage, Component};
 
 pub struct Sprite {
     pub frame_name: String,
-    pub visible: bool,
 }
 
 impl Component for Sprite {

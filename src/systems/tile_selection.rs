@@ -60,8 +60,8 @@ impl<'a> System<'a> for TileSelection {
             }
 
             if !tile_already_taken {
-                for (_, rect, transform) in (&selected_tile_storage, &mut rect_storage, &mut transform_storage).join() {
-                    rect.visible = true;
+                for (_, transform) in (&selected_tile_storage, &mut transform_storage).join() {
+                    transform.visible = true;
                     transform.pos.x = tile_mouse_x;
                     transform.pos.y = tile_mouse_y;
                 }
@@ -80,10 +80,10 @@ impl<'a> System<'a> for TileSelection {
                 }
             }
         } else {
-            for (_, rect) in (&selected_tile_storage, &rect_storage).join() {
+            for (_, transform) in (&selected_tile_storage, &transform_storage).join() {
                 // clean up build UI if selected tile not visible, may want to add a flag for checking this
                 // cou;ld maybe move build_ui_entity into the selected_tile component?
-                if !rect.visible {
+                if !transform.visible {
                     if let Some(build_ui_entity) = self.build_ui_entity {
                         let mut scene = self.scene.lock().unwrap();
 

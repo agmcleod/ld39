@@ -45,7 +45,7 @@ impl<'a> System<'a> for ButtonHover {
             let mut button = button_storage.get_mut(button_entity).unwrap();
             let mut sprite = sprite_storage.get_mut(button_entity).unwrap();
 
-            let abs_transform = Transform::new(absolute_pos.x, absolute_pos.y, 0.0, transform.size.x, transform.size.y, transform.rotation, transform.scale.x, transform.scale.y);
+            let abs_transform = Transform::visible(absolute_pos.x, absolute_pos.y, 0.0, transform.size.x, transform.size.y, transform.rotation, transform.scale.x, transform.scale.y);
             if !found_button && abs_transform.contains(&mouse_x, &mouse_y) {
                 button.mouse_is_over = true;
                 sprite.frame_name = button.get_hover_frame().clone();

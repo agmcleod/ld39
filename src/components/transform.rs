@@ -6,16 +6,22 @@ pub struct Transform {
     pub size: Vector2<u16>,
     pub rotation: f32,
     pub scale: Vector2<f32>,
+    pub visible: bool,
 }
 
 impl Transform {
-    pub fn new(x: f32, y: f32, z: f32, w: u16, h: u16, rotation: f32, scale_x: f32, scale_y: f32) -> Transform {
+    pub fn new(x: f32, y: f32, z: f32, w: u16, h: u16, rotation: f32, scale_x: f32, scale_y: f32, visible: bool) -> Transform {
         Transform{
             pos: Vector3{ x: x, y: y, z: z},
             size: Vector2{ x: w, y: h },
             rotation: rotation,
             scale: Vector2{ x: scale_x, y: scale_y },
+            visible: visible,
         }
+    }
+
+    pub fn visible(x: f32, y: f32, z: f32, w: u16, h: u16, rotation: f32, scale_x: f32, scale_y: f32) -> Transform {
+        Self::new(x, y, z, w, h, rotation, scale_x, scale_y, true)
     }
 
     pub fn contains(&self, x: &f32, y: &f32) -> bool {

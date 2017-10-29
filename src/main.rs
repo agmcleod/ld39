@@ -22,7 +22,6 @@ mod scene;
 mod spritesheet;
 mod state;
 mod systems;
-mod tech_tree;
 mod utils;
 
 use std::collections::HashMap;
@@ -33,6 +32,7 @@ use std::fs::File;
 use std::path::{Path, PathBuf};
 use rusttype::{FontCollection, Font};
 use components::{AnimationSheet, BuildCost, Button, Camera, ClickSound, Color, CurrentPower, Gatherer, HighlightTile, Input, PowerBar, Rect, ResourceCount, Resources, SelectedTile, Sprite, StateChange, Text, Tile, Transform, Wallet, WalletUI};
+use entities::tech_tree;
 use specs::{Entity, World, ReadStorage, WriteStorage};
 use renderer::{ColorFormat, DepthFormat};
 use spritesheet::Spritesheet;
@@ -68,6 +68,10 @@ fn setup_world(world: &mut World, window: &glutin::Window) {
     world.register::<Tile>();
     world.register::<Transform>();
     world.register::<WalletUI>();
+
+    world.register::<tech_tree::Coal>();
+    world.register::<tech_tree::Oil>();
+    world.register::<tech_tree::Solar>();
 }
 
 fn create_click_sound(root_path: &PathBuf) -> Decoder<BufReader<File>> {
@@ -104,35 +108,37 @@ fn render_entity<R: gfx::Resources, C: gfx::CommandBuffer<R>, F: gfx::Factory<R>
     rect_storage: &ReadStorage<Rect>,
     ) {
 
-    if let (Some(sprite), Some(transform)) = (sprite_storage.get(*entity), transform_storage.get_mut(*entity)) {
-        if sprite.visible {
-            basic.render(encoder, world, factory, &transform, Some(&sprite.frame_name), spritesheet, None, Some(asset_texture));
-        }
-    }
-
-    if let (Some(animation), Some(transform)) = (animation_storage.get(*entity), transform_storage.get_mut(*entity)) {
-        basic.render(encoder, world, factory, &transform, Some(animation.get_current_frame()), spritesheet, None, Some(asset_texture));
-    }
-
-    if let (Some(color), Some(transform), Some(rect)) = (color_storage.get(*entity), transform_storage.get_mut(*entity), rect_storage.get(*entity)) {
-        if rect.visible {
-            basic.render(encoder, world, factory, &transform, None, spritesheet, Some(color.0), None);
-        }
-    }
-
-    if let (Some(color), Some(transform), Some(text)) = (color_storage.get(*entity), transform_storage.get_mut(*entity), text_storage.get_mut(*entity)) {
-        if text.new_data {
-            text.new_data = false;
-            if !glyph_cache.contains_key(&text.text) {
-                renderer::text::create_texture_from_glyph(glyph_cache, &font, text, factory);
+    if let Some(transform) = transform_storage.get_mut(*entity) {
+        if transform.visible {
+             if let Some(sprite) = sprite_storage.get(*entity) {
+                basic.render(encoder, world, factory, &transform, Some(&sprite.frame_name), spritesheet, None, Some(asset_texture));
             }
-            let entry = glyph_cache.get(&text.text).unwrap();
-            transform.size.x = entry.width;
-            transform.size.y = entry.height;
-        }
 
-        if text.text != "" && text.visible {
-            basic.render(encoder, world, factory, &transform, None, spritesheet, Some(color.0), Some(&glyph_cache.get(&text.text).unwrap().view));
+            if let Some(animation) = animation_storage.get(*entity) {
+                basic.render(encoder, world, factory, &transform, Some(animation.get_current_frame()), spritesheet, None, Some(asset_texture));
+            }
+
+            if let (Some(color), Some(_)) = (color_storage.get(*entity), rect_storage.get(*entity)) {
+                if transform.visible {
+                    basic.render(encoder, world, factory, &transform, None, spritesheet, Some(color.0), None);
+                }
+            }
+
+            if let (Some(color), Some(text)) = (color_storage.get(*entity), text_storage.get_mut(*entity)) {
+                if text.new_data {
+                    text.new_data = false;
+                    if !glyph_cache.contains_key(&text.text) {
+                        renderer::text::create_texture_from_glyph(glyph_cache, &font, text, factory);
+                    }
+                    let entry = glyph_cache.get(&text.text).unwrap();
+                    transform.size.x = entry.width;
+                    transform.size.y = entry.height;
+                }
+
+                if text.text != "" && text.visible {
+                    basic.render(encoder, world, factory, &transform, None, spritesheet, Some(color.0), Some(&glyph_cache.get(&text.text).unwrap().view));
+                }
+            }
         }
     }
 }
@@ -156,7 +162,9 @@ fn render_node<R: gfx::Resources, C: gfx::CommandBuffer<R>, F: gfx::Factory<R>>(
     ) {
     if let Some(entity) = node.entity {
         if let Some(transform) = transforms.get(entity) {
-            basic.transform(&transform, false);
+            if transform.visible {
+                basic.transform(&transform, false);
+            }
         }
         render_entity(
             basic, encoder, world, factory, spritesheet, asset_texture,
@@ -176,7 +184,9 @@ fn render_node<R: gfx::Resources, C: gfx::CommandBuffer<R>, F: gfx::Factory<R>>(
 
     if let Some(entity) = node.entity {
         if let Some(transform) = transforms.get(entity) {
-            basic.transform(&transform, true);
+            if transform.visible {
+                basic.transform(&transform, true);
+            }
         }
     }
 }

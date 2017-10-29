@@ -6,8 +6,9 @@ use state::State;
 use rusttype::Font;
 use std::ops::DerefMut;
 
-use components::{BuildCost, Button, Color, CurrentPower, GathererType, HighlightTile, PowerBar, Rect, ResourceCount, Resources, ResourceType, SelectedTile, Sprite, Text, Tile, Transform, Wallet, WalletUI};
+use components::{Button, Color, CurrentPower, PowerBar, Rect, ResourceCount, Resources, ResourceType, SelectedTile, Sprite, Text, Tile, Transform, Wallet, WalletUI};
 use systems;
+use tech_tree;
 
 pub struct PlayState<'a> {
     dispatcher: Dispatcher<'a, 'a>,
@@ -59,9 +60,9 @@ impl <'a>State for PlayState<'a> {
                 let row = row as f32;
                 let size = Tile::get_size();
                 let tile = world.create_entity()
-                    .with(Transform::new(size * col, size * row, 1.0, size as u16, size as u16, 0.0, 1.0, 1.0))
+                    .with(Transform::visible(size * col, size * row, 1.0, size as u16, size as u16, 0.0, 1.0, 1.0))
                     .with(Button::new("tiles".to_string(), ["tiles.png".to_string(), "tiles_highlight.png".to_string()]))
-                    .with(Sprite{ frame_name: "tiles.png".to_string(), visible: true })
+                    .with(Sprite{ frame_name: "tiles.png".to_string() })
                     .with(Tile{})
                     .build();
 
@@ -71,12 +72,12 @@ impl <'a>State for PlayState<'a> {
 
         {
             let mut resources_storage = world.write_resource::<Resources>();
-            let mut resources: &mut Resources = resources_storage.deref_mut();
+            let resources: &mut Resources = resources_storage.deref_mut();
 
             resources.reset();
 
             let mut wallet_storage = world.write_resource::<Wallet>();
-            let mut wallet: &mut Wallet = wallet_storage.deref_mut();
+            let wallet: &mut Wallet = wallet_storage.deref_mut();
 
             wallet.reset();
         }
@@ -87,14 +88,14 @@ impl <'a>State for PlayState<'a> {
 
         let entity = world.create_entity()
             .with(PowerBar::new())
-            .with(Transform::new(670.0, 32.0, 1.0, 260, 32, 0.0, 1.0, 1.0))
-            .with(Sprite{ frame_name: "powerbar.png".to_string(), visible: true })
+            .with(Transform::visible(670.0, 32.0, 1.0, 260, 32, 0.0, 1.0, 1.0))
+            .with(Sprite{ frame_name: "powerbar.png".to_string() })
             .build();
         scene.nodes.push(Node::new(Some(entity), None));
 
         let entity = world.create_entity()
             .with(CurrentPower{})
-            .with(Transform::new(674.0, 36.0, 0.0, CurrentPower::get_max_with(), 24, 0.0, 1.0, 1.0))
+            .with(Transform::visible(674.0, 36.0, 0.0, CurrentPower::get_max_with(), 24, 0.0, 1.0, 1.0))
             .with(Rect::new())
             .with(Color([0.0, 1.0, 0.0, 1.0]))
             .build();
@@ -103,15 +104,15 @@ impl <'a>State for PlayState<'a> {
         // coal sprite
         let entity = world.create_entity()
             .with(ResourceCount{ resource_type: ResourceType::Coal })
-            .with(Transform::new(670.0, 108.0, 0.0, 32, 32, 0.0, 1.0, 1.0))
-            .with(Sprite{ frame_name: "coal.png".to_string(), visible: true })
+            .with(Transform::visible(670.0, 108.0, 0.0, 32, 32, 0.0, 1.0, 1.0))
+            .with(Sprite{ frame_name: "coal.png".to_string() })
             .build();
         scene.nodes.push(Node::new(Some(entity), None));
 
         // coal text
         let entity = world.create_entity()
             .with(ResourceCount{ resource_type: ResourceType::Coal })
-            .with(Transform::new(720.0, 108.0, 0.0, 32, 32, 0.0, 1.0, 1.0))
+            .with(Transform::visible(720.0, 108.0, 0.0, 32, 32, 0.0, 1.0, 1.0))
             .with(Text::new(&font, 32.0))
             .with(Color([0.0, 1.0, 0.0, 1.0]))
             .build();
@@ -120,15 +121,15 @@ impl <'a>State for PlayState<'a> {
         // oil sprite
         let entity = world.create_entity()
             .with(ResourceCount{ resource_type: ResourceType::Oil })
-            .with(Transform::new(670.0, 142.0, 0.0, 32, 32, 0.0, 1.0, 1.0))
-            .with(Sprite{ frame_name: "oil.png".to_string(), visible: true })
+            .with(Transform::visible(670.0, 142.0, 0.0, 32, 32, 0.0, 1.0, 1.0))
+            .with(Sprite{ frame_name: "oil.png".to_string() })
             .build();
         scene.nodes.push(Node::new(Some(entity), None));
 
         // oil text
         let entity = world.create_entity()
             .with(ResourceCount{ resource_type: ResourceType::Oil })
-            .with(Transform::new(720.0, 142.0, 0.0, 32, 32, 0.0, 1.0, 1.0))
+            .with(Transform::visible(720.0, 142.0, 0.0, 32, 32, 0.0, 1.0, 1.0))
             .with(Text::new(&font, 32.0))
             .with(Color([0.0, 1.0, 0.0, 1.0]))
             .build();
@@ -137,15 +138,15 @@ impl <'a>State for PlayState<'a> {
         // solar sprite
         let entity = world.create_entity()
             .with(ResourceCount{ resource_type: ResourceType::Clean })
-            .with(Transform::new(670.0, 188.0, 0.0, 32, 32, 0.0, 1.0, 1.0))
-            .with(Sprite{ frame_name: "sun.png".to_string(), visible: true })
+            .with(Transform::visible(670.0, 188.0, 0.0, 32, 32, 0.0, 1.0, 1.0))
+            .with(Sprite{ frame_name: "sun.png".to_string() })
             .build();
         scene.nodes.push(Node::new(Some(entity), None));
 
         // solar text
         let entity = world.create_entity()
             .with(ResourceCount{ resource_type: ResourceType::Clean })
-            .with(Transform::new(720.0, 188.0, 0.0, 32, 32, 0.0, 1.0, 1.0))
+            .with(Transform::visible(720.0, 188.0, 0.0, 32, 32, 0.0, 1.0, 1.0))
             .with(Text::new(&font, 32.0))
             .with(Color([0.0, 1.0, 0.0, 1.0]))
             .build();
@@ -154,8 +155,8 @@ impl <'a>State for PlayState<'a> {
         // money sprite
         let entity = world.create_entity()
             .with(WalletUI{})
-            .with(Transform::new(673.0, 228.0, 0.0, 26, 32, 0.0, 1.0, 1.0))
-            .with(Sprite{ frame_name: "dollarsign.png".to_string(), visible: true })
+            .with(Transform::visible(673.0, 228.0, 0.0, 26, 32, 0.0, 1.0, 1.0))
+            .with(Sprite{ frame_name: "dollarsign.png".to_string() })
             .build();
         scene.nodes.push(Node::new(Some(entity), None));
 
@@ -164,7 +165,7 @@ impl <'a>State for PlayState<'a> {
         text.set_text(format!("{}", Wallet::start_amount()));
         let entity = world.create_entity()
             .with(WalletUI{})
-            .with(Transform::new(720.0, 228.0, 0.0, 32, 32, 0.0, 1.0, 1.0))
+            .with(Transform::visible(720.0, 228.0, 0.0, 32, 32, 0.0, 1.0, 1.0))
             .with(text)
             .with(Color([0.0, 1.0, 0.0, 1.0]))
             .build();
@@ -173,8 +174,8 @@ impl <'a>State for PlayState<'a> {
         // selected
         let entity = world.create_entity()
             .with(SelectedTile{})
-            .with(Transform::new(0.0, 0.0, 0.0, 64, 64, 0.0, 1.0, 1.0))
-            .with(Rect::new_invisible())
+            .with(Transform::new(0.0, 0.0, 0.0, 64, 64, 0.0, 1.0, 1.0, false))
+            .with(Rect::new())
             .with(Color([1.0, 1.0, 1.0, 0.6]))
             .build();
         scene.nodes.push(Node::new(Some(entity), None));
@@ -182,10 +183,12 @@ impl <'a>State for PlayState<'a> {
         // sell button
         let entity = world.create_entity()
             .with(Button::new("power-btn".to_string(), ["power-btn.png".to_string(), "power-btn-hover.png".to_string()]))
-            .with(Transform::new(770.0, 576.0, 0.0, 96, 32, 0.0, 1.0, 1.0))
-            .with(Sprite{ frame_name: "power-btn.png".to_string(), visible: true })
+            .with(Transform::visible(770.0, 576.0, 0.0, 96, 32, 0.0, 1.0, 1.0))
+            .with(Sprite{ frame_name: "power-btn.png".to_string() })
             .build();
         scene.nodes.push(Node::new(Some(entity), None));
+
+        tech_tree::build_tech_tree(world);
     }
 
     fn update(&mut self, world: &mut World) {

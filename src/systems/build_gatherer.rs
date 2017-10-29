@@ -49,11 +49,11 @@ impl<'a> System<'a> for BuildGatherer {
         let mut selected_tile_x = 0.0;
         let mut selected_tile_y = 0.0;
         // spend the money, and hide selected tile
-        for (_, rect, transform) in (&selected_tile_storage, &mut rect_storage, &transform_storage).join() {
+        for (_, transform) in (&selected_tile_storage, &mut transform_storage).join() {
             // TODO: needs to be updated to build arbitrary type
             let amount = GathererType::get_type_for_resources_type(&resources.get_current_type()).get_build_cost();
-            if button_pressed && rect.visible && wallet.spend(amount) {
-                rect.visible = false;
+            if button_pressed && transform.visible && wallet.spend(amount) {
+                transform.visible = false;
                 create = true;
 
                 selected_tile_x = transform.pos.x;
@@ -72,7 +72,7 @@ impl<'a> System<'a> for BuildGatherer {
             let gatherer_entity = entities.create();
             gatherer_storage.insert(gatherer_entity, gatherer);
             animation_sheet_storage.insert(gatherer_entity, anim);
-            transform_storage.insert(gatherer_entity, Transform::new(selected_tile_x, selected_tile_y, 0.0, 64, 64, 0.0, 1.0, 1.0));
+            transform_storage.insert(gatherer_entity, Transform::visible(selected_tile_x, selected_tile_y, 0.0, 64, 64, 0.0, 1.0, 1.0));
 
             let mut scene = self.scene.lock().unwrap();
             scene.nodes.push(Node::new(Some(gatherer_entity), None));
@@ -82,8 +82,8 @@ impl<'a> System<'a> for BuildGatherer {
                 self.built_one = true;
                 let upgrade_button_entity = entities.create();
                 button_storage.insert(upgrade_button_entity, Button::new("upgrade".to_string(), ["refinery_button_1.png".to_string(), "refinery_button_2.png".to_string()]));
-                transform_storage.insert(upgrade_button_entity, Transform::new(670.0, 486.0, 0.0, 64, 64, 0.0, 1.0, 1.0));
-                sprite_storage.insert(upgrade_button_entity, Sprite{ frame_name: "refinery_1.png".to_string(), visible: true });
+                transform_storage.insert(upgrade_button_entity, Transform::visible(670.0, 486.0, 0.0, 64, 64, 0.0, 1.0, 1.0));
+                sprite_storage.insert(upgrade_button_entity, Sprite{ frame_name: "refinery_1.png".to_string() });
 
                 scene.nodes.push(Node::new(Some(upgrade_button_entity), None));
             }

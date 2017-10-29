@@ -1,16 +1,6 @@
-use tech_tree::buff::Buff;
-
-pub enum Status {
-    Locked,
-    Researchable,
-    Learning,
-    Researched,
-}
-
-pub struct Upgrade {
-    time_to_research: f32,
-    status: Status
-}
+use specs::Component;
+use specs::HashMapStorage;
+use tech_tree::upgrade::{Status, Upgrade};
 
 pub struct Coal {
     upgrade: Upgrade,
@@ -27,6 +17,6 @@ impl Coal {
     }
 }
 
-impl Buff for Coal {
-
+impl Component for Coal {
+    type Storage = HashMapStorage<Coal>;
 }
