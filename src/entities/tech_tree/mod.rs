@@ -5,8 +5,8 @@ pub use self::upgrade::*;
 use specs::{Entity, World};
 
 pub struct TechTreeNode {
-    entity: Entity,
-    sub_nodes: Vec<TechTreeNode>,
+    pub entity: Entity,
+    pub sub_nodes: Vec<TechTreeNode>,
 }
 
 pub fn build_tech_tree(world: &mut World) -> TechTreeNode {
@@ -36,4 +36,18 @@ pub fn build_tech_tree(world: &mut World) -> TechTreeNode {
         entity: coal_entity,
         sub_nodes: vec![oil_node]
     }
+}
+
+pub fn traverse_tree<F>(node: &mut TechTreeNode, cb: &mut F) -> bool where F: FnMut(&mut TechTreeNode) -> bool {
+    if cb(node) {
+        return true
+    } else {
+        for mut sub_node in node.sub_nodes.iter_mut() {
+            if traverse_tree(&mut sub_node, cb) {
+                return true
+            }
+        }
+    }
+
+    false
 }

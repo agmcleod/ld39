@@ -99,7 +99,6 @@ impl<R> Basic<R>
 
         let camera_res = world.read_resource::<components::Camera>();
         let camera = camera_res.deref();
-        let y = transform.pos.y;
         let z = transform.pos.z;
         let w = transform.size.x as f32;
         let h = transform.size.y as f32;

@@ -9,6 +9,7 @@ use std::ops::DerefMut;
 use components::{Button, Color, CurrentPower, PowerBar, Rect, ResourceCount, Resources, ResourceType, SelectedTile, Sprite, Text, Tile, Transform, Wallet, WalletUI};
 use systems;
 use tech_tree;
+use renderer;
 
 pub struct PlayState<'a> {
     dispatcher: Dispatcher<'a, 'a>,
@@ -85,6 +86,8 @@ impl <'a>State for PlayState<'a> {
         let font = &self.font;
 
         scene.nodes.push(Node::new(None, Some(tile_nodes)));
+
+        let dimensions = renderer::get_dimensions();
 
         let entity = world.create_entity()
             .with(PowerBar::new())
@@ -188,7 +191,18 @@ impl <'a>State for PlayState<'a> {
             .build();
         scene.nodes.push(Node::new(Some(entity), None));
 
-        tech_tree::build_tech_tree(world);
+        let mut tech_tree_node = tech_tree::build_tech_tree(world);
+        let mut tech_tree_container = Node::new(Some(world.create_entity()
+            .with(Transform::new(640.0, 0.0, 0.0, (dimensions[0] - 640.0) as u16, dimensions[1] as u16, 0.0, 1.0, 1.0, false))
+            .build()), None);
+        {
+            let mut add_to_container = |node: &mut tech_tree::TechTreeNode| {
+                tech_tree_container.sub_nodes.push(Node::new(Some(node.entity), None));
+                true
+            };
+            tech_tree::traverse_tree(&mut tech_tree_node, &mut add_to_container);
+        }
+        scene.nodes.push(tech_tree_container);
     }
 
     fn update(&mut self, world: &mut World) {

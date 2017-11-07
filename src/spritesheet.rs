@@ -1,5 +1,3 @@
-use serde;
-
 #[derive(Serialize, Deserialize)]
 pub struct FrameData {
     pub x: usize,

@@ -1,6 +1,5 @@
 use std::ops::DerefMut;
 use std::time::Instant;
-use std::sync::{Arc, Mutex};
 use components::{ResourceCount, CurrentPower, PowerBar, Resources, StateChange, Text, Transform};
 use state::play_state::PlayState;
 use specs::{FetchMut, ReadStorage, WriteStorage, Join, System};
