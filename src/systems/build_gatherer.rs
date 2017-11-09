@@ -7,7 +7,6 @@ use scene::node::Node;
 use systems::logic;
 
 pub struct BuildGatherer {
-    pub built_one: bool,
     pub scene: Arc<Mutex<Scene>>,
 }
 
@@ -72,21 +71,10 @@ impl<'a> System<'a> for BuildGatherer {
             let gatherer_entity = entities.create();
             gatherer_storage.insert(gatherer_entity, gatherer);
             animation_sheet_storage.insert(gatherer_entity, anim);
-            transform_storage.insert(gatherer_entity, Transform::visible(selected_tile_x, selected_tile_y, 0.0, 64, 64, 0.0, 1.0, 1.0));
+            transform_storage.insert(gatherer_entity, Transform::visible(selected_tile_x, selected_tile_y, 1.0, 64, 64, 0.0, 1.0, 1.0));
 
             let mut scene = self.scene.lock().unwrap();
             scene.nodes.push(Node::new(Some(gatherer_entity), None));
-
-            // create upgrade button
-            if !self.built_one {
-                self.built_one = true;
-                let upgrade_button_entity = entities.create();
-                button_storage.insert(upgrade_button_entity, Button::new("upgrade".to_string(), ["refinery_button_1.png".to_string(), "refinery_button_2.png".to_string()]));
-                transform_storage.insert(upgrade_button_entity, Transform::visible(670.0, 486.0, 0.0, 64, 64, 0.0, 1.0, 1.0));
-                sprite_storage.insert(upgrade_button_entity, Sprite{ frame_name: "refinery_1.png".to_string() });
-
-                scene.nodes.push(Node::new(Some(upgrade_button_entity), None));
-            }
         }
     }
 }

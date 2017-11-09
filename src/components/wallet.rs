@@ -1,5 +1,3 @@
-use specs::{Component, HashMapStorage};
-
 const START_AMOUNT: usize = 20;
 
 pub struct Wallet {
@@ -33,8 +31,4 @@ impl Wallet {
             true
         }
     }
-}
-
-impl Component for Wallet {
-    type Storage = HashMapStorage<Wallet>;
 }

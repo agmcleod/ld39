@@ -3,6 +3,8 @@ mod upgrade;
 pub use self::upgrade::*;
 
 use specs::{Entity, World};
+use renderer;
+use components::{Color, Rect, Transform};
 
 pub struct TechTreeNode {
     pub entity: Entity,
@@ -10,16 +12,28 @@ pub struct TechTreeNode {
 }
 
 pub fn build_tech_tree(world: &mut World) -> TechTreeNode {
+    let dimensions = renderer::get_dimensions();
+    let center_x = (dimensions[0] - 640.0) / 2.0 - 16.0;
+
     let coal_entity = world.create_entity()
         .with(Coal::new())
+        .with(Transform::new(center_x, 32.0, 0.0, 32, 32, 0.0, 1.0, 1.0, true))
+        .with(Rect{})
+        .with(Color([135.0 / 256.0, 177.0 / 256.0, 232.0 / 256.0, 1.0]))
         .build();
 
     let oil_entity = world.create_entity()
         .with(Oil::new())
+        .with(Transform::new(center_x, 96.0, 0.0, 32, 32, 0.0, 1.0, 1.0, true))
+        .with(Rect{})
+        .with(Color([135.0 / 256.0, 177.0 / 256.0, 232.0 / 256.0, 1.0]))
         .build();
 
     let solar_entity = world.create_entity()
         .with(Solar::new())
+        .with(Transform::new(center_x, 160.0, 0.0, 32, 32, 0.0, 1.0, 1.0, true))
+        .with(Rect{})
+        .with(Color([135.0 / 256.0, 177.0 / 256.0, 232.0 / 256.0, 1.0]))
         .build();
 
     let solar_node = TechTreeNode{

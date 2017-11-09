@@ -1,5 +1,4 @@
 use std::collections::HashMap;
-use specs::{Component, HashMapStorage};
 use glutin::VirtualKeyCode;
 
 #[derive(Debug)]
@@ -24,8 +23,4 @@ impl Input {
             mouse_pressed: false
         }
     }
-}
-
-impl Component for Input {
-    type Storage = HashMapStorage<Input>;
 }

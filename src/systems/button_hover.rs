@@ -35,15 +35,15 @@ impl<'a> System<'a> for ButtonHover {
             button_entities.push((transform.pos.z as i32, entity.clone()));
         }
 
-        button_entities.sort_by(|a, b| a.0.cmp(&b.0));
+        button_entities.sort_by(|a, b| b.0.cmp(&a.0));
 
         let mut found_button = false;
 
         for (_, button_entity) in button_entities {
             let absolute_pos = logic::get_absolute_pos(&scene, &button_entity, &transform_storage);
             let transform = transform_storage.get(button_entity).unwrap();
-            let mut button = button_storage.get_mut(button_entity).unwrap();
-            let mut sprite = sprite_storage.get_mut(button_entity).unwrap();
+            let button = button_storage.get_mut(button_entity).unwrap();
+            let sprite = sprite_storage.get_mut(button_entity).unwrap();
 
             let abs_transform = Transform::visible(absolute_pos.x, absolute_pos.y, 0.0, transform.size.x, transform.size.y, transform.rotation, transform.scale.x, transform.scale.y);
             if !found_button && abs_transform.contains(&mouse_x, &mouse_y) {

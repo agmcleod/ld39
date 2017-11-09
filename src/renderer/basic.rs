@@ -134,22 +134,22 @@ impl<R> Basic<R>
 
         let data: Vec<Vertex> = vec![
             Vertex{
-                pos: [0.0, 0.0, z],
+                pos: [0.0, 0.0, 0.0],
                 uv: [tx, ty],
                 color: color,
             },
             Vertex{
-                pos: [w, 0.0, z],
+                pos: [w, 0.0, 0.0],
                 uv: [tx2, ty],
                 color: color,
             },
             Vertex{
-                pos: [w, h, z],
+                pos: [w, h, 0.0],
                 uv: [tx2, ty2],
                 color: color,
             },
             Vertex{
-                pos: [0.0, h, z],
+                pos: [0.0, h, 0.0],
                 uv: [tx, ty2],
                 color: color,
             }

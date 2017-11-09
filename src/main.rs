@@ -31,7 +31,7 @@ use std::io::BufReader;
 use std::fs::File;
 use std::path::{Path, PathBuf};
 use rusttype::{FontCollection, Font};
-use components::{AnimationSheet, BuildCost, Button, Camera, ClickSound, Color, CurrentPower, Gatherer, HighlightTile, Input, PowerBar, Rect, ResourceCount, Resources, SelectedTile, Sprite, StateChange, Text, Tile, Transform, Wallet, WalletUI};
+use components::{AnimationSheet, BuildCost, Button, Camera, ClickSound, Color, CurrentPower, EntityLookup, Gatherer, HighlightTile, Input, PowerBar, Rect, ResourceCount, Resources, SelectedTile, Sprite, StateChange, Text, Tile, Transform, Wallet, WalletUI};
 use entities::tech_tree;
 use specs::{Entity, World, ReadStorage, WriteStorage};
 use renderer::{ColorFormat, DepthFormat};
@@ -52,6 +52,7 @@ fn setup_world(world: &mut World, window: &glutin::Window) {
     world.add_resource::<Resources>(Resources::new());
     world.add_resource::<ClickSound>(ClickSound{ play: false });
     world.add_resource::<Wallet>(Wallet::new());
+    world.add_resource::<EntityLookup>(EntityLookup::new());
     world.register::<AnimationSheet>();
     world.register::<BuildCost>();
     world.register::<Button>();
@@ -162,9 +163,10 @@ fn render_node<R: gfx::Resources, C: gfx::CommandBuffer<R>, F: gfx::Factory<R>>(
     ) {
     if let Some(entity) = node.entity {
         if let Some(transform) = transforms.get(entity) {
-            if transform.visible {
-                basic.transform(&transform, false);
+            if !transform.visible {
+                return
             }
+            basic.transform(&transform, false);
         }
         render_entity(
             basic, encoder, world, factory, spritesheet, asset_texture,
@@ -184,9 +186,7 @@ fn render_node<R: gfx::Resources, C: gfx::CommandBuffer<R>, F: gfx::Factory<R>>(
 
     if let Some(entity) = node.entity {
         if let Some(transform) = transforms.get(entity) {
-            if transform.visible {
-                basic.transform(&transform, true);
-            }
+            basic.transform(&transform, true);
         }
     }
 }

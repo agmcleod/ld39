@@ -6,7 +6,7 @@ use state::State;
 use rusttype::Font;
 use std::ops::DerefMut;
 
-use components::{Button, Color, CurrentPower, PowerBar, Rect, ResourceCount, Resources, ResourceType, SelectedTile, Sprite, Text, Tile, Transform, Wallet, WalletUI};
+use components::{Button, Color, CurrentPower, EntityLookup, PowerBar, Rect, ResourceCount, Resources, ResourceType, SelectedTile, Sprite, Text, Tile, Transform, Wallet, WalletUI};
 use systems;
 use tech_tree;
 use renderer;
@@ -26,9 +26,10 @@ impl <'a>PlayState<'a> {
             .add(systems::PowerUsage::new(), "power_usage", &[])
             .add(systems::ButtonHover{ scene: scene.clone() }, "button_hover", &[])
             .add(systems::SellEnergy{}, "sell_energy", &["button_hover"])
-            .add(systems::BuildGatherer{ built_one: false, scene: scene.clone() }, "build_gatherer", &["button_hover"])
+            .add(systems::BuildGatherer{ scene: scene.clone() }, "build_gatherer", &["button_hover"])
             .add(systems::TileSelection::new(scene.clone()), "tile_selection", &["build_gatherer"])
             .add(systems::Gathering{}, "gathering", &[])
+            .add(systems::ToggleTechTree::new(), "toggle_tech_tree", &["button_hover"])
             .build();
 
         let ps = PlayState{
@@ -61,7 +62,7 @@ impl <'a>State for PlayState<'a> {
                 let row = row as f32;
                 let size = Tile::get_size();
                 let tile = world.create_entity()
-                    .with(Transform::visible(size * col, size * row, 1.0, size as u16, size as u16, 0.0, 1.0, 1.0))
+                    .with(Transform::visible(size * col, size * row, 0.0, size as u16, size as u16, 0.0, 1.0, 1.0))
                     .with(Button::new("tiles".to_string(), ["tiles.png".to_string(), "tiles_highlight.png".to_string()]))
                     .with(Sprite{ frame_name: "tiles.png".to_string() })
                     .with(Tile{})
@@ -91,14 +92,14 @@ impl <'a>State for PlayState<'a> {
 
         let entity = world.create_entity()
             .with(PowerBar::new())
-            .with(Transform::visible(670.0, 32.0, 1.0, 260, 32, 0.0, 1.0, 1.0))
+            .with(Transform::visible(670.0, 32.0, 0.0, 260, 32, 0.0, 1.0, 1.0))
             .with(Sprite{ frame_name: "powerbar.png".to_string() })
             .build();
         scene.nodes.push(Node::new(Some(entity), None));
 
         let entity = world.create_entity()
             .with(CurrentPower{})
-            .with(Transform::visible(674.0, 36.0, 0.0, CurrentPower::get_max_with(), 24, 0.0, 1.0, 1.0))
+            .with(Transform::visible(674.0, 36.0, 1.0, CurrentPower::get_max_with(), 24, 0.0, 1.0, 1.0))
             .with(Rect::new())
             .with(Color([0.0, 1.0, 0.0, 1.0]))
             .build();
@@ -177,7 +178,7 @@ impl <'a>State for PlayState<'a> {
         // selected
         let entity = world.create_entity()
             .with(SelectedTile{})
-            .with(Transform::new(0.0, 0.0, 0.0, 64, 64, 0.0, 1.0, 1.0, false))
+            .with(Transform::new(0.0, 0.0, 1.0, 64, 64, 0.0, 1.0, 1.0, false))
             .with(Rect::new())
             .with(Color([1.0, 1.0, 1.0, 0.6]))
             .build();
@@ -186,22 +187,37 @@ impl <'a>State for PlayState<'a> {
         // sell button
         let entity = world.create_entity()
             .with(Button::new("power-btn".to_string(), ["power-btn.png".to_string(), "power-btn-hover.png".to_string()]))
-            .with(Transform::visible(770.0, 576.0, 0.0, 96, 32, 0.0, 1.0, 1.0))
+            .with(Transform::visible(822.0, 576.0, 0.0, 96, 32, 0.0, 1.0, 1.0))
             .with(Sprite{ frame_name: "power-btn.png".to_string() })
             .build();
         scene.nodes.push(Node::new(Some(entity), None));
 
+        // tech tree button
+        let entity = world.create_entity()
+            .with(Button::new("show-tech".to_string(), ["show-tech.png".to_string(), "show-tech-hover.png".to_string()]))
+            .with(Transform::visible(683.0, 576.0, 0.0, 96, 32, 0.0, 1.0, 1.0))
+            .with(Sprite{ frame_name: "show-tech.png".to_string() })
+            .build();
+        scene.nodes.push(Node::new(Some(entity), None));
+
+        {
+            let mut lookup = world.write_resource::<EntityLookup>();
+            lookup.entities.insert("show_button_entity".to_string(), entity);
+        }
+
         let mut tech_tree_node = tech_tree::build_tech_tree(world);
         let mut tech_tree_container = Node::new(Some(world.create_entity()
-            .with(Transform::new(640.0, 0.0, 0.0, (dimensions[0] - 640.0) as u16, dimensions[1] as u16, 0.0, 1.0, 1.0, false))
+            .with(Transform::new(640.0, 0.0, 2.0, (dimensions[0] - 640.0) as u16, dimensions[1] as u16, 0.0, 1.0, 1.0, false))
             .build()), None);
         {
             let mut add_to_container = |node: &mut tech_tree::TechTreeNode| {
                 tech_tree_container.sub_nodes.push(Node::new(Some(node.entity), None));
-                true
+                false
             };
             tech_tree::traverse_tree(&mut tech_tree_node, &mut add_to_container);
         }
+        let mut lookup = world.write_resource::<EntityLookup>();
+        lookup.entities.insert("tech_tree_container".to_string(), tech_tree_container.entity.unwrap());
         scene.nodes.push(tech_tree_container);
     }
 

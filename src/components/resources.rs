@@ -1,4 +1,3 @@
-use specs::{Component, HashMapStorage};
 use components::GathererType;
 
 #[derive(Copy, Clone, Debug, PartialEq)]
@@ -88,8 +87,4 @@ impl Resources {
         self.clean = 0;
         self.current_type = ResourceType::Coal;
     }
-}
-
-impl Component for Resources {
-    type Storage = HashMapStorage<Resources>;
 }

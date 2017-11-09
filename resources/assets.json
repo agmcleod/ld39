@@ -1,22 +1,6 @@
 {"frames": [
 
 {
-	"filename": "build.png",
-	"frame": {"x":166,"y":2,"w":96,"h":32},
-	"rotated": false,
-	"trimmed": false,
-	"spriteSourceSize": {"x":0,"y":0,"w":96,"h":32},
-	"sourceSize": {"w":96,"h":32}
-},
-{
-	"filename": "build_hover.png",
-	"frame": {"x":68,"y":2,"w":96,"h":32},
-	"rotated": false,
-	"trimmed": false,
-	"spriteSourceSize": {"x":0,"y":0,"w":96,"h":32},
-	"sourceSize": {"w":96,"h":32}
-},
-{
 	"filename": "coal.png",
 	"frame": {"x":424,"y":70,"w":32,"h":32},
 	"rotated": false,
@@ -66,7 +50,7 @@
 },
 {
 	"filename": "power-btn-hover.png",
-	"frame": {"x":390,"y":2,"w":96,"h":32},
+	"frame": {"x":166,"y":2,"w":96,"h":32},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":96,"h":32},
@@ -74,7 +58,7 @@
 },
 {
 	"filename": "power-btn.png",
-	"frame": {"x":292,"y":2,"w":96,"h":32},
+	"frame": {"x":68,"y":2,"w":96,"h":32},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":96,"h":32},
@@ -169,6 +153,22 @@
 	"sourceSize": {"w":64,"h":64}
 },
 {
+	"filename": "show-tech-hover.png",
+	"frame": {"x":390,"y":2,"w":96,"h":32},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":96,"h":32},
+	"sourceSize": {"w":96,"h":32}
+},
+{
+	"filename": "show-tech.png",
+	"frame": {"x":292,"y":2,"w":96,"h":32},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":96,"h":32},
+	"sourceSize": {"w":96,"h":32}
+},
+{
 	"filename": "sun.png",
 	"frame": {"x":424,"y":36,"w":32,"h":32},
 	"rotated": false,
@@ -223,6 +223,6 @@
 	"format": "RGBA8888",
 	"size": {"w":512,"h":256},
 	"scale": "1",
-	"smartupdate": "$TexturePacker:SmartUpdate:f8c0035278305f705ab875872d9215bf:e62987a865abdf815f287cbbe694b6bb:a759b6bbc8381ac9c472b28f589ad0d6$"
+	"smartupdate": "$TexturePacker:SmartUpdate:237d3245b83956e72858edbc0157bb3b:7e4c8a24ac3731378771f9b9d33fe0e8:a759b6bbc8381ac9c472b28f589ad0d6$"
 }
 }

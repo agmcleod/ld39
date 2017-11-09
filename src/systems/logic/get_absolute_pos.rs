@@ -8,6 +8,9 @@ fn check_node<'a>(node: &Node, entity: &Entity, position: &mut Vector2<f32>, tra
     let mut found_entity = false;
     if let Some(node_entity) = node.entity {
         let transform = transform_storage.get(node_entity).unwrap();
+        if !transform.visible {
+            return false
+        }
         position.x += transform.pos.x;
         position.y += transform.pos.y;
         if node_entity == *entity {
@@ -32,6 +35,7 @@ fn check_node<'a>(node: &Node, entity: &Entity, position: &mut Vector2<f32>, tra
     found_entity
 }
 
+// potential optimization is to change this into a quad tree
 pub fn get_absolute_pos<'a>(scene: &Scene, entity: &Entity, transform_storage: &ReadStorage<'a, Transform>) -> Vector2<f32> {
     let mut position = Vector2{ x: 0.0, y: 0.0 };
 
