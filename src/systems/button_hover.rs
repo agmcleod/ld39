@@ -2,6 +2,7 @@ use std::ops::Deref;
 use std::sync::{Arc, Mutex};
 use specs::{Entity, Entities, System, Fetch, Join, ReadStorage, WriteStorage};
 use components::{Button, Input, Transform, Sprite};
+use cgmath::Vector3;
 use scene::Scene;
 use systems::logic;
 
@@ -28,19 +29,19 @@ impl<'a> System<'a> for ButtonHover {
 
         let scene = self.scene.lock().unwrap();
 
-        let mut button_entities: Vec<(i32, Entity)> = Vec::new();
+        let mut button_entities: Vec<(i32, Entity, Vector3<f32>)> = Vec::new();
 
-        for (button, entity, _, transform) in (&mut button_storage, &*entities, &mut sprite_storage, &transform_storage).join() {
+        for (button, entity, _, _) in (&mut button_storage, &*entities, &mut sprite_storage, &transform_storage).join() {
             button.mouse_is_over = false;
-            button_entities.push((transform.pos.z as i32, entity.clone()));
+            let absolute_pos = logic::get_absolute_pos(&scene, &entity, &transform_storage);
+            button_entities.push((absolute_pos.z as i32, entity.clone(), absolute_pos));
         }
 
         button_entities.sort_by(|a, b| b.0.cmp(&a.0));
 
         let mut found_button = false;
 
-        for (_, button_entity) in button_entities {
-            let absolute_pos = logic::get_absolute_pos(&scene, &button_entity, &transform_storage);
+        for (_, button_entity, absolute_pos) in button_entities {
             let transform = transform_storage.get(button_entity).unwrap();
             let button = button_storage.get_mut(button_entity).unwrap();
             let sprite = sprite_storage.get_mut(button_entity).unwrap();
