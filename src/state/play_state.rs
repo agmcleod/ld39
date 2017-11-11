@@ -90,90 +90,94 @@ impl <'a>State for PlayState<'a> {
 
         let dimensions = renderer::get_dimensions();
 
+        let mut side_bar_container = Node::new(Some(world.create_entity()
+            .with(Transform::visible(640.0, 0.0, 0.0, (dimensions[0] - 640.0) as u16, dimensions[1] as u16, 0.0, 1.0, 1.0))
+            .build()), None);
+
         let entity = world.create_entity()
             .with(PowerBar::new())
-            .with(Transform::visible(670.0, 32.0, 0.0, 260, 32, 0.0, 1.0, 1.0))
+            .with(Transform::visible(30.0, 32.0, 0.0, 260, 32, 0.0, 1.0, 1.0))
             .with(Sprite{ frame_name: "powerbar.png".to_string() })
             .build();
-        scene.nodes.push(Node::new(Some(entity), None));
+        side_bar_container.sub_nodes.push(Node::new(Some(entity), None));
 
         let entity = world.create_entity()
             .with(CurrentPower{})
-            .with(Transform::visible(674.0, 36.0, 1.0, CurrentPower::get_max_with(), 24, 0.0, 1.0, 1.0))
+            .with(Transform::visible(34.0, 36.0, 1.0, CurrentPower::get_max_with(), 24, 0.0, 1.0, 1.0))
             .with(Rect::new())
             .with(Color([0.0, 1.0, 0.0, 1.0]))
             .build();
-        scene.nodes.push(Node::new(Some(entity), None));
+        side_bar_container.sub_nodes.push(Node::new(Some(entity), None));
 
         // coal sprite
         let entity = world.create_entity()
             .with(ResourceCount{ resource_type: ResourceType::Coal })
-            .with(Transform::visible(670.0, 108.0, 0.0, 32, 32, 0.0, 1.0, 1.0))
+            .with(Transform::visible(30.0, 108.0, 0.0, 32, 32, 0.0, 1.0, 1.0))
             .with(Sprite{ frame_name: "coal.png".to_string() })
             .build();
-        scene.nodes.push(Node::new(Some(entity), None));
+        side_bar_container.sub_nodes.push(Node::new(Some(entity), None));
 
         // coal text
         let entity = world.create_entity()
             .with(ResourceCount{ resource_type: ResourceType::Coal })
-            .with(Transform::visible(720.0, 108.0, 0.0, 32, 32, 0.0, 1.0, 1.0))
+            .with(Transform::visible(80.0, 108.0, 0.0, 32, 32, 0.0, 1.0, 1.0))
             .with(Text::new(&font, 32.0))
             .with(Color([0.0, 1.0, 0.0, 1.0]))
             .build();
-        scene.nodes.push(Node::new(Some(entity), None));
+        side_bar_container.sub_nodes.push(Node::new(Some(entity), None));
 
         // oil sprite
         let entity = world.create_entity()
             .with(ResourceCount{ resource_type: ResourceType::Oil })
-            .with(Transform::visible(670.0, 142.0, 0.0, 32, 32, 0.0, 1.0, 1.0))
+            .with(Transform::visible(30.0, 142.0, 0.0, 32, 32, 0.0, 1.0, 1.0))
             .with(Sprite{ frame_name: "oil.png".to_string() })
             .build();
-        scene.nodes.push(Node::new(Some(entity), None));
+        side_bar_container.sub_nodes.push(Node::new(Some(entity), None));
 
         // oil text
         let entity = world.create_entity()
             .with(ResourceCount{ resource_type: ResourceType::Oil })
-            .with(Transform::visible(720.0, 142.0, 0.0, 32, 32, 0.0, 1.0, 1.0))
+            .with(Transform::visible(80.0, 142.0, 0.0, 32, 32, 0.0, 1.0, 1.0))
             .with(Text::new(&font, 32.0))
             .with(Color([0.0, 1.0, 0.0, 1.0]))
             .build();
-        scene.nodes.push(Node::new(Some(entity), None));
+        side_bar_container.sub_nodes.push(Node::new(Some(entity), None));
 
         // solar sprite
         let entity = world.create_entity()
             .with(ResourceCount{ resource_type: ResourceType::Clean })
-            .with(Transform::visible(670.0, 188.0, 0.0, 32, 32, 0.0, 1.0, 1.0))
+            .with(Transform::visible(30.0, 188.0, 0.0, 32, 32, 0.0, 1.0, 1.0))
             .with(Sprite{ frame_name: "sun.png".to_string() })
             .build();
-        scene.nodes.push(Node::new(Some(entity), None));
+        side_bar_container.sub_nodes.push(Node::new(Some(entity), None));
 
         // solar text
         let entity = world.create_entity()
             .with(ResourceCount{ resource_type: ResourceType::Clean })
-            .with(Transform::visible(720.0, 188.0, 0.0, 32, 32, 0.0, 1.0, 1.0))
+            .with(Transform::visible(80.0, 188.0, 0.0, 32, 32, 0.0, 1.0, 1.0))
             .with(Text::new(&font, 32.0))
             .with(Color([0.0, 1.0, 0.0, 1.0]))
             .build();
-        scene.nodes.push(Node::new(Some(entity), None));
+        side_bar_container.sub_nodes.push(Node::new(Some(entity), None));
 
         // money sprite
         let entity = world.create_entity()
             .with(WalletUI{})
-            .with(Transform::visible(673.0, 228.0, 0.0, 26, 32, 0.0, 1.0, 1.0))
+            .with(Transform::visible(33.0, 228.0, 0.0, 26, 32, 0.0, 1.0, 1.0))
             .with(Sprite{ frame_name: "dollarsign.png".to_string() })
             .build();
-        scene.nodes.push(Node::new(Some(entity), None));
+        side_bar_container.sub_nodes.push(Node::new(Some(entity), None));
 
         // money text
         let mut text = Text::new(&font, 32.0);
         text.set_text(format!("{}", Wallet::start_amount()));
         let entity = world.create_entity()
             .with(WalletUI{})
-            .with(Transform::visible(720.0, 228.0, 0.0, 32, 32, 0.0, 1.0, 1.0))
+            .with(Transform::visible(80.0, 228.0, 0.0, 32, 32, 0.0, 1.0, 1.0))
             .with(text)
             .with(Color([0.0, 1.0, 0.0, 1.0]))
             .build();
-        scene.nodes.push(Node::new(Some(entity), None));
+        side_bar_container.sub_nodes.push(Node::new(Some(entity), None));
 
         // selected
         let entity = world.create_entity()
@@ -187,23 +191,26 @@ impl <'a>State for PlayState<'a> {
         // sell button
         let entity = world.create_entity()
             .with(Button::new("power-btn".to_string(), ["power-btn.png".to_string(), "power-btn-hover.png".to_string()]))
-            .with(Transform::visible(822.0, 576.0, 0.0, 96, 32, 0.0, 1.0, 1.0))
+            .with(Transform::visible(182.0, 576.0, 0.0, 96, 32, 0.0, 1.0, 1.0))
             .with(Sprite{ frame_name: "power-btn.png".to_string() })
             .build();
-        scene.nodes.push(Node::new(Some(entity), None));
+        side_bar_container.sub_nodes.push(Node::new(Some(entity), None));
 
         // tech tree button
         let entity = world.create_entity()
             .with(Button::new("show-tech".to_string(), ["show-tech.png".to_string(), "show-tech-hover.png".to_string()]))
-            .with(Transform::visible(683.0, 576.0, 0.0, 96, 32, 0.0, 1.0, 1.0))
+            .with(Transform::visible(43.0, 576.0, 0.0, 96, 32, 0.0, 1.0, 1.0))
             .with(Sprite{ frame_name: "show-tech.png".to_string() })
             .build();
-        scene.nodes.push(Node::new(Some(entity), None));
+        side_bar_container.sub_nodes.push(Node::new(Some(entity), None));
 
         {
             let mut lookup = world.write_resource::<EntityLookup>();
             lookup.entities.insert("show_button_entity".to_string(), entity);
+            lookup.entities.insert("side_bar_container".to_string(), side_bar_container.entity.unwrap());
         }
+
+        scene.nodes.push(side_bar_container);
 
         let mut tech_tree_node = tech_tree::build_tech_tree(world);
         let mut tech_tree_container = Node::new(Some(world.create_entity()
@@ -218,7 +225,18 @@ impl <'a>State for PlayState<'a> {
             };
             tech_tree::traverse_tree(&mut tech_tree_node, &mut add_to_container);
         }
+
+        let entity = world.create_entity()
+            .with(Button::new("resume_from_upgrades".to_string(), ["resume.png".to_string(), "resume-hover.png".to_string()]))
+            .with(Transform::visible(112.0, 576.0, 0.0, 96, 32, 0.0, 1.0, 1.0))
+            .with(Sprite{ frame_name: "resume.png".to_string() })
+            .build();
+
         let mut lookup = world.write_resource::<EntityLookup>();
+
+        lookup.entities.insert("resume_from_upgrades".to_string(), entity);
+        tech_tree_container.sub_nodes.push(Node::new(Some(entity), None));
+
         lookup.entities.insert("tech_tree_container".to_string(), tech_tree_container.entity.unwrap());
         scene.nodes.push(tech_tree_container);
     }
