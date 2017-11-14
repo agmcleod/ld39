@@ -14,6 +14,7 @@ pub trait State {
     fn setup(&mut self, world: &mut World);
     fn get_scene(&self) -> Arc<Mutex<Scene>>;
     fn update(&mut self, &mut World);
+    fn handle_custom_change(&mut self, &String);
 }
 
 pub struct StateManager {
@@ -62,6 +63,8 @@ impl StateManager {
         if state_change.action != "" && state_change.state != "" {
             if state_change.action == "restart" {
                 self.restart_current_state(world);
+            } else {
+                self.states.get_mut(&self.current_state).unwrap().handle_custom_change(&state_change.action);
             }
         }
     }

@@ -40,7 +40,7 @@ impl<'b> System<'b> for PowerUsage {
                 if power_bar.power_left > 0 {
                     power_bar.power_left -= 100;
                     if power_bar.power_left <= 0 {
-                        let mut state_change: &mut StateChange = state_change_storage.deref_mut();
+                        let state_change: &mut StateChange = state_change_storage.deref_mut();
                         state_change.state = PlayState::get_name();
                         state_change.action = "restart".to_string();
                     }

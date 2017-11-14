@@ -11,10 +11,18 @@ use systems;
 use tech_tree;
 use renderer;
 
+enum InternalState {
+    Game,
+    TechTree,
+    Pause,
+}
+
 pub struct PlayState<'a> {
     dispatcher: Dispatcher<'a, 'a>,
+    tech_tree_dispatcher: Dispatcher<'a, 'a>,
     scene: Arc<Mutex<Scene>>,
     font: Arc<Font<'static>>,
+    state: InternalState,
 }
 
 impl <'a>PlayState<'a> {
@@ -32,10 +40,17 @@ impl <'a>PlayState<'a> {
             .add(systems::ToggleTechTree::new(), "toggle_tech_tree", &["button_hover"])
             .build();
 
+        let tech_tree_dispatcher = DispatcherBuilder::new()
+            .add(systems::ButtonHover{ scene: scene.clone() }, "button_hover", &[])
+            .add(systems::ToggleTechTree::new(), "toggle_tech_tree", &["button_hover"])
+            .build();
+
         let ps = PlayState{
             dispatcher: dispatcher,
+            tech_tree_dispatcher: tech_tree_dispatcher,
             scene: scene,
             font: font.clone(),
+            state: InternalState::Game,
         };
 
         ps
@@ -242,6 +257,18 @@ impl <'a>State for PlayState<'a> {
     }
 
     fn update(&mut self, world: &mut World) {
-        self.dispatcher.dispatch(&mut world.res);
+        match self.state {
+            InternalState::Game => self.dispatcher.dispatch(&mut world.res),
+            InternalState::TechTree => self.tech_tree_dispatcher.dispatch(&mut world.res),
+            _ => {},
+        }
+    }
+
+    fn handle_custom_change(&mut self, action: &String) {
+        if action == "tech_tree_pause" {
+            self.state = InternalState::TechTree;
+        } else if action == "tech_tree_resume" {
+            self.state = InternalState::Game;
+        }
     }
 }

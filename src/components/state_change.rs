@@ -22,9 +22,18 @@ impl StateChange {
         }
     }
 
+    pub fn pending(&self) -> bool {
+        self.state != "" && self.action != ""
+    }
+
     pub fn reset(&mut self) {
         self.state = "".to_string();
         self.action = "".to_string();
+    }
+
+    pub fn set(&mut self, state: String, action: String) {
+        self.state = state;
+        self.action = action;
     }
 }
 
