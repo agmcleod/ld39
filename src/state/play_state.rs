@@ -205,17 +205,17 @@ impl <'a>State for PlayState<'a> {
 
         // sell button
         let entity = world.create_entity()
-            .with(Button::new("power-btn".to_string(), ["power-btn.png".to_string(), "power-btn-hover.png".to_string()]))
+            .with(Button::new("power_btn".to_string(), ["power_btn.png".to_string(), "power_btn_hover.png".to_string()]))
             .with(Transform::visible(182.0, 576.0, 0.0, 96, 32, 0.0, 1.0, 1.0))
-            .with(Sprite{ frame_name: "power-btn.png".to_string() })
+            .with(Sprite{ frame_name: "power_btn.png".to_string() })
             .build();
         side_bar_container.sub_nodes.push(Node::new(Some(entity), None));
 
         // tech tree button
         let entity = world.create_entity()
-            .with(Button::new("show-tech".to_string(), ["show-tech.png".to_string(), "show-tech-hover.png".to_string()]))
+            .with(Button::new("show_tech".to_string(), ["show_tech.png".to_string(), "show_tech_hover.png".to_string()]))
             .with(Transform::visible(43.0, 576.0, 0.0, 96, 32, 0.0, 1.0, 1.0))
-            .with(Sprite{ frame_name: "show-tech.png".to_string() })
+            .with(Sprite{ frame_name: "show_tech.png".to_string() })
             .build();
         side_bar_container.sub_nodes.push(Node::new(Some(entity), None));
 
@@ -242,7 +242,7 @@ impl <'a>State for PlayState<'a> {
         }
 
         let entity = world.create_entity()
-            .with(Button::new("resume_from_upgrades".to_string(), ["resume.png".to_string(), "resume-hover.png".to_string()]))
+            .with(Button::new("resume_from_upgrades".to_string(), ["resume.png".to_string(), "resume_hover.png".to_string()]))
             .with(Transform::visible(112.0, 576.0, 0.0, 96, 32, 0.0, 1.0, 1.0))
             .with(Sprite{ frame_name: "resume.png".to_string() })
             .build();

@@ -38,7 +38,7 @@ impl<'a> System<'a> for BuildGatherer {
 
         let mut button_pressed = false;
         for button in (&mut button_storage).join() {
-            if button.name == "build-coal" && button.clicked(&input) {
+            if button.name == "build_coal" && button.clicked(&input) {
                 button_pressed = true;
                 click_sound.play = true;
             }

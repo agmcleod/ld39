@@ -26,7 +26,7 @@ impl<'a> System<'a> for SellEnergy {
 
         let mut sell_button_clicked = false;
         for button in (&mut button_storage).join() {
-            if button.name == "power-btn".to_string() && button.clicked(&input) {
+            if button.name == "power_btn" && button.clicked(&input) {
                 click_sound.play = true;
                 sell_button_clicked = true;
             }

@@ -49,7 +49,7 @@
 	"sourceSize": {"w":64,"h":64}
 },
 {
-	"filename": "power-btn-hover.png",
+	"filename": "power_btn.png",
 	"frame": {"x":398,"y":70,"w":96,"h":32},
 	"rotated": false,
 	"trimmed": false,
@@ -57,7 +57,7 @@
 	"sourceSize": {"w":96,"h":32}
 },
 {
-	"filename": "power-btn.png",
+	"filename": "power_btn_hover.png",
 	"frame": {"x":358,"y":36,"w":96,"h":32},
 	"rotated": false,
 	"trimmed": false,
@@ -153,7 +153,7 @@
 	"sourceSize": {"w":64,"h":64}
 },
 {
-	"filename": "resume-hover.png",
+	"filename": "resume.png",
 	"frame": {"x":166,"y":2,"w":96,"h":32},
 	"rotated": false,
 	"trimmed": false,
@@ -161,7 +161,7 @@
 	"sourceSize": {"w":96,"h":32}
 },
 {
-	"filename": "resume.png",
+	"filename": "resume_hover.png",
 	"frame": {"x":68,"y":2,"w":96,"h":32},
 	"rotated": false,
 	"trimmed": false,
@@ -169,7 +169,7 @@
 	"sourceSize": {"w":96,"h":32}
 },
 {
-	"filename": "show-tech-hover.png",
+	"filename": "show_tech.png",
 	"frame": {"x":390,"y":2,"w":96,"h":32},
 	"rotated": false,
 	"trimmed": false,
@@ -177,7 +177,7 @@
 	"sourceSize": {"w":96,"h":32}
 },
 {
-	"filename": "show-tech.png",
+	"filename": "show_tech_hover.png",
 	"frame": {"x":292,"y":2,"w":96,"h":32},
 	"rotated": false,
 	"trimmed": false,
@@ -239,6 +239,6 @@
 	"format": "RGBA8888",
 	"size": {"w":512,"h":256},
 	"scale": "1",
-	"smartupdate": "$TexturePacker:SmartUpdate:56cd8f31c6c4e1c42e0df1a52db3b299:3744f173b2f74595ad07d00093cff0fc:a759b6bbc8381ac9c472b28f589ad0d6$"
+	"smartupdate": "$TexturePacker:SmartUpdate:e2df84fb0480b6e2e85bd02b26026985:48efbc3d7838bb51441931e631f86ca2:a759b6bbc8381ac9c472b28f589ad0d6$"
 }
 }
