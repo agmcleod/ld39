@@ -11,6 +11,7 @@ fn check_node<'a>(node: &Node, entity: &Entity, position: &mut Vector3<f32>, tra
         if !transform.visible {
             return false
         }
+        // increment it before confirming, so sub nodes consider the parent node position
         position.x += transform.pos.x;
         position.y += transform.pos.y;
         position.z += transform.pos.z;
@@ -21,13 +22,16 @@ fn check_node<'a>(node: &Node, entity: &Entity, position: &mut Vector3<f32>, tra
 
     if !found_entity {
         for node in &node.sub_nodes {
-            found_entity = check_node(&node, entity, position, transform_storage);
+            if check_node(&node, entity, position, transform_storage) {
+                return true
+            }
         }
     }
 
     if !found_entity {
         if let Some(node_entity) = node.entity {
             let transform = transform_storage.get(node_entity).unwrap();
+            // undo if nothing was found
             position.x -= transform.pos.x;
             position.y -= transform.pos.y;
             position.z -= transform.pos.z;
