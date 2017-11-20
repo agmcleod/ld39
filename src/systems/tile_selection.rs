@@ -3,7 +3,7 @@ use std::sync::{Arc, Mutex};
 use specs::{Entity, Entities, ReadStorage, WriteStorage, Fetch, Join, System};
 use components::{Button, Color, Gatherer, Input, Rect, Resources, SelectedTile, Sprite, Tile, Transform};
 use scene::Scene;
-use entities::build_ui;
+use entities::create_build_ui;
 
 pub struct TileSelection {
     pub scene: Arc<Mutex<Scene>>,
@@ -74,7 +74,7 @@ impl<'a> System<'a> for TileSelection {
                     transform.pos.y = tile_mouse_y;
                 } else {
                     let resources: &Resources = resource_storage.deref();
-                    let node = build_ui::create(tile_mouse_x + Tile::get_size(), tile_mouse_y, &entities, &mut button_storage, &mut color_storage, &mut rect_storage, &mut sprite_storage, &mut transform_storage, &resources.get_current_type());
+                    let node = create_build_ui::create(tile_mouse_x + Tile::get_size(), tile_mouse_y, &entities, &mut button_storage, &mut color_storage, &mut rect_storage, &mut sprite_storage, &mut transform_storage, &resources.get_current_type());
                     self.build_ui_entity = Some(node.entity.unwrap().clone());
                     scene.nodes.push(node);
                 }

@@ -37,12 +37,12 @@ impl <'a>PlayState<'a> {
             .add(systems::BuildGatherer{ scene: scene.clone() }, "build_gatherer", &["button_hover"])
             .add(systems::TileSelection::new(scene.clone()), "tile_selection", &["build_gatherer"])
             .add(systems::Gathering{}, "gathering", &[])
-            .add(systems::ToggleTechTree::new(), "toggle_tech_tree", &["button_hover"])
+            .add(systems::ToggleTechTree::new(scene.clone()), "toggle_tech_tree", &["button_hover"])
             .build();
 
         let tech_tree_dispatcher = DispatcherBuilder::new()
             .add(systems::ButtonHover{ scene: scene.clone() }, "button_hover", &[])
-            .add(systems::ToggleTechTree::new(), "toggle_tech_tree", &["button_hover"])
+            .add(systems::ToggleTechTree::new(scene.clone()), "toggle_tech_tree", &["button_hover"])
             .build();
 
         let ps = PlayState{
