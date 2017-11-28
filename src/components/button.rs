@@ -6,6 +6,7 @@ pub struct Button {
     pub frames: [String; 2],
     pub mouse_is_over: bool,
     pub pressed: bool,
+    pub disabled: bool,
 }
 
 impl Button {
@@ -15,6 +16,7 @@ impl Button {
             frames: frames,
             mouse_is_over: false,
             pressed: false,
+            disabled: false,
         }
     }
 
@@ -41,6 +43,10 @@ impl Button {
 
     pub fn get_default_frame(&self) -> &String {
         self.frames.get(0).unwrap()
+    }
+
+    pub fn set_disabled(&mut self, disabled: bool) {
+        self.disabled = disabled;
     }
 }
 
