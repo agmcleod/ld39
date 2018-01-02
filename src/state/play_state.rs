@@ -1,12 +1,12 @@
 use std::sync::{Arc, Mutex};
 use specs::{Dispatcher, DispatcherBuilder, World};
-use scene::Scene;
-use scene::node::Node;
+use scene::Node;
 use state::State;
 use rusttype::Font;
 use std::ops::DerefMut;
 
-use components::{Button, Color, CurrentPower, EntityLookup, PowerBar, Rect, ResourceCount, Resources, ResourceType, SelectedTile, Sprite, Text, Tile, Transform, Wallet, WalletUI};
+use components::{Button, Color, CurrentPower, EntityLookup, PowerBar, Rect, ResourceCount, Resources, ResourceType, SelectedTile, Sprite, Text, Tile, Transform, Wallet};
+use components::ui::WalletUI;
 use systems;
 use tech_tree;
 use renderer;
@@ -20,14 +20,14 @@ enum InternalState {
 pub struct PlayState<'a> {
     dispatcher: Dispatcher<'a, 'a>,
     tech_tree_dispatcher: Dispatcher<'a, 'a>,
-    scene: Arc<Mutex<Scene>>,
+    scene: Arc<Mutex<Node>>,
     font: Arc<Font<'static>>,
     state: InternalState,
 }
 
 impl <'a>PlayState<'a> {
     pub fn new(font: &Arc<Font<'static>>) -> PlayState<'a> {
-        let scene = Arc::new(Mutex::new(Scene::new()));
+        let scene = Arc::new(Mutex::new(Node::new(None, None)));
 
         let dispatcher = DispatcherBuilder::new()
             .add(systems::AnimationSystem::new(), "animation_system", &[])
@@ -43,6 +43,7 @@ impl <'a>PlayState<'a> {
         let tech_tree_dispatcher = DispatcherBuilder::new()
             .add(systems::ButtonHover{ scene: scene.clone() }, "button_hover", &[])
             .add(systems::ToggleTechTree::new(scene.clone()), "toggle_tech_tree", &["button_hover"])
+            .add(systems::TechTree::new(scene.clone()), "tech_tree", &[])
             .build();
 
         let ps = PlayState{
@@ -62,7 +63,7 @@ impl <'a>PlayState<'a> {
 }
 
 impl <'a>State for PlayState<'a> {
-    fn get_scene(&self) -> Arc<Mutex<Scene>> {
+    fn get_scene(&self) -> Arc<Mutex<Node>> {
         self.scene.clone()
     }
 
@@ -101,7 +102,7 @@ impl <'a>State for PlayState<'a> {
 
         let font = &self.font;
 
-        scene.nodes.push(Node::new(None, Some(tile_nodes)));
+        scene.sub_nodes.push(Node::new(None, Some(tile_nodes)));
 
         let dimensions = renderer::get_dimensions();
 
@@ -201,7 +202,7 @@ impl <'a>State for PlayState<'a> {
             .with(Rect::new())
             .with(Color([1.0, 1.0, 1.0, 0.6]))
             .build();
-        scene.nodes.push(Node::new(Some(entity), None));
+        scene.sub_nodes.push(Node::new(Some(entity), None));
 
         // sell button
         let entity = world.create_entity()
@@ -225,7 +226,7 @@ impl <'a>State for PlayState<'a> {
             lookup.entities.insert("side_bar_container".to_string(), side_bar_container.entity.unwrap());
         }
 
-        scene.nodes.push(side_bar_container);
+        scene.sub_nodes.push(side_bar_container);
 
         let mut tech_tree_node = tech_tree::build_tech_tree(world);
         let mut tech_tree_container = Node::new(Some(world.create_entity()
@@ -253,7 +254,7 @@ impl <'a>State for PlayState<'a> {
         tech_tree_container.sub_nodes.push(Node::new(Some(entity), None));
 
         lookup.entities.insert("tech_tree_container".to_string(), tech_tree_container.entity.unwrap());
-        scene.nodes.push(tech_tree_container);
+        scene.sub_nodes.push(tech_tree_container);
     }
 
     fn update(&mut self, world: &mut World) {

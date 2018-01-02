@@ -2,16 +2,16 @@ use std::ops::Deref;
 use std::sync::{Arc, Mutex};
 use specs::{Entity, Entities, ReadStorage, WriteStorage, Fetch, Join, System};
 use components::{Button, Color, Gatherer, Input, Rect, Resources, SelectedTile, Sprite, Tile, Transform};
-use scene::Scene;
+use scene::Node;
 use entities::create_build_ui;
 
 pub struct TileSelection {
-    pub scene: Arc<Mutex<Scene>>,
+    pub scene: Arc<Mutex<Node>>,
     pub build_ui_entity: Option<Entity>,
 }
 
 impl TileSelection {
-    pub fn new(scene: Arc<Mutex<Scene>>) -> TileSelection {
+    pub fn new(scene: Arc<Mutex<Node>>) -> TileSelection {
         TileSelection{
             scene: scene,
             build_ui_entity: None,
@@ -76,7 +76,7 @@ impl<'a> System<'a> for TileSelection {
                     let resources: &Resources = resource_storage.deref();
                     let node = create_build_ui::create(tile_mouse_x + Tile::get_size(), tile_mouse_y, &entities, &mut button_storage, &mut color_storage, &mut rect_storage, &mut sprite_storage, &mut transform_storage, &resources.get_current_type());
                     self.build_ui_entity = Some(node.entity.unwrap().clone());
-                    scene.nodes.push(node);
+                    scene.sub_nodes.push(node);
                 }
             }
         } else {
@@ -88,7 +88,7 @@ impl<'a> System<'a> for TileSelection {
                         let mut scene = self.scene.lock().unwrap();
 
                         let mut node_to_delete = -1i32;
-                        for (i, node) in scene.nodes.iter().enumerate() {
+                        for (i, node) in scene.sub_nodes.iter().enumerate() {
                             if let Some(entity) = node.entity {
                                 if entity == build_ui_entity {
                                     node_to_delete = i as i32;
@@ -97,7 +97,7 @@ impl<'a> System<'a> for TileSelection {
                         }
 
                         if node_to_delete > -1i32 {
-                            scene.nodes.remove(node_to_delete as usize);
+                            scene.sub_nodes.remove(node_to_delete as usize);
                             entities.delete(build_ui_entity);
                             self.build_ui_entity = None;
                         }

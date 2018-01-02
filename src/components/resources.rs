@@ -7,12 +7,6 @@ pub enum ResourceType {
     Clean,
 }
 
-impl ResourceType {
-    fn get_current_amount(&self, resources: &Resources) -> usize {
-        resources.coal + resources.oil + resources.clean
-    }
-}
-
 pub struct Resources {
     pub coal: usize,
     pub oil: usize,
@@ -49,10 +43,6 @@ impl Resources {
                 amount
             },
         }
-    }
-
-    pub fn get_amount(&mut self) -> usize {
-        self.current_type.get_current_amount(self)
     }
 
     pub fn get_amount_for_type(&self, resource_type: &ResourceType) -> usize {

@@ -1,5 +1,5 @@
 use specs::{Entities, WriteStorage};
-use scene::node::Node;
+use scene::Node;
 use components::{Color, Rect, Transform};
 
 pub fn create(

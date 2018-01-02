@@ -1,13 +1,13 @@
 use std::ops::{Deref, DerefMut};
 use specs::{Entities, Fetch, FetchMut, Join, ReadStorage, WriteStorage, System};
-use components::{AnimationSheet, Button, ClickSound, Gatherer, GathererType, Input, Rect, Resources, ResourceType, SelectedTile, Sprite, Text, Transform, Wallet, WalletUI};
+use components::{AnimationSheet, Button, ClickSound, Gatherer, GathererType, Input, Rect, Resources, ResourceType, SelectedTile, Sprite, Text, Transform, Wallet};
+use components::ui::WalletUI;
 use std::sync::{Arc, Mutex};
-use scene::Scene;
-use scene::node::Node;
+use scene::Node;
 use systems::logic;
 
 pub struct BuildGatherer {
-    pub scene: Arc<Mutex<Scene>>,
+    pub scene: Arc<Mutex<Node>>,
 }
 
 impl<'a> System<'a> for BuildGatherer {
@@ -49,7 +49,7 @@ impl<'a> System<'a> for BuildGatherer {
         let mut selected_tile_y = 0.0;
         // spend the money, and hide selected tile
         for (_, transform) in (&selected_tile_storage, &mut transform_storage).join() {
-            // TODO: needs to be updated to build arbitrary type
+            // TODO: needs to be updated to build arbitrary type, not just the furthest reached tech level
             let amount = GathererType::get_type_for_resources_type(&resources.get_current_type()).get_build_cost();
             if button_pressed && transform.visible && wallet.spend(amount) {
                 transform.visible = false;
@@ -74,7 +74,7 @@ impl<'a> System<'a> for BuildGatherer {
             transform_storage.insert(gatherer_entity, Transform::visible(selected_tile_x, selected_tile_y, 1.0, 64, 64, 0.0, 1.0, 1.0));
 
             let mut scene = self.scene.lock().unwrap();
-            scene.nodes.push(Node::new(Some(gatherer_entity), None));
+            scene.sub_nodes.push(Node::new(Some(gatherer_entity), None));
         }
     }
 }

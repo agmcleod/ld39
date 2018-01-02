@@ -1,10 +1,9 @@
 use cgmath::Vector3;
-use specs::{Entity, ReadStorage};
-use scene::Scene;
-use scene::node::Node;
+use specs::{Entity, WriteStorage};
+use scene::Node;
 use components::Transform;
 
-fn check_node<'a>(node: &Node, entity: &Entity, position: &mut Vector3<f32>, transform_storage: &ReadStorage<'a, Transform>) -> bool {
+fn check_node<'a>(node: &Node, entity: &Entity, position: &mut Vector3<f32>, transform_storage: &WriteStorage<'a, Transform>) -> bool {
     let mut found_entity = false;
     if let Some(node_entity) = node.entity {
         let transform = transform_storage.get(node_entity).unwrap();
@@ -42,10 +41,10 @@ fn check_node<'a>(node: &Node, entity: &Entity, position: &mut Vector3<f32>, tra
 }
 
 // potential optimization is to change this into a quad tree
-pub fn get_absolute_pos<'a>(scene: &Scene, entity: &Entity, transform_storage: &ReadStorage<'a, Transform>) -> Vector3<f32> {
+pub fn get_absolute_pos<'a>(scene: &Node, entity: &Entity, transform_storage: &WriteStorage<'a, Transform>) -> Vector3<f32> {
     let mut position = Vector3{ x: 0.0, y: 0.0, z: 0.0 };
 
-    for node in &scene.nodes {
+    for node in &scene.sub_nodes {
         if check_node(node, entity, &mut position, &transform_storage) {
             break
         }

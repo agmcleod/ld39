@@ -4,14 +4,14 @@ use specs::{Entities, System, Join, Fetch, FetchMut, ReadStorage, WriteStorage};
 use components::{Button, Color, EntityLookup, Input, Rect, StateChange, Tile, Transform};
 use state::play_state::PlayState;
 use entities::create_colored_rect;
-use scene::Scene;
+use scene::Node;
 
 pub struct ToggleTechTree {
-    scene: Arc<Mutex<Scene>>,
+    scene: Arc<Mutex<Node>>,
 }
 
 impl ToggleTechTree {
-    pub fn new(scene: Arc<Mutex<Scene>>) -> ToggleTechTree {
+    pub fn new(scene: Arc<Mutex<Node>>) -> ToggleTechTree {
         ToggleTechTree{
             scene: scene,
         }
@@ -38,7 +38,7 @@ impl ToggleTechTree {
                 let node = create_colored_rect::create(0.0, 0.0, 10.0, 640, 640, [0.0, 0.0, 0.0, 0.8], entities, transform_storage, color_storage, rect_storage);
                 lookup.entities.insert("pause_black".to_string(), node.entity.unwrap());
                 let mut scene = self.scene.lock().unwrap();
-                scene.nodes.push(node);
+                scene.sub_nodes.push(node);
 
                 was_clicked = true;
             }

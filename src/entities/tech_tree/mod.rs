@@ -5,6 +5,7 @@ pub use self::upgrade::*;
 use specs::{Entity, World};
 use renderer;
 use components::{Color, Rect, Transform};
+use components::ui;
 
 pub struct TechTreeNode {
     pub entity: Entity,
@@ -19,21 +20,24 @@ pub fn build_tech_tree(world: &mut World) -> TechTreeNode {
         .with(Coal::new())
         .with(Transform::new(center_x, 32.0, 0.0, 32, 32, 0.0, 1.0, 1.0, true))
         .with(Rect{})
-        .with(Color([135.0 / 256.0, 177.0 / 256.0, 232.0 / 256.0, 1.0]))
+        .with(ui::TechTreeNode{})
+        .with(Color(get_color_from_status(&Coal::new().upgrade.status)))
         .build();
 
     let oil_entity = world.create_entity()
         .with(Oil::new())
         .with(Transform::new(center_x, 96.0, 0.0, 32, 32, 0.0, 1.0, 1.0, true))
         .with(Rect{})
-        .with(Color([135.0 / 256.0, 177.0 / 256.0, 232.0 / 256.0, 1.0]))
+        .with(ui::TechTreeNode{})
+        .with(Color(get_color_from_status(&Oil::new().upgrade.status)))
         .build();
 
     let solar_entity = world.create_entity()
         .with(Solar::new())
         .with(Transform::new(center_x, 160.0, 0.0, 32, 32, 0.0, 1.0, 1.0, true))
         .with(Rect{})
-        .with(Color([135.0 / 256.0, 177.0 / 256.0, 232.0 / 256.0, 1.0]))
+        .with(ui::TechTreeNode{})
+        .with(Color(get_color_from_status(&Solar::new().upgrade.status)))
         .build();
 
     let solar_node = TechTreeNode{

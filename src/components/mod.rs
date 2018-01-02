@@ -20,7 +20,8 @@ mod text;
 mod tile;
 mod transform;
 mod wallet;
-mod wallet_ui;
+
+pub mod ui;
 
 pub use self::animation_sheet::*;
 pub use self::build_cost::*;
@@ -44,4 +45,3 @@ pub use self::text::*;
 pub use self::tile::*;
 pub use self::transform::*;
 pub use self::wallet::*;
-pub use self::wallet_ui::*;

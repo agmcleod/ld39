@@ -5,14 +5,13 @@ use std::sync::{Arc, Mutex};
 use specs::World;
 use std::collections::HashMap;
 
-use scene::Scene;
-use scene::node::Node;
+use scene::Node;
 
 use components::StateChange;
 
 pub trait State {
     fn setup(&mut self, world: &mut World);
-    fn get_scene(&self) -> Arc<Mutex<Scene>>;
+    fn get_scene(&self) -> Arc<Mutex<Node>>;
     fn update(&mut self, &mut World);
     fn handle_custom_change(&mut self, &String);
 }
@@ -40,7 +39,7 @@ impl StateManager {
     fn cleanup_state (&self, state: &Box<State>, world: &mut World) {
         let scene = state.get_scene();
         let scene = scene.lock().unwrap();
-        for node in &scene.nodes {
+        for node in &scene.sub_nodes {
             self.delete_entities_from_node(node, world);
         }
     }
@@ -55,7 +54,7 @@ impl StateManager {
         }
     }
 
-    pub fn get_current_scene(&self) -> Arc<Mutex<Scene>> {
+    pub fn get_current_scene(&self) -> Arc<Mutex<Node>> {
         self.states.get(&self.current_state).unwrap().get_scene()
     }
 

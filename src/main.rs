@@ -31,7 +31,8 @@ use std::io::BufReader;
 use std::fs::File;
 use std::path::{Path, PathBuf};
 use rusttype::{FontCollection, Font};
-use components::{AnimationSheet, BuildCost, Button, Camera, ClickSound, Color, CurrentPower, EntityLookup, Gatherer, HighlightTile, Input, PowerBar, Rect, ResourceCount, Resources, SelectedTile, Sprite, StateChange, Text, Tile, Transform, Wallet, WalletUI};
+use components::{AnimationSheet, BuildCost, Button, Camera, ClickSound, Color, CurrentPower, EntityLookup, Gatherer, HighlightTile, Input, PowerBar, Rect, ResourceCount, Resources, SelectedTile, Sprite, StateChange, Text, Tile, Transform, Wallet};
+use components::ui::{WalletUI, TechTreeNode};
 use entities::tech_tree;
 use specs::{Entity, World, ReadStorage, WriteStorage};
 use renderer::{ColorFormat, DepthFormat};
@@ -41,7 +42,7 @@ use glutin::GlContext;
 use gfx::{Device};
 use rodio::Source;
 use rodio::decoder::Decoder;
-use scene::node::Node;
+use scene::Node;
 use state::play_state::PlayState;
 use state::StateManager;
 
@@ -65,6 +66,7 @@ fn setup_world(world: &mut World, window: &glutin::Window) {
     world.register::<Rect>();
     world.register::<SelectedTile>();
     world.register::<Sprite>();
+    world.register::<TechTreeNode>();
     world.register::<Text>();
     world.register::<Tile>();
     world.register::<Transform>();
@@ -309,7 +311,7 @@ fn main() {
             let scene = state_manager.get_current_scene();
             let scene = scene.lock().unwrap();
 
-            for node in &scene.nodes {
+            for node in &scene.sub_nodes {
                 render_node(node,
                 &mut basic, &mut encoder, &world, &mut factory, &spritesheet, &asset_texture,
                 &font, &mut glyph_cache,

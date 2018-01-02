@@ -3,7 +3,7 @@ use specs::HashMapStorage;
 use tech_tree::upgrade::{Status, Upgrade};
 
 pub struct Coal {
-    upgrade: Upgrade,
+    pub upgrade: Upgrade,
 }
 
 impl Coal {

@@ -1,6 +1,7 @@
 use std::ops::{Deref, DerefMut};
 use specs::{Fetch, FetchMut, Join, WriteStorage, System};
-use components::{ClickSound, Input, Button, PowerBar, Resources, ResourceType, Text, Wallet, WalletUI};
+use components::{ClickSound, Input, Button, PowerBar, Resources, ResourceType, Text, Wallet};
+use components::ui::WalletUI;
 
 pub struct SellEnergy;
 

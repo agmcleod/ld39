@@ -1,16 +1,16 @@
 use specs::{Entities, WriteStorage};
-use scene::node::Node;
+use scene::Node;
 use components::{Button, Color, ResourceType, Rect, Sprite, Transform};
 
-pub fn create<'a>(
+pub fn create(
     x: f32,
     y: f32,
-    entities: &Entities<'a>,
-    button_storage: &mut WriteStorage<'a, Button>,
-    color_storage: &mut WriteStorage<'a, Color>,
-    rect_storage: &mut WriteStorage<'a, Rect>,
-    sprite_storage: &mut WriteStorage<'a, Sprite>,
-    transform_storage: &mut WriteStorage<'a, Transform>,
+    entities: &Entities,
+    button_storage: &mut WriteStorage<Button>,
+    color_storage: &mut WriteStorage<Color>,
+    rect_storage: &mut WriteStorage<Rect>,
+    sprite_storage: &mut WriteStorage<Sprite>,
+    transform_storage: &mut WriteStorage<Transform>,
     current_type: &ResourceType) -> Node {
     let coal_entity = entities.create();
     transform_storage.insert(coal_entity, Transform::visible(0.0, 0.0, 0.0, 32, 32, 0.0, 1.0, 1.0));

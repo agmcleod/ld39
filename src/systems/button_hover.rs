@@ -1,13 +1,13 @@
 use std::ops::Deref;
 use std::sync::{Arc, Mutex};
-use specs::{Entity, Entities, System, Fetch, Join, ReadStorage, WriteStorage};
+use specs::{Entity, Entities, System, Fetch, Join, WriteStorage};
 use components::{Button, Input, Transform, Sprite};
 use cgmath::Vector3;
-use scene::Scene;
+use scene::Node;
 use systems::logic;
 
 pub struct ButtonHover {
-    pub scene: Arc<Mutex<Scene>>,
+    pub scene: Arc<Mutex<Node>>,
 }
 
 impl<'a> System<'a> for ButtonHover {
@@ -15,7 +15,7 @@ impl<'a> System<'a> for ButtonHover {
         WriteStorage<'a, Button>,
         Entities<'a>,
         Fetch<'a, Input>,
-        ReadStorage<'a, Transform>,
+        WriteStorage<'a, Transform>,
         WriteStorage<'a, Sprite>,
     );
 

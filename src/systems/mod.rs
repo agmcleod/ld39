@@ -7,6 +7,7 @@ mod sell_energy;
 pub mod logic;
 mod tile_selection;
 mod toggle_tech_tree;
+mod tech_tree;
 
 pub use self::animation_system::*;
 pub use self::build_gatherer::*;
@@ -16,3 +17,4 @@ pub use self::power_usage::*;
 pub use self::sell_energy::*;
 pub use self::tile_selection::*;
 pub use self::toggle_tech_tree::*;
+pub use self::tech_tree::*;
