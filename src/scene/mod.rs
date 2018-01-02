@@ -11,10 +11,9 @@ fn get_node_for_entity(nodes: &mut Vec<Node>, target_entity: Entity) -> Option<&
             if e == target_entity {
                 return Some(node);
             }
-        } else if node.sub_nodes.len() > 0 {
-            if let Some(n) = get_node_for_entity(&mut node.sub_nodes, target_entity) {
-                return Some(n)
-            }
+        }
+        if let Some(n) = get_node_for_entity(&mut node.sub_nodes, target_entity) {
+            return Some(n)
         }
     }
 

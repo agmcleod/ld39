@@ -113,7 +113,7 @@ fn render_entity<R: gfx::Resources, C: gfx::CommandBuffer<R>, F: gfx::Factory<R>
 
     if let Some(transform) = transform_storage.get_mut(*entity) {
         if transform.visible {
-             if let Some(sprite) = sprite_storage.get(*entity) {
+            if let Some(sprite) = sprite_storage.get(*entity) {
                 basic.render(encoder, world, factory, &transform, Some(&sprite.frame_name), spritesheet, None, Some(asset_texture));
             }
 
@@ -122,9 +122,7 @@ fn render_entity<R: gfx::Resources, C: gfx::CommandBuffer<R>, F: gfx::Factory<R>
             }
 
             if let (Some(color), Some(_)) = (color_storage.get(*entity), rect_storage.get(*entity)) {
-                if transform.visible {
-                    basic.render(encoder, world, factory, &transform, None, spritesheet, Some(color.0), None);
-                }
+                basic.render(encoder, world, factory, &transform, None, spritesheet, Some(color.0), None);
             }
 
             if let (Some(color), Some(text)) = (color_storage.get(*entity), text_storage.get_mut(*entity)) {

@@ -21,7 +21,7 @@ pub fn create(
     rect_storage.insert(background.clone(), Rect{});
 
     let tooltip_container = entities.create();
-    transform_storage.insert(tooltip_container.clone(), Transform::visible(x, y, 100.0, w, h, 0.0, 1.0, 1.0));
+    transform_storage.insert(tooltip_container.clone(), Transform::visible(x, y, 50.0, w, h, 0.0, 1.0, 1.0));
     let container_node = Node::new(Some(tooltip_container.clone()), Some(vec![
         Node::new(Some(background), None)
     ]));

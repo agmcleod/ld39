@@ -229,11 +229,12 @@ impl <'a>State for PlayState<'a> {
         scene.sub_nodes.push(side_bar_container);
 
         let mut tech_tree_node = tech_tree::build_tech_tree(world);
-        let mut tech_tree_container = Node::new(Some(world.create_entity()
+        let tech_tree_container_entity = world.create_entity()
             .with(Transform::new(640.0, 0.0, 2.0, (dimensions[0] - 640.0) as u16, dimensions[1] as u16, 0.0, 1.0, 1.0, false))
             .with(Rect{})
             .with(Color([16.0 / 256.0, 14.0 / 256.0, 22.0 / 256.0, 1.0]))
-            .build()), None);
+            .build();
+        let mut tech_tree_container = Node::new(Some(tech_tree_container_entity.clone()), None);
         {
             let mut add_to_container = |node: &mut tech_tree::TechTreeNode| {
                 tech_tree_container.sub_nodes.push(Node::new(Some(node.entity), None));
@@ -249,6 +250,8 @@ impl <'a>State for PlayState<'a> {
             .build();
 
         let mut lookup = world.write_resource::<EntityLookup>();
+
+        lookup.entities.insert("tech_tree_container".to_string(), tech_tree_container_entity);
 
         lookup.entities.insert("resume_from_upgrades".to_string(), entity);
         tech_tree_container.sub_nodes.push(Node::new(Some(entity), None));

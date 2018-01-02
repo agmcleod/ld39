@@ -18,7 +18,7 @@ pub fn build_tech_tree(world: &mut World) -> TechTreeNode {
 
     let coal_entity = world.create_entity()
         .with(Coal::new())
-        .with(Transform::new(center_x, 32.0, 0.0, 32, 32, 0.0, 1.0, 1.0, true))
+        .with(Transform::visible(center_x, 32.0, 0.0, 32, 32, 0.0, 1.0, 1.0))
         .with(Rect{})
         .with(ui::TechTreeNode{})
         .with(Color(get_color_from_status(&Coal::new().upgrade.status)))
@@ -26,7 +26,7 @@ pub fn build_tech_tree(world: &mut World) -> TechTreeNode {
 
     let oil_entity = world.create_entity()
         .with(Oil::new())
-        .with(Transform::new(center_x, 96.0, 0.0, 32, 32, 0.0, 1.0, 1.0, true))
+        .with(Transform::visible(center_x, 96.0, 0.0, 32, 32, 0.0, 1.0, 1.0))
         .with(Rect{})
         .with(ui::TechTreeNode{})
         .with(Color(get_color_from_status(&Oil::new().upgrade.status)))
@@ -34,7 +34,7 @@ pub fn build_tech_tree(world: &mut World) -> TechTreeNode {
 
     let solar_entity = world.create_entity()
         .with(Solar::new())
-        .with(Transform::new(center_x, 160.0, 0.0, 32, 32, 0.0, 1.0, 1.0, true))
+        .with(Transform::visible(center_x, 160.0, 0.0, 32, 32, 0.0, 1.0, 1.0))
         .with(Rect{})
         .with(ui::TechTreeNode{})
         .with(Color(get_color_from_status(&Solar::new().upgrade.status)))
