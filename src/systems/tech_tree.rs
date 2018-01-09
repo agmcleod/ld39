@@ -6,18 +6,21 @@ use components::{Color, EntityLookup, Rect, Text, Input, Transform};
 use components::ui;
 use systems::logic::get_absolute_pos;
 use entities::create_tooltip;
+use rusttype::Font;
 
 pub struct TechTree {
     scene: Arc<Mutex<Node>>,
     current_tooltip: Option<Entity>,
+    font: Arc<Font<'static>>,
     current_tech_tree_node_entity: Option<Entity>,
 }
 
 impl TechTree {
-    pub fn new(scene: Arc<Mutex<Node>>) -> TechTree {
+    pub fn new(scene: Arc<Mutex<Node>>, font: Arc<Font<'static>>) -> TechTree {
         TechTree{
             scene,
             current_tooltip: None,
+            font,
             current_tech_tree_node_entity: None,
         }
     }

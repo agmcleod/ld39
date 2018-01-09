@@ -1,6 +1,7 @@
 use specs::{Entities, WriteStorage};
 use scene::Node;
 use components::{Color, Rect, Text, Transform};
+use rusttype::Font;
 
 pub fn create(
     entities: &Entities,
@@ -9,7 +10,9 @@ pub fn create(
     text_storage: &mut WriteStorage<Text>,
     transform_storage: &mut WriteStorage<Transform>,
     x: f32,
-    y: f32
+    y: f32,
+    font: &Font,
+    text: &str,
 ) -> Node {
     // w && h fixed for now
     let w = 150;
@@ -25,6 +28,9 @@ pub fn create(
     let container_node = Node::new(Some(tooltip_container.clone()), Some(vec![
         Node::new(Some(background), None)
     ]));
+
+    let text_entity = entities.create();
+    text_storage.insert(text_entity.clone(), Text::new(font, 20.0));
 
     container_node
 }

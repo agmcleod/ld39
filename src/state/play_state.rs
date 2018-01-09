@@ -43,7 +43,7 @@ impl <'a>PlayState<'a> {
         let tech_tree_dispatcher = DispatcherBuilder::new()
             .add(systems::ButtonHover{ scene: scene.clone() }, "button_hover", &[])
             .add(systems::ToggleTechTree::new(scene.clone()), "toggle_tech_tree", &["button_hover"])
-            .add(systems::TechTree::new(scene.clone()), "tech_tree", &[])
+            .add(systems::TechTree::new(scene.clone(), font.clone()), "tech_tree", &[])
             .build();
 
         let ps = PlayState{
