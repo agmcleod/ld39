@@ -21,12 +21,12 @@ pub struct PlayState<'a> {
     dispatcher: Dispatcher<'a, 'a>,
     tech_tree_dispatcher: Dispatcher<'a, 'a>,
     scene: Arc<Mutex<Node>>,
-    font: Arc<Font<'static>>,
+    font: Arc<Mutex<Font<'static>>>,
     state: InternalState,
 }
 
 impl <'a>PlayState<'a> {
-    pub fn new(font: &Arc<Font<'static>>) -> PlayState<'a> {
+    pub fn new(font: &Arc<Mutex<Font<'static>>>) -> PlayState<'a> {
         let scene = Arc::new(Mutex::new(Node::new(None, None)));
 
         let dispatcher = DispatcherBuilder::new()
@@ -100,7 +100,7 @@ impl <'a>State for PlayState<'a> {
             wallet.reset();
         }
 
-        let font = &self.font;
+        let font = self.font.lock().unwrap();
 
         scene.sub_nodes.push(Node::new(None, Some(tile_nodes)));
 

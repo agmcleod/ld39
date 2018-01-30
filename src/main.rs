@@ -25,7 +25,7 @@ mod systems;
 mod utils;
 
 use std::collections::HashMap;
-use std::sync::Arc;
+use std::sync::{Arc, Mutex};
 use std::ops::{DerefMut};
 use std::io::BufReader;
 use std::fs::File;
@@ -226,7 +226,7 @@ fn main() {
 
     let font_data = include_bytes!("../resources/MunroSmall.ttf");
     let font_collection = FontCollection::from_bytes(font_data as &[u8]);
-    let font = Arc::new(font_collection.into_font().unwrap());
+    let font = Arc::new(Mutex::new(font_collection.into_font().unwrap()));
     let mut glyph_cache: HashMap<String, renderer::text::GlyphCacheEntry<gfx_device_gl::Resources>> = HashMap::new();
 
     let audio_endpoint = rodio::get_default_endpoint().unwrap();
@@ -308,6 +308,7 @@ fn main() {
 
             let scene = state_manager.get_current_scene();
             let scene = scene.lock().unwrap();
+            let font = font.lock().unwrap();
 
             for node in &scene.sub_nodes {
                 render_node(node,
