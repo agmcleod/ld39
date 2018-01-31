@@ -74,4 +74,8 @@ impl Node {
     pub fn remove_node_with_entity(&mut self, target_entity: Entity) {
         remove_from_sub_nodes(&mut self.sub_nodes, target_entity);
     }
+
+    pub fn add(&mut self, node: Node) {
+        self.sub_nodes.push(node);
+    }
 }

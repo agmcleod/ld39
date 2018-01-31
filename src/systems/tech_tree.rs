@@ -69,7 +69,7 @@ impl <'a>System<'a> for TechTree {
                 if let Some(container_node) = scene.get_node_for_entity(*lookup.entities.get(&"tech_tree_container".to_string()).unwrap()) {
                     let font = self.font.lock().unwrap();
                     let tech_tree_node_ui = tech_tree_node_storage.get(tech_tree_node_entity).unwrap();
-                    let tooltip_node = create_tooltip::create(&entities, &mut color_storage, &mut rect_storage, &mut text_storage, &mut transform_storage, tooltip_position[0], tooltip_position[1], &font, &tech_tree_node_ui.text);
+                    let tooltip_node = create_tooltip::create(&entities, &mut color_storage, &mut rect_storage, &mut text_storage, &mut transform_storage, tooltip_position[0], tooltip_position[1], &font, tech_tree_node_ui.text.clone());
                     self.current_tooltip = Some(tooltip_node.entity.unwrap().clone());
                     self.current_tech_tree_node_entity = Some(tech_tree_node_entity.clone());
                     container_node.sub_nodes.push(tooltip_node);

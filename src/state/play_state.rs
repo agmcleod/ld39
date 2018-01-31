@@ -137,7 +137,7 @@ impl <'a>State for PlayState<'a> {
         let entity = world.create_entity()
             .with(ResourceCount{ resource_type: ResourceType::Coal })
             .with(Transform::visible(80.0, 108.0, 0.0, 32, 32, 0.0, 1.0, 1.0))
-            .with(Text::new(&font, 32.0))
+            .with(Text::new_with_size(&font, 32.0, 160, 32))
             .with(Color([0.0, 1.0, 0.0, 1.0]))
             .build();
         side_bar_container.sub_nodes.push(Node::new(Some(entity), None));
@@ -154,7 +154,7 @@ impl <'a>State for PlayState<'a> {
         let entity = world.create_entity()
             .with(ResourceCount{ resource_type: ResourceType::Oil })
             .with(Transform::visible(80.0, 142.0, 0.0, 32, 32, 0.0, 1.0, 1.0))
-            .with(Text::new(&font, 32.0))
+            .with(Text::new_with_size(&font, 32.0, 160, 32))
             .with(Color([0.0, 1.0, 0.0, 1.0]))
             .build();
         side_bar_container.sub_nodes.push(Node::new(Some(entity), None));
@@ -171,7 +171,7 @@ impl <'a>State for PlayState<'a> {
         let entity = world.create_entity()
             .with(ResourceCount{ resource_type: ResourceType::Clean })
             .with(Transform::visible(80.0, 188.0, 0.0, 32, 32, 0.0, 1.0, 1.0))
-            .with(Text::new(&font, 32.0))
+            .with(Text::new_with_size(&font, 32.0, 160, 32))
             .with(Color([0.0, 1.0, 0.0, 1.0]))
             .build();
         side_bar_container.sub_nodes.push(Node::new(Some(entity), None));
@@ -185,8 +185,7 @@ impl <'a>State for PlayState<'a> {
         side_bar_container.sub_nodes.push(Node::new(Some(entity), None));
 
         // money text
-        let mut text = Text::new(&font, 32.0);
-        text.set_text(format!("{}", Wallet::start_amount()));
+        let mut text = Text::new_with_text(&font, 32.0, 160, 32, format!("{}", Wallet::start_amount()));
         let entity = world.create_entity()
             .with(WalletUI{})
             .with(Transform::visible(80.0, 228.0, 0.0, 32, 32, 0.0, 1.0, 1.0))

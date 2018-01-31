@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use gfx;
 use gfx_device_gl;
-use rusttype::Font;
+use rusttype::{Font, point, Scale};
 use components;
 
 use renderer::ColorFormat;
@@ -15,11 +15,51 @@ pub struct GlyphCacheEntry<R: gfx::Resources>{
 
 pub fn create_texture_from_glyph<R, F>(glyph_cache: &mut HashMap<String, GlyphCacheEntry<R>>, font: &Font, text: &components::Text, factory: &mut F)
     where R: gfx::Resources, F: gfx::Factory<R> {
-    let glyphs: Vec<_> = font.layout(text.text.as_ref(), text.scale, text.offset).collect();
+    let v_metrics = font.v_metrics(text.scale);
+    let mut caret = point(0.0, v_metrics.ascent);
+    let advance_height = v_metrics.ascent - v_metrics.descent + v_metrics.line_gap;
+
+    let mut glyphs = Vec::new();
+    let mut last_glyph_id = None;
+
+    for c in text.text.chars() {
+        if c.is_control() {
+            match c {
+                '\r' => {
+                    caret = point(0.0, caret.y + advance_height);
+                }
+                '\n' => {},
+                _ => {}
+            }
+            continue;
+        }
+
+        let base_glyph = if let Some(glyph) = font.glyph(c) {
+            glyph
+        } else {
+            continue;
+        };
+        if let Some(id) = last_glyph_id.take() {
+            caret.x += font.pair_kerning(text.scale, id, base_glyph.id());
+        }
+        last_glyph_id = Some(base_glyph.id());
+        let mut glyph = base_glyph.scaled(text.scale).positioned(caret);
+        if let Some(bb) = glyph.pixel_bounding_box() {
+            if bb.max.x > text.size.x as i32 {
+                caret = point(0.0, caret.y + advance_height);
+                glyph = glyph.into_unpositioned().positioned(caret);
+                last_glyph_id = None;
+            }
+        }
+        caret.x += glyph.unpositioned().h_metrics().advance_width;
+        glyphs.push(glyph);
+    }
+
     let pixel_height = text.scale.y.ceil() as usize;
     let width = text.calc_text_width(&glyphs) as usize;
     let mut pixel_data = vec![0u8; 4 * width * pixel_height];
     let mapping_scale = 255.0;
+
     for g in glyphs {
         if let Some(bb) = g.pixel_bounding_box() {
             // v is the amount of the pixel covered

@@ -12,7 +12,7 @@ pub fn create(
     x: f32,
     y: f32,
     font: &Font,
-    text: &str,
+    text: String,
 ) -> Node {
     // w && h fixed for now
     let w = 150;
@@ -25,12 +25,16 @@ pub fn create(
 
     let tooltip_container = entities.create();
     transform_storage.insert(tooltip_container.clone(), Transform::visible(x, y, 50.0, w, h, 0.0, 1.0, 1.0));
-    let container_node = Node::new(Some(tooltip_container.clone()), Some(vec![
+    let mut container_node = Node::new(Some(tooltip_container.clone()), Some(vec![
         Node::new(Some(background), None)
     ]));
 
     let text_entity = entities.create();
-    text_storage.insert(text_entity.clone(), Text::new(font, 20.0));
+    text_storage.insert(text_entity.clone(), Text::new_with_text(font, 20.0, w, h, text));
+    transform_storage.insert(text_entity.clone(), Transform::visible(0.0, 0.0, 0.0, 0, 0, 0.0, 1.0, 1.0));
+    color_storage.insert(text_entity.clone(), Color([1.0, 1.0, 1.0, 1.0]));
+
+    container_node.add(Node::new(Some(text_entity.clone()), None));
 
     container_node
 }
