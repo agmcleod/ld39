@@ -31,7 +31,7 @@ pub fn create(
 
     let text_entity = entities.create();
     text_storage.insert(text_entity.clone(), Text::new_with_text(font, 20.0, w, h, text));
-    transform_storage.insert(text_entity.clone(), Transform::visible(0.0, 0.0, 0.0, 0, 0, 0.0, 1.0, 1.0));
+    transform_storage.insert(text_entity.clone(), Transform::visible(0.0, 0.0, 0.0, w, h, 0.0, 1.0, 1.0));
     color_storage.insert(text_entity.clone(), Color([1.0, 1.0, 1.0, 1.0]));
 
     container_node.add(Node::new(Some(text_entity.clone()), None));

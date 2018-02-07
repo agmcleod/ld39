@@ -22,13 +22,15 @@ pub fn create_texture_from_glyph<R, F>(glyph_cache: &mut HashMap<String, GlyphCa
     let mut glyphs = Vec::new();
     let mut last_glyph_id = None;
 
+    let mut pixel_height = text.scale.y.ceil();
+
     for c in text.text.chars() {
         if c.is_control() {
             match c {
-                '\r' => {
+                '\n' => {
                     caret = point(0.0, caret.y + advance_height);
-                }
-                '\n' => {},
+                    pixel_height += advance_height;
+                },
                 _ => {}
             }
             continue;
@@ -47,6 +49,7 @@ pub fn create_texture_from_glyph<R, F>(glyph_cache: &mut HashMap<String, GlyphCa
         if let Some(bb) = glyph.pixel_bounding_box() {
             if bb.max.x > text.size.x as i32 {
                 caret = point(0.0, caret.y + advance_height);
+                pixel_height += advance_height;
                 glyph = glyph.into_unpositioned().positioned(caret);
                 last_glyph_id = None;
             }
@@ -55,9 +58,8 @@ pub fn create_texture_from_glyph<R, F>(glyph_cache: &mut HashMap<String, GlyphCa
         glyphs.push(glyph);
     }
 
-    let pixel_height = text.scale.y.ceil() as usize;
     let width = text.calc_text_width(&glyphs) as usize;
-    let mut pixel_data = vec![0u8; 4 * width * pixel_height];
+    let mut pixel_data = vec![0u8; 4 * width * pixel_height as usize];
     let mapping_scale = 255.0;
 
     for g in glyphs {
