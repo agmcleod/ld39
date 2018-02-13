@@ -61,7 +61,7 @@ impl<R> Basic<R>
 
         let texels = [[0xff, 0xff, 0xff, 0xff]];
         let (_, texture_view) = factory.create_texture_immutable::<ColorFormat>(
-            texture::Kind::D2(1, 1, texture::AaMode::Single), &[&texels]
+            texture::Kind::D2(1, 1, texture::AaMode::Single), texture::Mipmap::Allocated,&[&texels]
         ).unwrap();
 
         let sinfo = texture::SamplerInfo::new(

@@ -87,7 +87,7 @@ pub fn create_texture_from_glyph<R, F>(glyph_cache: &mut HashMap<String, GlyphCa
         pixel_height as gfx::texture::Size,
         gfx::texture::AaMode::Single,
     );
-    let tex = factory.create_texture_immutable_u8::<ColorFormat>(kind, &[&pixel_data]);
+    let tex = factory.create_texture_immutable_u8::<ColorFormat>(kind, gfx::texture::Mipmap::Allocated,&[&pixel_data]);
     let (_, view) = tex.unwrap();
     glyph_cache.insert(text.text.clone(), GlyphCacheEntry{ view: view, width: width as u16, height: pixel_height as u16 });
 }

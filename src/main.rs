@@ -245,7 +245,7 @@ fn main() {
         events_loop.poll_events(|event| {
             match event {
                 Event::WindowEvent{ event, .. } => match event {
-                    WindowEvent::MouseMoved{ position: (x, y), .. } => {
+                    WindowEvent::CursorMoved{ position: (x, y), .. } => {
                         let mut input_res = world.write_resource::<Input>();
                         let input = input_res.deref_mut();
                         input.mouse_pos.0 = x as f32 / input.hidpi_factor;
