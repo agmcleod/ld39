@@ -2,6 +2,7 @@
 extern crate gfx;
 extern crate gfx_device_gl;
 extern crate gfx_window_glutin;
+extern crate gfx_glyph;
 extern crate glutin;
 extern crate specs;
 extern crate cgmath;
@@ -45,6 +46,7 @@ use rodio::decoder::Decoder;
 use scene::Node;
 use state::play_state::PlayState;
 use state::StateManager;
+use gfx_glyph::{Section, GlyphBrushBuilder};
 
 fn setup_world(world: &mut World, window: &glutin::Window) {
     world.add_resource::<Camera>(Camera(renderer::get_ortho()));
@@ -225,6 +227,7 @@ fn main() {
     let asset_texture = loader::gfx_load_texture(exe_path.join("resources/assets.png"), &mut factory);
 
     let font_data = include_bytes!("../resources/MunroSmall.ttf");
+    let mut glyph_brush = GlyphBrushBuilder::using_font_bytes(font_data);
     let font_collection = FontCollection::from_bytes(font_data as &[u8]);
     let font = Arc::new(Mutex::new(font_collection.into_font().unwrap()));
     let mut glyph_cache: HashMap<String, renderer::text::GlyphCacheEntry<gfx_device_gl::Resources>> = HashMap::new();

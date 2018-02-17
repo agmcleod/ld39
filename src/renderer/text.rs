@@ -71,7 +71,7 @@ pub fn create_texture_from_glyph<R, F>(glyph_cache: &mut HashMap<String, GlyphCa
                 let x = x as i32 + bb.min.x;
                 let y = y as i32 + bb.min.y;
                 // There's still a possibility that the glyph clips the boundaries of the bitmap
-                if v > 0 && x >= 0 && x < width as i32 && y >= 0 && y < pixel_height as i32 {
+                if v > 0 && x >= 0 && x <= width as i32 && y >= 0 && y <= pixel_height as i32 {
                     let i = (x as usize + y as usize * width) * 4;
                     pixel_data[i] = 255;
                     pixel_data[i + 1] = 255;
