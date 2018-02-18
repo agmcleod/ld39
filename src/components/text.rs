@@ -1,54 +1,47 @@
 use specs::{Component, VecStorage};
-use rusttype::{Font, PositionedGlyph, Scale, point, Point};
-use cgmath::Vector2;
+use rusttype::{PositionedGlyph, Scale};
+use cgmath::{Matrix4, SquareMatrix, Transform, Vector2, Vector3};
+use renderer::get_ortho;
 
 pub struct Text {
     pub scale: Scale,
-    pub offset: Point<f32>,
     pub new_data: bool,
     pub text: String,
     pub visible: bool,
     pub size: Vector2<u16>,
+    pub draw_transform: Matrix4<f32>,
 }
 
 impl Text {
-    pub fn new(font: &Font, size: f32) -> Text {
+    pub fn new(size: f32, w: u16, h: u16) -> Text {
         let scale = Scale { x: size, y: size };
-        let v_metrics = font.v_metrics(scale);
-        let offset = point(0.0, v_metrics.ascent);
 
         Text{
             scale: scale,
-            offset: offset,
             new_data: false,
             text: "".to_string(),
             visible: true,
-            size: Vector2{ x: size as u16, y: size as u16 },
+            size: Vector2{ x: w, y: h },
+            draw_transform: Matrix4::identity(),
         }
     }
 
-    pub fn new_with_size(font: &Font, size: f32, w: u16, h: u16,) -> Text {
-        let mut text_component = Text::new(font, size);
-        text_component.size.x = w;
-        text_component.size.y = w;
+    pub fn new_with_absolute_position(size: f32, w: u16, h: u16, position: Vector3<f32>, text: String) -> Text {
+        let mut text_component = Text::new(size, w, h);
+        text_component.set_transform(position);
+        text_component.text = text;
         text_component
-    }
-
-    pub fn new_with_text(font: &Font, size: f32, w: u16, h: u16, text: String) -> Text {
-        let mut text_component = Text::new_with_size(font, size, w, h);
-        text_component.set_text(text);
-        text_component
-    }
-
-    pub fn calc_text_width(&self, glyphs: &[PositionedGlyph]) -> f32 {
-        glyphs.last().unwrap().pixel_bounding_box().unwrap().max.x as f32
     }
 
     pub fn set_text(&mut self, text: String) {
-        if self.text != text {
-            self.new_data = true;
-            self.text = text;
-        }
+        self.text = text;
+    }
+
+    pub fn set_transform(&mut self, absolute_position: Vector3<f32>) {
+        let projection = get_ortho();
+        let transform = Matrix4::from_translation(absolute_position);
+
+        self.draw_transform = projection * transform;
     }
 }
 

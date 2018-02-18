@@ -110,6 +110,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "cgmath"
+version = "0.16.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+dependencies = [
+ "approx 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "num-traits 0.1.43 (registry+https://github.com/rust-lang/crates.io-index)",
+ "rand 0.4.2 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
 name = "claxon"
 version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -545,7 +555,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 name = "ld39"
 version = "0.1.0"
 dependencies = [
- "cgmath 0.14.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "cgmath 0.16.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "gfx 0.17.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "gfx_device_gl 0.15.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "gfx_glyph 0.8.2 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -1193,6 +1203,7 @@ dependencies = [
 "checksum cfg-if 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)" = "d4c819a1287eb618df47cc647173c5c4c66ba19d888a6e50d605672aed3140de"
 "checksum cgl 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)" = "86765cb42c2a2c497e142af72517c1b4d7ae5bb2f25dfa77a5c69642f2342d89"
 "checksum cgmath 0.14.1 (registry+https://github.com/rust-lang/crates.io-index)" = "87f025a17ad3f30d49015c787903976d5f9cd6115ece1eb7f4d6ffe06b8c4080"
+"checksum cgmath 0.16.0 (registry+https://github.com/rust-lang/crates.io-index)" = "6f3f4e27f2647652606e9faab058dd8686513a23b276fcd16e85eb0927838ddc"
 "checksum claxon 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)" = "84d1237389598ada39533a0015b2d04a9e21cae771c1ab9327fb87520c9e84c7"
 "checksum coco 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)" = "c06169f5beb7e31c7c67ebf5540b8b472d23e3eade3b2ec7d1f5b504a85f91bd"
 "checksum cocoa 0.13.0 (registry+https://github.com/rust-lang/crates.io-index)" = "ac0d785ff4faf0ff23d7b5561346bb50dc7ef9a11cb0e65e07ef776b7752938f"

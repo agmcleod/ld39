@@ -26,12 +26,10 @@ mod systems;
 mod utils;
 
 use std::collections::HashMap;
-use std::sync::{Arc, Mutex};
 use std::ops::{DerefMut};
 use std::io::BufReader;
 use std::fs::File;
 use std::path::{Path, PathBuf};
-use rusttype::{FontCollection, Font};
 use components::{AnimationSheet, BuildCost, Button, Camera, ClickSound, Color, CurrentPower, EntityLookup, Gatherer, HighlightTile, Input, PowerBar, Rect, ResourceCount, Resources, SelectedTile, Sprite, StateChange, Text, Tile, Transform, Wallet};
 use components::ui::{WalletUI, TechTreeNode};
 use entities::tech_tree;
@@ -46,7 +44,7 @@ use rodio::decoder::Decoder;
 use scene::Node;
 use state::play_state::PlayState;
 use state::StateManager;
-use gfx_glyph::{Section, GlyphBrushBuilder};
+use gfx_glyph::{font, GlyphBrush, GlyphBrushBuilder};
 
 fn setup_world(world: &mut World, window: &glutin::Window) {
     world.add_resource::<Camera>(Camera(renderer::get_ortho()));
@@ -102,8 +100,7 @@ fn render_entity<R: gfx::Resources, C: gfx::CommandBuffer<R>, F: gfx::Factory<R>
     factory: &mut F,
     spritesheet: &Spritesheet,
     asset_texture: &gfx::handle::ShaderResourceView<R, [f32; 4]>,
-    font: &Font,
-    glyph_cache: &mut HashMap<String, renderer::text::GlyphCacheEntry<R>>,
+    glyph_brush: &mut GlyphBrush<R, F>,
     entity: &Entity,
     sprite_storage: &ReadStorage<Sprite>,
     transform_storage: &mut WriteStorage<Transform>,
@@ -128,18 +125,8 @@ fn render_entity<R: gfx::Resources, C: gfx::CommandBuffer<R>, F: gfx::Factory<R>
             }
 
             if let (Some(color), Some(text)) = (color_storage.get(*entity), text_storage.get_mut(*entity)) {
-                if text.new_data {
-                    text.new_data = false;
-                    if !glyph_cache.contains_key(&text.text) {
-                        renderer::text::create_texture_from_glyph(glyph_cache, &font, text, factory);
-                    }
-                    let entry = glyph_cache.get(&text.text).unwrap();
-                    transform.size.x = entry.width;
-                    transform.size.y = entry.height;
-                }
-
                 if text.text != "" && text.visible {
-                    basic.render(encoder, world, factory, &transform, None, spritesheet, Some(color.0), Some(&glyph_cache.get(&text.text).unwrap().view));
+                    basic.render_text(encoder, &text, transform, color, glyph_brush);
                 }
             }
         }
@@ -154,8 +141,7 @@ fn render_node<R: gfx::Resources, C: gfx::CommandBuffer<R>, F: gfx::Factory<R>>(
     factory: &mut F,
     spritesheet: &Spritesheet,
     asset_texture: &gfx::handle::ShaderResourceView<R, [f32; 4]>,
-    font: &Font,
-    glyph_cache: &mut HashMap<String, renderer::text::GlyphCacheEntry<R>>,
+    glyph_brush: &mut GlyphBrush<R, F>,
     sprites: &ReadStorage<Sprite>,
     transforms: &mut WriteStorage<Transform>,
     animation_sheets: &ReadStorage<AnimationSheet>,
@@ -172,7 +158,7 @@ fn render_node<R: gfx::Resources, C: gfx::CommandBuffer<R>, F: gfx::Factory<R>>(
         }
         render_entity(
             basic, encoder, world, factory, spritesheet, asset_texture,
-            font, glyph_cache,
+            glyph_brush,
             &entity, sprites, transforms, animation_sheets, colors, texts, rects
         );
     }
@@ -181,8 +167,7 @@ fn render_node<R: gfx::Resources, C: gfx::CommandBuffer<R>, F: gfx::Factory<R>>(
         render_node(
             node,
             basic, encoder, world, factory, spritesheet, asset_texture,
-            font, glyph_cache,
-            sprites, transforms, animation_sheets, colors, texts, rects
+            glyph_brush, sprites, transforms, animation_sheets, colors, texts, rects
         );
     }
 
@@ -226,11 +211,8 @@ fn main() {
     let spritesheet: Spritesheet = serde_json::from_str(asset_data.as_ref()).unwrap();
     let asset_texture = loader::gfx_load_texture(exe_path.join("resources/assets.png"), &mut factory);
 
-    let font_data = include_bytes!("../resources/MunroSmall.ttf");
-    let mut glyph_brush = GlyphBrushBuilder::using_font_bytes(font_data);
-    let font_collection = FontCollection::from_bytes(font_data as &[u8]);
-    let font = Arc::new(Mutex::new(font_collection.into_font().unwrap()));
-    let mut glyph_cache: HashMap<String, renderer::text::GlyphCacheEntry<gfx_device_gl::Resources>> = HashMap::new();
+    let mut glyph_brush = GlyphBrushBuilder::using_font_bytes(include_bytes!("../resources/MunroSmall.ttf") as &[u8])
+        .build(factory.clone());
 
     let audio_endpoint = rodio::get_default_endpoint().unwrap();
     let click_sound_source = create_click_sound(&exe_path).buffered();
@@ -239,7 +221,7 @@ fn main() {
     setup_world(&mut world, &window);
 
     let mut state_manager = StateManager::new();
-    let play_state = PlayState::new(&font);
+    let play_state = PlayState::new();
     state_manager.add_state(PlayState::get_name(), Box::new(play_state));
     state_manager.swap_state(PlayState::get_name(), &mut world);
 
@@ -311,12 +293,11 @@ fn main() {
 
             let scene = state_manager.get_current_scene();
             let scene = scene.lock().unwrap();
-            let font = font.lock().unwrap();
 
             for node in &scene.sub_nodes {
                 render_node(node,
                 &mut basic, &mut encoder, &world, &mut factory, &spritesheet, &asset_texture,
-                &font, &mut glyph_cache,
+                &mut glyph_brush,
                 &sprites, &mut transforms, &animation_sheets, &colors, &mut texts, &rects);
             }
 

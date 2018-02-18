@@ -9,6 +9,7 @@ use gfx::traits::FactoryExt;
 use gfx::texture;
 use components;
 use spritesheet::{Frame, Spritesheet};
+use gfx_glyph::{GlyphBrush, Section};
 
 gfx_defines!{
     vertex Vertex {
@@ -171,6 +172,23 @@ impl<R> Basic<R>
 
         encoder.update_constant_buffer(&params.projection_cb, &self.projection);
         encoder.draw(&slice, &self.pso, &params);
+    }
+
+    pub fn render_text<C, F>(&mut self, encoder: &mut gfx::Encoder<R, C>, text: &components::Text, transform: &components::Transform, color: &components::Color, glyph_brush: &mut GlyphBrush<R, F>)
+        where R: gfx::Resources, C: gfx::CommandBuffer<R>, F: gfx::Factory<R> {
+        let section = Section{
+            text: text.text.as_ref(),
+            scale: text.scale.clone(),
+            bounds: (text.size.x as f32, text.size.y as f32),
+            screen_position: (transform.pos.x, transform.pos.y),
+            color: color.0,
+            z: transform.pos.z,
+            ..Section::default()
+        };
+
+        glyph_brush.queue(section);
+//        glyph_brush.draw_queued_with_transform(text.draw_transform.into(), encoder, &self.target.color, &self.target.depth).unwrap();
+        glyph_brush.draw_queued(encoder, &self.target.color, &self.target.depth).unwrap();
     }
 
     pub fn transform(&mut self, transform: &components::Transform, undo: bool) {

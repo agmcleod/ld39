@@ -1,7 +1,6 @@
 use cgmath::{ortho, Matrix4};
 use gfx;
 mod basic;
-pub mod text;
 
 pub type ColorFormat = gfx::format::Rgba8;
 pub type DepthFormat = gfx::format::Depth;

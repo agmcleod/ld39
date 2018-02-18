@@ -1,6 +1,6 @@
 use std::ops::{Deref, DerefMut};
 use specs::{Entities, Fetch, FetchMut, Join, ReadStorage, WriteStorage, System};
-use components::{AnimationSheet, Button, ClickSound, Gatherer, GathererType, Input, Rect, Resources, ResourceType, SelectedTile, Sprite, Text, Transform, Wallet};
+use components::{AnimationSheet, Button, ClickSound, Gatherer, GathererType, Input, Rect, Resources, SelectedTile, Sprite, Text, Transform, Wallet};
 use components::ui::WalletUI;
 use std::sync::{Arc, Mutex};
 use scene::Node;
@@ -29,7 +29,7 @@ impl<'a> System<'a> for BuildGatherer {
     );
 
     fn run(&mut self, data: Self::SystemData) {
-        let (mut animation_sheet_storage, mut button_storage, mut click_sound_storage, entities, mut gatherer_storage, input_storage, mut rect_storage, mut resources_storage, mut selected_tile_storage, mut sprite_storage, mut text_storage, mut transform_storage, mut wallet_storage, wallet_ui_storage) = data;
+        let (mut animation_sheet_storage, mut button_storage, mut click_sound_storage, entities, mut gatherer_storage, input_storage, rect_storage, mut resources_storage, selected_tile_storage, sprite_storage, mut text_storage, mut transform_storage, mut wallet_storage, wallet_ui_storage) = data;
 
         let resources: &mut Resources = resources_storage.deref_mut();
         let input: &Input = input_storage.deref();

@@ -4,7 +4,6 @@ use specs::{Entity, Entities, System, Fetch, Join, WriteStorage};
 use components::{Button, Input, Transform, Sprite};
 use cgmath::Vector3;
 use scene::Node;
-use systems::logic;
 
 pub struct ButtonHover {
     pub scene: Arc<Mutex<Node>>,
@@ -33,7 +32,7 @@ impl<'a> System<'a> for ButtonHover {
 
         for (button, entity, _, _) in (&mut button_storage, &*entities, &mut sprite_storage, &transform_storage).join() {
             button.mouse_is_over = false;
-            let absolute_pos = logic::get_absolute_pos(&scene, &entity, &transform_storage);
+            let absolute_pos = scene.get_absolute_pos(&entity, &transform_storage);
             button_entities.push((absolute_pos.z as i32, entity.clone(), absolute_pos));
         }
 

@@ -2,7 +2,6 @@ use std::sync::{Arc, Mutex};
 use specs::{Dispatcher, DispatcherBuilder, World};
 use scene::Node;
 use state::State;
-use rusttype::Font;
 use std::ops::DerefMut;
 
 use components::{Button, Color, CurrentPower, EntityLookup, PowerBar, Rect, ResourceCount, Resources, ResourceType, SelectedTile, Sprite, Text, Tile, Transform, Wallet};
@@ -10,6 +9,7 @@ use components::ui::WalletUI;
 use systems;
 use tech_tree;
 use renderer;
+use entities::create_text;
 
 enum InternalState {
     Game,
@@ -21,12 +21,11 @@ pub struct PlayState<'a> {
     dispatcher: Dispatcher<'a, 'a>,
     tech_tree_dispatcher: Dispatcher<'a, 'a>,
     scene: Arc<Mutex<Node>>,
-    font: Arc<Mutex<Font<'static>>>,
     state: InternalState,
 }
 
 impl <'a>PlayState<'a> {
-    pub fn new(font: &Arc<Mutex<Font<'static>>>) -> PlayState<'a> {
+    pub fn new() -> PlayState<'a> {
         let scene = Arc::new(Mutex::new(Node::new(None, None)));
 
         let dispatcher = DispatcherBuilder::new()
@@ -43,14 +42,13 @@ impl <'a>PlayState<'a> {
         let tech_tree_dispatcher = DispatcherBuilder::new()
             .add(systems::ButtonHover{ scene: scene.clone() }, "button_hover", &[])
             .add(systems::ToggleTechTree::new(scene.clone()), "toggle_tech_tree", &["button_hover"])
-            .add(systems::TechTree::new(scene.clone(), font.clone()), "tech_tree", &[])
+            .add(systems::TechTree::new(scene.clone()), "tech_tree", &[])
             .build();
 
         let ps = PlayState{
-            dispatcher: dispatcher,
-            tech_tree_dispatcher: tech_tree_dispatcher,
-            scene: scene,
-            font: font.clone(),
+            dispatcher,
+            tech_tree_dispatcher,
+            scene,
             state: InternalState::Game,
         };
 
@@ -100,8 +98,6 @@ impl <'a>State for PlayState<'a> {
             wallet.reset();
         }
 
-        let font = self.font.lock().unwrap();
-
         scene.sub_nodes.push(Node::new(None, Some(tile_nodes)));
 
         let dimensions = renderer::get_dimensions();
@@ -134,11 +130,8 @@ impl <'a>State for PlayState<'a> {
         side_bar_container.sub_nodes.push(Node::new(Some(entity), None));
 
         // coal text
-        let entity = world.create_entity()
+        let entity = create_text::create(world, "".to_string(), 32.0, 80.0, 108.0, 0.0, 160, 32, Color([0.0, 1.0, 0.0, 1.0]))
             .with(ResourceCount{ resource_type: ResourceType::Coal })
-            .with(Transform::visible(80.0, 108.0, 0.0, 32, 32, 0.0, 1.0, 1.0))
-            .with(Text::new_with_size(&font, 32.0, 160, 32))
-            .with(Color([0.0, 1.0, 0.0, 1.0]))
             .build();
         side_bar_container.sub_nodes.push(Node::new(Some(entity), None));
 
@@ -151,11 +144,8 @@ impl <'a>State for PlayState<'a> {
         side_bar_container.sub_nodes.push(Node::new(Some(entity), None));
 
         // oil text
-        let entity = world.create_entity()
+        let entity = create_text::create(world, "".to_string(), 32.0, 80.0, 142.0, 0.0, 160, 32, Color([0.0, 1.0, 0.0, 1.0]))
             .with(ResourceCount{ resource_type: ResourceType::Oil })
-            .with(Transform::visible(80.0, 142.0, 0.0, 32, 32, 0.0, 1.0, 1.0))
-            .with(Text::new_with_size(&font, 32.0, 160, 32))
-            .with(Color([0.0, 1.0, 0.0, 1.0]))
             .build();
         side_bar_container.sub_nodes.push(Node::new(Some(entity), None));
 
@@ -168,11 +158,8 @@ impl <'a>State for PlayState<'a> {
         side_bar_container.sub_nodes.push(Node::new(Some(entity), None));
 
         // solar text
-        let entity = world.create_entity()
+        let entity = create_text::create(world, "".to_string(), 32.0, 80.0, 188.0, 0.0, 160, 32, Color([0.0, 1.0, 0.0, 1.0]))
             .with(ResourceCount{ resource_type: ResourceType::Clean })
-            .with(Transform::visible(80.0, 188.0, 0.0, 32, 32, 0.0, 1.0, 1.0))
-            .with(Text::new_with_size(&font, 32.0, 160, 32))
-            .with(Color([0.0, 1.0, 0.0, 1.0]))
             .build();
         side_bar_container.sub_nodes.push(Node::new(Some(entity), None));
 
@@ -185,12 +172,8 @@ impl <'a>State for PlayState<'a> {
         side_bar_container.sub_nodes.push(Node::new(Some(entity), None));
 
         // money text
-        let mut text = Text::new_with_text(&font, 32.0, 160, 32, format!("{}", Wallet::start_amount()));
-        let entity = world.create_entity()
+        let entity = create_text::create(world, format!("{}", Wallet::start_amount()), 32.0, 80.0, 228.0, 0.0, 160, 32, Color([0.0, 1.0, 0.0, 1.0]))
             .with(WalletUI{})
-            .with(Transform::visible(80.0, 228.0, 0.0, 32, 32, 0.0, 1.0, 1.0))
-            .with(text)
-            .with(Color([0.0, 1.0, 0.0, 1.0]))
             .build();
         side_bar_container.sub_nodes.push(Node::new(Some(entity), None));
 
