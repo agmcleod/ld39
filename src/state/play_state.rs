@@ -4,7 +4,7 @@ use scene::Node;
 use state::State;
 use std::ops::DerefMut;
 
-use components::{Button, Color, CurrentPower, EntityLookup, PowerBar, Rect, ResourceCount, Resources, ResourceType, SelectedTile, Sprite, Text, Tile, Transform, Wallet};
+use components::{Button, Color, CurrentPower, EntityLookup, PowerBar, Rect, ResourceCount, Resources, ResourceType, SelectedTile, Sprite, Tile, Transform, Wallet};
 use components::ui::WalletUI;
 use systems;
 use tech_tree;
@@ -34,6 +34,7 @@ impl <'a>PlayState<'a> {
             .add(systems::ButtonHover{ scene: scene.clone() }, "button_hover", &[])
             .add(systems::SellEnergy{}, "sell_energy", &["button_hover"])
             .add(systems::BuildGatherer{ scene: scene.clone() }, "build_gatherer", &["button_hover"])
+            .add(systems::TextAbsoluteCache{ scene: scene.clone() }, "text_absolute_cache", &[])
             .add(systems::TileSelection::new(scene.clone()), "tile_selection", &["build_gatherer"])
             .add(systems::Gathering{}, "gathering", &[])
             .add(systems::ToggleTechTree::new(scene.clone()), "toggle_tech_tree", &["button_hover"])
@@ -43,6 +44,7 @@ impl <'a>PlayState<'a> {
             .add(systems::ButtonHover{ scene: scene.clone() }, "button_hover", &[])
             .add(systems::ToggleTechTree::new(scene.clone()), "toggle_tech_tree", &["button_hover"])
             .add(systems::TechTree::new(scene.clone()), "tech_tree", &[])
+            .add(systems::TextAbsoluteCache{ scene: scene.clone() }, "text_absolute_cache", &[])
             .build();
 
         let ps = PlayState{

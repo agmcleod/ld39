@@ -11,11 +11,10 @@ pub fn create(
     transform_storage: &mut WriteStorage<Transform>,
     x: f32,
     y: f32,
+    w: u16,
+    h: u16,
     text: String,
 ) -> Node {
-    // w && h fixed for now
-    let w = 150;
-    let h = 75;
 
     let background = entities.create();
     transform_storage.insert(background.clone(), Transform::visible(0.0, 0.0, 0.0, w, h, 0.0, 1.0, 1.0));
@@ -29,8 +28,8 @@ pub fn create(
     ]));
 
     let text_entity = entities.create();
-    text_storage.insert(text_entity.clone(), Text::new_with_absolute_position(20.0, w, h, Vector3::<f32>::zero(), text));
-    transform_storage.insert(text_entity.clone(), Transform::visible(0.0, 0.0, 0.0, w, h, 0.0, 1.0, 1.0));
+    text_storage.insert(text_entity.clone(), Text::new_with_text(20.0, w, h, text));
+    transform_storage.insert(text_entity.clone(), Transform::visible(5.0, 5.0, 0.0, w - 5, h - 5, 0.0, 1.0, 1.0));
     color_storage.insert(text_entity.clone(), Color([1.0, 1.0, 1.0, 1.0]));
 
     container_node.add(Node::new(Some(text_entity.clone()), None));

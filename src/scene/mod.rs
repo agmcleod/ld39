@@ -89,9 +89,9 @@ impl Node {
                 return false
             }
             // increment it before confirming, so sub nodes consider the parent node position
-            position.x += transform.pos.x;
-            position.y += transform.pos.y;
-            position.z += transform.pos.z;
+            position.x += transform.get_pos().x;
+            position.y += transform.get_pos().y;
+            position.z += transform.get_pos().z;
             if node_entity == *entity {
                 found_entity = true;
             }
@@ -109,9 +109,9 @@ impl Node {
             if let Some(node_entity) = node.entity {
                 let transform = transform_storage.get(node_entity).unwrap();
                 // undo if nothing was found
-                position.x -= transform.pos.x;
-                position.y -= transform.pos.y;
-                position.z -= transform.pos.z;
+                position.x -= transform.get_pos().x;
+                position.y -= transform.get_pos().y;
+                position.z -= transform.get_pos().z;
             }
         }
 

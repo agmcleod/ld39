@@ -55,8 +55,8 @@ impl<'a> System<'a> for BuildGatherer {
                 transform.visible = false;
                 create = true;
 
-                selected_tile_x = transform.pos.x;
-                selected_tile_y = transform.pos.y;
+                selected_tile_x = transform.get_pos().x;
+                selected_tile_y = transform.get_pos().y;
                 logic::update_text(format!("{}", wallet.money), &mut text_storage, &wallet_ui_storage);
             }
         }

@@ -100,7 +100,6 @@ impl<R> Basic<R>
 
         let camera_res = world.read_resource::<components::Camera>();
         let camera = camera_res.deref();
-        let z = transform.pos.z;
         let w = transform.size.x as f32;
         let h = transform.size.y as f32;
 
@@ -176,23 +175,23 @@ impl<R> Basic<R>
 
     pub fn render_text<C, F>(&mut self, encoder: &mut gfx::Encoder<R, C>, text: &components::Text, transform: &components::Transform, color: &components::Color, glyph_brush: &mut GlyphBrush<R, F>)
         where R: gfx::Resources, C: gfx::CommandBuffer<R>, F: gfx::Factory<R> {
+        let absolute_pos = transform.get_absolute_pos();
         let section = Section{
             text: text.text.as_ref(),
             scale: text.scale.clone(),
             bounds: (text.size.x as f32, text.size.y as f32),
-            screen_position: (transform.pos.x, transform.pos.y),
+            screen_position: (absolute_pos.x, absolute_pos.y),
             color: color.0,
-            z: transform.pos.z,
+            z: 0.0,
             ..Section::default()
         };
 
         glyph_brush.queue(section);
-//        glyph_brush.draw_queued_with_transform(text.draw_transform.into(), encoder, &self.target.color, &self.target.depth).unwrap();
         glyph_brush.draw_queued(encoder, &self.target.color, &self.target.depth).unwrap();
     }
 
     pub fn transform(&mut self, transform: &components::Transform, undo: bool) {
-        let mut transform = Matrix4::from_translation(transform.pos);
+        let mut transform = Matrix4::from_translation(*transform.get_pos());
         if undo {
             transform = transform.inverse_transform().unwrap();
         }

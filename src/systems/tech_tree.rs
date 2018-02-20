@@ -49,8 +49,8 @@ impl <'a>System<'a> for TechTree {
             let abs_transform = Transform::visible(absolute_pos.x, absolute_pos.y, 0.0, transform.size.x, transform.size.y, transform.rotation, transform.scale.x, transform.scale.y);
             if abs_transform.contains(&input.mouse_pos.0, &input.mouse_pos.1) {
                 tech_tree_node_entity = Some(entity.clone());
-                tooltip_position[0] = transform.pos.x;
-                tooltip_position[1] = transform.pos.y;
+                tooltip_position[0] = transform.get_pos().x;
+                tooltip_position[1] = transform.get_pos().y;
             }
         }
 
@@ -64,7 +64,7 @@ impl <'a>System<'a> for TechTree {
             if create_tooltip {
                 if let Some(container_node) = scene.get_node_for_entity(*lookup.entities.get(&"tech_tree_container".to_string()).unwrap()) {
                     let tech_tree_node_ui = tech_tree_node_storage.get(tech_tree_node_entity).unwrap();
-                    let tooltip_node = create_tooltip::create(&entities, &mut color_storage, &mut rect_storage, &mut text_storage, &mut transform_storage, tooltip_position[0], tooltip_position[1], tech_tree_node_ui.text.clone());
+                    let tooltip_node = create_tooltip::create(&entities, &mut color_storage, &mut rect_storage, &mut text_storage, &mut transform_storage, tooltip_position[0] - 70.0, tooltip_position[1] - 40.0, 160, 100, tech_tree_node_ui.text.clone());
                     self.current_tooltip = Some(tooltip_node.entity.unwrap().clone());
                     self.current_tech_tree_node_entity = Some(tech_tree_node_entity.clone());
                     container_node.sub_nodes.push(tooltip_node);
