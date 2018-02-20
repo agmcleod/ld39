@@ -199,13 +199,15 @@ fn main() {
 
     let mut world = World::new();
 
+    let (width, height, ..) = main_color.get_dimensions();
+
     let target = renderer::WindowTargets{
         color: main_color,
         depth: main_depth,
     };
 
     let mut encoder: gfx::Encoder<_, _> = factory.create_command_buffer().into();
-    let mut basic = renderer::Basic::new(&mut factory, &target);
+    let mut basic = renderer::Basic::new(&mut factory, &target, window.hidpi_factor());
 
     let asset_data = loader::read_text_from_file(exe_path.join("resources/assets.json")).unwrap();
     let spritesheet: Spritesheet = serde_json::from_str(asset_data.as_ref()).unwrap();

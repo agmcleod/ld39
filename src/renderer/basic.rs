@@ -44,12 +44,13 @@ pub struct Basic<R: gfx::Resources> {
     model: Matrix4<f32>,
     target: WindowTargets<R>,
     color_texture: (gfx::handle::ShaderResourceView<R, [f32; 4]>, gfx::handle::Sampler<R>),
+    hidpi_factor: f32,
 }
 
 impl<R> Basic<R>
     where R: gfx::Resources
 {
-    pub fn new<F>(factory: &mut F, target: &WindowTargets<R>) -> Basic<R>
+    pub fn new<F>(factory: &mut F, target: &WindowTargets<R>, hidpi_factor: f32) -> Basic<R>
         where F: gfx::Factory<R>
     {
         use gfx::traits::FactoryExt;
@@ -78,6 +79,7 @@ impl<R> Basic<R>
             model: Matrix4::identity(),
             target: (*target).clone(),
             color_texture: (texture_view, factory.create_sampler(sinfo)),
+            hidpi_factor,
         }
     }
 
@@ -176,11 +178,14 @@ impl<R> Basic<R>
     pub fn render_text<C, F>(&mut self, encoder: &mut gfx::Encoder<R, C>, text: &components::Text, transform: &components::Transform, color: &components::Color, glyph_brush: &mut GlyphBrush<R, F>)
         where R: gfx::Resources, C: gfx::CommandBuffer<R>, F: gfx::Factory<R> {
         let absolute_pos = transform.get_absolute_pos();
+        let mut scale = text.scale.clone();
+        scale.x *= self.hidpi_factor;
+        scale.y *= self.hidpi_factor;
         let section = Section{
             text: text.text.as_ref(),
-            scale: text.scale.clone(),
-            bounds: (text.size.x as f32, text.size.y as f32),
-            screen_position: (absolute_pos.x, absolute_pos.y),
+            scale,
+            bounds: (text.size.x as f32 * self.hidpi_factor, text.size.y as f32 * self.hidpi_factor),
+            screen_position: (absolute_pos.x * self.hidpi_factor, absolute_pos.y * self.hidpi_factor),
             color: color.0,
             z: 0.0,
             ..Section::default()
