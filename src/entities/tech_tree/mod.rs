@@ -20,7 +20,7 @@ pub fn build_tech_tree(world: &mut World) -> TechTreeNode {
         .with(Coal::new())
         .with(Transform::visible(center_x, 32.0, 0.0, 32, 32, 0.0, 1.0, 1.0))
         .with(Rect{})
-        .with(ui::TechTreeNode::new("Unlocks ability to farm coal".to_string()))
+        .with(ui::TechTreeNode::new("Unlocks ability to farm coal".to_string(), Coal::new().get_cost()))
         .with(Color(get_color_from_status(&Coal::new().upgrade.status)))
         .build();
 
@@ -28,7 +28,7 @@ pub fn build_tech_tree(world: &mut World) -> TechTreeNode {
         .with(Oil::new())
         .with(Transform::visible(center_x, 96.0, 0.0, 32, 32, 0.0, 1.0, 1.0))
         .with(Rect{})
-        .with(ui::TechTreeNode::new("Unlocks ability to farm oil".to_string()))
+        .with(ui::TechTreeNode::new("Unlocks ability to farm oil".to_string(), Oil::new().get_cost()))
         .with(Color(get_color_from_status(&Oil::new().upgrade.status)))
         .build();
 
@@ -36,7 +36,7 @@ pub fn build_tech_tree(world: &mut World) -> TechTreeNode {
         .with(Solar::new())
         .with(Transform::visible(center_x, 160.0, 0.0, 32, 32, 0.0, 1.0, 1.0))
         .with(Rect{})
-        .with(ui::TechTreeNode::new("Unlocks ability to farm solar".to_string()))
+        .with(ui::TechTreeNode::new("Unlocks ability to farm solar".to_string(), Solar::new().get_cost()))
         .with(Color(get_color_from_status(&Solar::new().upgrade.status)))
         .build();
 

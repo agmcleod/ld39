@@ -15,6 +15,7 @@ pub enum Status {
 
 pub struct Upgrade {
     pub time_to_research: f32,
+    pub cost: usize,
     pub status: Status
 }
 

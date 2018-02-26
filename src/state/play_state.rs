@@ -4,12 +4,13 @@ use scene::Node;
 use state::State;
 use std::ops::DerefMut;
 
-use components::{Button, Color, CurrentPower, EntityLookup, PowerBar, Rect, ResourceCount, Resources, ResourceType, SelectedTile, Sprite, Tile, Transform, Wallet};
+use components::{Button, Color, CurrentPower, EntityLookup, PowerBar, Rect, ResourceCount, Resources, ResourceType, SelectedTile, Sprite, Text, Tile, Transform, Wallet};
 use components::ui::WalletUI;
 use systems;
 use tech_tree;
 use renderer;
 use entities::create_text;
+use storage_types::*;
 
 enum InternalState {
     Game,
@@ -131,10 +132,20 @@ impl <'a>State for PlayState<'a> {
             .build();
         side_bar_container.sub_nodes.push(Node::new(Some(entity), None));
 
+        let mut entities = world.entities();
+        let mut color_storage = world.write::<Color>();
+        let mut transform_storage = world.write::<Transform>();
+        let mut text_storage = world.write::<Text>();
+        let mut resource_count_storage = world.write::<ResourceCount>();
+        let mut wallet_ui_storage = world.write::<WalletUI>();
+
+        let mut text_storages = TextStorage{
+            entities, color_storage, text_storage, transform_storage
+        };
+
         // coal text
-        let entity = create_text::create(world, "".to_string(), 32.0, 80.0, 108.0, 0.0, 160, 32, Color([0.0, 1.0, 0.0, 1.0]))
-            .with(ResourceCount{ resource_type: ResourceType::Coal })
-            .build();
+        let entity = create_text::create(&mut text_storages, "".to_string(), 32.0, 80.0, 108.0, 0.0, 160, 32, Color([0.0, 1.0, 0.0, 1.0]));
+        resource_count_storage.insert(entity.clone(), ResourceCount{ resource_type: ResourceType::Coal });
         side_bar_container.sub_nodes.push(Node::new(Some(entity), None));
 
         // oil sprite
@@ -146,9 +157,8 @@ impl <'a>State for PlayState<'a> {
         side_bar_container.sub_nodes.push(Node::new(Some(entity), None));
 
         // oil text
-        let entity = create_text::create(world, "".to_string(), 32.0, 80.0, 142.0, 0.0, 160, 32, Color([0.0, 1.0, 0.0, 1.0]))
-            .with(ResourceCount{ resource_type: ResourceType::Oil })
-            .build();
+        let entity = create_text::create(&mut text_storages, "".to_string(), 32.0, 80.0, 142.0, 0.0, 160, 32, Color([0.0, 1.0, 0.0, 1.0]));
+        resource_count_storage.insert(entity.clone(), ResourceCount{ resource_type: ResourceType::Oil });
         side_bar_container.sub_nodes.push(Node::new(Some(entity), None));
 
         // solar sprite
@@ -160,9 +170,8 @@ impl <'a>State for PlayState<'a> {
         side_bar_container.sub_nodes.push(Node::new(Some(entity), None));
 
         // solar text
-        let entity = create_text::create(world, "".to_string(), 32.0, 80.0, 188.0, 0.0, 160, 32, Color([0.0, 1.0, 0.0, 1.0]))
-            .with(ResourceCount{ resource_type: ResourceType::Clean })
-            .build();
+        let entity = create_text::create(&mut text_storages, "".to_string(), 32.0, 80.0, 188.0, 0.0, 160, 32, Color([0.0, 1.0, 0.0, 1.0]));
+        resource_count_storage.insert(entity.clone(), ResourceCount{ resource_type: ResourceType::Clean });
         side_bar_container.sub_nodes.push(Node::new(Some(entity), None));
 
         // money sprite
@@ -174,9 +183,8 @@ impl <'a>State for PlayState<'a> {
         side_bar_container.sub_nodes.push(Node::new(Some(entity), None));
 
         // money text
-        let entity = create_text::create(world, format!("{}", Wallet::start_amount()), 32.0, 80.0, 228.0, 0.0, 160, 32, Color([0.0, 1.0, 0.0, 1.0]))
-            .with(WalletUI{})
-            .build();
+        let entity = create_text::create(&mut text_storages, format!("{}", Wallet::start_amount()), 32.0, 80.0, 228.0, 0.0, 160, 32, Color([0.0, 1.0, 0.0, 1.0]));
+        wallet_ui_storage.insert(entity, WalletUI{});
         side_bar_container.sub_nodes.push(Node::new(Some(entity), None));
 
         // selected

@@ -12,8 +12,13 @@ impl Solar {
             upgrade: Upgrade{
                 time_to_research: 90.0,
                 status: Status::Locked,
+                cost: 30,
             }
         }
+    }
+
+    pub fn get_cost(&self) -> usize {
+        self.upgrade.cost
     }
 }
 

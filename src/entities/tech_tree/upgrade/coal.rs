@@ -11,9 +11,14 @@ impl Coal {
         Coal{
             upgrade: Upgrade{
                 time_to_research: 0.0,
+                cost: 0,
                 status: Status::Researched,
             }
         }
+    }
+
+    pub fn get_cost(&self) -> usize {
+        self.upgrade.cost
     }
 }
 

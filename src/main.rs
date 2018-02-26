@@ -22,6 +22,7 @@ mod renderer;
 mod scene;
 mod spritesheet;
 mod state;
+mod storage_types;
 mod systems;
 mod utils;
 

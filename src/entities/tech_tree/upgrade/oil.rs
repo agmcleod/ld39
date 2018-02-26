@@ -11,9 +11,14 @@ impl Oil {
         Oil{
             upgrade: Upgrade{
                 time_to_research: 60.0,
+                cost: 10,
                 status: Status::Researchable,
             }
         }
+    }
+
+    pub fn get_cost(&self) -> usize {
+        self.upgrade.cost
     }
 }
 
