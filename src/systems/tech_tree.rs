@@ -69,10 +69,11 @@ impl <'a>System<'a> for TechTree {
                     self.current_tooltip = Some(tooltip_node.entity.unwrap().clone());
                     self.current_tech_tree_node_entity = Some(tech_tree_node_entity.clone());
 
+                    // no point in showing this if the thing is already researched, but how do I get the Coal/Oil/Solar component type?
                     let text = create_text::create(
                         &mut TextStorage{entities, color_storage, text_storage, transform_storage},
-                        format!("{}", tech_tree_node_ui.cost),
-                        16.0,
+                        format!("${}", tech_tree_node_ui.cost),
+                        20.0,
                         120.0, 100.0, 0.0,
                         70, 20,
                         Color([1.0, 1.0, 0.0, 1.0])

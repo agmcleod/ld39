@@ -1,4 +1,3 @@
- pub mod buff;
 mod upgrade;
 pub use self::upgrade::*;
 
@@ -12,6 +11,10 @@ pub struct TechTreeNode {
     pub sub_nodes: Vec<TechTreeNode>,
 }
 
+/**
+ * This builds out the tech tree from a data stand point. It creates the entities to draw stuff on the screen
+ * It then creates the hierarchy for dependencies, so we know when something becomes researchable upon its parent being researched.
+ */
 pub fn build_tech_tree(world: &mut World) -> TechTreeNode {
     let dimensions = renderer::get_dimensions();
     let center_x = (dimensions[0] - 640.0) / 2.0 - 16.0;
