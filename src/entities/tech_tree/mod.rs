@@ -20,27 +20,27 @@ pub fn build_tech_tree(world: &mut World) -> TechTreeNode {
     let center_x = (dimensions[0] - 640.0) / 2.0 - 16.0;
 
     let coal_entity = world.create_entity()
-        .with(Coal::new())
+        .with(Upgrade::new(Buff::Coal, 0.0, 0, Status::Researched))
         .with(Transform::visible(center_x, 32.0, 0.0, 32, 32, 0.0, 1.0, 1.0))
         .with(Rect{})
-        .with(ui::TechTreeNode::new("Unlocks ability to farm coal".to_string(), Coal::new().get_cost()))
-        .with(Color(get_color_from_status(&Coal::new().upgrade.status)))
+        .with(ui::TechTreeNode::new("Unlocks ability to farm coal".to_string(), 0))
+        .with(Color(get_color_from_status(&Status::Researched)))
         .build();
 
     let oil_entity = world.create_entity()
-        .with(Oil::new())
+        .with(Upgrade::new(Buff::Oil, 60.0, 10, Status::Researchable))
         .with(Transform::visible(center_x, 96.0, 0.0, 32, 32, 0.0, 1.0, 1.0))
         .with(Rect{})
-        .with(ui::TechTreeNode::new("Unlocks ability to farm oil".to_string(), Oil::new().get_cost()))
-        .with(Color(get_color_from_status(&Oil::new().upgrade.status)))
+        .with(ui::TechTreeNode::new("Unlocks ability to farm oil".to_string(), 10))
+        .with(Color(get_color_from_status(&Status::Researchable)))
         .build();
 
     let solar_entity = world.create_entity()
-        .with(Solar::new())
+        .with(Upgrade::new(Buff::Solar, 90.0, 30, Status::Locked))
         .with(Transform::visible(center_x, 160.0, 0.0, 32, 32, 0.0, 1.0, 1.0))
         .with(Rect{})
-        .with(ui::TechTreeNode::new("Unlocks ability to farm solar".to_string(), Solar::new().get_cost()))
-        .with(Color(get_color_from_status(&Solar::new().upgrade.status)))
+        .with(ui::TechTreeNode::new("Unlocks ability to farm solar".to_string(), 30))
+        .with(Color(get_color_from_status(&Status::Locked)))
         .build();
 
     let solar_node = TechTreeNode{

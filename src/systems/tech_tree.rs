@@ -5,6 +5,7 @@ use scene::Node;
 use components::{Color, EntityLookup, Rect, Text, Input, Transform};
 use components::ui;
 use entities::{create_tooltip, create_text};
+use entities::tech_tree::{Upgrade, Status};
 use storage_types::*;
 
 pub struct TechTree {
@@ -33,10 +34,11 @@ impl <'a>System<'a> for TechTree {
         ReadStorage<'a, ui::TechTreeNode>,
         WriteStorage<'a, Text>,
         WriteStorage<'a, Transform>,
+        ReadStorage<'a, Upgrade>,
     );
 
     fn run(&mut self, data: Self::SystemData) {
-        let (entities, mut color_storage, entity_lookup_storage, input_storage, mut rect_storage, tech_tree_node_storage, mut text_storage, mut transform_storage) = data;
+        let (entities, mut color_storage, entity_lookup_storage, input_storage, mut rect_storage, tech_tree_node_storage, mut text_storage, mut transform_storage, upgrade_storage) = data;
 
         let input: &Input = input_storage.deref();
         let lookup: &EntityLookup = entity_lookup_storage.deref();
@@ -65,21 +67,34 @@ impl <'a>System<'a> for TechTree {
             if create_tooltip {
                 if let Some(container_node) = scene.get_node_for_entity(*lookup.entities.get(&"tech_tree_container".to_string()).unwrap()) {
                     let tech_tree_node_ui = tech_tree_node_storage.get(tech_tree_node_entity).unwrap();
-                    let mut tooltip_node = create_tooltip::create(&entities, &mut color_storage, &mut rect_storage, &mut text_storage, &mut transform_storage, tooltip_position[0] - 70.0, tooltip_position[1] - 40.0, 160, 130, tech_tree_node_ui.text.clone());
+                    let upgrade = upgrade_storage.get(tech_tree_node_entity).unwrap();
+                    let mut tooltip_node = create_tooltip::create(
+                        &entities,
+                        &mut color_storage,
+                        &mut rect_storage,
+                        &mut text_storage,
+                        &mut transform_storage,
+                        tooltip_position[0] - 70.0,
+                        tooltip_position[1] - 25.0,
+                        160,
+                        130,
+                        tech_tree_node_ui.text.clone()
+                    );
                     self.current_tooltip = Some(tooltip_node.entity.unwrap().clone());
                     self.current_tech_tree_node_entity = Some(tech_tree_node_entity.clone());
 
-                    // no point in showing this if the thing is already researched, but how do I get the Coal/Oil/Solar component type?
-                    let text = create_text::create(
-                        &mut TextStorage{entities, color_storage, text_storage, transform_storage},
-                        format!("${}", tech_tree_node_ui.cost),
-                        20.0,
-                        120.0, 100.0, 0.0,
-                        70, 20,
-                        Color([1.0, 1.0, 0.0, 1.0])
-                    );
+                    if upgrade.status != Status::Researched {
+                        let text = create_text::create(
+                            &mut TextStorage{entities, color_storage, text_storage, transform_storage},
+                            format!("${}", tech_tree_node_ui.cost),
+                            20.0,
+                            120.0, 100.0, 0.0,
+                            70, 20,
+                            Color([1.0, 1.0, 0.0, 1.0])
+                        );
 
-                    tooltip_node.sub_nodes.push(Node::new(Some(text), None));
+                        tooltip_node.sub_nodes.push(Node::new(Some(text), None));
+                    }
 
                     container_node.sub_nodes.push(tooltip_node);
                 }

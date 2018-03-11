@@ -1,11 +1,6 @@
-mod coal;
-mod oil;
-mod solar;
+use specs::{Component, VecStorage};
 
-pub use self::coal::*;
-pub use self::oil::*;
-pub use self::solar::*;
-
+#[derive(PartialEq)]
 pub enum Status {
     Locked,
     Researchable,
@@ -13,10 +8,33 @@ pub enum Status {
     Researched,
 }
 
+pub enum Buff {
+    Coal,
+    Oil,
+    Solar,
+}
+
 pub struct Upgrade {
+    pub buff: Buff,
     pub time_to_research: f32,
     pub cost: usize,
     pub status: Status
+}
+
+
+impl Upgrade {
+    pub fn new(buff: Buff, time_to_research: f32, cost: usize, status: Status) -> Upgrade {
+        Upgrade{
+            buff,
+            time_to_research,
+            cost,
+            status
+        }
+    }
+}
+
+impl Component for Upgrade {
+    type Storage = VecStorage<Upgrade>;
 }
 
 pub fn get_color_from_status(status: &Status) -> [f32; 4] {

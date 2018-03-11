@@ -73,9 +73,7 @@ fn setup_world(world: &mut World, window: &glutin::Window) {
     world.register::<Transform>();
     world.register::<WalletUI>();
 
-    world.register::<tech_tree::Coal>();
-    world.register::<tech_tree::Oil>();
-    world.register::<tech_tree::Solar>();
+    world.register::<tech_tree::Upgrade>();
 }
 
 fn create_click_sound(root_path: &PathBuf) -> Decoder<BufReader<File>> {
