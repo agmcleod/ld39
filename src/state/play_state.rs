@@ -193,27 +193,23 @@ impl <'a>State for PlayState<'a> {
             let mut resource_count_storage = world.write::<ResourceCount>();
             let mut wallet_ui_storage = world.write::<WalletUI>();
 
-            let mut text_storages = TextStorage{
-                entities, color_storage, text_storage, transform_storage
-            };
-
             // coal text
-            let entity = create_text::create(&mut text_storages, "".to_string(), 32.0, 80.0, 108.0, 0.0, 160, 32, Color([0.0, 1.0, 0.0, 1.0]));
+            let entity = create_text::create(&entities, &mut color_storage, &mut text_storage, &mut transform_storage, "".to_string(), 32.0, 80.0, 108.0, 0.0, 160, 32, Color([0.0, 1.0, 0.0, 1.0]));
             resource_count_storage.insert(entity.clone(), ResourceCount{ resource_type: ResourceType::Coal });
             side_bar_container.sub_nodes.push(Node::new(Some(entity), None));
 
             // oil text
-            let entity = create_text::create(&mut text_storages, "".to_string(), 32.0, 80.0, 142.0, 0.0, 160, 32, Color([0.0, 1.0, 0.0, 1.0]));
+            let entity = create_text::create(&entities, &mut color_storage, &mut text_storage, &mut transform_storage, "".to_string(), 32.0, 80.0, 142.0, 0.0, 160, 32, Color([0.0, 1.0, 0.0, 1.0]));
             resource_count_storage.insert(entity.clone(), ResourceCount{ resource_type: ResourceType::Oil });
             side_bar_container.sub_nodes.push(Node::new(Some(entity), None));
 
             // solar text
-            let entity = create_text::create(&mut text_storages, "".to_string(), 32.0, 80.0, 188.0, 0.0, 160, 32, Color([0.0, 1.0, 0.0, 1.0]));
+            let entity = create_text::create(&entities, &mut color_storage, &mut text_storage, &mut transform_storage, "".to_string(), 32.0, 80.0, 188.0, 0.0, 160, 32, Color([0.0, 1.0, 0.0, 1.0]));
             resource_count_storage.insert(entity.clone(), ResourceCount{ resource_type: ResourceType::Clean });
             side_bar_container.sub_nodes.push(Node::new(Some(entity), None));
 
             // money text
-            let entity = create_text::create(&mut text_storages, format!("{}", Wallet::start_amount()), 32.0, 80.0, 228.0, 0.0, 160, 32, Color([0.0, 1.0, 0.0, 1.0]));
+            let entity = create_text::create(&entities, &mut color_storage, &mut text_storage, &mut transform_storage, format!("{}", Wallet::start_amount()), 32.0, 80.0, 228.0, 0.0, 160, 32, Color([0.0, 1.0, 0.0, 1.0]));
             wallet_ui_storage.insert(entity, WalletUI{});
             side_bar_container.sub_nodes.push(Node::new(Some(entity), None));
         }

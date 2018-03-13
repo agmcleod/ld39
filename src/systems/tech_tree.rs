@@ -2,7 +2,7 @@ use std::sync::{Arc, Mutex};
 use std::ops::Deref;
 use specs::{Entity, Entities, Fetch, Join, ReadStorage, WriteStorage, System};
 use scene::Node;
-use components::{Color, EntityLookup, Rect, Text, Input, Transform};
+use components::{Button, Color, EntityLookup, Rect, Sprite, Text, Input, Transform};
 use components::ui;
 use entities::{create_tooltip, create_text};
 use entities::tech_tree::{Upgrade, Status};
@@ -27,10 +27,12 @@ impl TechTree {
 impl <'a>System<'a> for TechTree {
     type SystemData = (
         Entities<'a>,
+        WriteStorage<'a, Button>,
         WriteStorage<'a, Color>,
         Fetch<'a, EntityLookup>,
         Fetch<'a, Input>,
         WriteStorage<'a, Rect>,
+        WriteStorage<'a, Sprite>,
         ReadStorage<'a, ui::TechTreeNode>,
         WriteStorage<'a, Text>,
         WriteStorage<'a, Transform>,
@@ -38,7 +40,7 @@ impl <'a>System<'a> for TechTree {
     );
 
     fn run(&mut self, data: Self::SystemData) {
-        let (entities, mut color_storage, entity_lookup_storage, input_storage, mut rect_storage, tech_tree_node_storage, mut text_storage, mut transform_storage, upgrade_storage) = data;
+        let (entities, mut button_storage, mut color_storage, entity_lookup_storage, input_storage, mut rect_storage, mut sprite_storage, tech_tree_node_storage, mut text_storage, mut transform_storage, upgrade_storage) = data;
 
         let input: &Input = input_storage.deref();
         let lookup: &EntityLookup = entity_lookup_storage.deref();
@@ -85,19 +87,22 @@ impl <'a>System<'a> for TechTree {
 
                     if upgrade.status != Status::Researched {
                         let text = create_text::create(
-                            &mut TextStorage{entities, color_storage, text_storage, transform_storage},
+                            &entities, &mut color_storage, &mut text_storage, &mut transform_storage,
                             format!("${}", tech_tree_node_ui.cost),
                             20.0,
-                            120.0, 100.0, 0.0,
+                            0.0, 100.0, 0.0,
                             70, 20,
                             Color([1.0, 1.0, 0.0, 1.0])
                         );
-
                         tooltip_node.sub_nodes.push(Node::new(Some(text), None));
+
+                        let research_button = entities.create();
                     }
 
                     container_node.sub_nodes.push(tooltip_node);
                 }
+            } else if input.mouse_pressed {
+                println!("Tooltip clicked");
             }
         } else {
             if let Some(current_tooltip) = self.current_tooltip {
