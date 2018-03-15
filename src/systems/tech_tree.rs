@@ -77,7 +77,7 @@ impl <'a>System<'a> for TechTree {
                         &mut text_storage,
                         &mut transform_storage,
                         tooltip_position[0] - 70.0,
-                        tooltip_position[1] - 25.0,
+                        tooltip_position[1] + 32.0,
                         160,
                         130,
                         tech_tree_node_ui.text.clone()
@@ -87,10 +87,10 @@ impl <'a>System<'a> for TechTree {
 
                     if upgrade.status != Status::Researched {
                         let text = create_text::create(
-                            &entities, &mut color_storage, &mut text_storage, &mut transform_storage,
+                            &mut TextStorage{entities: &entities, color_storage: &mut color_storage, text_storage: &mut text_storage, transform_storage: &mut transform_storage},
                             format!("${}", tech_tree_node_ui.cost),
                             20.0,
-                            0.0, 100.0, 0.0,
+                            5.0, 100.0, 0.0,
                             70, 20,
                             Color([1.0, 1.0, 0.0, 1.0])
                         );
