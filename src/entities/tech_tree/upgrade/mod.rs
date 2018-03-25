@@ -1,5 +1,9 @@
 use specs::{Component, VecStorage};
 
+mod researched_buffs;
+
+pub use self::researched_buffs::*;
+
 #[derive(Debug, PartialEq)]
 pub enum Status {
     Locked,
@@ -8,6 +12,7 @@ pub enum Status {
     Researched,
 }
 
+#[derive(Copy, Clone, PartialEq, Eq, Hash)]
 pub enum Buff {
     Coal,
     Oil,

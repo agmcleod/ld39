@@ -11,7 +11,6 @@ pub struct Resources {
     pub coal: usize,
     pub oil: usize,
     pub clean: usize,
-    pub current_type: ResourceType,
 }
 
 impl Resources {
@@ -20,7 +19,6 @@ impl Resources {
             coal: 0,
             oil: 0,
             clean: 0,
-            current_type: ResourceType::Coal,
         }
     }
 
@@ -53,10 +51,6 @@ impl Resources {
         }
     }
 
-    pub fn get_current_type(&self) -> ResourceType {
-        self.current_type
-    }
-
     pub fn increase_type_for_gatherer_type(&mut self, gatherer_type: &GathererType) {
         match *gatherer_type {
             GathererType::Coal => {
@@ -75,6 +69,5 @@ impl Resources {
         self.coal = 50;
         self.oil = 0;
         self.clean = 0;
-        self.current_type = ResourceType::Coal;
     }
 }

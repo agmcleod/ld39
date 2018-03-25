@@ -26,7 +26,6 @@ mod storage_types;
 mod systems;
 mod utils;
 
-use std::collections::HashMap;
 use std::ops::{DerefMut};
 use std::io::BufReader;
 use std::fs::File;
@@ -46,7 +45,7 @@ use rodio::decoder::Decoder;
 use scene::Node;
 use state::play_state::PlayState;
 use state::StateManager;
-use gfx_glyph::{font, GlyphBrush, GlyphBrushBuilder};
+use gfx_glyph::{GlyphBrush, GlyphBrushBuilder};
 use utils::math;
 use systems::FRAME_TIME;
 
@@ -200,8 +199,6 @@ fn main() {
         gfx_window_glutin::init::<ColorFormat, DepthFormat>(builder, context, &events_loop);
 
     let mut world = World::new();
-
-    let (width, height, ..) = main_color.get_dimensions();
 
     let target = renderer::WindowTargets{
         color: main_color,

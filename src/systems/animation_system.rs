@@ -1,7 +1,5 @@
-use std::time::Instant;
 use specs::{WriteStorage, Join, System};
 use components::{AnimationSheet};
-use utils::math;
 use systems::FRAME_TIME;
 
 pub struct AnimationSystem;

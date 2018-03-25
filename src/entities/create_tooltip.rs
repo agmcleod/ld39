@@ -1,5 +1,4 @@
 use specs::{Entities, WriteStorage};
-use cgmath::{Vector3, Zero};
 use scene::Node;
 use components::{Color, Rect, Text, Transform};
 

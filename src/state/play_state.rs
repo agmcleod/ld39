@@ -1,4 +1,5 @@
 use std::sync::{Arc, Mutex};
+use std::collections::HashSet;
 use specs::{Dispatcher, DispatcherBuilder, World};
 use scene::Node;
 use state::State;
@@ -7,9 +8,8 @@ use std::ops::DerefMut;
 use components::{Button, Color, CurrentPower, EntityLookup, PowerBar, Rect, ResourceCount, Resources, ResourceType, SelectedTile, Sprite, Text, Tile, Transform, Wallet};
 use components::ui::WalletUI;
 use systems;
-use tech_tree;
 use renderer;
-use entities::create_text;
+use entities::{create_text, tech_tree};
 use storage_types::*;
 
 enum InternalState {
@@ -243,6 +243,8 @@ impl <'a>State for PlayState<'a> {
             .build();
 
         world.add_resource::<tech_tree::TechTreeNode>(tech_tree_node);
+        world.add_resource::<tech_tree::ResearchedBuffs>(tech_tree::ResearchedBuffs(HashSet::new()));
+
         let mut lookup = world.write_resource::<EntityLookup>();
 
         lookup.entities.insert("tech_tree_container".to_string(), tech_tree_container_entity);

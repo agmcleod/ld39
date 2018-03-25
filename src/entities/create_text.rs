@@ -1,5 +1,4 @@
-use specs::{Entity, Entities, EntityBuilder, WriteStorage, World};
-use cgmath::Vector3;
+use specs::{Entity};
 use components::{Color, Text, Transform};
 use storage_types::TextStorage;
 

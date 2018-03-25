@@ -24,7 +24,6 @@ pub struct StateManager {
 
 impl StateManager {
     pub fn new() -> StateManager {
-        let states: HashMap<String, Box<State>> = HashMap::new();
         StateManager{
             current_state: "".to_string(),
             states: HashMap::new(),

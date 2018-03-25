@@ -1,7 +1,8 @@
 use std::ops::{Deref, DerefMut};
 use specs::{Entities, Fetch, FetchMut, Join, ReadStorage, WriteStorage, System};
-use components::{AnimationSheet, Button, ClickSound, Gatherer, GathererType, Input, Rect, Resources, SelectedTile, Sprite, Text, Transform, Wallet};
+use components::{AnimationSheet, Button, ClickSound, Gatherer, GathererType, Input, Resources, ResourceType, SelectedTile, Text, Transform, Wallet};
 use components::ui::WalletUI;
+use entities::tech_tree::{Buff, ResearchedBuffs};
 use std::sync::{Arc, Mutex};
 use scene::Node;
 use systems::logic;
@@ -18,10 +19,8 @@ impl<'a> System<'a> for BuildGatherer {
         Entities<'a>,
         WriteStorage<'a, Gatherer>,
         Fetch<'a, Input>,
-        WriteStorage<'a, Rect>,
         FetchMut<'a, Resources>,
         ReadStorage<'a, SelectedTile>,
-        WriteStorage<'a, Sprite>,
         WriteStorage<'a, Text>,
         WriteStorage<'a, Transform>,
         FetchMut<'a, Wallet>,
@@ -29,17 +28,40 @@ impl<'a> System<'a> for BuildGatherer {
     );
 
     fn run(&mut self, data: Self::SystemData) {
-        let (mut animation_sheet_storage, mut button_storage, mut click_sound_storage, entities, mut gatherer_storage, input_storage, rect_storage, mut resources_storage, selected_tile_storage, sprite_storage, mut text_storage, mut transform_storage, mut wallet_storage, wallet_ui_storage) = data;
+        let (
+            mut animation_sheet_storage,
+            mut button_storage,
+            mut click_sound_storage,
+            entities,
+            mut gatherer_storage,
+            input_storage,
+            mut resources_storage,
+            selected_tile_storage,
+            mut text_storage,
+            mut transform_storage,
+            mut wallet_storage,
+            wallet_ui_storage
+        ) = data;
 
-        let resources: &mut Resources = resources_storage.deref_mut();
         let input: &Input = input_storage.deref();
         let click_sound: &mut ClickSound = click_sound_storage.deref_mut();
         let wallet: &mut Wallet = wallet_storage.deref_mut();
 
         let mut button_pressed = false;
+        let mut build_type = None;
         for button in (&mut button_storage).join() {
             if button.name == "build_coal" && button.clicked(&input) {
                 button_pressed = true;
+                build_type = Some(ResourceType::Coal);
+            } else if button.name == "build_oil" && button.clicked(&input) {
+                button_pressed = true;
+                build_type = Some(ResourceType::Oil);
+            } else if button.name == "build_clean" && button.clicked(&input) {
+                button_pressed = true;
+                build_type = Some(ResourceType::Clean);
+            }
+
+            if button_pressed {
                 click_sound.play = true;
             }
         }
@@ -48,23 +70,23 @@ impl<'a> System<'a> for BuildGatherer {
         let mut selected_tile_x = 0.0;
         let mut selected_tile_y = 0.0;
         // spend the money, and hide selected tile
-        for (_, transform) in (&selected_tile_storage, &mut transform_storage).join() {
-            // TODO: needs to be updated to build arbitrary type, not just the furthest reached tech level
-            let amount = GathererType::get_type_for_resources_type(&resources.get_current_type()).get_build_cost();
-            if button_pressed && transform.visible && wallet.spend(amount) {
-                transform.visible = false;
-                create = true;
+        if button_pressed {
+            for (_, transform) in (&selected_tile_storage, &mut transform_storage).join() {
+                let amount = GathererType::get_type_for_resources_type(&build_type.unwrap()).get_build_cost();
+                if transform.visible && wallet.spend(amount) {
+                    transform.visible = false;
+                    create = true;
 
-                selected_tile_x = transform.get_pos().x;
-                selected_tile_y = transform.get_pos().y;
-                logic::update_text(format!("{}", wallet.money), &mut text_storage, &wallet_ui_storage);
+                    selected_tile_x = transform.get_pos().x;
+                    selected_tile_y = transform.get_pos().y;
+                    logic::update_text(format!("{}", wallet.money), &mut text_storage, &wallet_ui_storage);
+                }
             }
         }
 
         if create {
             // create gatherer
-            // TODO: needs to be updated to build arbitrary type
-            let gatherer = Gatherer::new(&resources.get_current_type());
+            let gatherer = Gatherer::new(&build_type.unwrap());
             let mut anim = AnimationSheet::new(0.5);
             anim.add_animation("default".to_string(), gatherer.gatherer_type.get_frames());
             anim.set_current_animation("default".to_string());

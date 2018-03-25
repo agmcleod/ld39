@@ -51,7 +51,7 @@ impl ToggleTechTree {
         }
     }
 
-    fn check_resume_from_upgrades_button(&mut self, lookup: &mut EntityLookup, input: &Input, entities: &Entities, button_storage: &mut WriteStorage<Button>, color_storage: &mut WriteStorage<Color>, rect_storage: &mut WriteStorage<Rect>, transform_storage: &mut WriteStorage<Transform>, state_change_res: &mut FetchMut<StateChange>, tile_storage: &ReadStorage<Tile>) {
+    fn check_resume_from_upgrades_button(&mut self, lookup: &mut EntityLookup, input: &Input, entities: &Entities, button_storage: &mut WriteStorage<Button>, transform_storage: &mut WriteStorage<Transform>, state_change_res: &mut FetchMut<StateChange>, tile_storage: &ReadStorage<Tile>) {
         let mut was_clicked = false;
         {
             let button = button_storage.get_mut(*lookup.get("resume_from_upgrades").unwrap()).unwrap();
@@ -104,6 +104,6 @@ impl<'a> System<'a> for ToggleTechTree {
         let mut lookup: &mut EntityLookup = lookup.deref_mut();
         let input: &Input = input.deref();
         self.check_show_tech_button(&mut lookup, &input, &entities, &mut button_storage, &mut color_storage, &mut rect_storage, &mut transform_storage, &mut state_change_res, &tile_storage);
-        self.check_resume_from_upgrades_button(&mut lookup, &input, &entities, &mut button_storage, &mut color_storage, &mut rect_storage, &mut transform_storage, &mut state_change_res, &tile_storage);
+        self.check_resume_from_upgrades_button(&mut lookup, &input, &entities, &mut button_storage, &mut transform_storage, &mut state_change_res, &tile_storage);
     }
 }

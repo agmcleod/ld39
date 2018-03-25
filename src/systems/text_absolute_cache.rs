@@ -17,7 +17,7 @@ impl <'a>System<'a> for TextAbsoluteCache {
     fn run(&mut self, data: Self::SystemData) {
         let (entities, text_strorage, mut transform_storage) = data;
 
-        for (entity, text) in (&*entities, &text_strorage).join() {
+        for (entity, _) in (&*entities, &text_strorage).join() {
             let absolute_pos = if transform_storage.get(entity).unwrap().dirty_pos {
                 let scene = self.scene.lock().unwrap();
                 Some(scene.get_absolute_pos(&entity, &transform_storage))

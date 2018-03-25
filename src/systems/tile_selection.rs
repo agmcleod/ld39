@@ -4,6 +4,7 @@ use specs::{Entity, Entities, ReadStorage, WriteStorage, Fetch, Join, System};
 use components::{Button, Color, Gatherer, Input, Rect, Resources, SelectedTile, Sprite, Tile, Transform};
 use scene::Node;
 use entities::create_build_ui;
+use entities::tech_tree::{ResearchedBuffs};
 
 pub struct TileSelection {
     pub scene: Arc<Mutex<Node>>,
@@ -27,6 +28,7 @@ impl<'a> System<'a> for TileSelection {
         ReadStorage<'a, Gatherer>,
         Fetch<'a, Input>,
         WriteStorage<'a, Rect>,
+        Fetch<'a, ResearchedBuffs>,
         Fetch<'a, Resources>,
         ReadStorage<'a, SelectedTile>,
         WriteStorage<'a, Sprite>,
@@ -35,12 +37,26 @@ impl<'a> System<'a> for TileSelection {
     );
 
     fn run(&mut self, data: Self::SystemData) {
-        let (mut button_storage, mut color_storage, entities, gatherer_storage, input_storage, mut rect_storage, resource_storage, selected_tile_storage, mut sprite_storage, tile_storage, mut transform_storage) = data;
+        let (
+            mut button_storage,
+            mut color_storage,
+            entities,
+            gatherer_storage,
+            input_storage,
+            mut rect_storage,
+            researched_buffs,
+            resource_storage,
+            selected_tile_storage,
+            mut sprite_storage,
+            tile_storage,
+            mut transform_storage
+        ) = data;
 
         let input: &Input = input_storage.deref();
         let mut tile_mouse_x = 0.0;
         let mut tile_mouse_y = 0.0;
         let mut clicked = false;
+        let researched_buffs: &ResearchedBuffs = researched_buffs.deref();
 
         for (_, button, transform) in (&tile_storage, &mut button_storage, &transform_storage).join() {
             if button.clicked(&input) {
@@ -75,7 +91,7 @@ impl<'a> System<'a> for TileSelection {
                 } else {
                     // create build ui
                     let resources: &Resources = resource_storage.deref();
-                    let node = create_build_ui::create(tile_mouse_x + Tile::get_size(), tile_mouse_y, &entities, &mut button_storage, &mut color_storage, &mut rect_storage, &mut sprite_storage, &mut transform_storage, &resources.get_current_type());
+                    let node = create_build_ui::create(tile_mouse_x + Tile::get_size(), tile_mouse_y, &entities, &mut button_storage, &mut color_storage, &mut rect_storage, &mut sprite_storage, &mut transform_storage, &researched_buffs);
                     self.build_ui_entity = Some(node.entity.unwrap().clone());
                     scene.sub_nodes.push(node);
                 }
