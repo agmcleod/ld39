@@ -52,6 +52,7 @@ impl<'a> System<'a> for TileSelection {
 
         if clicked {
             let mut tile_already_taken = false;
+            // check if tile already selected
             for (_, transform) in (&gatherer_storage, &mut transform_storage).join() {
                 if transform.get_pos().x == tile_mouse_x && transform.get_pos().y == tile_mouse_y {
                     tile_already_taken = true;
@@ -67,10 +68,12 @@ impl<'a> System<'a> for TileSelection {
 
                 let mut scene = self.scene.lock().unwrap();
 
+                // if build UI showing, move its position
                 if let Some(build_ui_entity) = self.build_ui_entity {
                     let transform = transform_storage.get_mut(build_ui_entity).unwrap();
                     transform.set_pos2(tile_mouse_x + Tile::get_size(), tile_mouse_y);
                 } else {
+                    // create build ui
                     let resources: &Resources = resource_storage.deref();
                     let node = create_build_ui::create(tile_mouse_x + Tile::get_size(), tile_mouse_y, &entities, &mut button_storage, &mut color_storage, &mut rect_storage, &mut sprite_storage, &mut transform_storage, &resources.get_current_type());
                     self.build_ui_entity = Some(node.entity.unwrap().clone());

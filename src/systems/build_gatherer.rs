@@ -65,7 +65,7 @@ impl<'a> System<'a> for BuildGatherer {
             // create gatherer
             // TODO: needs to be updated to build arbitrary type
             let gatherer = Gatherer::new(&resources.get_current_type());
-            let mut anim = AnimationSheet::new(1.0);
+            let mut anim = AnimationSheet::new(0.5);
             anim.add_animation("default".to_string(), gatherer.gatherer_type.get_frames());
             anim.set_current_animation("default".to_string());
             let gatherer_entity = entities.create();

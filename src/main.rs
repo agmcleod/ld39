@@ -30,9 +30,10 @@ use std::collections::HashMap;
 use std::ops::{DerefMut};
 use std::io::BufReader;
 use std::fs::File;
+use std::time;
 use std::path::{Path, PathBuf};
 use components::{AnimationSheet, BuildCost, Button, Camera, ClickSound, Color, CurrentPower, EntityLookup, Gatherer, HighlightTile, Input, PowerBar, Rect, ResourceCount, Resources, SelectedTile, Sprite, StateChange, Text, Tile, Transform, Wallet};
-use components::ui::{WalletUI, TechTreeNode};
+use components::ui::{WalletUI, TechTreeButton};
 use entities::tech_tree;
 use specs::{Entity, World, ReadStorage, WriteStorage};
 use renderer::{ColorFormat, DepthFormat};
@@ -46,6 +47,8 @@ use scene::Node;
 use state::play_state::PlayState;
 use state::StateManager;
 use gfx_glyph::{font, GlyphBrush, GlyphBrushBuilder};
+use utils::math;
+use systems::FRAME_TIME;
 
 fn setup_world(world: &mut World, window: &glutin::Window) {
     world.add_resource::<Camera>(Camera(renderer::get_ortho()));
@@ -67,7 +70,7 @@ fn setup_world(world: &mut World, window: &glutin::Window) {
     world.register::<Rect>();
     world.register::<SelectedTile>();
     world.register::<Sprite>();
-    world.register::<TechTreeNode>();
+    world.register::<TechTreeButton>();
     world.register::<Text>();
     world.register::<Tile>();
     world.register::<Transform>();
@@ -227,6 +230,7 @@ fn main() {
     state_manager.swap_state(PlayState::get_name(), &mut world);
 
     let mut running = true;
+    let mut frame_start = time::Instant::now();
     while running {
         events_loop.poll_events(|event| {
             match event {
@@ -264,6 +268,13 @@ fn main() {
                 _ => ()
             }
         });
+
+        let duration = time::Instant::now() - frame_start;
+        if math::get_seconds(&duration) < FRAME_TIME {
+            continue
+        }
+
+        frame_start = time::Instant::now();
 
         state_manager.update(&mut world);
         world.maintain();

@@ -11,4 +11,8 @@ impl EntityLookup {
             entities: HashMap::new(),
         }
     }
+
+    pub fn get(&self, key: &str) -> Option<&Entity> {
+        self.entities.get(key)
+    }
 }

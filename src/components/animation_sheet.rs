@@ -1,23 +1,22 @@
 use std::collections::HashMap;
 use specs::{Component, VecStorage};
-use std::time::Instant;
 
 pub struct AnimationSheet {
     pub animations: HashMap<String, Vec<String>>,
     pub current_animation: String,
     pub current_index: usize,
-    pub frame_time: f32,
-    pub time_passed: Instant,
+    pub frame_length: f32,
+    pub time_passed: f32,
 }
 
 impl AnimationSheet {
-    pub fn new(frame_time: f32) -> AnimationSheet {
+    pub fn new(frame_length: f32) -> AnimationSheet {
         AnimationSheet{
             animations: HashMap::new(),
             current_animation: String::new(),
             current_index: 0,
-            frame_time: frame_time,
-            time_passed: Instant::now(),
+            frame_length,
+            time_passed: 0.0,
         }
     }
 

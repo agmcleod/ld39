@@ -1,6 +1,6 @@
 use specs::{Component, VecStorage};
 
-#[derive(PartialEq)]
+#[derive(Debug, PartialEq)]
 pub enum Status {
     Locked,
     Researchable,
@@ -17,6 +17,7 @@ pub enum Buff {
 pub struct Upgrade {
     pub buff: Buff,
     pub time_to_research: f32,
+    pub current_research_progress: f32,
     pub cost: usize,
     pub status: Status
 }
@@ -27,9 +28,14 @@ impl Upgrade {
         Upgrade{
             buff,
             time_to_research,
+            current_research_progress: 0.0,
             cost,
             status
         }
+    }
+
+    pub fn start_learning(&mut self) {
+        self.status = Status::Learning;
     }
 }
 

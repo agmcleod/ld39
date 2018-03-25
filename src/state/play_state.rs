@@ -39,6 +39,7 @@ impl <'a>PlayState<'a> {
             .add(systems::TileSelection::new(scene.clone()), "tile_selection", &["build_gatherer"])
             .add(systems::Gathering{}, "gathering", &[])
             .add(systems::ToggleTechTree::new(scene.clone()), "toggle_tech_tree", &["button_hover"])
+            .add(systems::Research{}, "research", &[])
             .build();
 
         let tech_tree_dispatcher = DispatcherBuilder::new()
@@ -186,7 +187,7 @@ impl <'a>State for PlayState<'a> {
             lookup.entities.insert("show_button_entity".to_string(), entity);
             lookup.entities.insert("side_bar_container".to_string(), side_bar_container.entity.unwrap());
 
-            let mut entities = world.entities();
+            let entities = world.entities();
             let mut color_storage = world.write::<Color>();
             let mut transform_storage = world.write::<Transform>();
             let mut text_storage = world.write::<Text>();
@@ -232,21 +233,22 @@ impl <'a>State for PlayState<'a> {
                 tech_tree_container.sub_nodes.push(Node::new(Some(node.entity), None));
                 false
             };
-            tech_tree::traverse_tree(&mut tech_tree_node, &mut add_to_container);
+            tech_tree::traverse_tree_mut(&mut tech_tree_node, &mut add_to_container);
         }
 
-        let entity = world.create_entity()
+        let resume_from_upgrades = world.create_entity()
             .with(Button::new("resume_from_upgrades".to_string(), ["resume.png".to_string(), "resume_hover.png".to_string()]))
             .with(Transform::visible(112.0, 576.0, 0.0, 96, 32, 0.0, 1.0, 1.0))
             .with(Sprite{ frame_name: "resume.png".to_string() })
             .build();
 
+        world.add_resource::<tech_tree::TechTreeNode>(tech_tree_node);
         let mut lookup = world.write_resource::<EntityLookup>();
 
         lookup.entities.insert("tech_tree_container".to_string(), tech_tree_container_entity);
 
-        lookup.entities.insert("resume_from_upgrades".to_string(), entity);
-        tech_tree_container.sub_nodes.push(Node::new(Some(entity), None));
+        lookup.entities.insert("resume_from_upgrades".to_string(), resume_from_upgrades);
+        tech_tree_container.sub_nodes.push(Node::new(Some(resume_from_upgrades), None));
 
         lookup.entities.insert("tech_tree_container".to_string(), tech_tree_container.entity.unwrap());
         scene.sub_nodes.push(tech_tree_container);
