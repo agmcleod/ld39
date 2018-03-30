@@ -4,6 +4,7 @@ use specs::{Entity, World};
 use renderer;
 use components::{Color, Rect, Transform};
 use components::ui;
+use loader;
 
 pub struct TechTreeNode {
     pub entity: Entity,
@@ -17,6 +18,8 @@ pub const SIZE: u16 = 32;
  * It then creates the hierarchy for dependencies, so we know when something becomes researchable upon its parent being researched.
  */
 pub fn build_tech_tree(world: &mut World) -> TechTreeNode {
+    let tech_tree_data = loader::read_text_from_file("resources/tech_tree.json").unwrap();
+
     let dimensions = renderer::get_dimensions();
     let center_x = (dimensions[0] - 640.0) / 2.0 - 16.0;
 

@@ -27,10 +27,7 @@ mod systems;
 mod utils;
 
 use std::ops::{DerefMut};
-use std::io::BufReader;
-use std::fs::File;
 use std::time;
-use std::path::{Path, PathBuf};
 use components::{AnimationSheet, BuildCost, Button, Camera, ClickSound, Color, CurrentPower, EntityLookup, Gatherer, HighlightTile, Input, PowerBar, Rect, ResourceCount, Resources, SelectedTile, Sprite, StateChange, Text, Tile, Transform, Wallet};
 use components::ui::{WalletUI, TechTreeButton};
 use entities::tech_tree;
@@ -41,7 +38,6 @@ use glutin::{Event, ElementState, MouseButton, VirtualKeyCode, WindowEvent};
 use glutin::GlContext;
 use gfx::{Device};
 use rodio::Source;
-use rodio::decoder::Decoder;
 use scene::Node;
 use state::play_state::PlayState;
 use state::StateManager;
@@ -76,22 +72,6 @@ fn setup_world(world: &mut World, window: &glutin::Window) {
     world.register::<WalletUI>();
 
     world.register::<tech_tree::Upgrade>();
-}
-
-fn create_click_sound(root_path: &PathBuf) -> Decoder<BufReader<File>> {
-    let audio_file = File::open(&Path::new(&root_path.join("resources/click.ogg"))).unwrap();
-    rodio::Decoder::new(BufReader::new(audio_file)).unwrap()
-}
-
-fn play_music(root_path: &PathBuf, endpoint: &rodio::Endpoint) -> rodio::Sink {
-    let sink = rodio::Sink::new(&endpoint);
-
-    let music_file = File::open(&Path::new(&root_path.join("resources/ld39.ogg"))).unwrap();
-    let source = rodio::Decoder::new(BufReader::new(music_file)).unwrap();
-    sink.append(source.repeat_infinite());
-
-    sink.play();
-    sink
 }
 
 fn render_entity<R: gfx::Resources, C: gfx::CommandBuffer<R>, F: gfx::Factory<R>>(
@@ -187,14 +167,6 @@ fn main() {
         .with_dimensions(dim[0] as u32, dim[1] as u32);
     let context = glutin::ContextBuilder::new();
 
-    let exe_path = match std::env::current_exe() {
-        Ok(mut p) => {
-            p.pop();
-            p
-        },
-        Err(_) => PathBuf::new(),
-    };
-
     let (window, mut device, mut factory, main_color, main_depth) =
         gfx_window_glutin::init::<ColorFormat, DepthFormat>(builder, context, &events_loop);
 
@@ -208,16 +180,17 @@ fn main() {
     let mut encoder: gfx::Encoder<_, _> = factory.create_command_buffer().into();
     let mut basic = renderer::Basic::new(&mut factory, &target, window.hidpi_factor());
 
-    let asset_data = loader::read_text_from_file(exe_path.join("resources/assets.json")).unwrap();
+    let asset_data = loader::read_text_from_file("resources/assets.json").unwrap();
     let spritesheet: Spritesheet = serde_json::from_str(asset_data.as_ref()).unwrap();
-    let asset_texture = loader::gfx_load_texture(exe_path.join("resources/assets.png"), &mut factory);
+    let asset_texture = loader::gfx_load_texture("resources/assets.png", &mut factory);
 
     let mut glyph_brush = GlyphBrushBuilder::using_font_bytes(include_bytes!("../resources/MunroSmall.ttf") as &[u8])
         .build(factory.clone());
 
-    let audio_endpoint = rodio::get_default_endpoint().unwrap();
-    let click_sound_source = create_click_sound(&exe_path).buffered();
-    let music = play_music(&exe_path, &audio_endpoint);
+    let audio_endpoint = rodio::default_endpoint().unwrap();
+    let click_sound_source = loader::create_sound("resources/click.ogg").buffered();
+    let music = loader::create_music_sink("resources/ld39.ogg", &audio_endpoint);
+    music.play();
 
     setup_world(&mut world, &window);
 

@@ -1,6 +1,6 @@
 use std::ops::{Deref, DerefMut};
 use specs::{Entities, Fetch, FetchMut, Join, ReadStorage, WriteStorage, System};
-use components::{AnimationSheet, Button, ClickSound, Gatherer, GathererType, Input, Resources, ResourceType, SelectedTile, Text, Transform, Wallet};
+use components::{AnimationSheet, Button, ClickSound, Gatherer, GathererType, Input, ResourceType, SelectedTile, Text, Transform, Wallet};
 use components::ui::WalletUI;
 use std::sync::{Arc, Mutex};
 use scene::Node;
@@ -18,7 +18,6 @@ impl<'a> System<'a> for BuildGatherer {
         Entities<'a>,
         WriteStorage<'a, Gatherer>,
         Fetch<'a, Input>,
-        FetchMut<'a, Resources>,
         ReadStorage<'a, SelectedTile>,
         WriteStorage<'a, Text>,
         WriteStorage<'a, Transform>,
@@ -34,7 +33,6 @@ impl<'a> System<'a> for BuildGatherer {
             entities,
             mut gatherer_storage,
             input_storage,
-            mut resources_storage,
             selected_tile_storage,
             mut text_storage,
             mut transform_storage,

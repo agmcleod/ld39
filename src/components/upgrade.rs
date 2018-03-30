@@ -1,6 +1,6 @@
 use specs::{Component, VecStorage};
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub enum Status {
     Locked,
     Researchable,
@@ -8,13 +8,14 @@ pub enum Status {
     Researched,
 }
 
-#[derive(Copy, Clone, PartialEq, Eq, Hash)]
+#[derive(Copy, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub enum Buff {
     Coal,
     Oil,
     Solar,
 }
 
+#[derive(Serialize, Deserialize)]
 pub struct Upgrade {
     pub buff: Buff,
     pub time_to_research: f32,

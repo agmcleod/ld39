@@ -1,0 +1,24 @@
+{
+  "buff": "Coal",
+  "time_to_research": 0.0,
+  "cost": 0,
+  "status": "Researched",
+  "x": 0.5,
+  "description": "Unlocks ability to mine coal",
+  "children": [{
+    "buff": "Oil",
+    "time_to_research": 5.0,
+    "cost": 10,
+    "status": "Researchable",
+    "x": 0.5,
+    "description": "Unlocks ability to dig for oil",
+    "children": [{
+      "buff": "Solar",
+      "time_to_research": 30.0,
+      "cost": 30,
+      "status": "Locked",
+      "x": 0.5,
+      "description": "Unlocks ability to harvest solar power"
+    }]
+  }]
+}

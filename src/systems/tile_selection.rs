@@ -1,7 +1,7 @@
 use std::ops::Deref;
 use std::sync::{Arc, Mutex};
 use specs::{Entity, Entities, ReadStorage, WriteStorage, Fetch, Join, System};
-use components::{Button, Color, Gatherer, Input, Rect, ResearchedBuffs, Resources, SelectedTile, Sprite, Tile, Transform};
+use components::{Button, Color, Gatherer, Input, Rect, ResearchedBuffs, SelectedTile, Sprite, Tile, Transform};
 use scene::Node;
 use entities::create_build_ui;
 
@@ -28,7 +28,6 @@ impl<'a> System<'a> for TileSelection {
         Fetch<'a, Input>,
         WriteStorage<'a, Rect>,
         Fetch<'a, ResearchedBuffs>,
-        Fetch<'a, Resources>,
         ReadStorage<'a, SelectedTile>,
         WriteStorage<'a, Sprite>,
         ReadStorage<'a, Tile>,
@@ -44,7 +43,6 @@ impl<'a> System<'a> for TileSelection {
             input_storage,
             mut rect_storage,
             researched_buffs,
-            resource_storage,
             selected_tile_storage,
             mut sprite_storage,
             tile_storage,
@@ -89,7 +87,6 @@ impl<'a> System<'a> for TileSelection {
                     transform.set_pos2(tile_mouse_x + Tile::get_size(), tile_mouse_y);
                 } else {
                     // create build ui
-                    let resources: &Resources = resource_storage.deref();
                     let node = create_build_ui::create(tile_mouse_x + Tile::get_size(), tile_mouse_y, &entities, &mut button_storage, &mut color_storage, &mut rect_storage, &mut sprite_storage, &mut transform_storage, &researched_buffs);
                     self.build_ui_entity = Some(node.entity.unwrap().clone());
                     scene.sub_nodes.push(node);
