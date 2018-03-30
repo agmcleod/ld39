@@ -1,7 +1,7 @@
 use specs::{Entities, WriteStorage};
 use scene::Node;
-use components::{Button, Color, ResourceType, Rect, Sprite, Transform};
-use entities::tech_tree::{Buff, ResearchedBuffs};
+use components::{Button, Color, ResearchedBuffs, ResourceType, Rect, Sprite, Transform};
+use entities::tech_tree::{Buff};
 
 pub fn create(
     x: f32,

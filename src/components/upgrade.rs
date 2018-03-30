@@ -1,9 +1,5 @@
 use specs::{Component, VecStorage};
 
-mod researched_buffs;
-
-pub use self::researched_buffs::*;
-
 #[derive(Debug, PartialEq)]
 pub enum Status {
     Locked,

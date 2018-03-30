@@ -1,5 +1,4 @@
-mod upgrade;
-pub use self::upgrade::*;
+pub use components::upgrade::*;
 
 use specs::{Entity, World};
 use renderer;

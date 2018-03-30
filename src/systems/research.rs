@@ -1,7 +1,7 @@
 use std::ops::{Deref, DerefMut};
 use specs::{Entities, Fetch, FetchMut, Join, System, WriteStorage};
-use entities::tech_tree::{TechTreeNode, Upgrade, ResearchedBuffs, Buff, Status, get_color_from_status, traverse_tree};
-use components::Color;
+use entities::tech_tree::{TechTreeNode, Upgrade, Buff, Status, get_color_from_status, traverse_tree};
+use components::{Color, ResearchedBuffs};
 use systems::FRAME_TIME;
 
 pub struct Research;

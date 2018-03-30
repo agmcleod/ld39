@@ -2,7 +2,6 @@ use std::ops::{Deref, DerefMut};
 use specs::{Entities, Fetch, FetchMut, Join, ReadStorage, WriteStorage, System};
 use components::{AnimationSheet, Button, ClickSound, Gatherer, GathererType, Input, Resources, ResourceType, SelectedTile, Text, Transform, Wallet};
 use components::ui::WalletUI;
-use entities::tech_tree::{Buff, ResearchedBuffs};
 use std::sync::{Arc, Mutex};
 use scene::Node;
 use systems::logic;

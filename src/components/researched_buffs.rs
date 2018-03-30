@@ -1,6 +1,6 @@
 use specs::{Component, HashMapStorage};
 use std::collections::HashSet;
-use self::super::Buff;
+use entities::tech_tree::Buff;
 
 pub struct ResearchedBuffs(pub HashSet<Buff>);
 

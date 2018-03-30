@@ -5,7 +5,7 @@ use scene::Node;
 use state::State;
 use std::ops::DerefMut;
 
-use components::{Button, Color, CurrentPower, EntityLookup, PowerBar, Rect, ResourceCount, Resources, ResourceType, SelectedTile, Sprite, Text, Tile, Transform, Wallet};
+use components::{Button, Color, CurrentPower, EntityLookup, PowerBar, Rect, ResearchedBuffs, ResourceCount, Resources, ResourceType, SelectedTile, Sprite, Text, Tile, Transform, Wallet};
 use components::ui::WalletUI;
 use systems;
 use renderer;
@@ -243,7 +243,7 @@ impl <'a>State for PlayState<'a> {
             .build();
 
         world.add_resource::<tech_tree::TechTreeNode>(tech_tree_node);
-        world.add_resource::<tech_tree::ResearchedBuffs>(tech_tree::ResearchedBuffs(HashSet::new()));
+        world.add_resource::<ResearchedBuffs>(ResearchedBuffs(HashSet::new()));
 
         let mut lookup = world.write_resource::<EntityLookup>();
 
