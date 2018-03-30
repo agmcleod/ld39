@@ -5,6 +5,10 @@ use renderer;
 use components::{Color, Rect, Transform};
 use components::ui;
 use loader;
+use serde_json::{
+    self,
+    Value,
+};
 
 pub struct TechTreeNode {
     pub entity: Entity,
@@ -13,54 +17,50 @@ pub struct TechTreeNode {
 
 pub const SIZE: u16 = 32;
 
+fn build_entity_nodes(world: &mut World, width: f32, node: Value, y: f32, y_increment: f32) -> TechTreeNode {
+    let x = node["x"].as_f64().unwrap() as f32 * width;
+    let description = node["description"].as_str().unwrap().to_string();
+    let upgrade: Upgrade = serde_json::from_value(node.clone()).unwrap();
+    let status = upgrade.status.clone();
+    let entity = world.create_entity()
+        .with(upgrade)
+        .with(Transform::visible(x, y, 0.0, SIZE, SIZE, 0.0, 1.0, 1.0))
+        .with(Rect{})
+        .with(Color(get_color_from_status(&status)))
+        .with(ui::TechTreeButton::new(description, 0))
+        .build();
+
+    let mut tech_tree_node = TechTreeNode{
+        entity,
+        sub_nodes: Vec::new(),
+    };
+
+    if let Some(children) = node.get("children") {
+        for child in children.as_array().unwrap().iter() {
+            tech_tree_node.sub_nodes.push(build_entity_nodes(world, width, child.clone(), y + y_increment, y_increment));
+        }
+    }
+
+    tech_tree_node
+}
+
 /**
  * This builds out the tech tree from a data stand point. It creates the entities to draw stuff on the screen
  * It then creates the hierarchy for dependencies, so we know when something becomes researchable upon its parent being researched.
  */
 pub fn build_tech_tree(world: &mut World) -> TechTreeNode {
     let tech_tree_data = loader::read_text_from_file("resources/tech_tree.json").unwrap();
+    let tech_tree_data: serde_json::Value = serde_json::from_str(tech_tree_data.as_ref()).unwrap();
 
     let dimensions = renderer::get_dimensions();
-    let center_x = (dimensions[0] - 640.0) / 2.0 - 16.0;
+    let width = dimensions[0] - 640.0;
+    let center_x = width / 2.0 - (SIZE / 2) as f32;
 
-    let coal_entity = world.create_entity()
-        .with(Upgrade::new(Buff::Coal, 0.0, 0, Status::Researched))
-        .with(Transform::visible(center_x, 32.0, 0.0, SIZE, SIZE, 0.0, 1.0, 1.0))
-        .with(Rect{})
-        .with(ui::TechTreeButton::new("Unlocks ability to farm coal".to_string(), 0))
-        .with(Color(get_color_from_status(&Status::Researched)))
-        .build();
+    let mut node = tech_tree_data;
+    let mut y = 32.0;
+    let y_increment = y * 2.0;
 
-    let oil_entity = world.create_entity()
-        .with(Upgrade::new(Buff::Oil, 5.0, 10, Status::Researchable))
-        .with(Transform::visible(center_x, 96.0, 0.0, SIZE, SIZE, 0.0, 1.0, 1.0))
-        .with(Rect{})
-        .with(ui::TechTreeButton::new("Unlocks ability to farm oil".to_string(), 10))
-        .with(Color(get_color_from_status(&Status::Researchable)))
-        .build();
-
-    let solar_entity = world.create_entity()
-        .with(Upgrade::new(Buff::Solar, 90.0, 30, Status::Locked))
-        .with(Transform::visible(center_x, 160.0, 0.0, SIZE, SIZE, 0.0, 1.0, 1.0))
-        .with(Rect{})
-        .with(ui::TechTreeButton::new("Unlocks ability to farm solar".to_string(), 30))
-        .with(Color(get_color_from_status(&Status::Locked)))
-        .build();
-
-    let solar_node = TechTreeNode{
-        entity: solar_entity,
-        sub_nodes: Vec::new(),
-    };
-
-    let oil_node = TechTreeNode{
-        entity: oil_entity,
-        sub_nodes: vec![solar_node]
-    };
-
-    TechTreeNode{
-        entity: coal_entity,
-        sub_nodes: vec![oil_node]
-    }
+    build_entity_nodes(world, width, node, y, y_increment)
 }
 
 pub fn traverse_tree_mut<F>(node: &mut TechTreeNode, cb: &mut F) -> bool where F: FnMut(&mut TechTreeNode) -> bool {

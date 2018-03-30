@@ -1,6 +1,6 @@
 use specs::{Component, VecStorage};
 
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Copy, Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub enum Status {
     Locked,
     Researchable,
@@ -19,11 +19,11 @@ pub enum Buff {
 pub struct Upgrade {
     pub buff: Buff,
     pub time_to_research: f32,
+    #[serde(default)]
     pub current_research_progress: f32,
     pub cost: usize,
     pub status: Status
 }
-
 
 impl Upgrade {
     pub fn new(buff: Buff, time_to_research: f32, cost: usize, status: Status) -> Upgrade {
