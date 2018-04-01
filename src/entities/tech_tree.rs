@@ -21,13 +21,14 @@ fn build_entity_nodes(world: &mut World, width: f32, node: Value, y: f32, y_incr
     let x = node["x"].as_f64().unwrap() as f32 * width;
     let description = node["description"].as_str().unwrap().to_string();
     let upgrade: Upgrade = serde_json::from_value(node.clone()).unwrap();
+    let cost = upgrade.cost;
     let status = upgrade.status.clone();
     let entity = world.create_entity()
         .with(upgrade)
         .with(Transform::visible(x, y, 0.0, SIZE, SIZE, 0.0, 1.0, 1.0))
         .with(Rect{})
         .with(Color(get_color_from_status(&status)))
-        .with(ui::TechTreeButton::new(description, 0))
+        .with(ui::TechTreeButton::new(description, cost))
         .build();
 
     let mut tech_tree_node = TechTreeNode{

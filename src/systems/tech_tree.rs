@@ -1,8 +1,8 @@
 use std::sync::{Arc, Mutex};
-use std::ops::Deref;
-use specs::{Entity, Entities, Fetch, Join, ReadStorage, WriteStorage, System};
+use std::ops::{Deref, DerefMut};
+use specs::{Entity, Entities, Fetch, FetchMut, Join, ReadStorage, WriteStorage, System};
 use scene::Node;
-use components::{Button, Color, EntityLookup, Rect, Sprite, Text, Input, Transform};
+use components::{Button, Color, EntityLookup, Rect, Sprite, Text, Input, Transform, Wallet};
 use components::ui;
 use entities::{create_tooltip, create_text};
 use entities::tech_tree::{Upgrade, Status, get_color_from_status};
@@ -37,10 +37,24 @@ impl <'a>System<'a> for TechTree {
         WriteStorage<'a, Text>,
         WriteStorage<'a, Transform>,
         WriteStorage<'a, Upgrade>,
+        FetchMut<'a, Wallet>,
     );
 
     fn run(&mut self, data: Self::SystemData) {
-        let (entities, button_storage, mut color_storage, entity_lookup_storage, input_storage, mut rect_storage, mut sprite_storage, tech_tree_node_storage, mut text_storage, mut transform_storage, mut upgrade_storage) = data;
+        let (
+            entities,
+            button_storage,
+            mut color_storage,
+            entity_lookup_storage,
+            input_storage,
+            mut rect_storage,
+            mut sprite_storage,
+            tech_tree_node_storage,
+            mut text_storage,
+            mut transform_storage,
+            mut upgrade_storage,
+            mut wallet_storage,
+        ) = data;
 
         let input: &Input = input_storage.deref();
         let lookup: &EntityLookup = entity_lookup_storage.deref();
@@ -129,8 +143,9 @@ impl <'a>System<'a> for TechTree {
                     container_node.sub_nodes.push(tooltip_node);
                 }
             } else if input.mouse_pressed {
+                let wallet: &mut Wallet = wallet_storage.deref_mut();
                 let upgrade = upgrade_storage.get_mut(tech_tree_node_entity).unwrap();
-                if upgrade.status == Status::Researchable {
+                if upgrade.status == Status::Researchable && wallet.spend(upgrade.cost) {
                     upgrade.start_learning();
                     *color_storage.get_mut(tech_tree_node_entity).unwrap() = Color(get_color_from_status(&upgrade.status));
                 }
