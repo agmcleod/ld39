@@ -15,7 +15,7 @@ pub struct Resources {
 
 impl Resources {
     pub fn new() -> Resources {
-        Resources{
+        Resources {
             coal: 0,
             oil: 0,
             clean: 0,
@@ -29,17 +29,17 @@ impl Resources {
                 let amount = self.coal;
                 self.coal = 0;
                 amount
-            },
+            }
             ResourceType::Oil => {
                 let amount = self.oil;
                 self.oil = 0;
                 amount
-            },
+            }
             ResourceType::Clean => {
                 let amount = self.clean;
                 self.clean = 0;
                 amount
-            },
+            }
         }
     }
 
@@ -55,13 +55,13 @@ impl Resources {
         match *gatherer_type {
             GathererType::Coal => {
                 self.coal += 1;
-            },
+            }
             GathererType::Oil => {
                 self.oil += 2;
-            },
+            }
             GathererType::Clean => {
                 self.clean += 4;
-            },
+            }
         }
     }
 

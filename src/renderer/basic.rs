@@ -1,10 +1,10 @@
-extern crate gfx;
 extern crate cgmath;
+extern crate gfx;
 extern crate specs;
 
 use specs::World;
 use renderer::{ColorFormat, DepthFormat};
-use cgmath::{SquareMatrix, Matrix4, Transform};
+use cgmath::{Matrix4, SquareMatrix, Transform};
 use gfx::traits::FactoryExt;
 use gfx::texture;
 use components;
@@ -43,36 +43,46 @@ pub struct Basic<R: gfx::Resources> {
     projection: Projection,
     model: Matrix4<f32>,
     target: WindowTargets<R>,
-    color_texture: (gfx::handle::ShaderResourceView<R, [f32; 4]>, gfx::handle::Sampler<R>),
+    color_texture: (
+        gfx::handle::ShaderResourceView<R, [f32; 4]>,
+        gfx::handle::Sampler<R>,
+    ),
     hidpi_factor: f32,
 }
 
 impl<R> Basic<R>
-    where R: gfx::Resources
+where
+    R: gfx::Resources,
 {
     pub fn new<F>(factory: &mut F, target: &WindowTargets<R>, hidpi_factor: f32) -> Basic<R>
-        where F: gfx::Factory<R>
+    where
+        F: gfx::Factory<R>,
     {
         use gfx::traits::FactoryExt;
 
-        let pso = factory.create_pipeline_simple(
-            include_bytes!("shaders/basic.glslv"),
-            include_bytes!("shaders/basic.glslf"),
-            pipe::new()
-        ).unwrap();
+        let pso = factory
+            .create_pipeline_simple(
+                include_bytes!("shaders/basic.glslv"),
+                include_bytes!("shaders/basic.glslf"),
+                pipe::new(),
+            )
+            .unwrap();
 
         let texels = [[0xff, 0xff, 0xff, 0xff]];
-        let (_, texture_view) = factory.create_texture_immutable::<ColorFormat>(
-            texture::Kind::D2(1, 1, texture::AaMode::Single), texture::Mipmap::Allocated,&[&texels]
-        ).unwrap();
+        let (_, texture_view) = factory
+            .create_texture_immutable::<ColorFormat>(
+                texture::Kind::D2(1, 1, texture::AaMode::Single),
+                texture::Mipmap::Allocated,
+                &[&texels],
+            )
+            .unwrap();
 
-        let sinfo = texture::SamplerInfo::new(
-            texture::FilterMethod::Bilinear,
-        texture::WrapMode::Clamp);
+        let sinfo =
+            texture::SamplerInfo::new(texture::FilterMethod::Bilinear, texture::WrapMode::Clamp);
 
-        Basic{
+        Basic {
             pso: pso,
-            projection: Projection{
+            projection: Projection {
                 model: Matrix4::identity().into(),
                 proj: self::super::get_ortho().into(),
             },
@@ -87,7 +97,8 @@ impl<R> Basic<R>
         self.projection.model = Matrix4::identity().into();
     }
 
-    pub fn render<C, F>(&mut self,
+    pub fn render<C, F>(
+        &mut self,
         encoder: &mut gfx::Encoder<R, C>,
         world: &World,
         factory: &mut F,
@@ -95,8 +106,11 @@ impl<R> Basic<R>
         frame_name: Option<&String>,
         spritesheet: &Spritesheet,
         color: Option<[f32; 4]>,
-        texture: Option<&gfx::handle::ShaderResourceView<R, [f32; 4]>>)
-        where R: gfx::Resources, C: gfx::CommandBuffer<R>, F: gfx::Factory<R>
+        texture: Option<&gfx::handle::ShaderResourceView<R, [f32; 4]>>,
+    ) where
+        R: gfx::Resources,
+        C: gfx::CommandBuffer<R>,
+        F: gfx::Factory<R>,
     {
         use std::ops::Deref;
 
@@ -111,9 +125,11 @@ impl<R> Basic<R>
         let mut ty2 = 1.0;
 
         if let Some(frame_name) = frame_name {
-            let region = spritesheet.frames.iter().filter(|frame|
-                frame.filename == *frame_name
-            ).collect::<Vec<&Frame>>()[0];
+            let region = spritesheet
+                .frames
+                .iter()
+                .filter(|frame| frame.filename == *frame_name)
+                .collect::<Vec<&Frame>>()[0];
             let sw = spritesheet.meta.size.w as f32;
             let sh = spritesheet.meta.size.h as f32;
             tx = region.frame.x as f32 / sw;
@@ -122,7 +138,10 @@ impl<R> Basic<R>
             ty2 = (region.frame.y as f32 + region.frame.h as f32) / sh;
         }
 
-        let tex: (gfx::handle::ShaderResourceView<R, [f32; 4]>, gfx::handle::Sampler<R>) = if let Some(texture) = texture {
+        let tex: (
+            gfx::handle::ShaderResourceView<R, [f32; 4]>,
+            gfx::handle::Sampler<R>,
+        ) = if let Some(texture) = texture {
             (texture.clone(), factory.create_sampler_linear())
         } else {
             self.color_texture.clone()
@@ -135,32 +154,32 @@ impl<R> Basic<R>
         };
 
         let data: Vec<Vertex> = vec![
-            Vertex{
+            Vertex {
                 pos: [0.0, 0.0, 0.0],
                 uv: [tx, ty],
                 color: color,
             },
-            Vertex{
+            Vertex {
                 pos: [w, 0.0, 0.0],
                 uv: [tx2, ty],
                 color: color,
             },
-            Vertex{
+            Vertex {
                 pos: [w, h, 0.0],
                 uv: [tx2, ty2],
                 color: color,
             },
-            Vertex{
+            Vertex {
                 pos: [0.0, h, 0.0],
                 uv: [tx, ty2],
                 color: color,
-            }
+            },
         ];
 
         let index_data: Vec<u32> = vec![0, 1, 2, 2, 3, 0];
         let (vbuf, slice) = factory.create_vertex_buffer_with_slice(&data, &index_data[..]);
 
-        let params = pipe::Data{
+        let params = pipe::Data {
             vbuf: vbuf,
             projection_cb: factory.create_constant_buffer(1),
             tex: tex,
@@ -175,24 +194,42 @@ impl<R> Basic<R>
         encoder.draw(&slice, &self.pso, &params);
     }
 
-    pub fn render_text<C, F>(&mut self, encoder: &mut gfx::Encoder<R, C>, text: &components::Text, transform: &components::Transform, color: &components::Color, glyph_brush: &mut GlyphBrush<R, F>)
-        where R: gfx::Resources, C: gfx::CommandBuffer<R>, F: gfx::Factory<R> {
+    pub fn render_text<C, F>(
+        &mut self,
+        encoder: &mut gfx::Encoder<R, C>,
+        text: &components::Text,
+        transform: &components::Transform,
+        color: &components::Color,
+        glyph_brush: &mut GlyphBrush<R, F>,
+    ) where
+        R: gfx::Resources,
+        C: gfx::CommandBuffer<R>,
+        F: gfx::Factory<R>,
+    {
         let absolute_pos = transform.get_absolute_pos();
         let mut scale = text.scale.clone();
         scale.x *= self.hidpi_factor;
         scale.y *= self.hidpi_factor;
-        let section = Section{
+        let section = Section {
             text: text.text.as_ref(),
             scale,
-            bounds: (text.size.x as f32 * self.hidpi_factor, text.size.y as f32 * self.hidpi_factor),
-            screen_position: (absolute_pos.x * self.hidpi_factor, absolute_pos.y * self.hidpi_factor),
+            bounds: (
+                text.size.x as f32 * self.hidpi_factor,
+                text.size.y as f32 * self.hidpi_factor,
+            ),
+            screen_position: (
+                absolute_pos.x * self.hidpi_factor,
+                absolute_pos.y * self.hidpi_factor,
+            ),
             color: color.0,
             z: 0.0,
             ..Section::default()
         };
 
         glyph_brush.queue(section);
-        glyph_brush.draw_queued(encoder, &self.target.color, &self.target.depth).unwrap();
+        glyph_brush
+            .draw_queued(encoder, &self.target.color, &self.target.depth)
+            .unwrap();
     }
 
     pub fn transform(&mut self, transform: &components::Transform, undo: bool) {

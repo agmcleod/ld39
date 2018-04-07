@@ -1,4 +1,4 @@
-use specs::{VecStorage, Component};
+use specs::{Component, VecStorage};
 
 pub struct Sprite {
     pub frame_name: String,

@@ -1,11 +1,11 @@
 use std::sync::{Arc, Mutex};
 use std::ops::{Deref, DerefMut};
-use specs::{Entity, Entities, Fetch, FetchMut, Join, ReadStorage, WriteStorage, System};
+use specs::{Entities, Entity, Fetch, FetchMut, Join, ReadStorage, System, WriteStorage};
 use scene::Node;
-use components::{Button, Color, EntityLookup, Rect, Sprite, Text, Input, Transform, Wallet};
+use components::{Button, Color, EntityLookup, Input, Rect, Sprite, Text, Transform, Wallet};
 use components::ui;
-use entities::{create_tooltip, create_text};
-use entities::tech_tree::{Upgrade, Status, get_color_from_status};
+use entities::{create_text, create_tooltip};
+use entities::tech_tree::{get_color_from_status, Status, Upgrade};
 use storage_types::*;
 
 pub struct TechTree {
@@ -16,7 +16,7 @@ pub struct TechTree {
 
 impl TechTree {
     pub fn new(scene: Arc<Mutex<Node>>) -> TechTree {
-        TechTree{
+        TechTree {
             scene,
             current_tooltip: None,
             current_tech_tree_node_entity: None,
@@ -24,7 +24,7 @@ impl TechTree {
     }
 }
 
-impl <'a>System<'a> for TechTree {
+impl<'a> System<'a> for TechTree {
     type SystemData = (
         Entities<'a>,
         ReadStorage<'a, Button>,
@@ -63,9 +63,20 @@ impl <'a>System<'a> for TechTree {
         let mut tech_tree_node_entity = None;
         let mut tooltip_position = [0.0, 0.0];
 
-        for (entity, _, transform) in (&*entities, &tech_tree_node_storage, &transform_storage).join() {
+        for (entity, _, transform) in
+            (&*entities, &tech_tree_node_storage, &transform_storage).join()
+        {
             let absolute_pos = scene.get_absolute_pos(&entity, &transform_storage);
-            let abs_transform = Transform::visible(absolute_pos.x, absolute_pos.y, 0.0, transform.size.x, transform.size.y, transform.rotation, transform.scale.x, transform.scale.y);
+            let abs_transform = Transform::visible(
+                absolute_pos.x,
+                absolute_pos.y,
+                0.0,
+                transform.size.x,
+                transform.size.y,
+                transform.rotation,
+                transform.scale.x,
+                transform.scale.y,
+            );
             if abs_transform.contains(&input.mouse_pos.0, &input.mouse_pos.1) {
                 tech_tree_node_entity = Some(entity.clone());
                 tooltip_position[0] = transform.get_pos().x;
@@ -74,15 +85,19 @@ impl <'a>System<'a> for TechTree {
         }
 
         if let Some(tech_tree_node_entity) = tech_tree_node_entity {
-            let create_tooltip = if let Some(current_tech_tree_node_entity) = self.current_tech_tree_node_entity {
-                current_tech_tree_node_entity != tech_tree_node_entity
-            } else {
-                true
-            };
+            let create_tooltip =
+                if let Some(current_tech_tree_node_entity) = self.current_tech_tree_node_entity {
+                    current_tech_tree_node_entity != tech_tree_node_entity
+                } else {
+                    true
+                };
 
             if create_tooltip {
-                if let Some(container_node) = scene.get_node_for_entity(*lookup.get(&"tech_tree_container".to_string()).unwrap()) {
-                    let tech_tree_node_ui = tech_tree_node_storage.get(tech_tree_node_entity).unwrap();
+                if let Some(container_node) = scene
+                    .get_node_for_entity(*lookup.get(&"tech_tree_container".to_string()).unwrap())
+                {
+                    let tech_tree_node_ui =
+                        tech_tree_node_storage.get(tech_tree_node_entity).unwrap();
                     let upgrade = upgrade_storage.get(tech_tree_node_entity).unwrap();
                     let mut tooltip_node = create_tooltip::create(
                         &entities,
@@ -94,21 +109,29 @@ impl <'a>System<'a> for TechTree {
                         tooltip_position[1] + 32.0,
                         160,
                         130,
-                        tech_tree_node_ui.text.clone()
+                        tech_tree_node_ui.text.clone(),
                     );
                     self.current_tooltip = Some(tooltip_node.entity.unwrap().clone());
                     self.current_tech_tree_node_entity = Some(tech_tree_node_entity.clone());
 
-                    let mut text_storage_type = TextStorage { entities: &entities, color_storage: &mut color_storage, text_storage: &mut text_storage, transform_storage: &mut transform_storage };
+                    let mut text_storage_type = TextStorage {
+                        entities: &entities,
+                        color_storage: &mut color_storage,
+                        text_storage: &mut text_storage,
+                        transform_storage: &mut transform_storage,
+                    };
 
                     if upgrade.status == Status::Researched {
                         let text = create_text::create(
                             &mut text_storage_type,
                             "Researched".to_string(),
                             20.0,
-                            5.0, 100.0, 0.0,
-                            120, 20,
-                            Color([0.5, 0.5, 0.5, 1.0])
+                            5.0,
+                            100.0,
+                            0.0,
+                            120,
+                            20,
+                            Color([0.5, 0.5, 0.5, 1.0]),
                         );
                         tooltip_node.sub_nodes.push(Node::new(Some(text), None));
                     } else {
@@ -116,12 +139,14 @@ impl <'a>System<'a> for TechTree {
                             &mut text_storage_type,
                             format!("${}", tech_tree_node_ui.cost),
                             20.0,
-                            5.0, 100.0, 0.0,
-                            70, 20,
-                            Color([1.0, 1.0, 0.0, 1.0])
+                            5.0,
+                            100.0,
+                            0.0,
+                            70,
+                            20,
+                            Color([1.0, 1.0, 0.0, 1.0]),
                         );
                         tooltip_node.sub_nodes.push(Node::new(Some(text), None));
-
 
                         let time_left = if upgrade.status == Status::Learning {
                             upgrade.time_to_research - upgrade.current_research_progress
@@ -133,9 +158,12 @@ impl <'a>System<'a> for TechTree {
                             &mut text_storage_type,
                             format!("{} sec", time_left),
                             20.0,
-                            100.0, 100.0, 0.0,
-                            70, 20,
-                            Color([1.0, 1.0, 0.0, 1.0])
+                            100.0,
+                            100.0,
+                            0.0,
+                            70,
+                            20,
+                            Color([1.0, 1.0, 0.0, 1.0]),
                         );
                         tooltip_node.sub_nodes.push(Node::new(Some(text), None));
                     }
@@ -147,7 +175,8 @@ impl <'a>System<'a> for TechTree {
                 let upgrade = upgrade_storage.get_mut(tech_tree_node_entity).unwrap();
                 if upgrade.status == Status::Researchable && wallet.spend(upgrade.cost) {
                     upgrade.start_learning();
-                    *color_storage.get_mut(tech_tree_node_entity).unwrap() = Color(get_color_from_status(&upgrade.status));
+                    *color_storage.get_mut(tech_tree_node_entity).unwrap() =
+                        Color(get_color_from_status(&upgrade.status));
                 }
             }
         } else {

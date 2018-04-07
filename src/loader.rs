@@ -1,5 +1,5 @@
-extern crate image;
 extern crate gfx;
+extern crate image;
 use std::env;
 use std::fs::File;
 use std::path::{Path, PathBuf};
@@ -7,25 +7,24 @@ use std::io::Result;
 use std::io::prelude::Read;
 use gfx::texture::Mipmap;
 use std::io::BufReader;
-use rodio::{
-    Decoder as SoundDecoder,
-    Endpoint,
-    Sink,
-    Source,
-    decoder::Decoder,
-};
+use rodio::{Decoder as SoundDecoder, Endpoint, Sink, Source, decoder::Decoder};
 
-pub fn gfx_load_texture
-<F, R>(path: &str, factory: &mut F) -> gfx::handle::ShaderResourceView<R, [f32; 4]>
-    where F: gfx::Factory<R>,
-          R: gfx::Resources
+pub fn gfx_load_texture<F, R>(
+    path: &str,
+    factory: &mut F,
+) -> gfx::handle::ShaderResourceView<R, [f32; 4]>
+where
+    F: gfx::Factory<R>,
+    R: gfx::Resources,
 {
     use gfx::format::Rgba8;
     let path = get_exe_path().join(path);
     let img = image::open(path).unwrap().to_rgba();
     let (width, height) = img.dimensions();
     let kind = gfx::texture::Kind::D2(width as u16, height as u16, gfx::texture::AaMode::Single);
-    let (_, view) = factory.create_texture_immutable_u8::<Rgba8>(kind, Mipmap::Allocated, &[&img]).unwrap();
+    let (_, view) = factory
+        .create_texture_immutable_u8::<Rgba8>(kind, Mipmap::Allocated, &[&img])
+        .unwrap();
     view
 }
 
@@ -56,7 +55,7 @@ fn get_exe_path() -> PathBuf {
         Ok(mut p) => {
             p.pop();
             p
-        },
+        }
         Err(_) => PathBuf::new(),
     }
 }

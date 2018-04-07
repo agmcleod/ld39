@@ -24,7 +24,7 @@ pub struct StateManager {
 
 impl StateManager {
     pub fn new() -> StateManager {
-        StateManager{
+        StateManager {
             current_state: "".to_string(),
             states: HashMap::new(),
             restart_next_frame: false,
@@ -35,7 +35,7 @@ impl StateManager {
         self.states.insert(name, state);
     }
 
-    fn cleanup_state (&self, state: &Box<State>, world: &mut World) {
+    fn cleanup_state(&self, state: &Box<State>, world: &mut World) {
         let scene = state.get_scene();
         let scene = scene.lock().unwrap();
         for node in &scene.sub_nodes {
@@ -62,7 +62,10 @@ impl StateManager {
             if state_change.action == "restart" {
                 self.restart_current_state(world);
             } else {
-                self.states.get_mut(&self.current_state).unwrap().handle_custom_change(&state_change.action);
+                self.states
+                    .get_mut(&self.current_state)
+                    .unwrap()
+                    .handle_custom_change(&state_change.action);
             }
         }
     }
@@ -84,10 +87,16 @@ impl StateManager {
         }
 
         self.current_state = name;
-        self.states.get_mut(&self.current_state).unwrap().setup(world);
+        self.states
+            .get_mut(&self.current_state)
+            .unwrap()
+            .setup(world);
     }
 
     pub fn update(&mut self, world: &mut World) {
-        self.states.get_mut(&self.current_state).unwrap().update(world);
+        self.states
+            .get_mut(&self.current_state)
+            .unwrap()
+            .update(world);
     }
 }

@@ -11,7 +11,7 @@ pub struct Button {
 
 impl Button {
     pub fn new(name: String, frames: [String; 2]) -> Button {
-        Button{
+        Button {
             name: name,
             frames: frames,
             mouse_is_over: false,
@@ -23,15 +23,15 @@ impl Button {
     pub fn clicked(&mut self, input: &Input) -> bool {
         if input.mouse_pressed && !self.pressed && self.mouse_is_over {
             self.pressed = true;
-            return false
+            return false;
         } else if !input.mouse_pressed && self.pressed {
             self.pressed = false;
             // return on release
             if self.mouse_is_over {
-                return true
+                return true;
             }
 
-            return false
+            return false;
         }
 
         false

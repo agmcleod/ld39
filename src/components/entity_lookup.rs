@@ -7,7 +7,7 @@ pub struct EntityLookup {
 
 impl EntityLookup {
     pub fn new() -> EntityLookup {
-        EntityLookup{
+        EntityLookup {
             entities: HashMap::new(),
         }
     }

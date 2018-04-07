@@ -8,7 +8,7 @@ pub struct PowerBar {
 
 impl PowerBar {
     pub fn new() -> PowerBar {
-        PowerBar{
+        PowerBar {
             power_left: MAX_POWER,
         }
     }

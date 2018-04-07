@@ -12,13 +12,13 @@ pub fn create(
     entities: &Entities,
     transform_storage: &mut WriteStorage<Transform>,
     color_storage: &mut WriteStorage<Color>,
-    rect_storage: &mut WriteStorage<Rect>) -> Node {
-
+    rect_storage: &mut WriteStorage<Rect>,
+) -> Node {
     let entity = entities.create();
 
     transform_storage.insert(entity, Transform::visible(x, y, z, w, h, 0.0, 1.0, 1.0));
     color_storage.insert(entity, Color(color));
-    rect_storage.insert(entity, Rect{});
+    rect_storage.insert(entity, Rect {});
 
     let node = Node::new(Some(entity), None);
     node

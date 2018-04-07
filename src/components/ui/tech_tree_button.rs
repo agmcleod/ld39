@@ -8,10 +8,7 @@ pub struct TechTreeButton {
 
 impl TechTreeButton {
     pub fn new(text: String, cost: usize) -> TechTreeButton {
-        TechTreeButton {
-            text,
-            cost,
-        }
+        TechTreeButton { text, cost }
     }
 }
 

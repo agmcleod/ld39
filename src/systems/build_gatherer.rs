@@ -1,6 +1,7 @@
 use std::ops::{Deref, DerefMut};
-use specs::{Entities, Fetch, FetchMut, Join, ReadStorage, WriteStorage, System};
-use components::{AnimationSheet, Button, ClickSound, Gatherer, GathererType, Input, ResourceType, SelectedTile, Text, Transform, Wallet};
+use specs::{Entities, Fetch, FetchMut, Join, ReadStorage, System, WriteStorage};
+use components::{AnimationSheet, Button, ClickSound, Gatherer, GathererType, Input, ResourceType,
+                 SelectedTile, Text, Transform, Wallet};
 use components::ui::WalletUI;
 use std::sync::{Arc, Mutex};
 use scene::Node;
@@ -37,7 +38,7 @@ impl<'a> System<'a> for BuildGatherer {
             mut text_storage,
             mut transform_storage,
             mut wallet_storage,
-            wallet_ui_storage
+            wallet_ui_storage,
         ) = data;
 
         let input: &Input = input_storage.deref();
@@ -69,14 +70,19 @@ impl<'a> System<'a> for BuildGatherer {
         // spend the money, and hide selected tile
         if button_pressed {
             for (_, transform) in (&selected_tile_storage, &mut transform_storage).join() {
-                let amount = GathererType::get_type_for_resources_type(&build_type.unwrap()).get_build_cost();
+                let amount = GathererType::get_type_for_resources_type(&build_type.unwrap())
+                    .get_build_cost();
                 if transform.visible && wallet.spend(amount) {
                     transform.visible = false;
                     create = true;
 
                     selected_tile_x = transform.get_pos().x;
                     selected_tile_y = transform.get_pos().y;
-                    logic::update_text(format!("{}", wallet.money), &mut text_storage, &wallet_ui_storage);
+                    logic::update_text(
+                        format!("{}", wallet.money),
+                        &mut text_storage,
+                        &wallet_ui_storage,
+                    );
                 }
             }
         }
@@ -90,7 +96,10 @@ impl<'a> System<'a> for BuildGatherer {
             let gatherer_entity = entities.create();
             gatherer_storage.insert(gatherer_entity, gatherer);
             animation_sheet_storage.insert(gatherer_entity, anim);
-            transform_storage.insert(gatherer_entity, Transform::visible(selected_tile_x, selected_tile_y, 1.0, 64, 64, 0.0, 1.0, 1.0));
+            transform_storage.insert(
+                gatherer_entity,
+                Transform::visible(selected_tile_x, selected_tile_y, 1.0, 64, 64, 0.0, 1.0, 1.0),
+            );
 
             let mut scene = self.scene.lock().unwrap();
             scene.sub_nodes.push(Node::new(Some(gatherer_entity), None));

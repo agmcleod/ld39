@@ -1,6 +1,6 @@
 use specs::{Component, VecStorage};
 use rusttype::Scale;
-use cgmath::{Vector2};
+use cgmath::Vector2;
 
 pub struct Text {
     pub scale: Scale,
@@ -14,12 +14,12 @@ impl Text {
     pub fn new(size: f32, w: u16, h: u16) -> Text {
         let scale = Scale { x: size, y: size };
 
-        Text{
+        Text {
             scale: scale,
             new_data: false,
             text: "".to_string(),
             visible: true,
-            size: Vector2{ x: w, y: h },
+            size: Vector2 { x: w, y: h },
         }
     }
 

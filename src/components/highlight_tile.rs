@@ -1,6 +1,6 @@
 use specs::{Component, HashMapStorage};
 
-pub struct HighlightTile{
+pub struct HighlightTile {
     pub visible: bool,
 }
 

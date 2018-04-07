@@ -29,7 +29,16 @@ impl GathererType {
     pub fn get_frames(&self) -> Vec<String> {
         match *self {
             GathererType::Coal => vec!["wheelbarrel.png".to_string()],
-            GathererType::Oil => vec!["refinery_1.png".to_string(), "refinery_2.png".to_string(), "refinery_3.png".to_string(), "refinery_4.png".to_string(), "refinery_5.png".to_string(), "refinery_6.png".to_string(), "refinery_7.png".to_string(), "refinery_8.png".to_string()],
+            GathererType::Oil => vec![
+                "refinery_1.png".to_string(),
+                "refinery_2.png".to_string(),
+                "refinery_3.png".to_string(),
+                "refinery_4.png".to_string(),
+                "refinery_5.png".to_string(),
+                "refinery_6.png".to_string(),
+                "refinery_7.png".to_string(),
+                "refinery_8.png".to_string(),
+            ],
             GathererType::Clean => vec!["plant.png".to_string()],
         }
     }
@@ -42,7 +51,7 @@ pub struct Gatherer {
 
 impl Gatherer {
     pub fn new(resource_type: &ResourceType) -> Gatherer {
-        Gatherer{
+        Gatherer {
             gatherer_type: GathererType::get_type_for_resources_type(resource_type),
             gather_tick: Instant::now(),
         }

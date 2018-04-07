@@ -1,4 +1,4 @@
-use specs::{Entities, Join, System, WriteStorage, ReadStorage};
+use specs::{Entities, Join, ReadStorage, System, WriteStorage};
 use std::sync::{Arc, Mutex};
 use components::{Text, Transform};
 use scene::Node;
@@ -7,7 +7,7 @@ pub struct TextAbsoluteCache {
     pub scene: Arc<Mutex<Node>>,
 }
 
-impl <'a>System<'a> for TextAbsoluteCache {
+impl<'a> System<'a> for TextAbsoluteCache {
     type SystemData = (
         Entities<'a>,
         ReadStorage<'a, Text>,
@@ -26,7 +26,10 @@ impl <'a>System<'a> for TextAbsoluteCache {
             };
 
             if let Some(absolute_pos) = absolute_pos {
-                transform_storage.get_mut(entity).unwrap().set_absolute_pos(absolute_pos);
+                transform_storage
+                    .get_mut(entity)
+                    .unwrap()
+                    .set_absolute_pos(absolute_pos);
             }
         }
     }

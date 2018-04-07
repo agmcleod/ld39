@@ -12,27 +12,48 @@ pub struct Transform {
 }
 
 impl Transform {
-    pub fn new(x: f32, y: f32, z: f32, w: u16, h: u16, rotation: f32, scale_x: f32, scale_y: f32, visible: bool) -> Transform {
-        Transform{
-            pos: Vector3{ x, y, z },
-            size: Vector2{ x: w, y: h },
+    pub fn new(
+        x: f32,
+        y: f32,
+        z: f32,
+        w: u16,
+        h: u16,
+        rotation: f32,
+        scale_x: f32,
+        scale_y: f32,
+        visible: bool,
+    ) -> Transform {
+        Transform {
+            pos: Vector3 { x, y, z },
+            size: Vector2 { x: w, y: h },
             rotation,
-            scale: Vector2{ x: scale_x, y: scale_y },
+            scale: Vector2 {
+                x: scale_x,
+                y: scale_y,
+            },
             visible,
-            absolute_pos: Vector3{ x, y, z },
-            dirty_pos: true
+            absolute_pos: Vector3 { x, y, z },
+            dirty_pos: true,
         }
     }
 
-    pub fn visible(x: f32, y: f32, z: f32, w: u16, h: u16, rotation: f32, scale_x: f32, scale_y: f32) -> Transform {
+    pub fn visible(
+        x: f32,
+        y: f32,
+        z: f32,
+        w: u16,
+        h: u16,
+        rotation: f32,
+        scale_x: f32,
+        scale_y: f32,
+    ) -> Transform {
         Self::new(x, y, z, w, h, rotation, scale_x, scale_y, true)
     }
 
     pub fn contains(&self, x: &f32, y: &f32) -> bool {
         let w = self.size.x as f32;
         let h = self.size.y as f32;
-        self.pos.x <= *x && self.pos.x + w >= *x &&
-        self.pos.y <= *y && self.pos.y + h >= *y
+        self.pos.x <= *x && self.pos.x + w >= *x && self.pos.y <= *y && self.pos.y + h >= *y
     }
 
     pub fn get_pos(&self) -> &Vector3<f32> {

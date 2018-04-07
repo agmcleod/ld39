@@ -31,5 +31,5 @@ pub struct Meta {
 #[derive(Serialize, Deserialize)]
 pub struct Spritesheet {
     pub frames: Vec<Frame>,
-    pub meta: Meta
+    pub meta: Meta,
 }

@@ -15,7 +15,7 @@ fn get_node_for_entity(nodes: &mut Vec<Node>, target_entity: Entity) -> Option<&
             }
         }
         if let Some(n) = get_node_for_entity(&mut node.sub_nodes, target_entity) {
-            return Some(n)
+            return Some(n);
         }
     }
 
@@ -26,7 +26,7 @@ fn remove_from_sub_nodes(nodes: &mut Vec<Node>, target_entity: Entity) -> bool {
     let to_remove = nodes.iter().position(|node| {
         if let Some(entity) = node.entity {
             if entity == target_entity {
-                return true
+                return true;
             }
         }
         false
@@ -34,12 +34,12 @@ fn remove_from_sub_nodes(nodes: &mut Vec<Node>, target_entity: Entity) -> bool {
 
     if let Some(to_remove) = to_remove {
         nodes.remove(to_remove);
-        return true
+        return true;
     }
 
     for node in nodes.iter_mut() {
         if node.sub_nodes.len() > 0 && remove_from_sub_nodes(&mut node.sub_nodes, target_entity) {
-            return true
+            return true;
         }
     }
 
@@ -53,7 +53,7 @@ impl Node {
             None => vec![],
         };
 
-        Node{
+        Node {
             entity: entity,
             sub_nodes: sub_nodes,
         }
@@ -81,12 +81,18 @@ impl Node {
         self.sub_nodes.push(node);
     }
 
-    fn check_node<'a>(&self, node: &Node, entity: &Entity, position: &mut Vector3<f32>, transform_storage: &WriteStorage<'a, Transform>) -> bool {
+    fn check_node<'a>(
+        &self,
+        node: &Node,
+        entity: &Entity,
+        position: &mut Vector3<f32>,
+        transform_storage: &WriteStorage<'a, Transform>,
+    ) -> bool {
         let mut found_entity = false;
         if let Some(node_entity) = node.entity {
             let transform = transform_storage.get(node_entity).unwrap();
             if !transform.visible {
-                return false
+                return false;
             }
             // increment it before confirming, so sub nodes consider the parent node position
             position.x += transform.get_pos().x;
@@ -100,7 +106,7 @@ impl Node {
         if !found_entity {
             for node in &node.sub_nodes {
                 if self.check_node(&node, entity, position, transform_storage) {
-                    return true
+                    return true;
                 }
             }
         }
@@ -119,12 +125,20 @@ impl Node {
     }
 
     // potential optimization is to change this into a quad tree
-    pub fn get_absolute_pos<'a>(&self, entity: &Entity, transform_storage: &WriteStorage<'a, Transform>) -> Vector3<f32> {
-        let mut position = Vector3{ x: 0.0, y: 0.0, z: 0.0 };
+    pub fn get_absolute_pos<'a>(
+        &self,
+        entity: &Entity,
+        transform_storage: &WriteStorage<'a, Transform>,
+    ) -> Vector3<f32> {
+        let mut position = Vector3 {
+            x: 0.0,
+            y: 0.0,
+            z: 0.0,
+        };
 
         for node in &self.sub_nodes {
             if self.check_node(node, entity, &mut position, &transform_storage) {
-                break
+                break;
             }
         }
 

@@ -1,6 +1,6 @@
 use std::ops::{Deref, DerefMut};
-use specs::{Fetch, FetchMut, Join, WriteStorage, System};
-use components::{ClickSound, Input, Button, PowerBar, Resources, ResourceType, Text, Wallet};
+use specs::{Fetch, FetchMut, Join, System, WriteStorage};
+use components::{Button, ClickSound, Input, PowerBar, ResourceType, Resources, Text, Wallet};
 use components::ui::WalletUI;
 
 pub struct SellEnergy;
@@ -18,7 +18,16 @@ impl<'a> System<'a> for SellEnergy {
     );
 
     fn run(&mut self, data: Self::SystemData) {
-        let (mut button_storage, mut click_sound_storage, input_storage, mut power_bar_storage, mut resources_storage, mut text_storage, mut wallet_storage, mut wallet_ui_storage) = data;
+        let (
+            mut button_storage,
+            mut click_sound_storage,
+            input_storage,
+            mut power_bar_storage,
+            mut resources_storage,
+            mut text_storage,
+            mut wallet_storage,
+            mut wallet_ui_storage,
+        ) = data;
 
         let click_sound: &mut ClickSound = click_sound_storage.deref_mut();
 

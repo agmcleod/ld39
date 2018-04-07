@@ -1,17 +1,17 @@
+extern crate cgmath;
 #[macro_use]
 extern crate gfx;
 extern crate gfx_device_gl;
-extern crate gfx_window_glutin;
 extern crate gfx_glyph;
+extern crate gfx_window_glutin;
 extern crate glutin;
-extern crate specs;
-extern crate cgmath;
-extern crate serde;
 extern crate image;
 extern crate rodio;
+extern crate serde;
 #[macro_use]
 extern crate serde_derive;
 extern crate serde_json;
+extern crate specs;
 
 extern crate rusttype;
 
@@ -26,17 +26,19 @@ mod storage_types;
 mod systems;
 mod utils;
 
-use std::ops::{DerefMut};
+use std::ops::DerefMut;
 use std::time;
-use components::{AnimationSheet, BuildCost, Button, Camera, ClickSound, Color, CurrentPower, EntityLookup, Gatherer, HighlightTile, Input, PowerBar, Rect, ResourceCount, Resources, SelectedTile, Sprite, StateChange, Text, Tile, Transform, Wallet};
-use components::ui::{WalletUI, TechTreeButton};
+use components::{AnimationSheet, BuildCost, Button, Camera, ClickSound, Color, CurrentPower,
+                 EntityLookup, Gatherer, HighlightTile, Input, PowerBar, Rect, ResourceCount,
+                 Resources, SelectedTile, Sprite, StateChange, Text, Tile, Transform, Wallet};
+use components::ui::{TechTreeButton, WalletUI};
 use entities::tech_tree;
-use specs::{Entity, World, ReadStorage, WriteStorage};
+use specs::{Entity, ReadStorage, World, WriteStorage};
 use renderer::{ColorFormat, DepthFormat};
 use spritesheet::Spritesheet;
-use glutin::{Event, ElementState, MouseButton, VirtualKeyCode, WindowEvent};
+use glutin::{ElementState, Event, MouseButton, VirtualKeyCode, WindowEvent};
 use glutin::GlContext;
-use gfx::{Device};
+use gfx::Device;
 use rodio::Source;
 use scene::Node;
 use state::play_state::PlayState;
@@ -48,9 +50,17 @@ use systems::FRAME_TIME;
 fn setup_world(world: &mut World, window: &glutin::Window) {
     world.add_resource::<Camera>(Camera(renderer::get_ortho()));
     world.add_resource::<StateChange>(StateChange::new());
-    world.add_resource::<Input>(Input::new(window.hidpi_factor(), vec![VirtualKeyCode::W, VirtualKeyCode::A, VirtualKeyCode::S, VirtualKeyCode::D]));
+    world.add_resource::<Input>(Input::new(
+        window.hidpi_factor(),
+        vec![
+            VirtualKeyCode::W,
+            VirtualKeyCode::A,
+            VirtualKeyCode::S,
+            VirtualKeyCode::D,
+        ],
+    ));
     world.add_resource::<Resources>(Resources::new());
-    world.add_resource::<ClickSound>(ClickSound{ play: false });
+    world.add_resource::<ClickSound>(ClickSound { play: false });
     world.add_resource::<Wallet>(Wallet::new());
     world.add_resource::<EntityLookup>(EntityLookup::new());
     world.register::<AnimationSheet>();
@@ -89,23 +99,52 @@ fn render_entity<R: gfx::Resources, C: gfx::CommandBuffer<R>, F: gfx::Factory<R>
     color_storage: &ReadStorage<Color>,
     text_storage: &mut WriteStorage<Text>,
     rect_storage: &ReadStorage<Rect>,
-    ) {
-
+) {
     if let Some(transform) = transform_storage.get_mut(*entity) {
         if transform.visible {
             if let Some(sprite) = sprite_storage.get(*entity) {
-                basic.render(encoder, world, factory, &transform, Some(&sprite.frame_name), spritesheet, None, Some(asset_texture));
+                basic.render(
+                    encoder,
+                    world,
+                    factory,
+                    &transform,
+                    Some(&sprite.frame_name),
+                    spritesheet,
+                    None,
+                    Some(asset_texture),
+                );
             }
 
             if let Some(animation) = animation_storage.get(*entity) {
-                basic.render(encoder, world, factory, &transform, Some(animation.get_current_frame()), spritesheet, None, Some(asset_texture));
+                basic.render(
+                    encoder,
+                    world,
+                    factory,
+                    &transform,
+                    Some(animation.get_current_frame()),
+                    spritesheet,
+                    None,
+                    Some(asset_texture),
+                );
             }
 
-            if let (Some(color), Some(_)) = (color_storage.get(*entity), rect_storage.get(*entity)) {
-                basic.render(encoder, world, factory, &transform, None, spritesheet, Some(color.0), None);
+            if let (Some(color), Some(_)) = (color_storage.get(*entity), rect_storage.get(*entity))
+            {
+                basic.render(
+                    encoder,
+                    world,
+                    factory,
+                    &transform,
+                    None,
+                    spritesheet,
+                    Some(color.0),
+                    None,
+                );
             }
 
-            if let (Some(color), Some(text)) = (color_storage.get(*entity), text_storage.get_mut(*entity)) {
+            if let (Some(color), Some(text)) =
+                (color_storage.get(*entity), text_storage.get_mut(*entity))
+            {
                 if text.text != "" && text.visible {
                     basic.render_text(encoder, &text, transform, color, glyph_brush);
                 }
@@ -129,26 +168,48 @@ fn render_node<R: gfx::Resources, C: gfx::CommandBuffer<R>, F: gfx::Factory<R>>(
     colors: &ReadStorage<Color>,
     texts: &mut WriteStorage<Text>,
     rects: &ReadStorage<Rect>,
-    ) {
+) {
     if let Some(entity) = node.entity {
         if let Some(transform) = transforms.get(entity) {
             if !transform.visible {
-                return
+                return;
             }
             basic.transform(&transform, false);
         }
         render_entity(
-            basic, encoder, world, factory, spritesheet, asset_texture,
+            basic,
+            encoder,
+            world,
+            factory,
+            spritesheet,
+            asset_texture,
             glyph_brush,
-            &entity, sprites, transforms, animation_sheets, colors, texts, rects
+            &entity,
+            sprites,
+            transforms,
+            animation_sheets,
+            colors,
+            texts,
+            rects,
         );
     }
 
     for node in &node.sub_nodes {
         render_node(
             node,
-            basic, encoder, world, factory, spritesheet, asset_texture,
-            glyph_brush, sprites, transforms, animation_sheets, colors, texts, rects
+            basic,
+            encoder,
+            world,
+            factory,
+            spritesheet,
+            asset_texture,
+            glyph_brush,
+            sprites,
+            transforms,
+            animation_sheets,
+            colors,
+            texts,
+            rects,
         );
     }
 
@@ -172,7 +233,7 @@ fn main() {
 
     let mut world = World::new();
 
-    let target = renderer::WindowTargets{
+    let target = renderer::WindowTargets {
         color: main_color,
         depth: main_depth,
     };
@@ -184,8 +245,9 @@ fn main() {
     let spritesheet: Spritesheet = serde_json::from_str(asset_data.as_ref()).unwrap();
     let asset_texture = loader::gfx_load_texture("resources/assets.png", &mut factory);
 
-    let mut glyph_brush = GlyphBrushBuilder::using_font_bytes(include_bytes!("../resources/MunroSmall.ttf") as &[u8])
-        .build(factory.clone());
+    let mut glyph_brush =
+        GlyphBrushBuilder::using_font_bytes(include_bytes!("../resources/MunroSmall.ttf") as &[u8])
+            .build(factory.clone());
 
     let audio_endpoint = rodio::default_endpoint().unwrap();
     let click_sound_source = loader::create_sound("resources/click.ogg").buffered();
@@ -202,46 +264,58 @@ fn main() {
     let mut running = true;
     let mut frame_start = time::Instant::now();
     while running {
-        events_loop.poll_events(|event| {
-            match event {
-                Event::WindowEvent{ event, .. } => match event {
-                    WindowEvent::CursorMoved{ position: (x, y), .. } => {
-                        let mut input_res = world.write_resource::<Input>();
-                        let input = input_res.deref_mut();
-                        input.mouse_pos.0 = x as f32 / input.hidpi_factor;
-                        input.mouse_pos.1 = y as f32 / input.hidpi_factor;
-                    },
-                    WindowEvent::MouseInput{ button: MouseButton::Left, state, .. } => {
-                        let mut input_res = world.write_resource::<Input>();
-                        let input = input_res.deref_mut();
-                        match state {
-                            ElementState::Pressed => input.mouse_pressed = true,
-                            ElementState::Released => input.mouse_pressed = false,
-                        };
-                    },
-                    WindowEvent::KeyboardInput{ input: glutin::KeyboardInput{ virtual_keycode: Some(VirtualKeyCode::Escape), .. }, .. } | glutin::WindowEvent::Closed => running = false,
-                    WindowEvent::KeyboardInput{ input, .. } => {
-                        let input_event = input;
-                        let mut input_res = world.write_resource::<Input>();
-                        let input = input_res.deref_mut();
-                        if let Some(key) = input_event.virtual_keycode {
-                            if input.pressed_keys.contains_key(&key) {
-                                match input_event.state {
-                                    ElementState::Pressed => input.pressed_keys.insert(key, true),
-                                    ElementState::Released => input.pressed_keys.insert(key, false),
-                                };
-                            }
+        events_loop.poll_events(|event| match event {
+            Event::WindowEvent { event, .. } => match event {
+                WindowEvent::CursorMoved {
+                    position: (x, y), ..
+                } => {
+                    let mut input_res = world.write_resource::<Input>();
+                    let input = input_res.deref_mut();
+                    input.mouse_pos.0 = x as f32 / input.hidpi_factor;
+                    input.mouse_pos.1 = y as f32 / input.hidpi_factor;
+                }
+                WindowEvent::MouseInput {
+                    button: MouseButton::Left,
+                    state,
+                    ..
+                } => {
+                    let mut input_res = world.write_resource::<Input>();
+                    let input = input_res.deref_mut();
+                    match state {
+                        ElementState::Pressed => input.mouse_pressed = true,
+                        ElementState::Released => input.mouse_pressed = false,
+                    };
+                }
+                WindowEvent::KeyboardInput {
+                    input:
+                        glutin::KeyboardInput {
+                            virtual_keycode: Some(VirtualKeyCode::Escape),
+                            ..
+                        },
+                    ..
+                }
+                | glutin::WindowEvent::Closed => running = false,
+                WindowEvent::KeyboardInput { input, .. } => {
+                    let input_event = input;
+                    let mut input_res = world.write_resource::<Input>();
+                    let input = input_res.deref_mut();
+                    if let Some(key) = input_event.virtual_keycode {
+                        if input.pressed_keys.contains_key(&key) {
+                            match input_event.state {
+                                ElementState::Pressed => input.pressed_keys.insert(key, true),
+                                ElementState::Released => input.pressed_keys.insert(key, false),
+                            };
                         }
-                    },
-                    _ => {}
-                },
-                _ => ()
-            }
+                    }
+                }
+                _ => {}
+            },
+            _ => (),
         });
 
         let duration = time::Instant::now() - frame_start;
         if math::get_seconds(&duration) < FRAME_TIME {
-            continue
+            continue;
         }
 
         frame_start = time::Instant::now();
@@ -251,7 +325,10 @@ fn main() {
 
         basic.reset_transform();
 
-        encoder.clear(&target.color, [16.0 / 256.0, 14.0 / 256.0, 22.0 / 256.0, 1.0]);
+        encoder.clear(
+            &target.color,
+            [16.0 / 256.0, 14.0 / 256.0, 22.0 / 256.0, 1.0],
+        );
         encoder.clear_depth(&target.depth, 1.0);
 
         {
@@ -277,10 +354,22 @@ fn main() {
             let scene = scene.lock().unwrap();
 
             for node in &scene.sub_nodes {
-                render_node(node,
-                &mut basic, &mut encoder, &world, &mut factory, &spritesheet, &asset_texture,
-                &mut glyph_brush,
-                &sprites, &mut transforms, &animation_sheets, &colors, &mut texts, &rects);
+                render_node(
+                    node,
+                    &mut basic,
+                    &mut encoder,
+                    &world,
+                    &mut factory,
+                    &spritesheet,
+                    &asset_texture,
+                    &mut glyph_brush,
+                    &sprites,
+                    &mut transforms,
+                    &animation_sheets,
+                    &colors,
+                    &mut texts,
+                    &rects,
+                );
             }
 
             encoder.flush(&mut device);

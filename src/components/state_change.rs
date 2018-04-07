@@ -7,7 +7,7 @@ pub struct StateChange {
 
 impl Clone for StateChange {
     fn clone(&self) -> StateChange {
-        StateChange{
+        StateChange {
             state: self.state.clone(),
             action: self.action.clone(),
         }
@@ -16,7 +16,7 @@ impl Clone for StateChange {
 
 impl StateChange {
     pub fn new() -> StateChange {
-        StateChange{
+        StateChange {
             state: "".to_string(),
             action: "".to_string(),
         }

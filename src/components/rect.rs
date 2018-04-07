@@ -5,7 +5,7 @@ pub struct Rect;
 
 impl Rect {
     pub fn new() -> Rect {
-        Rect{}
+        Rect {}
     }
 }
 

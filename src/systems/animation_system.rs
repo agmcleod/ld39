@@ -1,19 +1,17 @@
-use specs::{WriteStorage, Join, System};
-use components::{AnimationSheet};
+use specs::{Join, System, WriteStorage};
+use components::AnimationSheet;
 use systems::FRAME_TIME;
 
 pub struct AnimationSystem;
 
 impl AnimationSystem {
     pub fn new() -> AnimationSystem {
-        AnimationSystem{}
+        AnimationSystem {}
     }
 }
 
 impl<'a> System<'a> for AnimationSystem {
-    type SystemData = (
-        WriteStorage<'a, AnimationSheet>
-    );
+    type SystemData = (WriteStorage<'a, AnimationSheet>);
 
     fn run(&mut self, data: Self::SystemData) {
         let mut animation_sheet_storage = data;

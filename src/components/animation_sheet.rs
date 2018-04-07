@@ -11,7 +11,7 @@ pub struct AnimationSheet {
 
 impl AnimationSheet {
     pub fn new(frame_length: f32) -> AnimationSheet {
-        AnimationSheet{
+        AnimationSheet {
             animations: HashMap::new(),
             current_animation: String::new(),
             current_index: 0,
@@ -30,7 +30,8 @@ impl AnimationSheet {
 
     pub fn get_current_frame(&self) -> &String {
         self.get_current_animation()
-            .get(self.current_index).unwrap()
+            .get(self.current_index)
+            .unwrap()
     }
 
     pub fn set_current_animation(&mut self, name: String) {

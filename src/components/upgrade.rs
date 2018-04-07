@@ -22,17 +22,17 @@ pub struct Upgrade {
     #[serde(default)]
     pub current_research_progress: f32,
     pub cost: usize,
-    pub status: Status
+    pub status: Status,
 }
 
 impl Upgrade {
     pub fn new(buff: Buff, time_to_research: f32, cost: usize, status: Status) -> Upgrade {
-        Upgrade{
+        Upgrade {
             buff,
             time_to_research,
             current_research_progress: 0.0,
             cost,
-            status
+            status,
         }
     }
 

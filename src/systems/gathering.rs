@@ -1,16 +1,13 @@
 use std::time::Instant;
 use std::ops::DerefMut;
-use specs::{FetchMut, Join, WriteStorage, System};
+use specs::{FetchMut, Join, System, WriteStorage};
 use components::{Gatherer, Resources};
 use utils::math;
 
 pub struct Gathering;
 
 impl<'a> System<'a> for Gathering {
-    type SystemData = (
-        WriteStorage<'a, Gatherer>,
-        FetchMut<'a, Resources>,
-    );
+    type SystemData = (WriteStorage<'a, Gatherer>, FetchMut<'a, Resources>);
 
     fn run(&mut self, data: Self::SystemData) {
         let (mut gatherer_storage, mut resources_storage) = data;
