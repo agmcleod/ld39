@@ -78,7 +78,7 @@ where
             .unwrap();
 
         let sinfo =
-            texture::SamplerInfo::new(texture::FilterMethod::Bilinear, texture::WrapMode::Clamp);
+            texture::SamplerInfo::new(texture::FilterMethod::Scale, texture::WrapMode::Clamp);
 
         Basic {
             pso: pso,
@@ -142,7 +142,13 @@ where
             gfx::handle::ShaderResourceView<R, [f32; 4]>,
             gfx::handle::Sampler<R>,
         ) = if let Some(texture) = texture {
-            (texture.clone(), factory.create_sampler_linear())
+            (
+                texture.clone(),
+                factory.create_sampler(texture::SamplerInfo::new(
+                    texture::FilterMethod::Bilinear,
+                    texture::WrapMode::Clamp,
+                )),
+            )
         } else {
             self.color_texture.clone()
         };
