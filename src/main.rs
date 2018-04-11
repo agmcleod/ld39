@@ -12,6 +12,8 @@ extern crate serde;
 extern crate serde_derive;
 extern crate serde_json;
 extern crate specs;
+extern crate lyon_tessellation;
+extern crate lyon_path;
 
 extern crate rusttype;
 
@@ -30,7 +32,7 @@ use std::ops::DerefMut;
 use std::time;
 use components::{AnimationSheet, BuildCost, Button, Camera, ClickSound, Color, CurrentPower,
                  EntityLookup, Gatherer, HighlightTile, Input, PowerBar, Rect, ResourceCount,
-                 Resources, SelectedTile, Sprite, StateChange, Text, Tile, Transform, Wallet};
+                 Resources, SelectedTile, Shape, Sprite, StateChange, Text, Tile, Transform, Wallet};
 use components::ui::{TechTreeButton, WalletUI};
 use entities::tech_tree;
 use specs::{Entity, ReadStorage, World, WriteStorage};
@@ -74,6 +76,7 @@ fn setup_world(world: &mut World, window: &glutin::Window) {
     world.register::<PowerBar>();
     world.register::<Rect>();
     world.register::<SelectedTile>();
+    world.register::<Shape>();
     world.register::<Sprite>();
     world.register::<TechTreeButton>();
     world.register::<Text>();
@@ -99,6 +102,7 @@ fn render_entity<R: gfx::Resources, C: gfx::CommandBuffer<R>, F: gfx::Factory<R>
     color_storage: &ReadStorage<Color>,
     text_storage: &mut WriteStorage<Text>,
     rect_storage: &ReadStorage<Rect>,
+    shape_storage: &ReadStorage<Shape>,
 ) {
     if let Some(transform) = transform_storage.get_mut(*entity) {
         if transform.visible {
@@ -149,6 +153,15 @@ fn render_entity<R: gfx::Resources, C: gfx::CommandBuffer<R>, F: gfx::Factory<R>
                     basic.render_text(encoder, &text, transform, color, glyph_brush);
                 }
             }
+
+            if let Some(shape) = shape_storage.get(*entity) {
+                basic.render_shape(
+                    encoder,
+                    world,
+                    factory,
+                    &shape
+                );
+            }
         }
     }
 }
@@ -168,6 +181,7 @@ fn render_node<R: gfx::Resources, C: gfx::CommandBuffer<R>, F: gfx::Factory<R>>(
     colors: &ReadStorage<Color>,
     texts: &mut WriteStorage<Text>,
     rects: &ReadStorage<Rect>,
+    shapes: &ReadStorage<Shape>,
 ) {
     if let Some(entity) = node.entity {
         if let Some(transform) = transforms.get(entity) {
@@ -191,6 +205,7 @@ fn render_node<R: gfx::Resources, C: gfx::CommandBuffer<R>, F: gfx::Factory<R>>(
             colors,
             texts,
             rects,
+            shapes,
         );
     }
 
@@ -210,6 +225,7 @@ fn render_node<R: gfx::Resources, C: gfx::CommandBuffer<R>, F: gfx::Factory<R>>(
             colors,
             texts,
             rects,
+            shapes,
         );
     }
 
@@ -338,6 +354,7 @@ fn main() {
             let colors = world.read::<Color>();
             let mut texts = world.write::<Text>();
             let rects = world.read::<Rect>();
+            let shapes = world.read::<Shape>();
 
             let mut click_sound_storage = world.write_resource::<ClickSound>();
             let click_sound: &mut ClickSound = click_sound_storage.deref_mut();
@@ -369,6 +386,7 @@ fn main() {
                     &colors,
                     &mut texts,
                     &rects,
+                    &shapes,
                 );
             }
 

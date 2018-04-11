@@ -2,10 +2,12 @@ pub use components::upgrade::*;
 
 use specs::{Entity, World};
 use renderer;
-use components::{Color, Rect, Transform};
+use components::{Color, Rect, Shape, Transform};
 use components::ui;
 use loader;
 use serde_json::{self, Value};
+use scene::Node;
+use cgmath::{Vector2};
 
 pub struct TechTreeNode {
     pub entity: Entity,
@@ -13,13 +15,15 @@ pub struct TechTreeNode {
 }
 
 pub const SIZE: u16 = 32;
+const Y_INCREMENT: f32 = 64.0;
 
 fn build_entity_nodes(
     world: &mut World,
+    container: &mut Node,
     width: f32,
     node: Value,
     y: f32,
-    y_increment: f32,
+    last_position: Option<Vector2<f32>>,
 ) -> TechTreeNode {
     let x = node["x"].as_f64().unwrap() as f32 * width;
     let description = node["description"].as_str().unwrap().to_string();
@@ -29,25 +33,48 @@ fn build_entity_nodes(
     let entity = world
         .create_entity()
         .with(upgrade)
-        .with(Transform::visible(x, y, 0.0, SIZE, SIZE, 0.0, 1.0, 1.0))
+        .with(Transform::visible(x, y, 1.0, SIZE, SIZE, 0.0, 1.0, 1.0))
         .with(Rect {})
         .with(Color(get_color_from_status(&status)))
         .with(ui::TechTreeButton::new(description, cost))
         .build();
+
+    if let Some(last_position) = last_position {
+        let last_half_x = last_position.x + (SIZE as f32) / 2.0;
+        let last_half_y = last_position.y + (SIZE as f32) / 2.0;
+        let half_x = x + (SIZE as f32) / 2.0;
+        let half_y = y + (SIZE as f32) / 2.0;
+        let points = vec![
+            Vector2::new(last_half_x, last_half_y),
+            Vector2::new(half_x, half_y),
+            Vector2::new(half_x + 2.0, half_y),
+            Vector2::new(last_half_x + 2.0, last_half_y),
+        ];
+        let entity = world
+            .create_entity()
+            .with(Shape::new(points, [0.7, 0.7, 0.7, 1.0]))
+            .with(Transform::visible_identity())
+            .build();
+
+        container.sub_nodes.push(Node::new(Some(entity), None));
+    }
 
     let mut tech_tree_node = TechTreeNode {
         entity,
         sub_nodes: Vec::new(),
     };
 
+    container.sub_nodes.push(Node::new(Some(entity), None));
+
     if let Some(children) = node.get("children") {
         for child in children.as_array().unwrap().iter() {
             tech_tree_node.sub_nodes.push(build_entity_nodes(
                 world,
+                container,
                 width,
                 child.clone(),
-                y + y_increment,
-                y_increment,
+                y + Y_INCREMENT,
+                Some(Vector2{ x, y }),
             ));
         }
     }
@@ -56,10 +83,10 @@ fn build_entity_nodes(
 }
 
 /**
- * This builds out the tech tree from a data stand point. It creates the entities to draw stuff on the screen
+ * This builds out the tech tree from a data source. It creates the entities to draw stuff on the screen
  * It then creates the hierarchy for dependencies, so we know when something becomes researchable upon its parent being researched.
  */
-pub fn build_tech_tree(world: &mut World) -> TechTreeNode {
+pub fn build_tech_tree(world: &mut World, container: &mut Node) -> TechTreeNode {
     let tech_tree_data = loader::read_text_from_file("resources/tech_tree.json").unwrap();
     let tech_tree_data: serde_json::Value = serde_json::from_str(tech_tree_data.as_ref()).unwrap();
 
@@ -69,9 +96,8 @@ pub fn build_tech_tree(world: &mut World) -> TechTreeNode {
 
     let mut node = tech_tree_data;
     let mut y = 32.0;
-    let y_increment = y * 2.0;
 
-    build_entity_nodes(world, width, node, y, y_increment)
+    build_entity_nodes(world, container, width, node, y, None)
 }
 
 pub fn traverse_tree_mut<F>(node: &mut TechTreeNode, cb: &mut F) -> bool

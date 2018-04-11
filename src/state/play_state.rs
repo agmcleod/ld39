@@ -432,7 +432,6 @@ impl<'a> State for PlayState<'a> {
 
         scene.sub_nodes.push(side_bar_container);
 
-        let mut tech_tree_node = tech_tree::build_tech_tree(world);
         let tech_tree_container_entity = world
             .create_entity()
             .with(Transform::new(
@@ -450,15 +449,7 @@ impl<'a> State for PlayState<'a> {
             .with(Color([16.0 / 256.0, 14.0 / 256.0, 22.0 / 256.0, 1.0]))
             .build();
         let mut tech_tree_container = Node::new(Some(tech_tree_container_entity.clone()), None);
-        {
-            let mut add_to_container = |node: &mut tech_tree::TechTreeNode| {
-                tech_tree_container
-                    .sub_nodes
-                    .push(Node::new(Some(node.entity), None));
-                false
-            };
-            tech_tree::traverse_tree_mut(&mut tech_tree_node, &mut add_to_container);
-        }
+        let mut tech_tree_node = tech_tree::build_tech_tree(world, &mut tech_tree_container);
 
         let resume_from_upgrades = world
             .create_entity()

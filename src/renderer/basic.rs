@@ -200,6 +200,45 @@ where
         encoder.draw(&slice, &self.pso, &params);
     }
 
+    pub fn render_shape<C, F>(
+        &mut self,
+        encoder: &mut gfx::Encoder<R, C>,
+        world: &World,
+        factory: &mut F,
+        shape: &components::Shape,
+    ) where
+        R: gfx::Resources,
+        C: gfx::CommandBuffer<R>,
+        F: gfx::Factory<R>,
+    {
+        use std::ops::Deref;
+
+        let camera_res = world.read_resource::<components::Camera>();
+        let camera = camera_res.deref();
+
+        let tx = 0.0;
+        let ty = 0.0;
+        let tx2 = 1.0;
+        let ty2 = 1.0;
+
+        let buffers = &shape.buffers;
+        let (vbuf, slice) = factory.create_vertex_buffer_with_slice(&buffers.vertices[..], &buffers.indices[..]);
+
+        let params = pipe::Data {
+            vbuf: vbuf,
+            projection_cb: factory.create_constant_buffer(1),
+            tex: self.color_texture.clone(),
+            out: self.target.color.clone(),
+            depth: self.target.depth.clone(),
+        };
+
+        self.projection.proj = (*camera).0.into();
+        self.projection.model = self.model.into();
+
+        encoder.update_constant_buffer(&params.projection_cb, &self.projection);
+        encoder.draw(&slice, &self.pso, &params);
+    }
+
     pub fn render_text<C, F>(
         &mut self,
         encoder: &mut gfx::Encoder<R, C>,

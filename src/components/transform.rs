@@ -50,6 +50,10 @@ impl Transform {
         Self::new(x, y, z, w, h, rotation, scale_x, scale_y, true)
     }
 
+    pub fn visible_identity() -> Transform {
+        Transform::visible(0.0, 0.0, 0.0, 0, 0, 0.0, 1.0, 1.0)
+    }
+
     pub fn contains(&self, x: &f32, y: &f32) -> bool {
         let w = self.size.x as f32;
         let h = self.size.y as f32;
