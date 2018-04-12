@@ -15,6 +15,7 @@ pub struct TechTreeNode {
 }
 
 pub const SIZE: u16 = 32;
+const SIZE_F: f32 = SIZE as f32;
 const Y_INCREMENT: f32 = 64.0;
 
 fn build_entity_nodes(
@@ -22,10 +23,10 @@ fn build_entity_nodes(
     container: &mut Node,
     width: f32,
     node: Value,
-    y: f32,
     last_position: Option<Vector2<f32>>,
 ) -> TechTreeNode {
-    let x = node["x"].as_f64().unwrap() as f32 * width;
+    let x = node["x"].as_f64().unwrap() as f32 * width - SIZE_F / 2.0;
+    let y = node["y_tier"].as_u64().unwrap() as f32 * Y_INCREMENT + SIZE_F;
     let description = node["description"].as_str().unwrap().to_string();
     let upgrade: Upgrade = serde_json::from_value(node.clone()).unwrap();
     let cost = upgrade.cost;
@@ -33,17 +34,17 @@ fn build_entity_nodes(
     let entity = world
         .create_entity()
         .with(upgrade)
-        .with(Transform::visible(x, y, 1.0, SIZE, SIZE, 0.0, 1.0, 1.0))
+        .with(Transform::visible(x, y as f32, 1.0, SIZE, SIZE, 0.0, 1.0, 1.0))
         .with(Rect {})
         .with(Color(get_color_from_status(&status)))
         .with(ui::TechTreeButton::new(description, cost))
         .build();
 
     if let Some(last_position) = last_position {
-        let last_half_x = last_position.x + (SIZE as f32) / 2.0;
-        let last_half_y = last_position.y + (SIZE as f32) / 2.0;
-        let half_x = x + (SIZE as f32) / 2.0;
-        let half_y = y + (SIZE as f32) / 2.0;
+        let last_half_x = last_position.x + SIZE_F / 2.0;
+        let last_half_y = last_position.y + SIZE_F / 2.0;
+        let half_x = x + SIZE_F / 2.0;
+        let half_y = y + SIZE_F / 2.0;
         let points = vec![
             Vector2::new(last_half_x, last_half_y),
             Vector2::new(half_x, half_y),
@@ -73,7 +74,6 @@ fn build_entity_nodes(
                 container,
                 width,
                 child.clone(),
-                y + Y_INCREMENT,
                 Some(Vector2{ x, y }),
             ));
         }
@@ -92,12 +92,10 @@ pub fn build_tech_tree(world: &mut World, container: &mut Node) -> TechTreeNode 
 
     let dimensions = renderer::get_dimensions();
     let width = dimensions[0] - 640.0;
-    let center_x = width / 2.0 - (SIZE / 2) as f32;
 
     let mut node = tech_tree_data;
-    let mut y = 32.0;
 
-    build_entity_nodes(world, container, width, node, y, None)
+    build_entity_nodes(world, container, width, node, None)
 }
 
 pub fn traverse_tree_mut<F>(node: &mut TechTreeNode, cb: &mut F) -> bool

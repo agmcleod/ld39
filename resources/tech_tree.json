@@ -4,21 +4,133 @@
   "cost": 0,
   "status": "Researched",
   "x": 0.5,
+  "y_tier": 0,
   "description": "Unlocks ability to mine coal",
   "children": [{
+    "buff": "ResourceTrading",
+    "time_to_research": 20.0,
+    "cost": 15,
+    "status": "Researchable",
+    "x": 0.75,
+    "y_tier": 1,
+    "description": "+5% bonus for neighbouring facilities of same type"
+  }, {
+    "buff": "ConveyerBelts",
+    "time_to_research": 35.0,
+    "cost": 25,
+    "status": "Researchable",
+    "x": 0.20,
+    "y_tier": 1,
+    "description": "+5% coal gain rate, +5% more pollution.",
+    "children": [{
+      "buff": "RoboticLoaders",
+      "time_to_research": 30.0,
+      "cost": 35,
+      "status": "Locked",
+      "x": 0.20,
+      "y_tier": 1,
+      "description": "+5% coal gain rate",
+      "children": [{
+        "buff": "PollutionFilters",
+        "time_to_research": 45.0,
+        "cost": 45,
+        "status": "Locked",
+        "x": 0.1,
+        "y_tier": 2,
+        "description": "+10% pollution reduction"
+      }]
+    }]
+  }, {
     "buff": "Oil",
     "time_to_research": 5.0,
     "cost": 10,
     "status": "Researchable",
     "x": 0.5,
+    "y_tier": 1,
     "description": "Unlocks ability to dig for oil",
     "children": [{
-      "buff": "Solar",
+      "buff": "FudgeTheNumbers",
+      "time_to_research": 45.0,
+      "cost": 50,
+      "status": "Locked",
+      "x": 0.35,
+      "y_tier": 2,
+      "description": "5% pollution reduction"
+    }, {
+      "buff": "AutomatedRefiners",
+      "time_to_research": 50.0,
+      "cost": 70,
+      "status": "Locked",
+      "x": 0.65,
+      "y_tier": 2,
+      "description": "+5% oil gain rate, +5% more pollution."
+    }, {
+      "buff": "Purifier",
+      "time_to_research": 30.0,
+      "cost": 100,
+      "status": "Locked",
+      "x": 0.85,
+      "y_tier": 2,
+      "description": "+5% $ per unit sold"
+    }, {
+      "buff": "Hydro",
       "time_to_research": 30.0,
       "cost": 30,
       "status": "Locked",
-      "x": 0.5,
-      "description": "Unlocks ability to harvest solar power"
+      "x": 0.35,
+      "y_tier": 4,
+      "description": "Unlocks ability to collect hydro power",
+      "children": [{
+        "buff": "SalmonCannon",
+        "time_to_research": 40.0,
+        "cost": 120,
+        "status": "Locked",
+        "x": 0.20,
+        "y_tier": 5,
+        "description": "20% pollution reduction"
+      }, {
+        "buff": "ReinforcedTurbines",
+        "time_to_research": 50.0,
+        "cost": 70,
+        "status": "Locked",
+        "x": 0.35,
+        "y_tier": 5,
+        "description": "5% more energy harvested from the water"
+      }]
+    }, {
+      "buff": "Solar",
+      "time_to_research": 45.0,
+      "cost": 45,
+      "status": "Locked",
+      "x": 0.65,
+      "y_tier": 4,
+      "description": "Unlocks ability to harvest solar power",
+      "children": [{
+        "buff": "PurchaseSolarCellCompany",
+        "time_to_research": 150.0,
+        "cost": 500,
+        "status": "Locked",
+        "x": 0.65,
+        "y_tier": 5,
+        "description": "20% cost reduction to build solar.",
+        "children": [{
+          "buff": "SellPanelsToConsumers",
+          "time_to_research": 350.0,
+          "cost": 1500,
+          "status": "Locked",
+          "x": 0.65,
+          "y_tier": 6,
+          "description": "$10 every minute"
+        }]
+      }, {
+        "buff": "ImprovePanelTech",
+        "time_to_research": 90.0,
+        "cost": 150,
+        "status": "Locked",
+        "x": 0.85,
+        "y_tier": 5,
+        "description": "5% more energy harvested from the water"
+      }]
     }]
   }]
 }

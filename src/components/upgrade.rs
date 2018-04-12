@@ -13,6 +13,19 @@ pub enum Buff {
     Coal,
     Oil,
     Solar,
+    ResourceTrading,
+    ConveyerBelts,
+    RoboticLoaders,
+    PollutionFilters,
+    FudgeTheNumbers,
+    AutomatedRefiners,
+    Purifier,
+    Hydro,
+    SalmonCannon,
+    ReinforcedTurbines,
+    PurchaseSolarCellCompany,
+    ImprovePanelTech,
+    SellPanelsToConsumers,
 }
 
 #[derive(Serialize, Deserialize)]
