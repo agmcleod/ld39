@@ -105,7 +105,7 @@ where
         transform: &components::Transform,
         frame_name: Option<&String>,
         spritesheet: &Spritesheet,
-        color: Option<[f32; 4]>,
+        color: Option<&components::Color>,
         texture: Option<&gfx::handle::ShaderResourceView<R, [f32; 4]>>,
     ) where
         R: gfx::Resources,
@@ -154,7 +154,7 @@ where
         };
 
         let color = if let Some(color) = color {
-            color
+            color.0
         } else {
             [1.0; 4]
         };

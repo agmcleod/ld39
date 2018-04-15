@@ -114,7 +114,7 @@ fn render_entity<R: gfx::Resources, C: gfx::CommandBuffer<R>, F: gfx::Factory<R>
                     &transform,
                     Some(&sprite.frame_name),
                     spritesheet,
-                    None,
+                    color_storage.get(*entity),
                     Some(asset_texture),
                 );
             }
@@ -127,7 +127,7 @@ fn render_entity<R: gfx::Resources, C: gfx::CommandBuffer<R>, F: gfx::Factory<R>
                     &transform,
                     Some(animation.get_current_frame()),
                     spritesheet,
-                    None,
+                    color_storage.get(*entity),
                     Some(asset_texture),
                 );
             }
@@ -141,7 +141,7 @@ fn render_entity<R: gfx::Resources, C: gfx::CommandBuffer<R>, F: gfx::Factory<R>
                     &transform,
                     None,
                     spritesheet,
-                    Some(color.0),
+                    Some(color),
                     None,
                 );
             }

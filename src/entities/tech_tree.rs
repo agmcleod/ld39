@@ -2,7 +2,7 @@ pub use components::upgrade::*;
 
 use specs::{Entity, World};
 use renderer;
-use components::{Color, Rect, Shape, Transform};
+use components::{Color, Rect, Shape, Sprite, Transform};
 use components::ui;
 use loader;
 use serde_json::{self, Value};
@@ -35,8 +35,8 @@ fn build_entity_nodes(
         .create_entity()
         .with(upgrade)
         .with(Transform::visible(x, y as f32, 1.0, SIZE, SIZE, 0.0, 1.0, 1.0))
-        .with(Rect {})
         .with(Color(get_color_from_status(&status)))
+        .with(Sprite{ frame_name: format!("techtree/{}", node["frame_name"].as_str().unwrap()) })
         .with(ui::TechTreeButton::new(description, cost))
         .build();
 
