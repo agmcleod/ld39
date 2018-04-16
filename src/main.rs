@@ -6,14 +6,14 @@ extern crate gfx_glyph;
 extern crate gfx_window_glutin;
 extern crate glutin;
 extern crate image;
+extern crate lyon_path;
+extern crate lyon_tessellation;
 extern crate rodio;
 extern crate serde;
 #[macro_use]
 extern crate serde_derive;
 extern crate serde_json;
 extern crate specs;
-extern crate lyon_tessellation;
-extern crate lyon_path;
 
 extern crate rusttype;
 
@@ -31,8 +31,9 @@ mod utils;
 use std::ops::DerefMut;
 use std::time;
 use components::{AnimationSheet, BuildCost, Button, Camera, ClickSound, Color, CurrentPower,
-                 EntityLookup, Gatherer, HighlightTile, Input, PowerBar, Rect, ResourceCount,
-                 Resources, SelectedTile, Shape, Sprite, StateChange, Text, Tile, Transform, Wallet};
+                 EntityLookup, Gatherer, HighlightTile, Input, PowerBar, Rect,
+                 ResourceCount, Resources, SelectedTile, Shape, Sprite, StateChange, Text, Tile,
+                 Transform, Wallet, upgrade::{LearnProgress, Upgrade}};
 use components::ui::{TechTreeButton, WalletUI};
 use entities::tech_tree;
 use specs::{Entity, ReadStorage, World, WriteStorage};
@@ -70,11 +71,12 @@ fn setup_world(world: &mut World, window: &glutin::Window) {
     world.register::<Button>();
     world.register::<CurrentPower>();
     world.register::<Color>();
-    world.register::<ResourceCount>();
     world.register::<Gatherer>();
     world.register::<HighlightTile>();
+    world.register::<LearnProgress>();
     world.register::<PowerBar>();
     world.register::<Rect>();
+    world.register::<ResourceCount>();
     world.register::<SelectedTile>();
     world.register::<Shape>();
     world.register::<Sprite>();
@@ -82,9 +84,8 @@ fn setup_world(world: &mut World, window: &glutin::Window) {
     world.register::<Text>();
     world.register::<Tile>();
     world.register::<Transform>();
+    world.register::<Upgrade>();
     world.register::<WalletUI>();
-
-    world.register::<tech_tree::Upgrade>();
 }
 
 fn render_entity<R: gfx::Resources, C: gfx::CommandBuffer<R>, F: gfx::Factory<R>>(
@@ -155,12 +156,7 @@ fn render_entity<R: gfx::Resources, C: gfx::CommandBuffer<R>, F: gfx::Factory<R>
             }
 
             if let Some(shape) = shape_storage.get(*entity) {
-                basic.render_shape(
-                    encoder,
-                    world,
-                    factory,
-                    &shape
-                );
+                basic.render_shape(encoder, world, factory, &shape);
             }
         }
     }

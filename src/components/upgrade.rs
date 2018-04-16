@@ -1,4 +1,4 @@
-use specs::{Component, VecStorage};
+use specs::{Component, HashMapStorage, VecStorage};
 
 #[derive(Copy, Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub enum Status {
@@ -8,7 +8,7 @@ pub enum Status {
     Researched,
 }
 
-#[derive(Copy, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub enum Buff {
     Coal,
     Oil,
@@ -39,16 +39,6 @@ pub struct Upgrade {
 }
 
 impl Upgrade {
-    pub fn new(buff: Buff, time_to_research: f32, cost: usize, status: Status) -> Upgrade {
-        Upgrade {
-            buff,
-            time_to_research,
-            current_research_progress: 0.0,
-            cost,
-            status,
-        }
-    }
-
     pub fn start_learning(&mut self) {
         self.status = Status::Learning;
     }
@@ -63,4 +53,12 @@ pub fn get_color_from_status(status: &Status) -> [f32; 4] {
         Status::Researchable => [1.0, 1.0, 1.0, 1.0],
         _ => [0.3, 0.3, 0.3, 1.0],
     }
+}
+
+pub struct LearnProgress {
+    pub buff: Buff,
+}
+
+impl Component for LearnProgress {
+    type Storage = HashMapStorage<Self>;
 }

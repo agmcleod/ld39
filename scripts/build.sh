@@ -1,2 +1,2 @@
 cargo build
-cp -r resources target/debug/
+./scripts/copy_resources.sh

@@ -6,8 +6,8 @@ use state::State;
 use std::ops::DerefMut;
 
 use components::{Button, Color, CurrentPower, EntityLookup, PowerBar, Rect, ResearchedBuffs,
-                 ResourceCount, ResourceType, Resources, SelectedTile, Sprite, Text, Tile,
-                 Transform, Wallet};
+                 ResearchingCount, ResourceCount, ResourceType, Resources, SelectedTile, Sprite,
+                 Text, Tile, Transform, Wallet};
 use components::ui::WalletUI;
 use systems;
 use renderer;
@@ -67,7 +67,7 @@ impl<'a> PlayState<'a> {
                 "toggle_tech_tree",
                 &["button_hover"],
             )
-            .add(systems::Research {}, "research", &[])
+            .add(systems::Research::new(scene.clone()), "research", &[])
             .build();
 
         let tech_tree_dispatcher = DispatcherBuilder::new()
@@ -449,7 +449,7 @@ impl<'a> State for PlayState<'a> {
             .with(Color([16.0 / 256.0, 14.0 / 256.0, 22.0 / 256.0, 1.0]))
             .build();
         let mut tech_tree_container = Node::new(Some(tech_tree_container_entity.clone()), None);
-        let mut tech_tree_node = tech_tree::build_tech_tree(world, &mut tech_tree_container);
+        let tech_tree_node = tech_tree::build_tech_tree(world, &mut tech_tree_container);
 
         let resume_from_upgrades = world
             .create_entity()
@@ -465,6 +465,7 @@ impl<'a> State for PlayState<'a> {
 
         world.add_resource::<tech_tree::TechTreeNode>(tech_tree_node);
         world.add_resource::<ResearchedBuffs>(ResearchedBuffs(HashSet::new()));
+        world.add_resource::<ResearchingCount>(ResearchingCount { count: 0 });
 
         let mut lookup = world.write_resource::<EntityLookup>();
 

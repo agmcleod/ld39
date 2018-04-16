@@ -1,20 +1,8 @@
 use specs::{Component, VecStorage};
 use cgmath::Vector2;
-use lyon_path::{
-    default::Path,
-    builder::FlatPathBuilder,
-    math::point as lyon_point,
-};
-use lyon_tessellation::{
-    FillOptions,
-    FillTessellator,
-    FillVertex,
-    geometry_builder::{
-        VertexBuffers,
-        BuffersBuilder,
-        VertexConstructor,
-    },
-};
+use lyon_path::{builder::FlatPathBuilder, default::Path, math::point as lyon_point};
+use lyon_tessellation::{FillOptions, FillTessellator, FillVertex,
+                        geometry_builder::{BuffersBuilder, VertexBuffers, VertexConstructor}};
 use renderer::Vertex;
 
 pub struct Shape {
@@ -23,7 +11,7 @@ pub struct Shape {
 
 impl Shape {
     pub fn new(points: Vec<Vector2<f32>>, color: [f32; 4]) -> Self {
-        Shape{
+        Shape {
             buffers: Self::build_buffers(points, color),
         }
     }
@@ -48,30 +36,31 @@ impl Shape {
         let mut tessellator = FillTessellator::new();
 
         // Compute the tessellation.
-        tessellator.tessellate_path(
-            path.path_iter(),
-            &FillOptions::default(),
-            &mut BuffersBuilder::new(&mut buffers, VertexCtor{ color })
-        ).unwrap();
+        tessellator
+            .tessellate_path(
+                path.path_iter(),
+                &FillOptions::default(),
+                &mut BuffersBuilder::new(&mut buffers, VertexCtor { color }),
+            )
+            .unwrap();
 
         buffers
     }
 }
 
-struct VertexCtor{
+struct VertexCtor {
     pub color: [f32; 4],
 }
 
 impl VertexConstructor<FillVertex, Vertex> for VertexCtor {
     fn new_vertex(&mut self, vertex: FillVertex) -> Vertex {
-        Vertex{
+        Vertex {
             pos: [vertex.position.x, vertex.position.y, 0.0],
             uv: [0.0, 0.0],
             color: self.color.clone(),
         }
     }
 }
-
 
 impl Component for Shape {
     type Storage = VecStorage<Self>;

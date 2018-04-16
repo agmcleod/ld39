@@ -216,13 +216,9 @@ where
         let camera_res = world.read_resource::<components::Camera>();
         let camera = camera_res.deref();
 
-        let tx = 0.0;
-        let ty = 0.0;
-        let tx2 = 1.0;
-        let ty2 = 1.0;
-
         let buffers = &shape.buffers;
-        let (vbuf, slice) = factory.create_vertex_buffer_with_slice(&buffers.vertices[..], &buffers.indices[..]);
+        let (vbuf, slice) =
+            factory.create_vertex_buffer_with_slice(&buffers.vertices[..], &buffers.indices[..]);
 
         let params = pipe::Data {
             vbuf: vbuf,

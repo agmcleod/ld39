@@ -70,12 +70,6 @@ impl Transform {
         self.dirty_pos = true;
     }
 
-    pub fn set_pos3(&mut self, x: f32, y: f32, z: f32) {
-        self.set_pos2(x, y);
-        self.pos.z = z;
-        self.dirty_pos = true;
-    }
-
     pub fn get_absolute_pos(&self) -> &Vector3<f32> {
         &self.absolute_pos
     }

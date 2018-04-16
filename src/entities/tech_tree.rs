@@ -2,12 +2,12 @@ pub use components::upgrade::*;
 
 use specs::{Entity, World};
 use renderer;
-use components::{Color, Rect, Shape, Sprite, Transform};
+use components::{Color, Shape, Sprite, Transform};
 use components::ui;
 use loader;
 use serde_json::{self, Value};
 use scene::Node;
-use cgmath::{Vector2};
+use cgmath::Vector2;
 
 pub struct TechTreeNode {
     pub entity: Entity,
@@ -34,9 +34,20 @@ fn build_entity_nodes(
     let entity = world
         .create_entity()
         .with(upgrade)
-        .with(Transform::visible(x, y as f32, 1.0, SIZE, SIZE, 0.0, 1.0, 1.0))
+        .with(Transform::visible(
+            x,
+            y as f32,
+            1.0,
+            SIZE,
+            SIZE,
+            0.0,
+            1.0,
+            1.0,
+        ))
         .with(Color(get_color_from_status(&status)))
-        .with(Sprite{ frame_name: format!("techtree/{}", node["frame_name"].as_str().unwrap()) })
+        .with(Sprite {
+            frame_name: format!("techtree/{}", node["frame_name"].as_str().unwrap()),
+        })
         .with(ui::TechTreeButton::new(description, cost))
         .build();
 
@@ -74,7 +85,7 @@ fn build_entity_nodes(
                 container,
                 width,
                 child.clone(),
-                Some(Vector2{ x, y }),
+                Some(Vector2 { x, y }),
             ));
         }
     }
@@ -93,7 +104,7 @@ pub fn build_tech_tree(world: &mut World, container: &mut Node) -> TechTreeNode 
     let dimensions = renderer::get_dimensions();
     let width = dimensions[0] - 640.0;
 
-    let mut node = tech_tree_data;
+    let node = tech_tree_data;
 
     build_entity_nodes(world, container, width, node, None)
 }
