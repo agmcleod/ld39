@@ -46,9 +46,9 @@ impl TechTree {
         transform_storage.insert(
             sprite_entity,
             Transform::visible(
-                20.0 + 64.0 * researching_count as f32,
-                510.0,
-                1.0,
+                0.0,
+                -36.0,
+                0.0,
                 32,
                 32,
                 0.0,
@@ -56,9 +56,6 @@ impl TechTree {
                 1.0,
             ),
         );
-        sidebar_node
-            .sub_nodes
-            .push(Node::new(Some(sprite_entity), None));
 
         let progress_entity = entities.create();
         transform_storage.insert(
@@ -66,7 +63,7 @@ impl TechTree {
             Transform::visible(
                 20.0 + 64.0 * researching_count as f32,
                 546.0,
-                1.0,
+                0.0,
                 0,
                 10,
                 0.0,
@@ -77,9 +74,10 @@ impl TechTree {
         color_storage.insert(progress_entity, Color([0.0, 1.0, 0.0, 1.0]));
         rect_storage.insert(progress_entity, Rect {});
         learn_progress_storage.insert(progress_entity, LearnProgress { buff });
+
         sidebar_node
             .sub_nodes
-            .push(Node::new(Some(progress_entity), None));
+            .push(Node::new(Some(progress_entity), Some(vec![Node::new(Some(sprite_entity), None)])));
     }
 }
 
@@ -258,7 +256,7 @@ impl<'a> System<'a> for TechTree {
             }
         } else {
             if let Some(current_tooltip) = self.current_tooltip {
-                scene.remove_node_with_entity(current_tooltip);
+                scene.remove_node_with_entity(&entities, current_tooltip);
                 self.current_tooltip = None;
                 self.current_tech_tree_node_entity = None;
             }

@@ -60,12 +60,11 @@ impl<'a> System<'a> for Research {
                     upgrade_entities_researched.push(entity);
                     *color = Color(get_color_from_status(&upgrade.status));
                     researching_count.count -= 1;
-                } else {
-                    researching_entities.insert(
-                        upgrade.buff,
-                        (upgrade.current_research_progress, upgrade.time_to_research),
-                    );
                 }
+                researching_entities.insert(
+                    upgrade.buff,
+                    (upgrade.current_research_progress, upgrade.time_to_research),
+                );
             }
         }
 
@@ -75,7 +74,7 @@ impl<'a> System<'a> for Research {
                 if progress_time.0 / progress_time.1 >= 1.0 {
                     let mut scene = self.scene.lock().unwrap();
                     entities.delete(entity);
-                    scene.remove_node_with_entity(entity);
+                    scene.remove_node_with_entity(&entities, entity);
                 }
             }
         }

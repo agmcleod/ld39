@@ -112,9 +112,8 @@ impl ToggleTechTree {
                 let state_change: &mut StateChange = state_change_res.deref_mut();
                 state_change.set(PlayState::get_name(), "tech_tree_resume".to_string());
                 let overlay_entity = *lookup.get(&"pause_black".to_string()).unwrap();
-                entities.delete(overlay_entity);
                 let mut scene = self.scene.lock().unwrap();
-                scene.remove_node_with_entity(overlay_entity);
+                scene.remove_node_with_entity(entities, overlay_entity);
                 lookup.entities.remove(&"pause_black".to_string());
                 was_clicked = true;
             }
