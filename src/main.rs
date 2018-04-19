@@ -14,6 +14,9 @@ extern crate serde;
 extern crate serde_derive;
 extern crate serde_json;
 extern crate specs;
+extern crate rand;
+#[macro_use]
+extern crate rand_derive;
 
 extern crate rusttype;
 

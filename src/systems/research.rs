@@ -47,7 +47,7 @@ impl<'a> System<'a> for Research {
         ) = data;
 
         let mut upgrade_entities_researched = Vec::with_capacity(3);
-        let mut researching_count = researching_count_storage.deref_mut();
+        let researching_count = researching_count_storage.deref_mut();
         let mut researching_entities = HashMap::new();
         for (entity, color, upgrade) in
             (&*entities, &mut color_storage, &mut upgrade_storage).join()

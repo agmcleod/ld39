@@ -19,4 +19,5 @@ rusttype = "~0.5.0"
 gfx_glyph = "0.10.1"
 lyon_tessellation = "0.10.0"
 lyon_path = "0.10.0"
-
+rand = "~0.4.0"
+rand_derive = "~0.3.0"

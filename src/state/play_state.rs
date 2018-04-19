@@ -7,12 +7,14 @@ use std::ops::DerefMut;
 
 use components::{Button, Color, CurrentPower, EntityLookup, PowerBar, Rect, ResearchedBuffs,
                  ResearchingCount, ResourceCount, ResourceType, Resources, SelectedTile, Sprite,
-                 Text, Tile, Transform, Wallet};
+                 Text, Tile, TileType, Transform, Wallet};
 use components::ui::WalletUI;
 use systems;
 use renderer;
 use entities::{create_text, tech_tree};
 use storage_types::*;
+use rand;
+use rand::Rng;
 
 enum InternalState {
     Game,
@@ -118,12 +120,17 @@ impl<'a> State for PlayState<'a> {
         scene.clear();
 
         let mut tile_nodes: Vec<Node> = Vec::with_capacity(100);
+        let mut rng = rand::thread_rng();
         for row in 0..10 {
             for col in 0..10 {
                 let col = col as f32;
                 let row = row as f32;
                 let size = Tile::get_size();
-                let tile = world
+                let tile_type: TileType = rng.gen();
+                let tile = Tile::new(tile_type);
+                let sprite_frames = Tile::get_sprite_frames(&tile.tile_type);
+                let frame_one = sprite_frames[0].clone();
+                let tile_entity = world
                     .create_entity()
                     .with(Transform::visible(
                         size * col,
@@ -136,16 +143,16 @@ impl<'a> State for PlayState<'a> {
                         1.0,
                     ))
                     .with(Button::new(
-                        "tiles".to_string(),
-                        ["tiles.png".to_string(), "tiles_highlight.png".to_string()],
+                        frame_one.clone(),
+                        sprite_frames,
                     ))
                     .with(Sprite {
-                        frame_name: "tiles.png".to_string(),
+                        frame_name: frame_one,
                     })
-                    .with(Tile {})
+                    .with(tile)
                     .build();
 
-                tile_nodes.push(Node::new(Some(tile), None));
+                tile_nodes.push(Node::new(Some(tile_entity), None));
             }
         }
 
