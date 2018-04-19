@@ -1,6 +1,6 @@
 use specs::{Component, VecStorage};
 
-#[derive(Rand)]
+#[derive(Rand, PartialEq)]
 pub enum TileType {
     Open,
     EcoSystem,

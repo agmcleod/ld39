@@ -142,15 +142,20 @@ impl<'a> State for PlayState<'a> {
                         1.0,
                         1.0,
                     ))
-                    .with(Button::new(
-                        frame_one.clone(),
+                    .with(Sprite {
+                        frame_name: frame_one.clone(),
+                    });
+
+                let tile_entity = if tile.tile_type == TileType::Open {
+                    tile_entity.with(Button::new(
+                        frame_one,
                         sprite_frames,
                     ))
-                    .with(Sprite {
-                        frame_name: frame_one,
-                    })
-                    .with(tile)
-                    .build();
+                } else {
+                    tile_entity
+                };
+
+                let tile_entity = tile_entity.with(tile).build();
 
                 tile_nodes.push(Node::new(Some(tile_entity), None));
             }
