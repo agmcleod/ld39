@@ -1,11 +1,11 @@
 use std::sync::{Arc, Mutex};
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 use specs::{Dispatcher, DispatcherBuilder, World};
 use scene::Node;
 use state::State;
 use std::ops::DerefMut;
 
-use components::{Button, Color, CurrentPower, EntityLookup, PowerBar, Rect, ResearchedBuffs,
+use components::{Button, Color, CurrentPower, EntityLookup, PowerBar, ProtectedNodes, Rect, ResearchedBuffs,
                  ResearchingCount, ResourceCount, ResourceType, Resources, SelectedTile, Sprite,
                  Text, Tile, TileType, Transform, Wallet};
 use components::ui::WalletUI;
@@ -13,8 +13,7 @@ use systems;
 use renderer;
 use entities::{create_text, tech_tree};
 use storage_types::*;
-use rand;
-use rand::Rng;
+use rand::{thread_rng, Rng};
 
 enum InternalState {
     Game,
@@ -120,13 +119,104 @@ impl<'a> State for PlayState<'a> {
         scene.clear();
 
         let mut tile_nodes: Vec<Node> = Vec::with_capacity(100);
-        let mut rng = rand::thread_rng();
+        let mut rng = thread_rng();
+
+        let mut set_nodes = HashMap::new();
+        for _ in 0..3 {
+            let mut x = 0;
+            let mut y = 0;
+            loop {
+                x = rng.gen_range(1, 9);
+                y = rng.gen_range(1, 9);
+
+                let mut all_nodes_free = true;
+
+                'check_nodes: for i in 0..3 {
+                    for j in 0..3 {
+                        if set_nodes.contains_key(&(x + i, y + j)) {
+                            all_nodes_free = false;
+                            break 'check_nodes
+                        }
+                    }
+                }
+
+                if all_nodes_free {
+                    break
+                }
+            }
+
+            let weight: u32 = rng.gen_range(0, 101);
+            let mut highest = 1;
+            let tile_type = if weight >= 90 {
+                highest = 4;
+                TileType::City
+            } else if weight >= 75 {
+                highest = 3;
+                TileType::River
+            } else {
+                highest = 2;
+                TileType::EcoSystem
+            };
+
+            set_nodes.insert((x, y), tile_type);
+
+            let center_x = x;
+            let center_y = y;
+
+            x -= 1;
+            y -= 1;
+
+            for i in 0..3 {
+                for j in 0..3 {
+                    if x + i == center_x && y + j == center_y {
+                        continue
+                    }
+                    let tile_type = if highest == 4 {
+                        let weight: u32 = rng.gen_range(0, 101);
+                        if weight >= 90 {
+                            TileType::City
+                        } else if weight >= 75 {
+                            TileType::River
+                        } else if weight >= 55 {
+                            TileType::EcoSystem
+                        } else {
+                            TileType::Open
+                        }
+                    } else if highest == 3 {
+                        let weight: u32 = rng.gen_range(0, 101);
+                        if weight >= 75 {
+                            TileType::River
+                        } else if weight >= 50 {
+                            TileType::EcoSystem
+                        } else {
+                            TileType::Open
+                        }
+                    } else if highest == 2 {
+                        let weight: u32 = rng.gen_range(0, 101);
+                        if weight >= 60 {
+                            TileType::EcoSystem
+                        } else {
+                            TileType::Open
+                        }
+                    } else {
+                        TileType::Open
+                    };
+
+                    set_nodes.insert((x + i, y + j), tile_type);
+                }
+            }
+        }
+
         for row in 0..10 {
             for col in 0..10 {
+                let size = Tile::get_size();
+                let tile_type = if let Some(tile_type) = set_nodes.get(&(row, col)) {
+                    (*tile_type).clone()
+                } else {
+                    TileType::Open
+                };
                 let col = col as f32;
                 let row = row as f32;
-                let size = Tile::get_size();
-                let tile_type: TileType = rng.gen();
                 let tile = Tile::new(tile_type);
                 let sprite_frames = Tile::get_sprite_frames(&tile.tile_type);
                 let frame_one = sprite_frames[0].clone();
@@ -160,6 +250,8 @@ impl<'a> State for PlayState<'a> {
                 tile_nodes.push(Node::new(Some(tile_entity), None));
             }
         }
+
+        world.add_resource(ProtectedNodes{ nodes: set_nodes });
 
         {
             let mut resources_storage = world.write_resource::<Resources>();
