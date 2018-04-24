@@ -14,9 +14,7 @@ pub struct Tile {
 
 impl Tile {
     pub fn new(tile_type: TileType) -> Tile {
-        Tile{
-            tile_type,
-        }
+        Tile { tile_type }
     }
 
     pub fn get_sprite_frames(tile_type: &TileType) -> [String; 2] {

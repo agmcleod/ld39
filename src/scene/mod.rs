@@ -1,4 +1,4 @@
-use specs::{Entity, Entities, WriteStorage};
+use specs::{Entities, Entity, WriteStorage};
 use cgmath::Vector3;
 use components::Transform;
 
@@ -22,7 +22,12 @@ fn get_node_for_entity(nodes: &mut Vec<Node>, target_entity: Entity) -> Option<&
     None
 }
 
-fn remove_from_sub_nodes(nodes: &mut Vec<Node>, entities: &Entities, target_entity: Entity, delete_all_entities_found: bool) -> bool {
+fn remove_from_sub_nodes(
+    nodes: &mut Vec<Node>,
+    entities: &Entities,
+    target_entity: Entity,
+    delete_all_entities_found: bool,
+) -> bool {
     let to_remove = nodes.iter().position(|node| {
         if let Some(entity) = node.entity {
             if delete_all_entities_found {
@@ -40,13 +45,24 @@ fn remove_from_sub_nodes(nodes: &mut Vec<Node>, entities: &Entities, target_enti
         // since we found the node, we need to remove all sub node's entities.
         // we keep the target the same, so no other node is found to be the same one.
         // no entity should be in the scene graph more than once
-        remove_from_sub_nodes(&mut nodes[to_remove].sub_nodes, entities, target_entity, true);
+        remove_from_sub_nodes(
+            &mut nodes[to_remove].sub_nodes,
+            entities,
+            target_entity,
+            true,
+        );
         nodes.remove(to_remove);
         return true;
     }
 
     for node in nodes.iter_mut() {
-        if node.sub_nodes.len() > 0 && remove_from_sub_nodes(&mut node.sub_nodes, entities, target_entity, delete_all_entities_found) {
+        if node.sub_nodes.len() > 0
+            && remove_from_sub_nodes(
+                &mut node.sub_nodes,
+                entities,
+                target_entity,
+                delete_all_entities_found,
+            ) {
             return true;
         }
     }

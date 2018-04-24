@@ -1,7 +1,7 @@
-const START_AMOUNT: usize = 20;
+const START_AMOUNT: i32 = 20;
 
 pub struct Wallet {
-    pub money: usize,
+    pub money: i32,
 }
 
 impl Wallet {
@@ -11,11 +11,11 @@ impl Wallet {
         }
     }
 
-    pub fn start_amount() -> usize {
+    pub fn start_amount() -> i32 {
         START_AMOUNT
     }
 
-    pub fn add_money(&mut self, amount: usize) {
+    pub fn add_money(&mut self, amount: i32) {
         self.money += amount;
     }
 
@@ -23,7 +23,7 @@ impl Wallet {
         self.money = START_AMOUNT;
     }
 
-    pub fn spend(&mut self, amount: usize) -> bool {
+    pub fn spend(&mut self, amount: i32) -> bool {
         if amount > self.money {
             false
         } else {

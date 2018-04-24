@@ -3,11 +3,11 @@ use specs::{Component, HashMapStorage};
 #[derive(Default)]
 pub struct TechTreeButton {
     pub text: String,
-    pub cost: usize,
+    pub cost: i32,
 }
 
 impl TechTreeButton {
-    pub fn new(text: String, cost: usize) -> TechTreeButton {
+    pub fn new(text: String, cost: i32) -> TechTreeButton {
         TechTreeButton { text, cost }
     }
 }

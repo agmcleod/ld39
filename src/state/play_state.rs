@@ -5,9 +5,9 @@ use scene::Node;
 use state::State;
 use std::ops::DerefMut;
 
-use components::{Button, Color, CurrentPower, EntityLookup, PowerBar, ProtectedNodes, Rect, ResearchedBuffs,
-                 ResearchingCount, ResourceCount, ResourceType, Resources, SelectedTile, Sprite,
-                 Text, Tile, TileType, Transform, Wallet};
+use components::{Button, Color, CurrentPower, EntityLookup, PowerBar, ProtectedNodes, Rect,
+                 ResearchedBuffs, ResearchingCount, ResourceCount, ResourceType, Resources,
+                 SelectedTile, Sprite, Text, Tile, TileType, Transform, Wallet};
 use components::ui::WalletUI;
 use systems;
 use renderer;
@@ -69,6 +69,7 @@ impl<'a> PlayState<'a> {
                 &["button_hover"],
             )
             .add(systems::Research::new(scene.clone()), "research", &[])
+            .add(systems::Pollution::new(), "pollution", &[])
             .build();
 
         let tech_tree_dispatcher = DispatcherBuilder::new()
@@ -135,13 +136,13 @@ impl<'a> State for PlayState<'a> {
                     for j in 0..3 {
                         if set_nodes.contains_key(&(x + i, y + j)) {
                             all_nodes_free = false;
-                            break 'check_nodes
+                            break 'check_nodes;
                         }
                     }
                 }
 
                 if all_nodes_free {
-                    break
+                    break;
                 }
             }
 
@@ -169,7 +170,7 @@ impl<'a> State for PlayState<'a> {
             for i in 0..3 {
                 for j in 0..3 {
                     if x + i == center_x && y + j == center_y {
-                        continue
+                        continue;
                     }
                     let tile_type = if highest == 4 {
                         let weight: u32 = rng.gen_range(0, 101);
@@ -237,10 +238,7 @@ impl<'a> State for PlayState<'a> {
                     });
 
                 let tile_entity = if tile.tile_type == TileType::Open {
-                    tile_entity.with(Button::new(
-                        frame_one,
-                        sprite_frames,
-                    ))
+                    tile_entity.with(Button::new(frame_one, sprite_frames))
                 } else {
                     tile_entity
                 };
@@ -251,7 +249,7 @@ impl<'a> State for PlayState<'a> {
             }
         }
 
-        world.add_resource(ProtectedNodes{ nodes: set_nodes });
+        world.add_resource(ProtectedNodes { nodes: set_nodes });
 
         {
             let mut resources_storage = world.write_resource::<Resources>();
@@ -354,7 +352,7 @@ impl<'a> State for PlayState<'a> {
         let entity = world
             .create_entity()
             .with(ResourceCount {
-                resource_type: ResourceType::Clean,
+                resource_type: ResourceType::Solar,
             })
             .with(Transform::visible(30.0, 188.0, 0.0, 32, 32, 0.0, 1.0, 1.0))
             .with(Sprite {
@@ -509,7 +507,7 @@ impl<'a> State for PlayState<'a> {
             resource_count_storage.insert(
                 entity.clone(),
                 ResourceCount {
-                    resource_type: ResourceType::Clean,
+                    resource_type: ResourceType::Solar,
                 },
             );
             side_bar_container

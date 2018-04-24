@@ -34,7 +34,7 @@ pub struct Upgrade {
     pub time_to_research: f32,
     #[serde(default)]
     pub current_research_progress: f32,
-    pub cost: usize,
+    pub cost: i32,
     pub status: Status,
 }
 

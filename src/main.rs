@@ -8,15 +8,15 @@ extern crate glutin;
 extern crate image;
 extern crate lyon_path;
 extern crate lyon_tessellation;
+extern crate rand;
+#[macro_use]
+extern crate rand_derive;
 extern crate rodio;
 extern crate serde;
 #[macro_use]
 extern crate serde_derive;
 extern crate serde_json;
 extern crate specs;
-extern crate rand;
-#[macro_use]
-extern crate rand_derive;
 
 extern crate rusttype;
 
@@ -34,9 +34,9 @@ mod utils;
 use std::ops::DerefMut;
 use std::time;
 use components::{AnimationSheet, BuildCost, Button, Camera, ClickSound, Color, CurrentPower,
-                 EntityLookup, Gatherer, HighlightTile, Input, PowerBar, Rect,
-                 ResourceCount, Resources, SelectedTile, Shape, Sprite, StateChange, Text, Tile,
-                 Transform, Wallet, upgrade::{LearnProgress, Upgrade}};
+                 EntityLookup, Gatherer, HighlightTile, Input, PowerBar, Rect, ResourceCount,
+                 Resources, SelectedTile, Shape, Sprite, StateChange, Text, Tile, Transform,
+                 Wallet, upgrade::{LearnProgress, Upgrade}};
 use components::ui::{TechTreeButton, WalletUI};
 use specs::{Entity, ReadStorage, World, WriteStorage};
 use renderer::{ColorFormat, DepthFormat};

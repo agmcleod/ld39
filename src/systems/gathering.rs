@@ -17,7 +17,7 @@ impl<'a> System<'a> for Gathering {
         for gatherer in (&mut gatherer_storage).join() {
             if math::get_seconds(&gatherer.gather_tick.elapsed()) >= 1.2 {
                 gatherer.gather_tick = Instant::now();
-                resources.increase_type_for_gatherer_type(&gatherer.gatherer_type);
+                resources.increase_resource_for_gatherer_type(&gatherer.gatherer_type);
             }
         }
     }

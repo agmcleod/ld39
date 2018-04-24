@@ -1,7 +1,8 @@
 use std::ops::{Deref, DerefMut};
 use specs::{Entities, Fetch, FetchMut, Join, ReadStorage, System, WriteStorage};
-use components::{AnimationSheet, Button, ClickSound, Gatherer, GathererType, Input, ResourceType,
-                 SelectedTile, Text, Transform, Wallet};
+use components::{AnimationSheet, Button, ClickSound, Gatherer, GathererType, Input,
+                 ProtectedNodes, ResourceType, SelectedTile, Text, Tile, TileType, Transform,
+                 Wallet};
 use components::ui::WalletUI;
 use std::sync::{Arc, Mutex};
 use scene::Node;
@@ -19,6 +20,7 @@ impl<'a> System<'a> for BuildGatherer {
         Entities<'a>,
         WriteStorage<'a, Gatherer>,
         Fetch<'a, Input>,
+        Fetch<'a, ProtectedNodes>,
         ReadStorage<'a, SelectedTile>,
         WriteStorage<'a, Text>,
         WriteStorage<'a, Transform>,
@@ -34,6 +36,7 @@ impl<'a> System<'a> for BuildGatherer {
             entities,
             mut gatherer_storage,
             input_storage,
+            protected_nodes_storage,
             selected_tile_storage,
             mut text_storage,
             mut transform_storage,
@@ -54,9 +57,9 @@ impl<'a> System<'a> for BuildGatherer {
             } else if button.name == "build_oil" && button.clicked(&input) {
                 button_pressed = true;
                 build_type = Some(ResourceType::Oil);
-            } else if button.name == "build_clean" && button.clicked(&input) {
+            } else if button.name == "build_solar" && button.clicked(&input) {
                 button_pressed = true;
-                build_type = Some(ResourceType::Clean);
+                build_type = Some(ResourceType::Solar);
             }
 
             if button_pressed {
@@ -89,7 +92,26 @@ impl<'a> System<'a> for BuildGatherer {
 
         if create {
             // create gatherer
-            let gatherer = Gatherer::new(&build_type.unwrap());
+            let protected_nodes = protected_nodes_storage.deref();
+            let selected_tile_col = (selected_tile_x / Tile::get_size()) as i32;
+            let selected_tile_row = (selected_tile_y / Tile::get_size()) as i32;
+
+            let mut polluting = false;
+
+            for i in -1..2 {
+                for j in -1..2 {
+                    if let Some(tile_type) = protected_nodes
+                        .nodes
+                        .get(&(selected_tile_col + i, selected_tile_row + j))
+                    {
+                        if *tile_type != TileType::Open {
+                            polluting = true;
+                        }
+                    }
+                }
+            }
+
+            let gatherer = Gatherer::new(&build_type.unwrap(), polluting);
             let mut anim = AnimationSheet::new(0.5);
             anim.add_animation("default".to_string(), gatherer.gatherer_type.get_frames());
             anim.set_current_animation("default".to_string());

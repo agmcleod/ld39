@@ -45,16 +45,7 @@ impl TechTree {
         sprite_storage.insert(sprite_entity, sprite);
         transform_storage.insert(
             sprite_entity,
-            Transform::visible(
-                0.0,
-                -36.0,
-                0.0,
-                32,
-                32,
-                0.0,
-                1.0,
-                1.0,
-            ),
+            Transform::visible(0.0, -36.0, 0.0, 32, 32, 0.0, 1.0, 1.0),
         );
 
         let progress_entity = entities.create();
@@ -75,9 +66,10 @@ impl TechTree {
         rect_storage.insert(progress_entity, Rect {});
         learn_progress_storage.insert(progress_entity, LearnProgress { buff });
 
-        sidebar_node
-            .sub_nodes
-            .push(Node::new(Some(progress_entity), Some(vec![Node::new(Some(sprite_entity), None)])));
+        sidebar_node.sub_nodes.push(Node::new(
+            Some(progress_entity),
+            Some(vec![Node::new(Some(sprite_entity), None)]),
+        ));
     }
 }
 

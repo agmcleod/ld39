@@ -68,7 +68,9 @@ impl<'a> System<'a> for Research {
             }
         }
 
-        for (entity, transform, learn_progress) in (&*entities, &mut transform_storage, &learn_progress_storage).join() {
+        for (entity, transform, learn_progress) in
+            (&*entities, &mut transform_storage, &learn_progress_storage).join()
+        {
             if let Some(progress_time) = researching_entities.get(&learn_progress.buff) {
                 transform.size.x = (32.0 * (progress_time.0 / progress_time.1)) as u16;
                 if progress_time.0 / progress_time.1 >= 1.0 {

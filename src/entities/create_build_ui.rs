@@ -65,15 +65,15 @@ pub fn create(
     }
 
     if researched_buffs.0.contains(&Buff::Solar) {
-        let clean_entity = entities.create();
+        let solar_entity = entities.create();
         transform_storage.insert(
-            clean_entity,
+            solar_entity,
             Transform::visible(0.0, 64.0, 0.0, 32, 32, 0.0, 1.0, 1.0),
         );
         button_storage.insert(
-            clean_entity,
+            solar_entity,
             Button::new(
-                "build_clean".to_string(),
+                "build_solar".to_string(),
                 [
                     "plant_button_1.png".to_string(),
                     "plant_button_2.png".to_string(),
@@ -81,13 +81,13 @@ pub fn create(
             ),
         );
         sprite_storage.insert(
-            clean_entity,
+            solar_entity,
             Sprite {
                 frame_name: "plant_button_2.png".to_string(),
             },
         );
 
-        new_entities.push(Node::new(Some(clean_entity), None));
+        new_entities.push(Node::new(Some(solar_entity), None));
     }
 
     let container_entity = entities.create();

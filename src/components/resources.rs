@@ -4,13 +4,15 @@ use components::GathererType;
 pub enum ResourceType {
     Coal,
     Oil,
-    Clean,
+    Solar,
+    Hydro,
 }
 
 pub struct Resources {
-    pub coal: usize,
-    pub oil: usize,
-    pub clean: usize,
+    pub coal: i32,
+    pub oil: i32,
+    pub solar: i32,
+    pub hydro: i32,
 }
 
 impl Resources {
@@ -18,12 +20,13 @@ impl Resources {
         Resources {
             coal: 0,
             oil: 0,
-            clean: 0,
+            solar: 0,
+            hydro: 0,
         }
     }
 
     // TODO: Consider overflow
-    pub fn withdraw_all_for_type(&mut self, resource_type: ResourceType) -> usize {
+    pub fn withdraw_all_for_type(&mut self, resource_type: ResourceType) -> i32 {
         match resource_type {
             ResourceType::Coal => {
                 let amount = self.coal;
@@ -35,39 +38,40 @@ impl Resources {
                 self.oil = 0;
                 amount
             }
-            ResourceType::Clean => {
-                let amount = self.clean;
-                self.clean = 0;
+            ResourceType::Solar => {
+                let amount = self.solar;
+                self.solar = 0;
+                amount
+            }
+            ResourceType::Hydro => {
+                let amount = self.hydro;
+                self.hydro = 0;
                 amount
             }
         }
     }
 
-    pub fn get_amount_for_type(&self, resource_type: &ResourceType) -> usize {
+    pub fn get_amount_for_type(&self, resource_type: &ResourceType) -> i32 {
         match *resource_type {
             ResourceType::Coal => self.coal,
             ResourceType::Oil => self.oil,
-            ResourceType::Clean => self.clean,
+            ResourceType::Solar => self.solar,
+            ResourceType::Hydro => self.hydro,
         }
     }
 
-    pub fn increase_type_for_gatherer_type(&mut self, gatherer_type: &GathererType) {
+    pub fn increase_resource_for_gatherer_type(&mut self, gatherer_type: &GathererType) {
         match *gatherer_type {
-            GathererType::Coal => {
-                self.coal += 1;
-            }
-            GathererType::Oil => {
-                self.oil += 2;
-            }
-            GathererType::Clean => {
-                self.clean += 4;
-            }
+            GathererType::Coal => self.coal += 1,
+            GathererType::Oil => self.oil += 2,
+            GathererType::Solar => self.solar += 4,
+            GathererType::Hydro => self.hydro += 3,
         }
     }
 
     pub fn reset(&mut self) {
         self.coal = 50;
         self.oil = 0;
-        self.clean = 0;
+        self.solar = 0;
     }
 }

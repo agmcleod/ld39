@@ -1,9 +1,9 @@
 use specs::{Component, VecStorage};
 
-const MAX_POWER: usize = 10_000;
+const MAX_POWER: i32 = 10_000;
 
 pub struct PowerBar {
-    pub power_left: usize,
+    pub power_left: i32,
 }
 
 impl PowerBar {
@@ -17,7 +17,7 @@ impl PowerBar {
         MAX_POWER as f32
     }
 
-    pub fn add_power(&mut self, power: usize) {
+    pub fn add_power(&mut self, power: i32) {
         self.power_left += power;
         if self.power_left > MAX_POWER {
             self.power_left = MAX_POWER;

@@ -2,11 +2,12 @@ use std::time::Instant;
 use specs::{Component, VecStorage};
 use components::ResourceType;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum GathererType {
     Coal,
     Oil,
-    Clean,
+    Solar,
+    Hydro,
 }
 
 impl GathererType {
@@ -14,15 +15,17 @@ impl GathererType {
         match *resource_type {
             ResourceType::Coal => GathererType::Coal,
             ResourceType::Oil => GathererType::Oil,
-            ResourceType::Clean => GathererType::Clean,
+            ResourceType::Solar => GathererType::Solar,
+            ResourceType::Hydro => GathererType::Hydro,
         }
     }
 
-    pub fn get_build_cost(&self) -> usize {
+    pub fn get_build_cost(&self) -> i32 {
         match *self {
             GathererType::Coal => 10,
             GathererType::Oil => 15,
-            GathererType::Clean => 25,
+            GathererType::Solar => 25,
+            GathererType::Hydro => 20,
         }
     }
 
@@ -39,7 +42,17 @@ impl GathererType {
                 "refinery_7.png".to_string(),
                 "refinery_8.png".to_string(),
             ],
-            GathererType::Clean => vec!["plant.png".to_string()],
+            GathererType::Solar => vec!["plant.png".to_string()],
+            GathererType::Hydro => vec!["hydro.png".to_string()],
+        }
+    }
+
+    pub fn get_pollution_amount(&self) -> i32 {
+        match *self {
+            GathererType::Coal => 10,
+            GathererType::Oil => 8,
+            GathererType::Hydro => 5,
+            _ => 0,
         }
     }
 }
@@ -47,13 +60,15 @@ impl GathererType {
 pub struct Gatherer {
     pub gatherer_type: GathererType,
     pub gather_tick: Instant,
+    pub polluting: bool,
 }
 
 impl Gatherer {
-    pub fn new(resource_type: &ResourceType) -> Gatherer {
+    pub fn new(resource_type: &ResourceType, polluting: bool) -> Gatherer {
         Gatherer {
             gatherer_type: GathererType::get_type_for_resources_type(resource_type),
             gather_tick: Instant::now(),
+            polluting,
         }
     }
 }
