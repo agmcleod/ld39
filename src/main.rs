@@ -34,7 +34,7 @@ mod utils;
 use std::ops::DerefMut;
 use std::time;
 use components::{AnimationSheet, BuildCost, Button, Camera, ClickSound, Color, CurrentPower,
-                 EntityLookup, Gatherer, HighlightTile, Input, PowerBar, Rect, ResourceCount,
+                 EntityLookup, Gatherer, HighlightTile, Input, PollutionCount, PowerBar, Rect, ResourceCount,
                  Resources, SelectedTile, Shape, Sprite, StateChange, Text, Tile, Transform,
                  Wallet, upgrade::{LearnProgress, Upgrade}};
 use components::ui::{TechTreeButton, WalletUI};
@@ -76,6 +76,7 @@ fn setup_world(world: &mut World, window: &glutin::Window) {
     world.register::<Gatherer>();
     world.register::<HighlightTile>();
     world.register::<LearnProgress>();
+    world.register::<PollutionCount>();
     world.register::<PowerBar>();
     world.register::<Rect>();
     world.register::<ResourceCount>();
