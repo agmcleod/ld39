@@ -1,6 +1,6 @@
 use std::ops::{Deref, DerefMut};
 use specs::{Entities, Fetch, FetchMut, Join, ReadStorage, System, WriteStorage};
-use components::{AnimationSheet, Button, ClickSound, Gatherer, GathererType, Input,
+use components::{AnimationSheet, Button, ClickSound, Color, Gatherer, GathererType, Input,
                  ProtectedNodes, ResourceType, SelectedTile, Text, Tile, TileType, Transform,
                  Wallet};
 use components::ui::WalletUI;
@@ -17,6 +17,7 @@ impl<'a> System<'a> for BuildGatherer {
         WriteStorage<'a, AnimationSheet>,
         WriteStorage<'a, Button>,
         FetchMut<'a, ClickSound>,
+        WriteStorage<'a, Color>,
         Entities<'a>,
         WriteStorage<'a, Gatherer>,
         Fetch<'a, Input>,
@@ -33,6 +34,7 @@ impl<'a> System<'a> for BuildGatherer {
             mut animation_sheet_storage,
             mut button_storage,
             mut click_sound_storage,
+            mut color_storage,
             entities,
             mut gatherer_storage,
             input_storage,
@@ -49,17 +51,17 @@ impl<'a> System<'a> for BuildGatherer {
         let wallet: &mut Wallet = wallet_storage.deref_mut();
 
         let mut button_pressed = false;
-        let mut build_type = None;
+        let mut gatherer_type = None;
         for button in (&mut button_storage).join() {
             if button.name == "build_coal" && button.clicked(&input) {
                 button_pressed = true;
-                build_type = Some(ResourceType::Coal);
+                gatherer_type = Some(GathererType::Coal);
             } else if button.name == "build_oil" && button.clicked(&input) {
                 button_pressed = true;
-                build_type = Some(ResourceType::Oil);
+                gatherer_type = Some(GathererType::Oil);
             } else if button.name == "build_solar" && button.clicked(&input) {
                 button_pressed = true;
-                build_type = Some(ResourceType::Solar);
+                gatherer_type = Some(GathererType::Solar);
             }
 
             if button_pressed {
@@ -72,9 +74,8 @@ impl<'a> System<'a> for BuildGatherer {
         let mut selected_tile_y = 0.0;
         // spend the money, and hide selected tile
         if button_pressed {
+            let amount = gatherer_type.unwrap().clone().get_build_cost();
             for (_, transform) in (&selected_tile_storage, &mut transform_storage).join() {
-                let amount = GathererType::get_type_for_resources_type(&build_type.unwrap())
-                    .get_build_cost();
                 if transform.visible && wallet.spend(amount) {
                     transform.visible = false;
                     create = true;
@@ -98,20 +99,65 @@ impl<'a> System<'a> for BuildGatherer {
 
             let mut polluting = false;
 
+            let gatherer_type = gatherer_type.unwrap();
+
+            let mut pollution = 0i32;
+
+            // calculate pollution, and add pollution sprites on top
+            // this will at present overlap polluting animations
             for i in -1..2 {
                 for j in -1..2 {
-                    if let Some(tile_type) = protected_nodes
+                    if i == 0 && j == 0 {
+                        continue;
+                    }
+                    if let Some(&(tile_type, entity)) = protected_nodes
                         .nodes
                         .get(&(selected_tile_col + i, selected_tile_row + j))
                     {
-                        if *tile_type != TileType::Open {
-                            polluting = true;
+                        // if it's a protected tile type, and any non hydro. Or if its a hydro next to a water base
+                        if tile_type != TileType::Open && (gatherer_type != GathererType::Hydro
+                            || (gatherer_type == GathererType::Hydro
+                                && (tile_type == TileType::EcoSystem
+                                    || tile_type == TileType::River)))
+                        {
+                            pollution += gatherer_type.get_pollution_amount();
+
+                            let pollution_entity = entities.create();
+                            transform_storage.insert(
+                                pollution_entity,
+                                Transform::visible(
+                                    selected_tile_x + (i as f32) * Tile::get_size(),
+                                    selected_tile_y + (j as f32) * Tile::get_size(),
+                                    2.0,
+                                    64,
+                                    64,
+                                    0.0,
+                                    1.0,
+                                    1.0,
+                                ),
+                            );
+                            let mut animation = AnimationSheet::new(0.1);
+                            animation.add_animation(
+                                "default".to_string(),
+                                [1, 2, 3, 4, 5, 6, 7, 6, 5, 4, 3, 2]
+                                    .iter()
+                                    .map(|n| format!("pollution_{}.png", n))
+                                    .collect(),
+                            );
+                            animation.set_current_animation("default".to_string());
+                            animation_sheet_storage.insert(pollution_entity, animation);
+                            color_storage.insert(pollution_entity, Color([1.0, 1.0, 1.0, 0.6]));
+
+                            let mut scene = self.scene.lock().unwrap();
+                            scene
+                                .sub_nodes
+                                .push(Node::new(Some(pollution_entity), None));
                         }
                     }
                 }
             }
 
-            let gatherer = Gatherer::new(&build_type.unwrap(), polluting);
+            let gatherer = Gatherer::new(gatherer_type, pollution);
             let mut anim = AnimationSheet::new(0.5);
             anim.add_animation("default".to_string(), gatherer.gatherer_type.get_frames());
             anim.set_current_animation("default".to_string());

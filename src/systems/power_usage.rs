@@ -3,16 +3,18 @@ use std::time::Instant;
 use components::{CurrentPower, PowerBar, ResourceCount, Resources, StateChange, Text, Transform};
 use state::play_state::PlayState;
 use specs::{FetchMut, Join, ReadStorage, System, WriteStorage};
-use utils::math;
+use systems::FRAME_TIME;
 
 pub struct PowerUsage {
     instant: Instant,
+    frame_count: f32,
 }
 
 impl PowerUsage {
     pub fn new() -> PowerUsage {
         PowerUsage {
             instant: Instant::now(),
+            frame_count: 0.0,
         }
     }
 }
@@ -41,9 +43,11 @@ impl<'b> System<'b> for PowerUsage {
         let resources: &mut Resources = resources_storage.deref_mut();
 
         let mut power_left = 0;
+        self.frame_count += 1.0;
         for power_bar in (&mut power_storage).join() {
             power_left = power_bar.power_left;
-            if math::get_seconds(&self.instant.elapsed()) >= 0.250 {
+            if self.frame_count * FRAME_TIME >= 1.0 {
+                self.frame_count = 0.0;
                 self.instant = Instant::now();
                 if power_bar.power_left > 0 {
                     power_bar.power_left -= 100;

@@ -2,7 +2,7 @@
 
 {
 	"filename": "city.png",
-	"frame": {"x":134,"y":400,"w":64,"h":64},
+	"frame": {"x":200,"y":334,"w":64,"h":64},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":64,"h":64},
@@ -10,7 +10,7 @@
 },
 {
 	"filename": "city_highlight.png",
-	"frame": {"x":134,"y":334,"w":64,"h":64},
+	"frame": {"x":200,"y":268,"w":64,"h":64},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":64,"h":64},
@@ -18,7 +18,7 @@
 },
 {
 	"filename": "coal.png",
-	"frame": {"x":368,"y":170,"w":32,"h":32},
+	"frame": {"x":300,"y":406,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
@@ -34,7 +34,7 @@
 },
 {
 	"filename": "oil.png",
-	"frame": {"x":334,"y":170,"w":32,"h":32},
+	"frame": {"x":268,"y":372,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
@@ -42,7 +42,7 @@
 },
 {
 	"filename": "plant.png",
-	"frame": {"x":134,"y":268,"w":64,"h":64},
+	"frame": {"x":200,"y":202,"w":64,"h":64},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":64,"h":64},
@@ -50,7 +50,7 @@
 },
 {
 	"filename": "plant_button_1.png",
-	"frame": {"x":134,"y":202,"w":64,"h":64},
+	"frame": {"x":430,"y":136,"w":64,"h":64},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":64,"h":64},
@@ -58,6 +58,62 @@
 },
 {
 	"filename": "plant_button_2.png",
+	"frame": {"x":364,"y":136,"w":64,"h":64},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":64,"h":64},
+	"sourceSize": {"w":64,"h":64}
+},
+{
+	"filename": "pollution_1.png",
+	"frame": {"x":298,"y":136,"w":64,"h":64},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":64,"h":64},
+	"sourceSize": {"w":64,"h":64}
+},
+{
+	"filename": "pollution_2.png",
+	"frame": {"x":232,"y":136,"w":64,"h":64},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":64,"h":64},
+	"sourceSize": {"w":64,"h":64}
+},
+{
+	"filename": "pollution_3.png",
+	"frame": {"x":134,"y":400,"w":64,"h":64},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":64,"h":64},
+	"sourceSize": {"w":64,"h":64}
+},
+{
+	"filename": "pollution_4.png",
+	"frame": {"x":134,"y":334,"w":64,"h":64},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":64,"h":64},
+	"sourceSize": {"w":64,"h":64}
+},
+{
+	"filename": "pollution_5.png",
+	"frame": {"x":134,"y":268,"w":64,"h":64},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":64,"h":64},
+	"sourceSize": {"w":64,"h":64}
+},
+{
+	"filename": "pollution_6.png",
+	"frame": {"x":134,"y":202,"w":64,"h":64},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":64,"h":64},
+	"sourceSize": {"w":64,"h":64}
+},
+{
+	"filename": "pollution_7.png",
 	"frame": {"x":134,"y":136,"w":64,"h":64},
 	"rotated": false,
 	"trimmed": false,
@@ -218,7 +274,7 @@
 },
 {
 	"filename": "sun.png",
-	"frame": {"x":300,"y":170,"w":32,"h":32},
+	"frame": {"x":266,"y":338,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
@@ -258,7 +314,7 @@
 },
 {
 	"filename": "techtree/automatedrefiners.png",
-	"frame": {"x":266,"y":170,"w":32,"h":32},
+	"frame": {"x":266,"y":304,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
@@ -266,7 +322,7 @@
 },
 {
 	"filename": "techtree/coalnode.png",
-	"frame": {"x":232,"y":170,"w":32,"h":32},
+	"frame": {"x":266,"y":270,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
@@ -274,7 +330,7 @@
 },
 {
 	"filename": "techtree/conveyerbelts.png",
-	"frame": {"x":470,"y":136,"w":32,"h":32},
+	"frame": {"x":266,"y":236,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
@@ -282,7 +338,7 @@
 },
 {
 	"filename": "techtree/fudgethenumbers.png",
-	"frame": {"x":436,"y":136,"w":32,"h":32},
+	"frame": {"x":266,"y":202,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
@@ -290,7 +346,7 @@
 },
 {
 	"filename": "techtree/hydro.png",
-	"frame": {"x":402,"y":136,"w":32,"h":32},
+	"frame": {"x":266,"y":468,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
@@ -298,7 +354,7 @@
 },
 {
 	"filename": "techtree/improvedpaneltech.png",
-	"frame": {"x":368,"y":136,"w":32,"h":32},
+	"frame": {"x":266,"y":434,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
@@ -306,7 +362,7 @@
 },
 {
 	"filename": "techtree/oilnode.png",
-	"frame": {"x":334,"y":136,"w":32,"h":32},
+	"frame": {"x":232,"y":468,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
@@ -314,7 +370,7 @@
 },
 {
 	"filename": "techtree/pollutionfilters.png",
-	"frame": {"x":300,"y":136,"w":32,"h":32},
+	"frame": {"x":234,"y":400,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
@@ -322,7 +378,7 @@
 },
 {
 	"filename": "techtree/purchasesolarcellcompany.png",
-	"frame": {"x":266,"y":136,"w":32,"h":32},
+	"frame": {"x":232,"y":434,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
@@ -330,7 +386,7 @@
 },
 {
 	"filename": "techtree/purifier.png",
-	"frame": {"x":232,"y":136,"w":32,"h":32},
+	"frame": {"x":200,"y":400,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
@@ -431,6 +487,6 @@
 	"format": "RGBA8888",
 	"size": {"w":512,"h":512},
 	"scale": "1",
-	"smartupdate": "$TexturePacker:SmartUpdate:8662b4786105b6123b9fd6fa23962e2c:2fddbfc1031677e4387b1e40b966ede6:a759b6bbc8381ac9c472b28f589ad0d6$"
+	"smartupdate": "$TexturePacker:SmartUpdate:f30472a25c4cef01788dbdfdac3cb150:bd6ccf9c09ecbcbd458d7430320219b9:a759b6bbc8381ac9c472b28f589ad0d6$"
 }
 }

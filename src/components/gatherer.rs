@@ -2,7 +2,7 @@ use std::time::Instant;
 use specs::{Component, VecStorage};
 use components::ResourceType;
 
-#[derive(Debug, PartialEq)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 pub enum GathererType {
     Coal,
     Oil,
@@ -60,15 +60,15 @@ impl GathererType {
 pub struct Gatherer {
     pub gatherer_type: GathererType,
     pub gather_tick: Instant,
-    pub polluting: bool,
+    pub pollution: i32,
 }
 
 impl Gatherer {
-    pub fn new(resource_type: &ResourceType, polluting: bool) -> Gatherer {
+    pub fn new(gatherer_type: GathererType, pollution: i32) -> Gatherer {
         Gatherer {
-            gatherer_type: GathererType::get_type_for_resources_type(resource_type),
+            gatherer_type: gatherer_type,
             gather_tick: Instant::now(),
-            polluting,
+            pollution,
         }
     }
 }

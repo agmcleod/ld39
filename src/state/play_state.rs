@@ -5,9 +5,10 @@ use scene::Node;
 use state::State;
 use std::ops::DerefMut;
 
-use components::{Button, Color, CurrentPower, EntityLookup, PollutionCount, PowerBar, ProtectedNodes, Rect,
-                 ResearchedBuffs, ResearchingCount, ResourceCount, ResourceType, Resources,
-                 SelectedTile, Sprite, Text, Tile, TileType, Transform, Wallet};
+use components::{Button, Color, CurrentPower, EntityLookup, PollutionCount, PowerBar,
+                 ProtectedNodes, Rect, ResearchedBuffs, ResearchingCount, ResourceCount,
+                 ResourceType, Resources, SelectedTile, Sprite, Text, Tile, TileType, Transform,
+                 Wallet};
 use components::ui::WalletUI;
 use systems;
 use renderer;
@@ -123,9 +124,11 @@ impl<'a> State for PlayState<'a> {
         let mut rng = thread_rng();
 
         let mut set_nodes = HashMap::new();
+        // we'll build 3 pockets of protected nodes
         for _ in 0..3 {
             let mut x = 0;
             let mut y = 0;
+            // find the center first
             loop {
                 x = rng.gen_range(1, 9);
                 y = rng.gen_range(1, 9);
@@ -146,6 +149,7 @@ impl<'a> State for PlayState<'a> {
                 }
             }
 
+            // set the type for the center
             let weight: u32 = rng.gen_range(0, 101);
             let mut highest = 1;
             let tile_type = if weight >= 90 {
@@ -159,7 +163,7 @@ impl<'a> State for PlayState<'a> {
                 TileType::EcoSystem
             };
 
-            set_nodes.insert((x, y), tile_type);
+            set_nodes.insert((x, y), (tile_type, None));
 
             let center_x = x;
             let center_y = y;
@@ -167,6 +171,7 @@ impl<'a> State for PlayState<'a> {
             x -= 1;
             y -= 1;
 
+            // fill the surrounding tiles from the center with other types
             for i in 0..3 {
                 for j in 0..3 {
                     if x + i == center_x && y + j == center_y {
@@ -203,7 +208,7 @@ impl<'a> State for PlayState<'a> {
                         TileType::Open
                     };
 
-                    set_nodes.insert((x + i, y + j), tile_type);
+                    set_nodes.insert((x + i, y + j), (tile_type, None));
                 }
             }
         }
@@ -211,21 +216,19 @@ impl<'a> State for PlayState<'a> {
         for row in 0..10 {
             for col in 0..10 {
                 let size = Tile::get_size();
-                let tile_type = if let Some(tile_type) = set_nodes.get(&(col, row)) {
-                    (*tile_type).clone()
+                let tile_type = if let Some(&(tile_type, _)) = set_nodes.get(&(col, row)) {
+                    tile_type.clone()
                 } else {
                     TileType::Open
                 };
-                let col = col as f32;
-                let row = row as f32;
                 let tile = Tile::new(tile_type);
                 let sprite_frames = Tile::get_sprite_frames(&tile.tile_type);
                 let frame_one = sprite_frames[0].clone();
                 let tile_entity = world
                     .create_entity()
                     .with(Transform::visible(
-                        size * col,
-                        size * row,
+                        size * col as f32,
+                        size * row as f32,
                         0.0,
                         size as u16,
                         size as u16,
@@ -243,7 +246,13 @@ impl<'a> State for PlayState<'a> {
                     tile_entity
                 };
 
+                let tile_type = tile.tile_type.clone();
+
                 let tile_entity = tile_entity.with(tile).build();
+
+                if tile_type != TileType::Open {
+                    set_nodes.insert((col, row), (tile_type, Some(tile_entity.clone())));
+                }
 
                 tile_nodes.push(Node::new(Some(tile_entity), None));
             }
@@ -380,11 +389,18 @@ impl<'a> State for PlayState<'a> {
         let entity = world
             .create_entity()
             .with(Transform::visible(33.0, 260.0, 0.0, 200, 32, 0.0, 1.0, 1.0))
-            .with(PollutionCount{ count: 0 })
-            .with(Text::new_with_text(32.0, 200, 32, "Pollution: 0".to_string()))
+            .with(PollutionCount { count: 0 })
+            .with(Text::new_with_text(
+                32.0,
+                200,
+                32,
+                "Pollution: 0".to_string(),
+            ))
             .with(Color([0.0, 1.0, 0.0, 1.0]))
             .build();
-        side_bar_container.sub_nodes.push(Node::new(Some(entity), None));
+        side_bar_container
+            .sub_nodes
+            .push(Node::new(Some(entity), None));
 
         // selected
         let entity = world
