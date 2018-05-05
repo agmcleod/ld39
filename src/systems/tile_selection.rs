@@ -18,6 +18,27 @@ impl TileSelection {
             build_ui_entity: None,
         }
     }
+
+    fn remove_build_ui_entity(&mut self, entities: &Entities) {
+        if let Some(build_ui_entity) = self.build_ui_entity {
+            let mut scene = self.scene.lock().unwrap();
+
+            let mut node_to_delete = -1i32;
+            for (i, node) in scene.sub_nodes.iter().enumerate() {
+                if let Some(entity) = node.entity {
+                    if entity == build_ui_entity {
+                        node_to_delete = i as i32;
+                    }
+                }
+            }
+
+            if node_to_delete > -1i32 {
+                scene.sub_nodes.remove(node_to_delete as usize);
+                entities.delete(build_ui_entity);
+                self.build_ui_entity = None;
+            }
+        }
+    }
 }
 
 impl<'a> System<'a> for TileSelection {
@@ -56,13 +77,16 @@ impl<'a> System<'a> for TileSelection {
         let mut clicked = false;
         let researched_buffs: &ResearchedBuffs = researched_buffs.deref();
 
-        for (_, button, transform) in
+        let mut tile_type_selected = None;
+
+        for (tile, button, transform) in
             (&tile_storage, &mut button_storage, &transform_storage).join()
         {
             if button.clicked(&input) {
                 tile_mouse_x = transform.get_pos().x;
                 tile_mouse_y = transform.get_pos().y;
                 clicked = true;
+                tile_type_selected = Some(tile.tile_type.clone());
             }
         }
 
@@ -82,53 +106,29 @@ impl<'a> System<'a> for TileSelection {
                     transform.set_pos2(tile_mouse_x, tile_mouse_y);
                 }
 
+                // if build UI showing, clean it up, as tile type may be different
+                self.remove_build_ui_entity(&entities);
+                // create build ui
+                let node = create_build_ui::create(
+                    tile_mouse_x + Tile::get_size(),
+                    tile_mouse_y,
+                    &tile_type_selected.unwrap(),
+                    &entities,
+                    &mut button_storage,
+                    &mut color_storage,
+                    &mut rect_storage,
+                    &mut sprite_storage,
+                    &mut transform_storage,
+                    &researched_buffs,
+                );
+                self.build_ui_entity = Some(node.entity.unwrap().clone());
                 let mut scene = self.scene.lock().unwrap();
-
-                // if build UI showing, move its position
-                if let Some(build_ui_entity) = self.build_ui_entity {
-                    let transform = transform_storage.get_mut(build_ui_entity).unwrap();
-                    transform.set_pos2(tile_mouse_x + Tile::get_size(), tile_mouse_y);
-                } else {
-                    // create build ui
-                    let node = create_build_ui::create(
-                        tile_mouse_x + Tile::get_size(),
-                        tile_mouse_y,
-                        &entities,
-                        &mut button_storage,
-                        &mut color_storage,
-                        &mut rect_storage,
-                        &mut sprite_storage,
-                        &mut transform_storage,
-                        &researched_buffs,
-                    );
-                    self.build_ui_entity = Some(node.entity.unwrap().clone());
-                    scene.sub_nodes.push(node);
-                }
+                scene.sub_nodes.push(node);
             }
         } else {
             for (_, transform) in (&selected_tile_storage, &transform_storage).join() {
-                // clean up build UI if selected tile not visible,
-                // may want to add a flag for checking this
-                // could maybe move build_ui_entity into the selected_tile component?
                 if !transform.visible {
-                    if let Some(build_ui_entity) = self.build_ui_entity {
-                        let mut scene = self.scene.lock().unwrap();
-
-                        let mut node_to_delete = -1i32;
-                        for (i, node) in scene.sub_nodes.iter().enumerate() {
-                            if let Some(entity) = node.entity {
-                                if entity == build_ui_entity {
-                                    node_to_delete = i as i32;
-                                }
-                            }
-                        }
-
-                        if node_to_delete > -1i32 {
-                            scene.sub_nodes.remove(node_to_delete as usize);
-                            entities.delete(build_ui_entity);
-                            self.build_ui_entity = None;
-                        }
-                    }
+                    self.remove_build_ui_entity(&entities);
                 }
             }
         }

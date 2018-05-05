@@ -1,7 +1,6 @@
-use std::ops::{Deref, DerefMut};
-use specs::{Fetch, FetchMut, Join, ReadStorage, System, WriteStorage};
-use components::{Gatherer, GathererType, PollutionCount, ProtectedNodes, Text, Tile, TileType,
-                 Transform, Wallet, ui::WalletUI};
+use std::ops::{DerefMut};
+use specs::{FetchMut, Join, ReadStorage, System, WriteStorage};
+use components::{Gatherer, PollutionCount, Text, Wallet, ui::WalletUI};
 use systems::{logic, FRAME_TIME};
 
 pub struct Pollution {
@@ -18,9 +17,7 @@ impl<'a> System<'a> for Pollution {
     type SystemData = (
         ReadStorage<'a, Gatherer>,
         WriteStorage<'a, PollutionCount>,
-        Fetch<'a, ProtectedNodes>,
         WriteStorage<'a, Text>,
-        ReadStorage<'a, Transform>,
         FetchMut<'a, Wallet>,
         ReadStorage<'a, WalletUI>,
     );
@@ -29,9 +26,7 @@ impl<'a> System<'a> for Pollution {
         let (
             gatherer_storage,
             mut pollution_count_storage,
-            protected_nodes_storage,
             mut text_storage,
-            transform_storage,
             mut wallet_storage,
             wallet_ui_storage,
         ) = data;
@@ -44,8 +39,6 @@ impl<'a> System<'a> for Pollution {
 
         self.ticker = 0.0;
 
-        let protected_nodes = protected_nodes_storage.deref();
-
         let mut pollution = 0;
 
         // can probably cache the pollution production amount on a tile when created
@@ -56,7 +49,7 @@ impl<'a> System<'a> for Pollution {
 
         if pollution > 0 {
             let wallet = wallet_storage.deref_mut();
-            wallet.money -= pollution / 10;
+            wallet.money -= pollution % 100 * 2;
             logic::update_text(
                 format!("{}", wallet.money),
                 &mut text_storage,

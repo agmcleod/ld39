@@ -46,8 +46,9 @@ impl<'a> System<'a> for SellEnergy {
             let coal_amount = resources.withdraw_all_for_type(ResourceType::Coal) / 4;
             let oil_amount = resources.withdraw_all_for_type(ResourceType::Oil) / 3;
             let solar_amount = resources.withdraw_all_for_type(ResourceType::Solar) / 2;
+            let hydro_amount = resources.withdraw_all_for_type(ResourceType::Hydro) / 2;
             for power_bar in (&mut power_bar_storage).join() {
-                power_bar.add_power((coal_amount + oil_amount + solar_amount) * 100);
+                power_bar.add_power((coal_amount + oil_amount + solar_amount + hydro_amount) * 100);
             }
 
             let wallet: &mut Wallet = wallet_storage.deref_mut();

@@ -62,10 +62,10 @@ impl Resources {
 
     pub fn increase_resource_for_gatherer_type(&mut self, gatherer_type: &GathererType) {
         match *gatherer_type {
-            GathererType::Coal => self.coal += 1,
-            GathererType::Oil => self.oil += 2,
-            GathererType::Solar => self.solar += 4,
-            GathererType::Hydro => self.hydro += 3,
+            GathererType::Coal => self.coal += 5,
+            GathererType::Oil => self.oil += 8,
+            GathererType::Solar => self.solar += 12,
+            GathererType::Hydro => self.hydro += 12,
         }
     }
 

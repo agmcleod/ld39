@@ -224,6 +224,7 @@ impl<'a> State for PlayState<'a> {
                 let tile = Tile::new(tile_type);
                 let sprite_frames = Tile::get_sprite_frames(&tile.tile_type);
                 let frame_one = sprite_frames[0].clone();
+                let tile_type = tile.tile_type.clone();
                 let tile_entity = world
                     .create_entity()
                     .with(Transform::visible(
@@ -238,17 +239,9 @@ impl<'a> State for PlayState<'a> {
                     ))
                     .with(Sprite {
                         frame_name: frame_one.clone(),
-                    });
-
-                let tile_entity = if tile.tile_type == TileType::Open {
-                    tile_entity.with(Button::new(frame_one, sprite_frames))
-                } else {
-                    tile_entity
-                };
-
-                let tile_type = tile.tile_type.clone();
-
-                let tile_entity = tile_entity.with(tile).build();
+                    })
+                    .with(Button::new(frame_one, sprite_frames))
+                    .with(tile).build();
 
                 if tile_type != TileType::Open {
                     set_nodes.insert((col, row), (tile_type, Some(tile_entity.clone())));

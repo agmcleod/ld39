@@ -97,8 +97,6 @@ impl<'a> System<'a> for BuildGatherer {
             let selected_tile_col = (selected_tile_x / Tile::get_size()) as i32;
             let selected_tile_row = (selected_tile_y / Tile::get_size()) as i32;
 
-            let mut polluting = false;
-
             let gatherer_type = gatherer_type.unwrap();
 
             let mut pollution = 0i32;
