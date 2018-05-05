@@ -341,7 +341,7 @@ impl<'a> State for PlayState<'a> {
             .with(ResourceCount {
                 resource_type: ResourceType::Oil,
             })
-            .with(Transform::visible(30.0, 142.0, 0.0, 32, 32, 0.0, 1.0, 1.0))
+            .with(Transform::visible(30.0, 154.0, 0.0, 32, 32, 0.0, 1.0, 1.0))
             .with(Sprite {
                 frame_name: "oil.png".to_string(),
             })
@@ -356,9 +356,24 @@ impl<'a> State for PlayState<'a> {
             .with(ResourceCount {
                 resource_type: ResourceType::Solar,
             })
-            .with(Transform::visible(30.0, 188.0, 0.0, 32, 32, 0.0, 1.0, 1.0))
+            .with(Transform::visible(30.0, 200.0, 0.0, 32, 32, 0.0, 1.0, 1.0))
             .with(Sprite {
                 frame_name: "sun.png".to_string(),
+            })
+            .build();
+        side_bar_container
+            .sub_nodes
+            .push(Node::new(Some(entity), None));
+
+        // water sprite
+        let entity = world
+            .create_entity()
+            .with(ResourceCount {
+                resource_type: ResourceType::Hydro,
+            })
+            .with(Transform::visible(33.0, 246.0, 0.0, 26, 32, 0.0, 1.0, 1.0))
+            .with(Sprite {
+                frame_name: "water.png".to_string(),
             })
             .build();
         side_bar_container
@@ -369,7 +384,7 @@ impl<'a> State for PlayState<'a> {
         let entity = world
             .create_entity()
             .with(WalletUI {})
-            .with(Transform::visible(33.0, 228.0, 0.0, 26, 32, 0.0, 1.0, 1.0))
+            .with(Transform::visible(33.0, 294.0, 0.0, 26, 32, 0.0, 1.0, 1.0))
             .with(Sprite {
                 frame_name: "dollarsign.png".to_string(),
             })
@@ -378,10 +393,12 @@ impl<'a> State for PlayState<'a> {
             .sub_nodes
             .push(Node::new(Some(entity), None));
 
+
+
         // pollution levels
         let entity = world
             .create_entity()
-            .with(Transform::visible(33.0, 260.0, 0.0, 200, 32, 0.0, 1.0, 1.0))
+            .with(Transform::visible(33.0, 340.0, 0.0, 200, 32, 0.0, 1.0, 1.0))
             .with(PollutionCount { count: 0 })
             .with(Text::new_with_text(
                 32.0,
@@ -495,7 +512,7 @@ impl<'a> State for PlayState<'a> {
                 "".to_string(),
                 32.0,
                 80.0,
-                142.0,
+                154.0,
                 0.0,
                 160,
                 32,
@@ -517,7 +534,7 @@ impl<'a> State for PlayState<'a> {
                 "".to_string(),
                 32.0,
                 80.0,
-                188.0,
+                200.0,
                 0.0,
                 160,
                 32,
@@ -533,13 +550,34 @@ impl<'a> State for PlayState<'a> {
                 .sub_nodes
                 .push(Node::new(Some(entity), None));
 
+            let water_text = create_text::create(
+                &mut text_storages,
+                format!("{}", Wallet::start_amount()),
+                32.0,
+                80.0,
+                246.0,
+                0.0,
+                160,
+                32,
+                Color([0.0, 1.0, 0.0, 1.0]),
+            );
+            resource_count_storage.insert(
+                water_text.clone(),
+                ResourceCount {
+                    resource_type: ResourceType::Hydro,
+                },
+            );
+            side_bar_container
+                .sub_nodes
+                .push(Node::new(Some(water_text), None));
+
             // money text
             let entity = create_text::create(
                 &mut text_storages,
                 format!("{}", Wallet::start_amount()),
                 32.0,
                 80.0,
-                228.0,
+                294.0,
                 0.0,
                 160,
                 32,
