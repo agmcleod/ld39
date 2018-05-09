@@ -241,7 +241,8 @@ impl<'a> State for PlayState<'a> {
                         frame_name: frame_one.clone(),
                     })
                     .with(Button::new(frame_one, sprite_frames))
-                    .with(tile).build();
+                    .with(tile)
+                    .build();
 
                 if tile_type != TileType::Open {
                     set_nodes.insert((col, row), (tile_type, Some(tile_entity.clone())));
@@ -392,8 +393,6 @@ impl<'a> State for PlayState<'a> {
         side_bar_container
             .sub_nodes
             .push(Node::new(Some(entity), None));
-
-
 
         // pollution levels
         let entity = world

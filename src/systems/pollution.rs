@@ -1,4 +1,4 @@
-use std::ops::{DerefMut};
+use std::ops::DerefMut;
 use specs::{FetchMut, Join, ReadStorage, System, WriteStorage};
 use components::{Gatherer, PollutionCount, Text, Wallet, ui::WalletUI};
 use systems::{logic, FRAME_TIME};

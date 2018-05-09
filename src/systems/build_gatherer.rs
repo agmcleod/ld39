@@ -62,6 +62,9 @@ impl<'a> System<'a> for BuildGatherer {
             } else if button.name == "build_solar" && button.clicked(&input) {
                 button_pressed = true;
                 gatherer_type = Some(GathererType::Solar);
+            } else if button.name == "build_hydro" && button.clicked(&input) {
+                button_pressed = true;
+                gatherer_type = Some(GathererType::Hydro);
             }
 
             if button_pressed {
@@ -103,53 +106,54 @@ impl<'a> System<'a> for BuildGatherer {
 
             // calculate pollution, and add pollution sprites on top
             // this will at present overlap polluting animations
-            for i in -1..2 {
-                for j in -1..2 {
-                    if i == 0 && j == 0 {
-                        continue;
-                    }
-                    if let Some(&(tile_type, entity)) = protected_nodes
-                        .nodes
-                        .get(&(selected_tile_col + i, selected_tile_row + j))
-                    {
-                        // if it's a protected tile type, and any non hydro. Or if its a hydro next to a water base
-                        if tile_type != TileType::Open && (gatherer_type != GathererType::Hydro
-                            || (gatherer_type == GathererType::Hydro
-                                && (tile_type == TileType::EcoSystem
-                                    || tile_type == TileType::River)))
+            // Solar doesn pollute
+            if gatherer_type != GathererType::Solar {
+                for i in -1..2 {
+                    for j in -1..2 {
+                        if gatherer_type == GathererType::Hydro && (i != 0 || j != 0) {
+                            continue;
+                        } else if gatherer_type != GathererType::Hydro && i == 0 && j == 0 {
+                            continue;
+                        }
+                        if let Some(&(tile_type, entity)) = protected_nodes
+                            .nodes
+                            .get(&(selected_tile_col + i, selected_tile_row + j))
                         {
-                            pollution += gatherer_type.get_pollution_amount();
+                            // if its a non open tile
+                            if tile_type != TileType::Open {
+                                pollution += gatherer_type.get_pollution_amount();
 
-                            let pollution_entity = entities.create();
-                            transform_storage.insert(
-                                pollution_entity,
-                                Transform::visible(
-                                    selected_tile_x + (i as f32) * Tile::get_size(),
-                                    selected_tile_y + (j as f32) * Tile::get_size(),
-                                    2.0,
-                                    64,
-                                    64,
-                                    0.0,
-                                    1.0,
-                                    1.0,
-                                ),
-                            );
-                            let mut animation = AnimationSheet::new(0.1);
-                            animation.add_animation(
-                                "default".to_string(),
-                                [1, 2, 3, 4, 5, 6, 7, 6, 5, 4, 3, 2]
-                                    .iter()
-                                    .map(|n| format!("pollution_{}.png", n))
-                                    .collect(),
-                            );
-                            animation.set_current_animation("default".to_string());
-                            animation_sheet_storage.insert(pollution_entity, animation);
-                            color_storage.insert(pollution_entity, Color([1.0, 1.0, 1.0, 0.6]));
+                                let pollution_entity = entities.create();
+                                transform_storage.insert(
+                                    pollution_entity,
+                                    Transform::visible(
+                                        selected_tile_x + (i as f32) * Tile::get_size(),
+                                        selected_tile_y + (j as f32) * Tile::get_size(),
+                                        3.0,
+                                        64,
+                                        64,
+                                        0.0,
+                                        1.0,
+                                        1.0,
+                                    ),
+                                );
+                                let mut animation = AnimationSheet::new(0.1);
+                                animation.add_animation(
+                                    "default".to_string(),
+                                    [1, 2, 3, 4, 5, 6, 7, 6, 5, 4, 3, 2]
+                                        .iter()
+                                        .map(|n| format!("pollution_{}.png", n))
+                                        .collect(),
+                                );
+                                animation.set_current_animation("default".to_string());
+                                animation_sheet_storage.insert(pollution_entity, animation);
+                                color_storage.insert(pollution_entity, Color([1.0, 1.0, 1.0, 1.0]));
 
-                            let mut scene = self.scene.lock().unwrap();
-                            scene
-                                .sub_nodes
-                                .push(Node::new(Some(pollution_entity), None));
+                                let mut scene = self.scene.lock().unwrap();
+                                scene
+                                    .sub_nodes
+                                    .push(Node::new(Some(pollution_entity), None));
+                            }
                         }
                     }
                 }
@@ -164,7 +168,7 @@ impl<'a> System<'a> for BuildGatherer {
             animation_sheet_storage.insert(gatherer_entity, anim);
             transform_storage.insert(
                 gatherer_entity,
-                Transform::visible(selected_tile_x, selected_tile_y, 1.0, 64, 64, 0.0, 1.0, 1.0),
+                Transform::visible(selected_tile_x, selected_tile_y, 2.0, 64, 64, 0.0, 1.0, 1.0),
             );
 
             let mut scene = self.scene.lock().unwrap();

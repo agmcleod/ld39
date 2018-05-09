@@ -3,11 +3,12 @@ use std::ops::{Deref, DerefMut};
 use specs::{Entities, Entity, Fetch, FetchMut, Join, ReadStorage, System, WriteStorage};
 use scene::Node;
 use components::{Color, EntityLookup, Input, Rect, ResearchingCount, Sprite, Text, Transform,
-                 Wallet, upgrade::{Buff, LearnProgress}};
+                 Wallet, ui::WalletUI, upgrade::{Buff, LearnProgress}};
 use components::ui;
 use entities::{create_text, create_tooltip};
 use entities::tech_tree::{get_color_from_status, Status, Upgrade};
 use storage_types::*;
+use systems::logic;
 
 pub struct TechTree {
     scene: Arc<Mutex<Node>>,
@@ -88,6 +89,7 @@ impl<'a> System<'a> for TechTree {
         WriteStorage<'a, Transform>,
         WriteStorage<'a, Upgrade>,
         FetchMut<'a, Wallet>,
+        ReadStorage<'a, WalletUI>,
     );
 
     fn run(&mut self, data: Self::SystemData) {
@@ -105,6 +107,7 @@ impl<'a> System<'a> for TechTree {
             mut transform_storage,
             mut upgrade_storage,
             mut wallet_storage,
+            wallet_ui_storage,
         ) = data;
 
         let input: &Input = input_storage.deref();
@@ -244,6 +247,11 @@ impl<'a> System<'a> for TechTree {
                         researching_count.count,
                     );
                     researching_count.count += 1;
+                    logic::update_text(
+                        format!("{}", wallet.money),
+                        &mut text_storage,
+                        &wallet_ui_storage,
+                    );
                 }
             }
         } else {

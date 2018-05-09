@@ -98,7 +98,7 @@ pub fn create(
         let hydro_entity = entities.create();
         transform_storage.insert(
             hydro_entity,
-            Transform::visible(0.0, 96.0, 0.0, 32, 32, 0.0, 1.0, 1.0),
+            Transform::visible(0.0, 0.0, 0.0, 32, 32, 0.0, 1.0, 1.0),
         );
 
         button_storage.insert(
@@ -108,15 +108,15 @@ pub fn create(
                 [
                     "hydro_button.png".to_string(),
                     "hydro_button_2.png".to_string(),
-                ]
-            )
+                ],
+            ),
         );
 
         sprite_storage.insert(
             hydro_entity,
-            Sprite{
+            Sprite {
                 frame_name: "hydro_button.png".to_string(),
-            }
+            },
         );
 
         new_entities.push(Node::new(Some(hydro_entity), None));

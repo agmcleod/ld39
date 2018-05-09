@@ -83,7 +83,7 @@
       "frame_name": "purifier.png"
     }, {
       "buff": "Hydro",
-      "time_to_research": 30.0,
+      "time_to_research": 5.0,
       "cost": 30,
       "status": "Locked",
       "x": 0.35,
