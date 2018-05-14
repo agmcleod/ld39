@@ -1,6 +1,6 @@
 use std::sync::{Arc, Mutex};
 use std::ops::{Deref, DerefMut};
-use specs::{Entities, Entity, Fetch, FetchMut, Join, ReadStorage, System, WriteStorage};
+use specs::{Entities, Entity, Read, Write, Join, ReadStorage, System, WriteStorage};
 use scene::Node;
 use components::{Color, EntityLookup, Input, Rect, ResearchingCount, Sprite, Text, Transform,
                  Wallet, ui::WalletUI, upgrade::{Buff, LearnProgress}};
@@ -78,17 +78,17 @@ impl<'a> System<'a> for TechTree {
     type SystemData = (
         Entities<'a>,
         WriteStorage<'a, Color>,
-        Fetch<'a, EntityLookup>,
-        Fetch<'a, Input>,
+        Read<'a, EntityLookup>,
+        Read<'a, Input>,
         WriteStorage<'a, LearnProgress>,
         WriteStorage<'a, Rect>,
-        FetchMut<'a, ResearchingCount>,
+        Write<'a, ResearchingCount>,
         WriteStorage<'a, Sprite>,
         ReadStorage<'a, ui::TechTreeButton>,
         WriteStorage<'a, Text>,
         WriteStorage<'a, Transform>,
         WriteStorage<'a, Upgrade>,
-        FetchMut<'a, Wallet>,
+        Write<'a, Wallet>,
         ReadStorage<'a, WalletUI>,
     );
 

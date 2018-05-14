@@ -1,7 +1,7 @@
 use std::ops::{Deref, DerefMut};
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
-use specs::{Entities, Fetch, FetchMut, Join, ReadStorage, System, WriteStorage};
+use specs::{Entities, ReadExpect, Write, Join, ReadStorage, System, WriteStorage};
 use entities::tech_tree::{get_color_from_status, traverse_tree, TechTreeNode};
 use components::{Color, ResearchedBuffs, ResearchingCount, Transform,
                  upgrade::{Buff, LearnProgress, Status, Upgrade}};
@@ -27,9 +27,9 @@ impl<'a> System<'a> for Research {
         Entities<'a>,
         WriteStorage<'a, Color>,
         ReadStorage<'a, LearnProgress>,
-        FetchMut<'a, ResearchedBuffs>,
-        FetchMut<'a, ResearchingCount>,
-        Fetch<'a, TechTreeNode>,
+        Write<'a, ResearchedBuffs>,
+        Write<'a, ResearchingCount>,
+        ReadExpect<'a, TechTreeNode>,
         WriteStorage<'a, Transform>,
         WriteStorage<'a, Upgrade>,
     );

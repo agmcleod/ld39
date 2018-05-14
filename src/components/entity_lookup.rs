@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 use specs::Entity;
 
+#[derive(Default)]
 pub struct EntityLookup {
     pub entities: HashMap<String, Entity>,
 }

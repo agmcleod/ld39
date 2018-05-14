@@ -34,60 +34,60 @@ impl<'a> PlayState<'a> {
         let scene = Arc::new(Mutex::new(Node::new(None, None)));
 
         let dispatcher = DispatcherBuilder::new()
-            .add(systems::AnimationSystem::new(), "animation_system", &[])
-            .add(systems::PowerUsage::new(), "power_usage", &[])
-            .add(
+            .with(systems::AnimationSystem::new(), "animation_system", &[])
+            .with(systems::PowerUsage::new(), "power_usage", &[])
+            .with(
                 systems::ButtonHover {
                     scene: scene.clone(),
                 },
                 "button_hover",
                 &[],
             )
-            .add(systems::SellEnergy {}, "sell_energy", &["button_hover"])
-            .add(
+            .with(systems::SellEnergy {}, "sell_energy", &["button_hover"])
+            .with(
                 systems::BuildGatherer {
                     scene: scene.clone(),
                 },
                 "build_gatherer",
                 &["button_hover"],
             )
-            .add(
+            .with(
                 systems::TextAbsoluteCache {
                     scene: scene.clone(),
                 },
                 "text_absolute_cache",
                 &[],
             )
-            .add(
+            .with(
                 systems::TileSelection::new(scene.clone()),
                 "tile_selection",
                 &["build_gatherer"],
             )
-            .add(systems::Gathering {}, "gathering", &[])
-            .add(
+            .with(systems::Gathering {}, "gathering", &[])
+            .with(
                 systems::ToggleTechTree::new(scene.clone()),
                 "toggle_tech_tree",
                 &["button_hover"],
             )
-            .add(systems::Research::new(scene.clone()), "research", &[])
-            .add(systems::Pollution::new(), "pollution", &[])
+            .with(systems::Research::new(scene.clone()), "research", &[])
+            .with(systems::Pollution::new(), "pollution", &[])
             .build();
 
         let tech_tree_dispatcher = DispatcherBuilder::new()
-            .add(
+            .with(
                 systems::ButtonHover {
                     scene: scene.clone(),
                 },
                 "button_hover",
                 &[],
             )
-            .add(
+            .with(
                 systems::ToggleTechTree::new(scene.clone()),
                 "toggle_tech_tree",
                 &["button_hover"],
             )
-            .add(systems::TechTree::new(scene.clone()), "tech_tree", &[])
-            .add(
+            .with(systems::TechTree::new(scene.clone()), "tech_tree", &[])
+            .with(
                 systems::TextAbsoluteCache {
                     scene: scene.clone(),
                 },
@@ -470,11 +470,11 @@ impl<'a> State for PlayState<'a> {
             );
 
             let entities = world.entities();
-            let mut color_storage = world.write::<Color>();
-            let mut transform_storage = world.write::<Transform>();
-            let mut text_storage = world.write::<Text>();
-            let mut resource_count_storage = world.write::<ResourceCount>();
-            let mut wallet_ui_storage = world.write::<WalletUI>();
+            let mut color_storage = world.write_storage::<Color>();
+            let mut transform_storage = world.write_storage::<Transform>();
+            let mut text_storage = world.write_storage::<Text>();
+            let mut resource_count_storage = world.write_storage::<ResourceCount>();
+            let mut wallet_ui_storage = world.write_storage::<WalletUI>();
 
             let mut text_storages = TextStorage {
                 entities: &entities,

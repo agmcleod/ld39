@@ -347,13 +347,13 @@ fn main() {
         encoder.clear_depth(&target.depth, 1.0);
 
         {
-            let sprites = world.read::<Sprite>();
-            let mut transforms = world.write::<Transform>();
-            let animation_sheets = world.read::<AnimationSheet>();
-            let colors = world.read::<Color>();
-            let mut texts = world.write::<Text>();
-            let rects = world.read::<Rect>();
-            let shapes = world.read::<Shape>();
+            let sprites = world.read_storage::<Sprite>();
+            let mut transforms = world.write_storage::<Transform>();
+            let animation_sheets = world.read_storage::<AnimationSheet>();
+            let colors = world.read_storage::<Color>();
+            let mut texts = world.write_storage::<Text>();
+            let rects = world.read_storage::<Rect>();
+            let shapes = world.read_storage::<Shape>();
 
             let mut click_sound_storage = world.write_resource::<ClickSound>();
             let click_sound: &mut ClickSound = click_sound_storage.deref_mut();

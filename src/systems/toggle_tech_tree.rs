@@ -1,6 +1,6 @@
 use std::ops::{Deref, DerefMut};
 use std::sync::{Arc, Mutex};
-use specs::{Entities, Fetch, FetchMut, Join, ReadStorage, System, WriteStorage};
+use specs::{Entities, Read, Write, Join, ReadStorage, System, WriteStorage};
 use components::{Button, Color, EntityLookup, Input, Rect, StateChange, Tile, Transform};
 use state::play_state::PlayState;
 use entities::create_colored_rect;
@@ -24,7 +24,7 @@ impl ToggleTechTree {
         color_storage: &mut WriteStorage<Color>,
         rect_storage: &mut WriteStorage<Rect>,
         transform_storage: &mut WriteStorage<Transform>,
-        state_change_res: &mut FetchMut<StateChange>,
+        state_change_res: &mut Write<StateChange>,
         tile_storage: &ReadStorage<Tile>,
     ) {
         let mut was_clicked = false;
@@ -86,7 +86,7 @@ impl ToggleTechTree {
         entities: &Entities,
         button_storage: &mut WriteStorage<Button>,
         transform_storage: &mut WriteStorage<Transform>,
-        state_change_res: &mut FetchMut<StateChange>,
+        state_change_res: &mut Write<StateChange>,
         tile_storage: &ReadStorage<Tile>,
     ) {
         let mut was_clicked = false;
@@ -132,10 +132,10 @@ impl<'a> System<'a> for ToggleTechTree {
         Entities<'a>,
         WriteStorage<'a, Button>,
         WriteStorage<'a, Color>,
-        FetchMut<'a, EntityLookup>,
-        Fetch<'a, Input>,
+        Write<'a, EntityLookup>,
+        Read<'a, Input>,
         WriteStorage<'a, Rect>,
-        FetchMut<'a, StateChange>,
+        Write<'a, StateChange>,
         ReadStorage<'a, Tile>,
         WriteStorage<'a, Transform>,
     );

@@ -2,7 +2,7 @@ use std::ops::DerefMut;
 use std::time::Instant;
 use components::{CurrentPower, PowerBar, ResourceCount, Resources, StateChange, Text, Transform};
 use state::play_state::PlayState;
-use specs::{FetchMut, Join, ReadStorage, System, WriteStorage};
+use specs::{Write, Join, ReadStorage, System, WriteStorage};
 use systems::FRAME_TIME;
 
 pub struct PowerUsage {
@@ -24,8 +24,8 @@ impl<'b> System<'b> for PowerUsage {
         ReadStorage<'b, ResourceCount>,
         ReadStorage<'b, CurrentPower>,
         WriteStorage<'b, PowerBar>,
-        FetchMut<'b, Resources>,
-        FetchMut<'b, StateChange>,
+        Write<'b, Resources>,
+        Write<'b, StateChange>,
         WriteStorage<'b, Text>,
         WriteStorage<'b, Transform>,
     );

@@ -1,5 +1,5 @@
 use std::ops::DerefMut;
-use specs::{FetchMut, Join, ReadStorage, System, WriteStorage};
+use specs::{Write, Join, ReadStorage, System, WriteStorage};
 use components::{Gatherer, PollutionCount, Text, Wallet, ui::WalletUI};
 use systems::{logic, FRAME_TIME};
 
@@ -18,7 +18,7 @@ impl<'a> System<'a> for Pollution {
         ReadStorage<'a, Gatherer>,
         WriteStorage<'a, PollutionCount>,
         WriteStorage<'a, Text>,
-        FetchMut<'a, Wallet>,
+        Write<'a, Wallet>,
         ReadStorage<'a, WalletUI>,
     );
 

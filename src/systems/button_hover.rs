@@ -1,6 +1,6 @@
 use std::ops::Deref;
 use std::sync::{Arc, Mutex};
-use specs::{Entities, Entity, Fetch, Join, System, WriteStorage};
+use specs::{Entities, Entity, Read, Join, System, WriteStorage};
 use components::{Button, Input, Sprite, Transform};
 use cgmath::Vector3;
 use scene::Node;
@@ -13,7 +13,7 @@ impl<'a> System<'a> for ButtonHover {
     type SystemData = (
         WriteStorage<'a, Button>,
         Entities<'a>,
-        Fetch<'a, Input>,
+        Read<'a, Input>,
         WriteStorage<'a, Transform>,
         WriteStorage<'a, Sprite>,
     );

@@ -1,7 +1,7 @@
 use std::ops::{Deref, DerefMut};
-use specs::{Entities, Fetch, FetchMut, Join, ReadStorage, System, WriteStorage};
+use specs::{Entities, Read, Write, Join, ReadStorage, System, WriteStorage};
 use components::{AnimationSheet, Button, ClickSound, Color, Gatherer, GathererType, Input,
-                 ProtectedNodes, ResourceType, SelectedTile, Text, Tile, TileType, Transform,
+                 ProtectedNodes, SelectedTile, Text, Tile, TileType, Transform,
                  Wallet};
 use components::ui::WalletUI;
 use std::sync::{Arc, Mutex};
@@ -16,16 +16,16 @@ impl<'a> System<'a> for BuildGatherer {
     type SystemData = (
         WriteStorage<'a, AnimationSheet>,
         WriteStorage<'a, Button>,
-        FetchMut<'a, ClickSound>,
+        Write<'a, ClickSound>,
         WriteStorage<'a, Color>,
         Entities<'a>,
         WriteStorage<'a, Gatherer>,
-        Fetch<'a, Input>,
-        Fetch<'a, ProtectedNodes>,
+        Read<'a, Input>,
+        Read<'a, ProtectedNodes>,
         ReadStorage<'a, SelectedTile>,
         WriteStorage<'a, Text>,
         WriteStorage<'a, Transform>,
-        FetchMut<'a, Wallet>,
+        Write<'a, Wallet>,
         ReadStorage<'a, WalletUI>,
     );
 

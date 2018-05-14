@@ -1,5 +1,5 @@
 use std::ops::{Deref, DerefMut};
-use specs::{Fetch, FetchMut, Join, System, WriteStorage};
+use specs::{Read, Write, Join, System, WriteStorage};
 use components::{Button, ClickSound, Input, PowerBar, ResourceType, Resources, Text, Wallet};
 use components::ui::WalletUI;
 
@@ -8,12 +8,12 @@ pub struct SellEnergy;
 impl<'a> System<'a> for SellEnergy {
     type SystemData = (
         WriteStorage<'a, Button>,
-        FetchMut<'a, ClickSound>,
-        Fetch<'a, Input>,
+        Write<'a, ClickSound>,
+        Read<'a, Input>,
         WriteStorage<'a, PowerBar>,
-        FetchMut<'a, Resources>,
+        Write<'a, Resources>,
         WriteStorage<'a, Text>,
-        FetchMut<'a, Wallet>,
+        Write<'a, Wallet>,
         WriteStorage<'a, WalletUI>,
     );
 

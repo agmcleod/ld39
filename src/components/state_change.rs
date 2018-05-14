@@ -1,5 +1,6 @@
 use specs::{Component, HashMapStorage};
 
+#[derive(Default)]
 pub struct StateChange {
     pub state: String,
     pub action: String,

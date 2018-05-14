@@ -1,6 +1,6 @@
 use std::ops::Deref;
 use std::sync::{Arc, Mutex};
-use specs::{Entities, Entity, Fetch, Join, ReadStorage, System, WriteStorage};
+use specs::{Entities, Entity, Read, Join, ReadStorage, System, WriteStorage};
 use components::{Button, Color, Gatherer, Input, Rect, ResearchedBuffs, SelectedTile, Sprite,
                  Tile, Transform};
 use scene::Node;
@@ -47,9 +47,9 @@ impl<'a> System<'a> for TileSelection {
         WriteStorage<'a, Color>,
         Entities<'a>,
         ReadStorage<'a, Gatherer>,
-        Fetch<'a, Input>,
+        Read<'a, Input>,
         WriteStorage<'a, Rect>,
-        Fetch<'a, ResearchedBuffs>,
+        Read<'a, ResearchedBuffs>,
         ReadStorage<'a, SelectedTile>,
         WriteStorage<'a, Sprite>,
         ReadStorage<'a, Tile>,

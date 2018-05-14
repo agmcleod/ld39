@@ -1,5 +1,6 @@
 const START_AMOUNT: i32 = 20;
 
+#[derive(Default)]
 pub struct Wallet {
     pub money: i32,
 }

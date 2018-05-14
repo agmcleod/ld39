@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use glutin::VirtualKeyCode;
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct Input {
     pub hidpi_factor: f32,
     pub pressed_keys: HashMap<VirtualKeyCode, bool>,

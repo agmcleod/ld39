@@ -8,6 +8,7 @@ pub enum ResourceType {
     Hydro,
 }
 
+#[derive(Default)]
 pub struct Resources {
     pub coal: i32,
     pub oil: i32,
