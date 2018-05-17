@@ -1,6 +1,6 @@
 use std::sync::{Arc, Mutex};
 use std::ops::{Deref, DerefMut};
-use specs::{Entities, Entity, Read, Write, Join, ReadStorage, System, WriteStorage};
+use specs::{Entities, Entity, Join, Read, ReadStorage, System, Write, WriteStorage};
 use scene::Node;
 use components::{Color, EntityLookup, Input, Rect, ResearchingCount, Sprite, Text, Transform,
                  Wallet, ui::WalletUI, upgrade::{Buff, LearnProgress}};
@@ -43,31 +43,39 @@ impl TechTree {
         let sidebar_node = scene.get_node_for_entity(*sidebar_entity).unwrap();
 
         let sprite_entity = entities.create();
-        sprite_storage.insert(sprite_entity, sprite);
-        transform_storage.insert(
-            sprite_entity,
-            Transform::visible(0.0, -36.0, 0.0, 32, 32, 0.0, 1.0, 1.0),
-        );
+        sprite_storage.insert(sprite_entity, sprite).unwrap();
+        transform_storage
+            .insert(
+                sprite_entity,
+                Transform::visible(0.0, -36.0, 0.0, 32, 32, 0.0, 1.0, 1.0),
+            )
+            .unwrap();
 
         let progress_entity = entities.create();
-        transform_storage.insert(
-            progress_entity,
-            Transform::visible(
-                20.0 + 64.0 * researching_count as f32,
-                546.0,
-                0.0,
-                0,
-                10,
-                0.0,
-                1.0,
-                1.0,
-            ),
-        );
-        color_storage.insert(progress_entity, Color([0.0, 1.0, 0.0, 1.0]));
-        rect_storage.insert(progress_entity, Rect {});
-        learn_progress_storage.insert(progress_entity, LearnProgress { buff });
+        transform_storage
+            .insert(
+                progress_entity,
+                Transform::visible(
+                    20.0 + 64.0 * researching_count as f32,
+                    546.0,
+                    0.0,
+                    0,
+                    10,
+                    0.0,
+                    1.0,
+                    1.0,
+                ),
+            )
+            .unwrap();
+        color_storage
+            .insert(progress_entity, Color([0.0, 1.0, 0.0, 1.0]))
+            .unwrap();
+        rect_storage.insert(progress_entity, Rect {}).unwrap();
+        learn_progress_storage
+            .insert(progress_entity, LearnProgress { buff })
+            .unwrap();
 
-        sidebar_node.sub_nodes.push(Node::new(
+        sidebar_node.add(Node::new(
             Some(progress_entity),
             Some(vec![Node::new(Some(sprite_entity), None)]),
         ));
@@ -187,7 +195,7 @@ impl<'a> System<'a> for TechTree {
                             20,
                             Color([0.5, 0.5, 0.5, 1.0]),
                         );
-                        tooltip_node.sub_nodes.push(Node::new(Some(text), None));
+                        tooltip_node.add(Node::new(Some(text), None));
                     } else {
                         let text = create_text::create(
                             &mut text_storage_type,
@@ -200,7 +208,7 @@ impl<'a> System<'a> for TechTree {
                             20,
                             Color([1.0, 1.0, 0.0, 1.0]),
                         );
-                        tooltip_node.sub_nodes.push(Node::new(Some(text), None));
+                        tooltip_node.add(Node::new(Some(text), None));
 
                         let time_left = if upgrade.status == Status::Learning {
                             upgrade.time_to_research - upgrade.current_research_progress
@@ -219,10 +227,10 @@ impl<'a> System<'a> for TechTree {
                             20,
                             Color([1.0, 1.0, 0.0, 1.0]),
                         );
-                        tooltip_node.sub_nodes.push(Node::new(Some(text), None));
+                        tooltip_node.add(Node::new(Some(text), None));
                     }
 
-                    container_node.sub_nodes.push(tooltip_node);
+                    container_node.add(tooltip_node);
                 }
             } else if input.mouse_pressed {
                 let wallet: &mut Wallet = wallet_storage.deref_mut();

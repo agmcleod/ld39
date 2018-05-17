@@ -16,12 +16,15 @@ pub fn create(
     let text = Text::new_with_text(size, w, h, text);
 
     let entity = storages.entities.create();
-    storages.transform_storage.insert(
-        entity.clone(),
-        Transform::visible(x, y, z, w, h, 0.0, 1.0, 1.0),
-    );
-    storages.text_storage.insert(entity.clone(), text);
-    storages.color_storage.insert(entity, color);
+    storages
+        .transform_storage
+        .insert(
+            entity.clone(),
+            Transform::visible(x, y, z, w, h, 0.0, 1.0, 1.0),
+        )
+        .unwrap();
+    storages.text_storage.insert(entity.clone(), text).unwrap();
+    storages.color_storage.insert(entity, color).unwrap();
 
     entity
 }

@@ -15,42 +15,54 @@ pub fn create(
     text: String,
 ) -> Node {
     let background = entities.create();
-    transform_storage.insert(
-        background.clone(),
-        Transform::visible(0.0, 0.0, 0.0, w, h, 0.0, 1.0, 1.0),
-    );
-    color_storage.insert(background.clone(), Color([0.0, 0.0, 0.0, 0.6]));
-    rect_storage.insert(background.clone(), Rect {});
+    transform_storage
+        .insert(
+            background.clone(),
+            Transform::visible(0.0, 0.0, 0.0, w, h, 0.0, 1.0, 1.0),
+        )
+        .unwrap();
+    color_storage
+        .insert(background.clone(), Color([0.0, 0.0, 0.0, 0.6]))
+        .unwrap();
+    rect_storage.insert(background.clone(), Rect {}).unwrap();
 
     let tooltip_container = entities.create();
-    transform_storage.insert(
-        tooltip_container.clone(),
-        Transform::visible(x, y, 50.0, w, h, 0.0, 1.0, 1.0),
-    );
+    transform_storage
+        .insert(
+            tooltip_container.clone(),
+            Transform::visible(x, y, 50.0, w, h, 0.0, 1.0, 1.0),
+        )
+        .unwrap();
     let mut container_node = Node::new(
         Some(tooltip_container.clone()),
         Some(vec![Node::new(Some(background), None)]),
     );
 
     let text_entity = entities.create();
-    text_storage.insert(
-        text_entity.clone(),
-        Text::new_with_text(20.0, (w as f32 * 0.9) as u16, (h as f32 * 0.9) as u16, text),
-    );
-    transform_storage.insert(
-        text_entity.clone(),
-        Transform::visible(
-            w as f32 * 0.05,
-            h as f32 * 0.05,
-            0.0,
-            w - 5,
-            h - 5,
-            0.0,
-            1.0,
-            1.0,
-        ),
-    );
-    color_storage.insert(text_entity.clone(), Color([1.0, 1.0, 1.0, 1.0]));
+    text_storage
+        .insert(
+            text_entity.clone(),
+            Text::new_with_text(20.0, (w as f32 * 0.9) as u16, (h as f32 * 0.9) as u16, text),
+        )
+        .unwrap();
+    transform_storage
+        .insert(
+            text_entity.clone(),
+            Transform::visible(
+                w as f32 * 0.05,
+                h as f32 * 0.05,
+                0.0,
+                w - 5,
+                h - 5,
+                0.0,
+                1.0,
+                1.0,
+            ),
+        )
+        .unwrap();
+    color_storage
+        .insert(text_entity.clone(), Color([1.0, 1.0, 1.0, 1.0]))
+        .unwrap();
 
     container_node.add(Node::new(Some(text_entity.clone()), None));
 

@@ -38,17 +38,17 @@ impl StateManager {
     fn cleanup_state(&self, state: &Box<State>, world: &mut World) {
         let scene = state.get_scene();
         let scene = scene.lock().unwrap();
-        for node in &scene.sub_nodes {
+        for node in scene.get_sub_nodes() {
             self.delete_entities_from_node(node, world);
         }
     }
 
     fn delete_entities_from_node(&self, node: &Node, world: &mut World) {
         if let Some(entity) = node.entity {
-            world.delete_entity(entity);
+            world.delete_entity(entity).unwrap();
         }
 
-        for node in &node.sub_nodes {
+        for node in node.get_sub_nodes() {
             self.delete_entities_from_node(node, world);
         }
     }

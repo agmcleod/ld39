@@ -126,8 +126,8 @@ impl<'a> State for PlayState<'a> {
         let mut set_nodes = HashMap::new();
         // we'll build 3 pockets of protected nodes
         for _ in 0..3 {
-            let mut x = 0;
-            let mut y = 0;
+            let mut x;
+            let mut y;
             // find the center first
             loop {
                 x = rng.gen_range(1, 9);
@@ -151,7 +151,7 @@ impl<'a> State for PlayState<'a> {
 
             // set the type for the center
             let weight: u32 = rng.gen_range(0, 101);
-            let mut highest = 1;
+            let mut highest = 2;
             let tile_type = if weight >= 90 {
                 highest = 4;
                 TileType::City
@@ -159,7 +159,6 @@ impl<'a> State for PlayState<'a> {
                 highest = 3;
                 TileType::River
             } else {
-                highest = 2;
                 TileType::EcoSystem
             };
 
@@ -266,7 +265,7 @@ impl<'a> State for PlayState<'a> {
             wallet.reset();
         }
 
-        scene.sub_nodes.push(Node::new(None, Some(tile_nodes)));
+        scene.add_many(tile_nodes);
 
         let dimensions = renderer::get_dimensions();
 
@@ -297,9 +296,7 @@ impl<'a> State for PlayState<'a> {
                 frame_name: "powerbar.png".to_string(),
             })
             .build();
-        side_bar_container
-            .sub_nodes
-            .push(Node::new(Some(entity), None));
+        side_bar_container.add(Node::new(Some(entity), None));
 
         let entity = world
             .create_entity()
@@ -317,9 +314,7 @@ impl<'a> State for PlayState<'a> {
             .with(Rect::new())
             .with(Color([0.0, 1.0, 0.0, 1.0]))
             .build();
-        side_bar_container
-            .sub_nodes
-            .push(Node::new(Some(entity), None));
+        side_bar_container.add(Node::new(Some(entity), None));
 
         // coal sprite
         let entity = world
@@ -332,9 +327,7 @@ impl<'a> State for PlayState<'a> {
                 frame_name: "coal.png".to_string(),
             })
             .build();
-        side_bar_container
-            .sub_nodes
-            .push(Node::new(Some(entity), None));
+        side_bar_container.add(Node::new(Some(entity), None));
 
         // oil sprite
         let entity = world
@@ -347,9 +340,7 @@ impl<'a> State for PlayState<'a> {
                 frame_name: "oil.png".to_string(),
             })
             .build();
-        side_bar_container
-            .sub_nodes
-            .push(Node::new(Some(entity), None));
+        side_bar_container.add(Node::new(Some(entity), None));
 
         // solar sprite
         let entity = world
@@ -362,9 +353,7 @@ impl<'a> State for PlayState<'a> {
                 frame_name: "sun.png".to_string(),
             })
             .build();
-        side_bar_container
-            .sub_nodes
-            .push(Node::new(Some(entity), None));
+        side_bar_container.add(Node::new(Some(entity), None));
 
         // water sprite
         let entity = world
@@ -377,9 +366,7 @@ impl<'a> State for PlayState<'a> {
                 frame_name: "water.png".to_string(),
             })
             .build();
-        side_bar_container
-            .sub_nodes
-            .push(Node::new(Some(entity), None));
+        side_bar_container.add(Node::new(Some(entity), None));
 
         // money sprite
         let entity = world
@@ -390,9 +377,7 @@ impl<'a> State for PlayState<'a> {
                 frame_name: "dollarsign.png".to_string(),
             })
             .build();
-        side_bar_container
-            .sub_nodes
-            .push(Node::new(Some(entity), None));
+        side_bar_container.add(Node::new(Some(entity), None));
 
         // pollution levels
         let entity = world
@@ -407,9 +392,7 @@ impl<'a> State for PlayState<'a> {
             ))
             .with(Color([0.0, 1.0, 0.0, 1.0]))
             .build();
-        side_bar_container
-            .sub_nodes
-            .push(Node::new(Some(entity), None));
+        side_bar_container.add(Node::new(Some(entity), None));
 
         // selected
         let entity = world
@@ -419,7 +402,7 @@ impl<'a> State for PlayState<'a> {
             .with(Rect::new())
             .with(Color([1.0, 1.0, 1.0, 0.6]))
             .build();
-        scene.sub_nodes.push(Node::new(Some(entity), None));
+        scene.add(Node::new(Some(entity), None));
 
         // sell button
         let entity = world
@@ -436,9 +419,7 @@ impl<'a> State for PlayState<'a> {
                 frame_name: "power_btn.png".to_string(),
             })
             .build();
-        side_bar_container
-            .sub_nodes
-            .push(Node::new(Some(entity), None));
+        side_bar_container.add(Node::new(Some(entity), None));
 
         // tech tree button
         let entity = world
@@ -455,9 +436,7 @@ impl<'a> State for PlayState<'a> {
                 frame_name: "show_tech.png".to_string(),
             })
             .build();
-        side_bar_container
-            .sub_nodes
-            .push(Node::new(Some(entity), None));
+        side_bar_container.add(Node::new(Some(entity), None));
 
         {
             let mut lookup = world.write_resource::<EntityLookup>();
@@ -495,15 +474,15 @@ impl<'a> State for PlayState<'a> {
                 32,
                 Color([0.0, 1.0, 0.0, 1.0]),
             );
-            resource_count_storage.insert(
-                entity.clone(),
-                ResourceCount {
-                    resource_type: ResourceType::Coal,
-                },
-            );
-            side_bar_container
-                .sub_nodes
-                .push(Node::new(Some(entity), None));
+            resource_count_storage
+                .insert(
+                    entity.clone(),
+                    ResourceCount {
+                        resource_type: ResourceType::Coal,
+                    },
+                )
+                .unwrap();
+            side_bar_container.add(Node::new(Some(entity), None));
 
             // oil text
             let entity = create_text::create(
@@ -517,15 +496,15 @@ impl<'a> State for PlayState<'a> {
                 32,
                 Color([0.0, 1.0, 0.0, 1.0]),
             );
-            resource_count_storage.insert(
-                entity.clone(),
-                ResourceCount {
-                    resource_type: ResourceType::Oil,
-                },
-            );
-            side_bar_container
-                .sub_nodes
-                .push(Node::new(Some(entity), None));
+            resource_count_storage
+                .insert(
+                    entity.clone(),
+                    ResourceCount {
+                        resource_type: ResourceType::Oil,
+                    },
+                )
+                .unwrap();
+            side_bar_container.add(Node::new(Some(entity), None));
 
             // solar text
             let entity = create_text::create(
@@ -539,15 +518,15 @@ impl<'a> State for PlayState<'a> {
                 32,
                 Color([0.0, 1.0, 0.0, 1.0]),
             );
-            resource_count_storage.insert(
-                entity.clone(),
-                ResourceCount {
-                    resource_type: ResourceType::Solar,
-                },
-            );
-            side_bar_container
-                .sub_nodes
-                .push(Node::new(Some(entity), None));
+            resource_count_storage
+                .insert(
+                    entity.clone(),
+                    ResourceCount {
+                        resource_type: ResourceType::Solar,
+                    },
+                )
+                .unwrap();
+            side_bar_container.add(Node::new(Some(entity), None));
 
             let water_text = create_text::create(
                 &mut text_storages,
@@ -560,15 +539,15 @@ impl<'a> State for PlayState<'a> {
                 32,
                 Color([0.0, 1.0, 0.0, 1.0]),
             );
-            resource_count_storage.insert(
-                water_text.clone(),
-                ResourceCount {
-                    resource_type: ResourceType::Hydro,
-                },
-            );
-            side_bar_container
-                .sub_nodes
-                .push(Node::new(Some(water_text), None));
+            resource_count_storage
+                .insert(
+                    water_text.clone(),
+                    ResourceCount {
+                        resource_type: ResourceType::Hydro,
+                    },
+                )
+                .unwrap();
+            side_bar_container.add(Node::new(Some(water_text), None));
 
             // money text
             let entity = create_text::create(
@@ -582,13 +561,11 @@ impl<'a> State for PlayState<'a> {
                 32,
                 Color([0.0, 1.0, 0.0, 1.0]),
             );
-            wallet_ui_storage.insert(entity, WalletUI {});
-            side_bar_container
-                .sub_nodes
-                .push(Node::new(Some(entity), None));
+            wallet_ui_storage.insert(entity, WalletUI {}).unwrap();
+            side_bar_container.add(Node::new(Some(entity), None));
         }
 
-        scene.sub_nodes.push(side_bar_container);
+        scene.add(side_bar_container);
 
         let tech_tree_container_entity = world
             .create_entity()
@@ -627,23 +604,23 @@ impl<'a> State for PlayState<'a> {
 
         let mut lookup = world.write_resource::<EntityLookup>();
 
-        lookup.entities.insert(
-            "tech_tree_container".to_string(),
-            tech_tree_container_entity,
-        );
+        lookup
+            .entities
+            .insert(
+                "tech_tree_container".to_string(),
+                tech_tree_container_entity,
+            );
 
         lookup
             .entities
             .insert("resume_from_upgrades".to_string(), resume_from_upgrades);
-        tech_tree_container
-            .sub_nodes
-            .push(Node::new(Some(resume_from_upgrades), None));
+        tech_tree_container.add(Node::new(Some(resume_from_upgrades), None));
 
         lookup.entities.insert(
             "tech_tree_container".to_string(),
             tech_tree_container.entity.unwrap(),
         );
-        scene.sub_nodes.push(tech_tree_container);
+        scene.add(tech_tree_container);
     }
 
     fn update(&mut self, world: &mut World) {

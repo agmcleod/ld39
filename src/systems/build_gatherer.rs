@@ -1,8 +1,7 @@
 use std::ops::{Deref, DerefMut};
-use specs::{Entities, Read, Write, Join, ReadStorage, System, WriteStorage};
+use specs::{Entities, Join, Read, ReadStorage, System, Write, WriteStorage};
 use components::{AnimationSheet, Button, ClickSound, Color, Gatherer, GathererType, Input,
-                 ProtectedNodes, SelectedTile, Text, Tile, TileType, Transform,
-                 Wallet};
+                 ProtectedNodes, SelectedTile, Text, Tile, TileType, Transform, Wallet};
 use components::ui::WalletUI;
 use std::sync::{Arc, Mutex};
 use scene::Node;
@@ -115,7 +114,7 @@ impl<'a> System<'a> for BuildGatherer {
                         } else if gatherer_type != GathererType::Hydro && i == 0 && j == 0 {
                             continue;
                         }
-                        if let Some(&(tile_type, entity)) = protected_nodes
+                        if let Some(&(tile_type, _)) = protected_nodes
                             .nodes
                             .get(&(selected_tile_col + i, selected_tile_row + j))
                         {
@@ -124,19 +123,21 @@ impl<'a> System<'a> for BuildGatherer {
                                 pollution += gatherer_type.get_pollution_amount();
 
                                 let pollution_entity = entities.create();
-                                transform_storage.insert(
-                                    pollution_entity,
-                                    Transform::visible(
-                                        selected_tile_x + (i as f32) * Tile::get_size(),
-                                        selected_tile_y + (j as f32) * Tile::get_size(),
-                                        3.0,
-                                        64,
-                                        64,
-                                        0.0,
-                                        1.0,
-                                        1.0,
-                                    ),
-                                );
+                                transform_storage
+                                    .insert(
+                                        pollution_entity,
+                                        Transform::visible(
+                                            selected_tile_x + (i as f32) * Tile::get_size(),
+                                            selected_tile_y + (j as f32) * Tile::get_size(),
+                                            3.0,
+                                            64,
+                                            64,
+                                            0.0,
+                                            1.0,
+                                            1.0,
+                                        ),
+                                    )
+                                    .unwrap();
                                 let mut animation = AnimationSheet::new(0.1);
                                 animation.add_animation(
                                     "default".to_string(),
@@ -146,13 +147,15 @@ impl<'a> System<'a> for BuildGatherer {
                                         .collect(),
                                 );
                                 animation.set_current_animation("default".to_string());
-                                animation_sheet_storage.insert(pollution_entity, animation);
-                                color_storage.insert(pollution_entity, Color([1.0, 1.0, 1.0, 1.0]));
+                                animation_sheet_storage
+                                    .insert(pollution_entity, animation)
+                                    .unwrap();
+                                color_storage
+                                    .insert(pollution_entity, Color([1.0, 1.0, 1.0, 1.0]))
+                                    .unwrap();
 
                                 let mut scene = self.scene.lock().unwrap();
-                                scene
-                                    .sub_nodes
-                                    .push(Node::new(Some(pollution_entity), None));
+                                scene.add(Node::new(Some(pollution_entity), None));
                             }
                         }
                     }
@@ -164,15 +167,28 @@ impl<'a> System<'a> for BuildGatherer {
             anim.add_animation("default".to_string(), gatherer.gatherer_type.get_frames());
             anim.set_current_animation("default".to_string());
             let gatherer_entity = entities.create();
-            gatherer_storage.insert(gatherer_entity, gatherer);
-            animation_sheet_storage.insert(gatherer_entity, anim);
-            transform_storage.insert(
-                gatherer_entity,
-                Transform::visible(selected_tile_x, selected_tile_y, 2.0, 64, 64, 0.0, 1.0, 1.0),
-            );
+            gatherer_storage.insert(gatherer_entity, gatherer).unwrap();
+            animation_sheet_storage
+                .insert(gatherer_entity, anim)
+                .unwrap();
+            transform_storage
+                .insert(
+                    gatherer_entity,
+                    Transform::visible(
+                        selected_tile_x,
+                        selected_tile_y,
+                        2.0,
+                        64,
+                        64,
+                        0.0,
+                        1.0,
+                        1.0,
+                    ),
+                )
+                .unwrap();
 
             let mut scene = self.scene.lock().unwrap();
-            scene.sub_nodes.push(Node::new(Some(gatherer_entity), None));
+            scene.add(Node::new(Some(gatherer_entity), None));
         }
     }
 }

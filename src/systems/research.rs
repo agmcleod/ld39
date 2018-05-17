@@ -1,7 +1,7 @@
 use std::ops::{Deref, DerefMut};
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
-use specs::{Entities, ReadExpect, Write, Join, ReadStorage, System, WriteStorage};
+use specs::{Entities, Join, ReadExpect, ReadStorage, System, Write, WriteStorage};
 use entities::tech_tree::{get_color_from_status, traverse_tree, TechTreeNode};
 use components::{Color, ResearchedBuffs, ResearchingCount, Transform,
                  upgrade::{Buff, LearnProgress, Status, Upgrade}};
@@ -75,7 +75,7 @@ impl<'a> System<'a> for Research {
                 transform.size.x = (32.0 * (progress_time.0 / progress_time.1)) as u16;
                 if progress_time.0 / progress_time.1 >= 1.0 {
                     let mut scene = self.scene.lock().unwrap();
-                    entities.delete(entity);
+                    entities.delete(entity).unwrap();
                     scene.remove_node_with_entity(&entities, entity);
                 }
             }

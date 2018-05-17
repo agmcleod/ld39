@@ -166,7 +166,7 @@ fn render_entity<R: gfx::Resources, C: gfx::CommandBuffer<R>, F: gfx::Factory<R>
 }
 
 fn render_node<R: gfx::Resources, C: gfx::CommandBuffer<R>, F: gfx::Factory<R>>(
-    node: &Node,
+    node: &mut Node,
     basic: &mut renderer::Basic<R>,
     encoder: &mut gfx::Encoder<R, C>,
     world: &World,
@@ -182,6 +182,7 @@ fn render_node<R: gfx::Resources, C: gfx::CommandBuffer<R>, F: gfx::Factory<R>>(
     rects: &ReadStorage<Rect>,
     shapes: &ReadStorage<Shape>,
 ) {
+    node.sort_children(transforms);
     if let Some(entity) = node.entity {
         if let Some(transform) = transforms.get(entity) {
             if !transform.visible {
@@ -208,7 +209,7 @@ fn render_node<R: gfx::Resources, C: gfx::CommandBuffer<R>, F: gfx::Factory<R>>(
         );
     }
 
-    for node in &node.sub_nodes {
+    for node in &mut node.sub_nodes {
         render_node(
             node,
             basic,
@@ -367,9 +368,10 @@ fn main() {
             }
 
             let scene = state_manager.get_current_scene();
-            let scene = scene.lock().unwrap();
+            let mut scene = scene.lock().unwrap();
 
-            for node in &scene.sub_nodes {
+            scene.sort_children(&mut transforms);
+            for node in &mut scene.sub_nodes {
                 render_node(
                     node,
                     &mut basic,

@@ -1,6 +1,5 @@
 use std::time::Instant;
 use specs::{Component, VecStorage};
-use components::ResourceType;
 
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub enum GathererType {
@@ -11,15 +10,6 @@ pub enum GathererType {
 }
 
 impl GathererType {
-    pub fn get_type_for_resources_type(resource_type: &ResourceType) -> GathererType {
-        match *resource_type {
-            ResourceType::Coal => GathererType::Coal,
-            ResourceType::Oil => GathererType::Oil,
-            ResourceType::Solar => GathererType::Solar,
-            ResourceType::Hydro => GathererType::Hydro,
-        }
-    }
-
     pub fn get_build_cost(&self) -> i32 {
         match *self {
             GathererType::Coal => 10,

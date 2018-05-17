@@ -16,9 +16,11 @@ pub fn create(
 ) -> Node {
     let entity = entities.create();
 
-    transform_storage.insert(entity, Transform::visible(x, y, z, w, h, 0.0, 1.0, 1.0));
-    color_storage.insert(entity, Color(color));
-    rect_storage.insert(entity, Rect {});
+    transform_storage
+        .insert(entity, Transform::visible(x, y, z, w, h, 0.0, 1.0, 1.0))
+        .unwrap();
+    color_storage.insert(entity, Color(color)).unwrap();
+    rect_storage.insert(entity, Rect {}).unwrap();
 
     let node = Node::new(Some(entity), None);
     node

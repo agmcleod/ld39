@@ -1,6 +1,6 @@
 use std::time::Instant;
 use std::ops::DerefMut;
-use specs::{Write, Join, System, WriteStorage};
+use specs::{Join, System, Write, WriteStorage};
 use components::{Gatherer, Resources};
 use utils::math;
 

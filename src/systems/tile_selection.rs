@@ -1,6 +1,6 @@
 use std::ops::Deref;
 use std::sync::{Arc, Mutex};
-use specs::{Entities, Entity, Read, Join, ReadStorage, System, WriteStorage};
+use specs::{Entities, Entity, Join, Read, ReadStorage, System, WriteStorage};
 use components::{Button, Color, Gatherer, Input, Rect, ResearchedBuffs, SelectedTile, Sprite,
                  Tile, Transform};
 use scene::Node;
@@ -24,7 +24,7 @@ impl TileSelection {
             let mut scene = self.scene.lock().unwrap();
 
             let mut node_to_delete = -1i32;
-            for (i, node) in scene.sub_nodes.iter().enumerate() {
+            for (i, node) in scene.get_sub_nodes().iter().enumerate() {
                 if let Some(entity) = node.entity {
                     if entity == build_ui_entity {
                         node_to_delete = i as i32;
@@ -33,8 +33,8 @@ impl TileSelection {
             }
 
             if node_to_delete > -1i32 {
-                scene.sub_nodes.remove(node_to_delete as usize);
-                entities.delete(build_ui_entity);
+                scene.remove_by_index(node_to_delete as usize);
+                entities.delete(build_ui_entity).unwrap();
                 self.build_ui_entity = None;
             }
         }
@@ -123,7 +123,7 @@ impl<'a> System<'a> for TileSelection {
                 );
                 self.build_ui_entity = Some(node.entity.unwrap().clone());
                 let mut scene = self.scene.lock().unwrap();
-                scene.sub_nodes.push(node);
+                scene.add(node);
             }
         } else {
             for (_, transform) in (&selected_tile_storage, &transform_storage).join() {

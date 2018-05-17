@@ -1,5 +1,5 @@
 use std::ops::{Deref, DerefMut};
-use specs::{Read, Write, Join, System, WriteStorage};
+use specs::{Join, Read, System, Write, WriteStorage};
 use components::{Button, ClickSound, Input, PowerBar, ResourceType, Resources, Text, Wallet};
 use components::ui::WalletUI;
 

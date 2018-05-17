@@ -1,6 +1,6 @@
 use std::ops::{Deref, DerefMut};
 use std::sync::{Arc, Mutex};
-use specs::{Entities, Read, Write, Join, ReadStorage, System, WriteStorage};
+use specs::{Entities, Join, Read, ReadStorage, System, Write, WriteStorage};
 use components::{Button, Color, EntityLookup, Input, Rect, StateChange, Tile, Transform};
 use state::play_state::PlayState;
 use entities::create_colored_rect;
@@ -66,7 +66,7 @@ impl ToggleTechTree {
                     .entities
                     .insert("pause_black".to_string(), node.entity.unwrap());
                 let mut scene = self.scene.lock().unwrap();
-                scene.sub_nodes.push(node);
+                scene.add(node);
 
                 was_clicked = true;
             }

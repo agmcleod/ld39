@@ -68,7 +68,7 @@ fn build_entity_nodes(
             .with(Transform::visible_identity())
             .build();
 
-        container.sub_nodes.push(Node::new(Some(entity), None));
+        container.add(Node::new(Some(entity), None));
     }
 
     let mut tech_tree_node = TechTreeNode {
@@ -76,7 +76,7 @@ fn build_entity_nodes(
         sub_nodes: Vec::new(),
     };
 
-    container.sub_nodes.push(Node::new(Some(entity), None));
+    container.add(Node::new(Some(entity), None));
 
     if let Some(children) = node.get("children") {
         for child in children.as_array().unwrap().iter() {

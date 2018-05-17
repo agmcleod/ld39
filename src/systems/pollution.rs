@@ -1,5 +1,5 @@
 use std::ops::DerefMut;
-use specs::{Write, Join, ReadStorage, System, WriteStorage};
+use specs::{Join, ReadStorage, System, Write, WriteStorage};
 use components::{Gatherer, PollutionCount, Text, Wallet, ui::WalletUI};
 use systems::{logic, FRAME_TIME};
 
