@@ -5,8 +5,8 @@ use scene::Node;
 use state::State;
 use std::ops::DerefMut;
 
-use components::{Button, Color, CurrentPower, EntityLookup, PollutionCount, PowerBar,
-                 ProtectedNodes, Rect, ResearchedBuffs, ResearchingCount, ResourceCount,
+use components::{Button, Color, CurrentPower, EntityLookup, GathererPositions, PollutionCount,
+                 PowerBar, ProtectedNodes, Rect, ResearchedBuffs, ResearchingCount, ResourceCount,
                  ResourceType, Resources, SelectedTile, Sprite, Text, Tile, TileType, Transform,
                  Wallet};
 use components::ui::WalletUI;
@@ -252,6 +252,7 @@ impl<'a> State for PlayState<'a> {
         }
 
         world.add_resource(ProtectedNodes { nodes: set_nodes });
+        world.add_resource(GathererPositions::new());
 
         {
             let mut resources_storage = world.write_resource::<Resources>();
@@ -604,12 +605,10 @@ impl<'a> State for PlayState<'a> {
 
         let mut lookup = world.write_resource::<EntityLookup>();
 
-        lookup
-            .entities
-            .insert(
-                "tech_tree_container".to_string(),
-                tech_tree_container_entity,
-            );
+        lookup.entities.insert(
+            "tech_tree_container".to_string(),
+            tech_tree_container_entity,
+        );
 
         lookup
             .entities

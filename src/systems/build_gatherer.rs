@@ -1,7 +1,8 @@
 use std::ops::{Deref, DerefMut};
 use specs::{Entities, Join, Read, ReadStorage, System, Write, WriteStorage};
-use components::{AnimationSheet, Button, ClickSound, Color, Gatherer, GathererType, Input,
-                 ProtectedNodes, SelectedTile, Text, Tile, TileType, Transform, Wallet};
+use components::{AnimationSheet, Button, ClickSound, Color, Gatherer, GathererPositions,
+                 GathererType, Input, ProtectedNodes, ResearchedBuffs, SelectedTile, Text, Tile,
+                 TileType, Transform, Wallet, upgrade::Buff};
 use components::ui::WalletUI;
 use std::sync::{Arc, Mutex};
 use scene::Node;
@@ -19,8 +20,10 @@ impl<'a> System<'a> for BuildGatherer {
         WriteStorage<'a, Color>,
         Entities<'a>,
         WriteStorage<'a, Gatherer>,
+        Write<'a, GathererPositions>,
         Read<'a, Input>,
         Read<'a, ProtectedNodes>,
+        Read<'a, ResearchedBuffs>,
         ReadStorage<'a, SelectedTile>,
         WriteStorage<'a, Text>,
         WriteStorage<'a, Transform>,
@@ -36,8 +39,10 @@ impl<'a> System<'a> for BuildGatherer {
             mut color_storage,
             entities,
             mut gatherer_storage,
+            mut gatherer_positions_storage,
             input_storage,
             protected_nodes_storage,
+            researched_buffs_storage,
             selected_tile_storage,
             mut text_storage,
             mut transform_storage,
@@ -186,6 +191,43 @@ impl<'a> System<'a> for BuildGatherer {
                     ),
                 )
                 .unwrap();
+
+            let gatherer_positions = gatherer_positions_storage.deref_mut();
+            gatherer_positions.gatherers.insert(
+                (selected_tile_col, selected_tile_row),
+                (gatherer_type.clone(), gatherer_entity.clone()),
+            );
+
+            let researched_buffs = researched_buffs_storage.deref();
+            if researched_buffs.0.contains(&Buff::ResourceTrading) {
+                let mut at_least_one_adjacent = false;
+                for i in -1..2 {
+                    for j in -1..2 {
+                        if i == 0 && j == 0 {
+                            continue;
+                        }
+                        if let Some(&(other_gatherer_type, entity)) = gatherer_positions
+                            .gatherers
+                            .get(&(selected_tile_col + i, selected_tile_row + j))
+                        {
+                            if gatherer_type == other_gatherer_type {
+                                gatherer_storage
+                                    .get_mut(entity)
+                                    .unwrap()
+                                    .has_adjancent_of_same_type = true;
+                                at_least_one_adjacent = true;
+                            }
+                        }
+                    }
+                }
+
+                if at_least_one_adjacent {
+                    gatherer_storage
+                        .get_mut(gatherer_entity)
+                        .unwrap()
+                        .has_adjancent_of_same_type = true;
+                }
+            }
 
             let mut scene = self.scene.lock().unwrap();
             scene.add(Node::new(Some(gatherer_entity), None));

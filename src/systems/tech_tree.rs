@@ -122,7 +122,7 @@ impl<'a> System<'a> for TechTree {
         let lookup: &EntityLookup = entity_lookup_storage.deref();
 
         let mut scene = self.scene.lock().unwrap();
-        let mut tech_tree_node_entity = None;
+        let mut mouse_over_tech_tree_node_entity = None;
         let mut tooltip_position = [0.0, 0.0];
 
         for (entity, _, transform) in
@@ -140,27 +140,35 @@ impl<'a> System<'a> for TechTree {
                 transform.scale.y,
             );
             if abs_transform.contains(&input.mouse_pos.0, &input.mouse_pos.1) {
-                tech_tree_node_entity = Some(entity.clone());
+                mouse_over_tech_tree_node_entity = Some(entity.clone());
                 tooltip_position[0] = transform.get_pos().x;
                 tooltip_position[1] = transform.get_pos().y;
             }
         }
 
-        if let Some(tech_tree_node_entity) = tech_tree_node_entity {
+        if let Some(mouse_over_tech_tree_node_entity) = mouse_over_tech_tree_node_entity {
             let create_tooltip =
                 if let Some(current_tech_tree_node_entity) = self.current_tech_tree_node_entity {
-                    current_tech_tree_node_entity != tech_tree_node_entity
+                    current_tech_tree_node_entity != mouse_over_tech_tree_node_entity
                 } else {
                     true
                 };
 
             if create_tooltip {
+                if let Some(current_tooltip) = self.current_tooltip {
+                    scene.remove_node_with_entity(&entities, current_tooltip);
+                    self.current_tooltip = None;
+                    self.current_tech_tree_node_entity = None;
+                }
                 if let Some(container_node) = scene
                     .get_node_for_entity(*lookup.get(&"tech_tree_container".to_string()).unwrap())
                 {
-                    let tech_tree_node_ui =
-                        tech_tree_node_storage.get(tech_tree_node_entity).unwrap();
-                    let upgrade = upgrade_storage.get(tech_tree_node_entity).unwrap();
+                    let tech_tree_node_ui = tech_tree_node_storage
+                        .get(mouse_over_tech_tree_node_entity)
+                        .unwrap();
+                    let upgrade = upgrade_storage
+                        .get(mouse_over_tech_tree_node_entity)
+                        .unwrap();
                     let mut tooltip_node = create_tooltip::create(
                         &entities,
                         &mut color_storage,
@@ -174,7 +182,8 @@ impl<'a> System<'a> for TechTree {
                         tech_tree_node_ui.text.clone(),
                     );
                     self.current_tooltip = Some(tooltip_node.entity.unwrap().clone());
-                    self.current_tech_tree_node_entity = Some(tech_tree_node_entity.clone());
+                    self.current_tech_tree_node_entity =
+                        Some(mouse_over_tech_tree_node_entity.clone());
 
                     let mut text_storage_type = TextStorage {
                         entities: &entities,
@@ -234,13 +243,19 @@ impl<'a> System<'a> for TechTree {
                 }
             } else if input.mouse_pressed {
                 let wallet: &mut Wallet = wallet_storage.deref_mut();
-                let upgrade = upgrade_storage.get_mut(tech_tree_node_entity).unwrap();
+                let upgrade = upgrade_storage
+                    .get_mut(mouse_over_tech_tree_node_entity)
+                    .unwrap();
                 if upgrade.status == Status::Researchable && wallet.spend(upgrade.cost) {
                     upgrade.start_learning();
-                    *color_storage.get_mut(tech_tree_node_entity).unwrap() =
-                        Color(get_color_from_status(&upgrade.status));
+                    *color_storage
+                        .get_mut(mouse_over_tech_tree_node_entity)
+                        .unwrap() = Color(get_color_from_status(&upgrade.status));
                     let researching_count = researching_count_storage.deref_mut();
-                    let sprite = (*sprite_storage.get(tech_tree_node_entity).unwrap()).clone();
+                    let sprite = (*sprite_storage
+                        .get(mouse_over_tech_tree_node_entity)
+                        .unwrap())
+                        .clone();
                     self.build_research_progress_ui(
                         &mut scene,
                         upgrade.buff,

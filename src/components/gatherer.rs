@@ -51,6 +51,7 @@ pub struct Gatherer {
     pub gatherer_type: GathererType,
     pub gather_tick: Instant,
     pub pollution: i32,
+    pub has_adjancent_of_same_type: bool,
 }
 
 impl Gatherer {
@@ -59,6 +60,7 @@ impl Gatherer {
             gatherer_type: gatherer_type,
             gather_tick: Instant::now(),
             pollution,
+            has_adjancent_of_same_type: false,
         }
     }
 }

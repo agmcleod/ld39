@@ -268,7 +268,7 @@ fn main() {
     let audio_endpoint = rodio::default_endpoint().unwrap();
     let click_sound_source = loader::create_sound("resources/click.ogg").buffered();
     let music = loader::create_music_sink("resources/ld39.ogg", &audio_endpoint);
-    music.play();
+    music.stop();
 
     setup_world(&mut world, &window);
 
