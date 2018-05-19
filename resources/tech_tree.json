@@ -14,7 +14,7 @@
     "status": "Researchable",
     "x": 0.75,
     "y_tier": 1,
-    "description": "+1 unit gained for each gatherer with neighbouring facilities of same type",
+    "description": "+1 unit gained for having the same gatherer type as a neighbour",
     "frame_name": "resourcetrading.png"
   }, {
     "buff": "ConveyerBelts",
