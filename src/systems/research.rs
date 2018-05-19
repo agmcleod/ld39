@@ -88,6 +88,7 @@ impl<'a> System<'a> for Research {
                     for sub_node in &node.sub_nodes {
                         upgrade_storage.get_mut(sub_node.entity).unwrap().status =
                             Status::Researchable;
+                        color_storage.insert(sub_node.entity, Color(get_color_from_status(&Status::Researchable))).unwrap();
                     }
                     return true;
                 }
