@@ -6,9 +6,9 @@ use state::State;
 use std::ops::DerefMut;
 
 use components::{Button, Color, CurrentPower, EntityLookup, GathererPositions, PollutionCount,
-                 PowerBar, ProtectedNodes, Rect, ResearchedBuffs, ResearchingCount, ResourceCount,
-                 ResourceType, Resources, SelectedTile, Sprite, Text, Tile, TileType, Transform,
-                 Wallet};
+                 PowerBar, ProtectedNodes, Rect, ResearchedBuffs, ResearchingEntities,
+                 ResourceCount, ResourceType, Resources, SelectedTile, Sprite, Text, Tile,
+                 TileType, Transform, Wallet};
 use components::ui::WalletUI;
 use systems;
 use renderer;
@@ -601,7 +601,7 @@ impl<'a> State for PlayState<'a> {
 
         world.add_resource::<tech_tree::TechTreeNode>(tech_tree_node);
         world.add_resource::<ResearchedBuffs>(ResearchedBuffs(HashSet::new()));
-        world.add_resource::<ResearchingCount>(ResearchingCount { count: 0 });
+        world.add_resource::<ResearchingEntities>(ResearchingEntities::new());
 
         let mut lookup = world.write_resource::<EntityLookup>();
 

@@ -110,7 +110,7 @@ impl<'a> System<'a> for BuildGatherer {
 
             // calculate pollution, and add pollution sprites on top
             // this will at present overlap polluting animations
-            // Solar doesn pollute
+            // Solar doesn't pollute
             if gatherer_type != GathererType::Solar {
                 for i in -1..2 {
                     for j in -1..2 {
@@ -199,6 +199,7 @@ impl<'a> System<'a> for BuildGatherer {
             );
 
             let researched_buffs = researched_buffs_storage.deref();
+            // check for adjacent gatherers
             if researched_buffs.0.contains(&Buff::ResourceTrading) {
                 let mut at_least_one_adjacent = false;
                 for i in -1..2 {

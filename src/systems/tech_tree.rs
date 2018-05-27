@@ -2,7 +2,7 @@ use std::sync::{Arc, Mutex};
 use std::ops::{Deref, DerefMut};
 use specs::{Entities, Entity, Join, Read, ReadStorage, System, Write, WriteStorage};
 use scene::Node;
-use components::{Color, EntityLookup, Input, Rect, ResearchingCount, Sprite, Text, Transform,
+use components::{Color, EntityLookup, Input, Rect, ResearchingEntities, Sprite, Text, Transform,
                  Wallet, ui::WalletUI, upgrade::{Buff, LearnProgress}};
 use components::ui;
 use entities::{create_text, create_tooltip};
@@ -38,7 +38,7 @@ impl TechTree {
         rect_storage: &mut WriteStorage<Rect>,
         learn_progress_storage: &mut WriteStorage<LearnProgress>,
         researching_count: usize,
-    ) {
+    ) -> Entity {
         let sidebar_entity = lookup.get("side_bar_container").unwrap();
         let sidebar_node = scene.get_node_for_entity(*sidebar_entity).unwrap();
 
@@ -76,9 +76,11 @@ impl TechTree {
             .unwrap();
 
         sidebar_node.add(Node::new(
-            Some(progress_entity),
+            Some(progress_entity.clone()),
             Some(vec![Node::new(Some(sprite_entity), None)]),
         ));
+
+        progress_entity
     }
 }
 
@@ -90,7 +92,7 @@ impl<'a> System<'a> for TechTree {
         Read<'a, Input>,
         WriteStorage<'a, LearnProgress>,
         WriteStorage<'a, Rect>,
-        Write<'a, ResearchingCount>,
+        Write<'a, ResearchingEntities>,
         WriteStorage<'a, Sprite>,
         ReadStorage<'a, ui::TechTreeButton>,
         WriteStorage<'a, Text>,
@@ -108,7 +110,7 @@ impl<'a> System<'a> for TechTree {
             input_storage,
             mut learn_progress_storage,
             mut rect_storage,
-            mut researching_count_storage,
+            mut researching_entities_storage,
             mut sprite_storage,
             tech_tree_node_storage,
             mut text_storage,
@@ -251,12 +253,12 @@ impl<'a> System<'a> for TechTree {
                     *color_storage
                         .get_mut(mouse_over_tech_tree_node_entity)
                         .unwrap() = Color(get_color_from_status(&upgrade.status));
-                    let researching_count = researching_count_storage.deref_mut();
+                    let researching_entities = researching_entities_storage.deref_mut();
                     let sprite = (*sprite_storage
                         .get(mouse_over_tech_tree_node_entity)
                         .unwrap())
                         .clone();
-                    self.build_research_progress_ui(
+                    let progress_entity = self.build_research_progress_ui(
                         &mut scene,
                         upgrade.buff,
                         &lookup,
@@ -267,9 +269,9 @@ impl<'a> System<'a> for TechTree {
                         &mut color_storage,
                         &mut rect_storage,
                         &mut learn_progress_storage,
-                        researching_count.count,
+                        researching_entities.entities.len(),
                     );
-                    researching_count.count += 1;
+                    researching_entities.entities.push(progress_entity);
                     logic::update_text(
                         format!("{}", wallet.money),
                         &mut text_storage,
