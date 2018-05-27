@@ -23,7 +23,7 @@
     "status": "Researchable",
     "x": 0.20,
     "y_tier": 1,
-    "description": "+5% coal gain rate, +5% more pollution.",
+    "description": "+1 coal gain rate & +1 more pollution per gatherer.",
     "frame_name": "conveyerbelts.png",
     "children": [{
       "buff": "RoboticLoaders",
@@ -32,7 +32,7 @@
       "status": "Locked",
       "x": 0.20,
       "y_tier": 2,
-      "description": "+5% coal gain rate",
+      "description": "+1 coal gain rate",
       "frame_name": "roboticloaders.png",
       "children": [{
         "buff": "PollutionFilters",
@@ -41,7 +41,7 @@
         "status": "Locked",
         "x": 0.1,
         "y_tier": 3,
-        "description": "+10% pollution reduction",
+        "description": "+20% pollution reduction",
         "frame_name": "pollutionfilters.png"
       }]
     }]
@@ -61,7 +61,7 @@
       "status": "Locked",
       "x": 0.35,
       "y_tier": 2,
-      "description": "5% pollution reduction",
+      "description": "20% pollution reduction",
       "frame_name": "fudgethenumbers.png"
     }, {
       "buff": "AutomatedRefiners",
@@ -70,7 +70,7 @@
       "status": "Locked",
       "x": 0.65,
       "y_tier": 2,
-      "description": "+5% oil gain rate, +5% more pollution.",
+      "description": "+1 oil gain rate, +1 more pollution.",
       "frame_name": "automatedrefiners.png"
     }, {
       "buff": "Purifier",
@@ -79,7 +79,7 @@
       "status": "Locked",
       "x": 0.85,
       "y_tier": 2,
-      "description": "+5% $ per unit sold",
+      "description": "+1 oil gain rate",
       "frame_name": "purifier.png"
     }, {
       "buff": "Hydro",
@@ -106,7 +106,7 @@
         "status": "Locked",
         "x": 0.35,
         "y_tier": 5,
-        "description": "5% more energy harvested from the water",
+        "description": "+1 energy harvested from the water",
         "frame_name": "reinforcedturbines.png"
       }]
     }, {
@@ -144,7 +144,7 @@
         "status": "Locked",
         "x": 0.85,
         "y_tier": 5,
-        "description": "5% more energy harvested from the water",
+        "description": "+1 more energy harvested from the solar plants",
         "frame_name": "improvedpaneltech.png"
       }]
     }]

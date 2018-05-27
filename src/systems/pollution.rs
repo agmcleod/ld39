@@ -1,6 +1,7 @@
-use std::ops::DerefMut;
-use specs::{Join, ReadStorage, System, Write, WriteStorage};
-use components::{Gatherer, PollutionCount, Text, Wallet, ui::WalletUI};
+use std::ops::{Deref, DerefMut};
+use specs::{Join, Read, ReadStorage, System, Write, WriteStorage};
+use components::{Gatherer, GathererType, ResearchedBuffs, Text, Wallet,
+                 ui::{PollutionCount, WalletUI}, upgrade::Buff};
 use systems::{logic, FRAME_TIME};
 
 pub struct Pollution {
@@ -17,6 +18,7 @@ impl<'a> System<'a> for Pollution {
     type SystemData = (
         ReadStorage<'a, Gatherer>,
         WriteStorage<'a, PollutionCount>,
+        Read<'a, ResearchedBuffs>,
         WriteStorage<'a, Text>,
         Write<'a, Wallet>,
         ReadStorage<'a, WalletUI>,
@@ -26,6 +28,7 @@ impl<'a> System<'a> for Pollution {
         let (
             gatherer_storage,
             mut pollution_count_storage,
+            researched_buffs_storage,
             mut text_storage,
             mut wallet_storage,
             wallet_ui_storage,
@@ -40,11 +43,29 @@ impl<'a> System<'a> for Pollution {
         self.ticker = 0.0;
 
         let mut pollution = 0;
+        let researched_buffs = researched_buffs_storage.deref();
 
-        // can probably cache the pollution production amount on a tile when created
-        // instead of calculating it here
         for gatherer in (&gatherer_storage).join() {
-            pollution += gatherer.pollution;
+            let mut amount = gatherer.pollution;
+            if gatherer.gatherer_type == GathererType::Coal {
+                if researched_buffs.0.contains(&Buff::ConveyerBelts) {
+                    amount += 1;
+                } else if researched_buffs.0.contains(&Buff::PollutionFilters) {
+                    amount -= amount * 20 / 100;
+                }
+            } else if gatherer.gatherer_type == GathererType::Oil {
+                if researched_buffs.0.contains(&Buff::AutomatedRefiners) {
+                    amount += 1;
+                } else if researched_buffs.0.contains(&Buff::FudgeTheNumbers) {
+                    amount -= amount * 20 / 100;
+                }
+            } else if gatherer.gatherer_type == GathererType::Hydro {
+                if researched_buffs.0.contains(&Buff::SalmonCannon) {
+                    amount -= amount * 20 / 100;
+                }
+            }
+
+            pollution += amount;
         }
 
         if pollution > 0 {

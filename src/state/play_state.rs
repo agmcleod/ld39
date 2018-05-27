@@ -5,10 +5,10 @@ use scene::Node;
 use state::State;
 use std::ops::DerefMut;
 
-use components::{Button, Color, CurrentPower, EntityLookup, GathererPositions, PollutionCount,
-                 PowerBar, ProtectedNodes, Rect, ResearchedBuffs, ResearchingEntities,
-                 ResourceCount, ResourceType, Resources, SelectedTile, Sprite, Text, Tile,
-                 TileType, Transform, Wallet};
+use components::{Button, Color, CurrentPower, EntityLookup, GathererPositions, PowerBar,
+                 ProtectedNodes, Rect, ResearchedBuffs, ResearchingEntities, ResourceCount,
+                 ResourceType, Resources, SelectedTile, Sprite, Text, Tile, TileType, Transform,
+                 Wallet, ui::PollutionCount};
 use components::ui::WalletUI;
 use systems;
 use renderer;
@@ -43,7 +43,7 @@ impl<'a> PlayState<'a> {
                 "button_hover",
                 &[],
             )
-            .with(systems::SellEnergy {}, "sell_energy", &["button_hover"])
+            .with(systems::SellEnergy::new(), "sell_energy", &["button_hover"])
             .with(
                 systems::BuildGatherer {
                     scene: scene.clone(),

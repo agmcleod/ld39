@@ -34,10 +34,10 @@ mod utils;
 use std::ops::DerefMut;
 use std::time;
 use components::{AnimationSheet, BuildCost, Button, Camera, ClickSound, Color, CurrentPower,
-                 EntityLookup, Gatherer, HighlightTile, Input, PollutionCount, PowerBar, Rect,
-                 ResourceCount, Resources, SelectedTile, Shape, Sprite, StateChange, Text, Tile,
-                 Transform, Wallet, upgrade::{LearnProgress, Upgrade}};
-use components::ui::{TechTreeButton, WalletUI};
+                 EntityLookup, Gatherer, HighlightTile, Input, PowerBar, Rect, ResourceCount,
+                 Resources, SelectedTile, Shape, Sprite, StateChange, Text, Tile, Transform,
+                 Wallet, upgrade::{LearnProgress, Upgrade}};
+use components::ui::{PollutionCount, TechTreeButton, WalletUI};
 use specs::{Entity, ReadStorage, World, WriteStorage};
 use renderer::{ColorFormat, DepthFormat};
 use spritesheet::Spritesheet;

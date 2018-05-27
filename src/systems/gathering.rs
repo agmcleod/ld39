@@ -39,6 +39,31 @@ impl<'a> System<'a> for Gathering {
                 {
                     amount += 1;
                 }
+
+                if gatherer.gatherer_type == GathererType::Coal {
+                    if researched_buffs.0.contains(&Buff::ConveyerBelts) {
+                        amount += 1;
+                    }
+                    if researched_buffs.0.contains(&Buff::RoboticLoaders) {
+                        amount += 1;
+                    }
+                } else if gatherer.gatherer_type == GathererType::Oil {
+                    if researched_buffs.0.contains(&Buff::AutomatedRefiners) {
+                        amount += 1;
+                    }
+                    if researched_buffs.0.contains(&Buff::Purifier) {
+                        amount += 1;
+                    }
+                } else if gatherer.gatherer_type == GathererType::Hydro {
+                    if researched_buffs.0.contains(&Buff::ReinforcedTurbines) {
+                        amount += 1;
+                    }
+                } else if gatherer.gatherer_type == GathererType::Solar {
+                    if researched_buffs.0.contains(&Buff::ImprovePanelTech) {
+                        amount += 1;
+                    }
+                }
+
                 resources.increase_resource_for_gatherer_type(&gatherer.gatherer_type, amount);
             }
         }

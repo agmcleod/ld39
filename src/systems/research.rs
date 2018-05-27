@@ -84,7 +84,7 @@ impl<'a> System<'a> for Research {
             mut researched_buffs,
             mut researching_entities_storage,
             tech_tree_storage,
-            mut transform_storage,
+            transform_storage,
             mut upgrade_storage,
         ) = data;
 

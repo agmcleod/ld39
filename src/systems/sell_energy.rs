@@ -1,9 +1,33 @@
 use std::ops::{Deref, DerefMut};
 use specs::{Join, Read, System, Write, WriteStorage};
-use components::{Button, ClickSound, Input, PowerBar, ResourceType, Resources, Text, Wallet};
+use components::{Button, ClickSound, Input, PowerBar, ResearchedBuffs, ResourceType, Resources,
+                 Text, Wallet, upgrade::Buff};
 use components::ui::WalletUI;
+use systems::FRAME_TIME;
 
-pub struct SellEnergy;
+pub struct SellEnergy {
+    minute_ticker: f32,
+}
+
+impl SellEnergy {
+    pub fn new() -> Self {
+        SellEnergy { minute_ticker: 0.0 }
+    }
+
+    fn add_money<'a>(
+        &mut self,
+        amount: i32,
+        wallet_storage: &mut Write<'a, Wallet>,
+        wallet_ui_storage: &mut WriteStorage<'a, WalletUI>,
+        text_storage: &mut WriteStorage<'a, Text>,
+    ) {
+        let wallet: &mut Wallet = wallet_storage.deref_mut();
+        for (_, text) in (wallet_ui_storage, text_storage).join() {
+            wallet.add_money(amount);
+            text.set_text(format!("{}", wallet.money));
+        }
+    }
+}
 
 impl<'a> System<'a> for SellEnergy {
     type SystemData = (
@@ -11,6 +35,7 @@ impl<'a> System<'a> for SellEnergy {
         Write<'a, ClickSound>,
         Read<'a, Input>,
         WriteStorage<'a, PowerBar>,
+        Read<'a, ResearchedBuffs>,
         Write<'a, Resources>,
         WriteStorage<'a, Text>,
         Write<'a, Wallet>,
@@ -23,6 +48,7 @@ impl<'a> System<'a> for SellEnergy {
             mut click_sound_storage,
             input_storage,
             mut power_bar_storage,
+            researched_buffs_storage,
             mut resources_storage,
             mut text_storage,
             mut wallet_storage,
@@ -42,8 +68,14 @@ impl<'a> System<'a> for SellEnergy {
             }
         }
 
+        let researched_buffs = researched_buffs_storage.deref();
+
         if sell_button_clicked {
-            let coal_amount = resources.withdraw_all_for_type(ResourceType::Coal) / 4;
+            let mut coal_amount = resources.withdraw_all_for_type(ResourceType::Coal) / 4;
+            if researched_buffs.0.contains(&Buff::Purifier) {
+                coal_amount += coal_amount * 5 / 100;
+            }
+
             let oil_amount = resources.withdraw_all_for_type(ResourceType::Oil) / 3;
             let solar_amount = resources.withdraw_all_for_type(ResourceType::Solar) / 2;
             let hydro_amount = resources.withdraw_all_for_type(ResourceType::Hydro) / 2;
@@ -51,11 +83,24 @@ impl<'a> System<'a> for SellEnergy {
                 power_bar.add_power((coal_amount + oil_amount + solar_amount + hydro_amount) * 100);
             }
 
-            let wallet: &mut Wallet = wallet_storage.deref_mut();
+            self.add_money(
+                coal_amount + oil_amount + solar_amount,
+                &mut wallet_storage,
+                &mut wallet_ui_storage,
+                &mut text_storage,
+            );
+        }
 
-            for (_, text) in (&mut wallet_ui_storage, &mut text_storage).join() {
-                wallet.add_money(coal_amount + oil_amount + solar_amount);
-                text.set_text(format!("{}", wallet.money));
+        if researched_buffs.0.contains(&Buff::SellPanelsToConsumers) {
+            self.minute_ticker += FRAME_TIME;
+            if self.minute_ticker >= 1.0 {
+                self.minute_ticker = 0.0;
+                self.add_money(
+                    10,
+                    &mut wallet_storage,
+                    &mut wallet_ui_storage,
+                    &mut text_storage,
+                );
             }
         }
     }

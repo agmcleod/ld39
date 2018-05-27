@@ -76,12 +76,19 @@ impl<'a> System<'a> for BuildGatherer {
             }
         }
 
+        let researched_buffs = researched_buffs_storage.deref();
+
         let mut create = false;
         let mut selected_tile_x = 0.0;
         let mut selected_tile_y = 0.0;
         // spend the money, and hide selected tile
         if button_pressed {
-            let amount = gatherer_type.unwrap().clone().get_build_cost();
+            let mut amount = gatherer_type.unwrap().clone().get_build_cost();
+            if gatherer_type.unwrap() == GathererType::Solar
+                && researched_buffs.0.contains(&Buff::PurchaseSolarCellCompany)
+            {
+                amount -= amount * 20 / 100;
+            }
             for (_, transform) in (&selected_tile_storage, &mut transform_storage).join() {
                 if transform.visible && wallet.spend(amount) {
                     transform.visible = false;
@@ -198,7 +205,6 @@ impl<'a> System<'a> for BuildGatherer {
                 (gatherer_type.clone(), gatherer_entity.clone()),
             );
 
-            let researched_buffs = researched_buffs_storage.deref();
             // check for adjacent gatherers
             if researched_buffs.0.contains(&Buff::ResourceTrading) {
                 let mut at_least_one_adjacent = false;
