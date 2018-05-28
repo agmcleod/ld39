@@ -56,7 +56,7 @@ impl TechTree {
             .insert(
                 progress_entity,
                 Transform::visible(
-                    20.0 + 64.0 * researching_count as f32,
+                    20.0 + 40.0 * researching_count as f32,
                     546.0,
                     0.0,
                     0,

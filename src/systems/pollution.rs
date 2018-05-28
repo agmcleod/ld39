@@ -47,21 +47,23 @@ impl<'a> System<'a> for Pollution {
 
         for gatherer in (&gatherer_storage).join() {
             let mut amount = gatherer.pollution;
-            if gatherer.gatherer_type == GathererType::Coal {
-                if researched_buffs.0.contains(&Buff::ConveyerBelts) {
-                    amount += 1;
-                } else if researched_buffs.0.contains(&Buff::PollutionFilters) {
-                    amount -= amount * 20 / 100;
-                }
-            } else if gatherer.gatherer_type == GathererType::Oil {
-                if researched_buffs.0.contains(&Buff::AutomatedRefiners) {
-                    amount += 1;
-                } else if researched_buffs.0.contains(&Buff::FudgeTheNumbers) {
-                    amount -= amount * 20 / 100;
-                }
-            } else if gatherer.gatherer_type == GathererType::Hydro {
-                if researched_buffs.0.contains(&Buff::SalmonCannon) {
-                    amount -= amount * 20 / 100;
+            if amount > 0 {
+                if gatherer.gatherer_type == GathererType::Coal {
+                    if researched_buffs.0.contains(&Buff::ConveyerBelts) {
+                        amount += 1;
+                    } else if researched_buffs.0.contains(&Buff::PollutionFilters) {
+                        amount -= amount * 20 / 100;
+                    }
+                } else if gatherer.gatherer_type == GathererType::Oil {
+                    if researched_buffs.0.contains(&Buff::AutomatedRefiners) {
+                        amount += 1;
+                    } else if researched_buffs.0.contains(&Buff::FudgeTheNumbers) {
+                        amount -= amount * 20 / 100;
+                    }
+                } else if gatherer.gatherer_type == GathererType::Hydro {
+                    if researched_buffs.0.contains(&Buff::SalmonCannon) {
+                        amount -= amount * 20 / 100;
+                    }
                 }
             }
 

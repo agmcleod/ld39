@@ -268,7 +268,6 @@ fn main() {
     let audio_endpoint = rodio::default_endpoint().unwrap();
     let click_sound_source = loader::create_sound("resources/click.ogg").buffered();
     let music = loader::create_music_sink("resources/ld39.ogg", &audio_endpoint);
-    music.stop();
 
     setup_world(&mut world, &window);
 
@@ -280,6 +279,13 @@ fn main() {
     let mut running = true;
     let mut frame_start = time::Instant::now();
     while running {
+        let duration = time::Instant::now() - frame_start;
+        if math::get_seconds(&duration) < FRAME_TIME {
+            continue;
+        }
+
+        frame_start = time::Instant::now();
+
         events_loop.poll_events(|event| match event {
             Event::WindowEvent { event, .. } => match event {
                 WindowEvent::CursorMoved {
@@ -329,13 +335,6 @@ fn main() {
             _ => (),
         });
 
-        let duration = time::Instant::now() - frame_start;
-        if math::get_seconds(&duration) < FRAME_TIME {
-            continue;
-        }
-
-        frame_start = time::Instant::now();
-
         state_manager.update(&mut world);
         world.maintain();
 
@@ -360,8 +359,9 @@ fn main() {
             let click_sound: &mut ClickSound = click_sound_storage.deref_mut();
             if click_sound.play {
                 click_sound.play = false;
-                let sink = rodio::Sink::new(&audio_endpoint);
+                let mut sink = rodio::Sink::new(&audio_endpoint);
 
+                sink.set_volume(0.5);
                 sink.append(click_sound_source.clone());
                 sink.play();
                 sink.detach();

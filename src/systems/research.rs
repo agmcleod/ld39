@@ -58,7 +58,7 @@ impl Research {
             for (i, entity) in researching_entities.entities.iter().enumerate() {
                 let mut transform = transform_storage.get_mut(*entity).unwrap();
                 let y = transform.get_pos().y;
-                transform.set_pos2(20.0 + 64.0 * i as f32, y);
+                transform.set_pos2(20.0 + 40.0 * i as f32, y);
             }
         }
     }
