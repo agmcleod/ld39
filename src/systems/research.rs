@@ -1,11 +1,10 @@
 use std::ops::{Deref, DerefMut};
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
-use specs::{Entities, Join, ReadExpect, ReadStorage, System, Write, WriteStorage};
+use specs::{Entities, Join, Read, ReadExpect, ReadStorage, System, Write, WriteStorage};
 use entities::tech_tree::{get_color_from_status, traverse_tree, TechTreeNode};
-use components::{Color, ResearchedBuffs, ResearchingEntities, Transform,
+use components::{Color, DeltaTime, ResearchedBuffs, ResearchingEntities, Transform,
                  upgrade::{Buff, LearnProgress, Status, Upgrade}};
-use systems::FRAME_TIME;
 use scene::Node;
 
 type ResearchingUpgrades = HashMap<Buff, (f32, f32)>;
@@ -68,6 +67,7 @@ impl<'a> System<'a> for Research {
     type SystemData = (
         Entities<'a>,
         WriteStorage<'a, Color>,
+        Read<'a, DeltaTime>,
         ReadStorage<'a, LearnProgress>,
         Write<'a, ResearchedBuffs>,
         Write<'a, ResearchingEntities>,
@@ -80,6 +80,7 @@ impl<'a> System<'a> for Research {
         let (
             entities,
             mut color_storage,
+            delta_time_storage,
             learn_progress_storage,
             mut researched_buffs,
             mut researching_entities_storage,
@@ -88,6 +89,8 @@ impl<'a> System<'a> for Research {
             mut upgrade_storage,
         ) = data;
 
+        let dt = delta_time_storage.deref().dt;
+
         let mut upgrade_entities_researched = Vec::with_capacity(3);
         let mut researching_entities = researching_entities_storage.deref_mut();
         let mut researching_upgrades: ResearchingUpgrades = HashMap::new();
@@ -95,7 +98,7 @@ impl<'a> System<'a> for Research {
             (&*entities, &mut color_storage, &mut upgrade_storage).join()
         {
             if upgrade.status == Status::Learning {
-                upgrade.current_research_progress += FRAME_TIME;
+                upgrade.current_research_progress += dt;
                 if upgrade.current_research_progress >= upgrade.time_to_research {
                     self.research_finished(upgrade.buff, researched_buffs.deref_mut());
                     upgrade.status = Status::Researched;

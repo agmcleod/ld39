@@ -1,8 +1,8 @@
 use std::ops::{Deref, DerefMut};
 use specs::{Join, Read, ReadStorage, System, Write, WriteStorage};
-use components::{Gatherer, GathererType, ResearchedBuffs, Text, Wallet,
+use components::{DeltaTime, Gatherer, GathererType, ResearchedBuffs, Text, Wallet,
                  ui::{PollutionCount, WalletUI}, upgrade::Buff};
-use systems::{logic, FRAME_TIME};
+use systems::{logic};
 
 pub struct Pollution {
     ticker: f32,
@@ -16,6 +16,7 @@ impl Pollution {
 
 impl<'a> System<'a> for Pollution {
     type SystemData = (
+        Read<'a, DeltaTime>,
         ReadStorage<'a, Gatherer>,
         WriteStorage<'a, PollutionCount>,
         Read<'a, ResearchedBuffs>,
@@ -26,6 +27,7 @@ impl<'a> System<'a> for Pollution {
 
     fn run(&mut self, data: Self::SystemData) {
         let (
+            delta_time_storage,
             gatherer_storage,
             mut pollution_count_storage,
             researched_buffs_storage,
@@ -34,7 +36,7 @@ impl<'a> System<'a> for Pollution {
             wallet_ui_storage,
         ) = data;
 
-        self.ticker += FRAME_TIME;
+        self.ticker += delta_time_storage.deref().dt;
 
         if self.ticker < 1.0 {
             return;

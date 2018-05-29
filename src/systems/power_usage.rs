@@ -1,9 +1,8 @@
-use std::ops::DerefMut;
+use std::ops::{Deref, DerefMut};
 use std::time::Instant;
-use components::{CurrentPower, PowerBar, ResourceCount, Resources, StateChange, Text, Transform};
+use components::{CurrentPower, DeltaTime, PowerBar, ResourceCount, Resources, StateChange, Text, Transform};
 use state::play_state::PlayState;
-use specs::{Join, ReadStorage, System, Write, WriteStorage};
-use systems::FRAME_TIME;
+use specs::{Join, Read, ReadStorage, System, Write, WriteStorage};
 
 pub struct PowerUsage {
     instant: Instant,
@@ -23,6 +22,7 @@ impl<'b> System<'b> for PowerUsage {
     type SystemData = (
         ReadStorage<'b, ResourceCount>,
         ReadStorage<'b, CurrentPower>,
+        Read<'b, DeltaTime>,
         WriteStorage<'b, PowerBar>,
         Write<'b, Resources>,
         Write<'b, StateChange>,
@@ -34,6 +34,7 @@ impl<'b> System<'b> for PowerUsage {
         let (
             resource_count_storage,
             current_power_storage,
+            delta_time_storage,
             mut power_storage,
             mut resources_storage,
             mut state_change_storage,
@@ -44,9 +45,10 @@ impl<'b> System<'b> for PowerUsage {
 
         let mut power_left = 0;
         self.frame_count += 1.0;
+        let dt = delta_time_storage.deref().dt;
         for power_bar in (&mut power_storage).join() {
             power_left = power_bar.power_left;
-            if self.frame_count * FRAME_TIME >= 1.0 {
+            if self.frame_count * dt >= 1.0 {
                 self.frame_count = 0.0;
                 self.instant = Instant::now();
                 if power_bar.power_left > 0 {

@@ -1,9 +1,8 @@
 use std::ops::{Deref, DerefMut};
 use specs::{Join, Read, System, Write, WriteStorage};
-use components::{Button, ClickSound, Input, PowerBar, ResearchedBuffs, ResourceType, Resources,
+use components::{Button, ClickSound, DeltaTime, Input, PowerBar, ResearchedBuffs, ResourceType, Resources,
                  Text, Wallet, upgrade::Buff};
 use components::ui::WalletUI;
-use systems::FRAME_TIME;
 
 pub struct SellEnergy {
     minute_ticker: f32,
@@ -33,6 +32,7 @@ impl<'a> System<'a> for SellEnergy {
     type SystemData = (
         WriteStorage<'a, Button>,
         Write<'a, ClickSound>,
+        Read<'a, DeltaTime>,
         Read<'a, Input>,
         WriteStorage<'a, PowerBar>,
         Read<'a, ResearchedBuffs>,
@@ -46,6 +46,7 @@ impl<'a> System<'a> for SellEnergy {
         let (
             mut button_storage,
             mut click_sound_storage,
+            delta_time_storage,
             input_storage,
             mut power_bar_storage,
             researched_buffs_storage,
@@ -92,7 +93,7 @@ impl<'a> System<'a> for SellEnergy {
         }
 
         if researched_buffs.0.contains(&Buff::SellPanelsToConsumers) {
-            self.minute_ticker += FRAME_TIME;
+            self.minute_ticker += delta_time_storage.deref().dt;
             if self.minute_ticker >= 1.0 {
                 self.minute_ticker = 0.0;
                 self.add_money(

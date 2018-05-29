@@ -34,7 +34,7 @@ mod utils;
 use std::ops::DerefMut;
 use std::time;
 use components::{AnimationSheet, BuildCost, Button, Camera, ClickSound, Color, CurrentPower,
-                 EntityLookup, Gatherer, HighlightTile, Input, PowerBar, Rect, ResourceCount,
+                 DeltaTime, EntityLookup, Gatherer, HighlightTile, Input, PowerBar, Rect, ResourceCount,
                  Resources, SelectedTile, Shape, Sprite, StateChange, Text, Tile, Transform,
                  Wallet, upgrade::{LearnProgress, Upgrade}};
 use components::ui::{PollutionCount, TechTreeButton, WalletUI};
@@ -50,7 +50,6 @@ use state::play_state::PlayState;
 use state::StateManager;
 use gfx_glyph::{GlyphBrush, GlyphBrushBuilder};
 use utils::math;
-use systems::FRAME_TIME;
 
 fn setup_world(world: &mut World, window: &glutin::Window) {
     world.add_resource::<Camera>(Camera(renderer::get_ortho()));
@@ -68,6 +67,7 @@ fn setup_world(world: &mut World, window: &glutin::Window) {
     world.add_resource::<ClickSound>(ClickSound { play: false });
     world.add_resource::<Wallet>(Wallet::new());
     world.add_resource::<EntityLookup>(EntityLookup::new());
+    world.add_resource::<DeltaTime>(DeltaTime{ dt: 0.0 });
     world.register::<AnimationSheet>();
     world.register::<BuildCost>();
     world.register::<Button>();
@@ -280,9 +280,6 @@ fn main() {
     let mut frame_start = time::Instant::now();
     while running {
         let duration = time::Instant::now() - frame_start;
-        if math::get_seconds(&duration) < FRAME_TIME {
-            continue;
-        }
 
         frame_start = time::Instant::now();
 
@@ -334,6 +331,11 @@ fn main() {
             },
             _ => (),
         });
+
+        {
+            let mut dt = world.write_resource::<DeltaTime>();
+            dt.dt = math::get_seconds(&duration);
+        }
 
         state_manager.update(&mut world);
         world.maintain();

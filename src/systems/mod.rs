@@ -12,8 +12,6 @@ mod tile_selection;
 mod toggle_tech_tree;
 mod tech_tree;
 
-pub const FRAME_TIME: f32 = 0.016;
-
 pub use self::animation_system::*;
 pub use self::build_gatherer::*;
 pub use self::button_hover::*;
