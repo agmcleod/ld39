@@ -5,7 +5,7 @@ use scene::Node;
 use state::State;
 use std::ops::DerefMut;
 
-use components::{Button, Color, CurrentPower, EntityLookup, GathererPositions, PowerBar,
+use components::{Button, Color, EntityLookup, GathererPositions, PowerBar,
                  ProtectedNodes, Rect, ResearchedBuffs, ResearchingEntities, ResourceCount,
                  ResourceType, Resources, SelectedTile, Sprite, Text, Tile, TileType, Transform,
                  Wallet, ui::PollutionCount};
@@ -289,25 +289,32 @@ impl<'a> State for PlayState<'a> {
             None,
         );
 
-        let entity = world
-            .create_entity()
-            .with(PowerBar::new())
-            .with(Transform::visible(30.0, 32.0, 0.0, 260, 32, 0.0, 1.0, 1.0))
-            .with(Sprite {
-                frame_name: "powerbar.png".to_string(),
-            })
-            .build();
-        side_bar_container.add(Node::new(Some(entity), None));
+        for (i, coords) in [(30.0, 32.0), (162.0, 32.0), (30.0, 50.0), (162.0, 50.0)].iter().enumerate() {
+            let frame_name = if i == 0 {
+                "powerbar.png".to_string()
+            } else {
+                "powerbar_disabled.png".to_string()
+            };
+
+            let entity = world
+                .create_entity()
+                .with(Transform::visible(coords.0, coords.1, 0.0, 130, 16, 0.0, 1.0, 1.0))
+                .with(Sprite {
+                    frame_name,
+                })
+                .build();
+            side_bar_container.add(Node::new(Some(entity), None));
+        }
 
         let entity = world
             .create_entity()
-            .with(CurrentPower {})
+            .with(PowerBar::new())
             .with(Transform::visible(
-                34.0,
-                36.0,
+                33.0,
+                35.0,
                 1.0,
-                CurrentPower::get_max_with(),
-                24,
+                PowerBar::get_max_width() as u16,
+                10,
                 0.0,
                 1.0,
                 1.0,

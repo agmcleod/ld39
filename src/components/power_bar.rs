@@ -17,6 +17,8 @@ impl PowerBar {
         MAX_POWER as f32
     }
 
+    pub fn get_max_width() -> f32 { 124.0 }
+
     pub fn add_power(&mut self, power: i32) {
         self.power_left += power;
         if self.power_left > MAX_POWER {

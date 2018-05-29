@@ -33,7 +33,7 @@ mod utils;
 
 use std::ops::DerefMut;
 use std::time;
-use components::{AnimationSheet, BuildCost, Button, Camera, ClickSound, Color, CurrentPower,
+use components::{AnimationSheet, BuildCost, Button, Camera, ClickSound, Color,
                  DeltaTime, EntityLookup, Gatherer, HighlightTile, Input, PowerBar, Rect, ResourceCount,
                  Resources, SelectedTile, Shape, Sprite, StateChange, Text, Tile, Transform,
                  Wallet, upgrade::{LearnProgress, Upgrade}};
@@ -71,7 +71,6 @@ fn setup_world(world: &mut World, window: &glutin::Window) {
     world.register::<AnimationSheet>();
     world.register::<BuildCost>();
     world.register::<Button>();
-    world.register::<CurrentPower>();
     world.register::<Color>();
     world.register::<Gatherer>();
     world.register::<HighlightTile>();
