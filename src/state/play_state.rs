@@ -71,6 +71,7 @@ impl<'a> PlayState<'a> {
             )
             .with(systems::Research::new(scene.clone()), "research", &[])
             .with(systems::Pollution::new(), "pollution", &[])
+            .with(systems::CitiesToPower{}, "cities_to_power", &["button_hover"])
             .build();
 
         let tech_tree_dispatcher = DispatcherBuilder::new()
@@ -324,6 +325,15 @@ impl<'a> State for PlayState<'a> {
             .build();
         side_bar_container.add(Node::new(Some(entity), None));
 
+        // add city power target
+        let power_additional_city = world
+            .create_entity()
+            .with(Sprite{ frame_name: "power_additional_city.png".to_string() })
+            .with(Button::new("power_additional_city".to_string(), ["power_additional_city.png".to_string(), "power_additional_city_hover.png".to_string()]))
+            .with(Transform::visible(30.0, 80.0, 0.0, 96, 32, 0.0, 1.0, 1.0))
+            .build();
+        side_bar_container.add(Node::new(Some(power_additional_city.clone()), None));
+
         // coal sprite
         let entity = world
             .create_entity()
@@ -454,6 +464,11 @@ impl<'a> State for PlayState<'a> {
             lookup.entities.insert(
                 "side_bar_container".to_string(),
                 side_bar_container.entity.unwrap(),
+            );
+
+            lookup.entities.insert(
+                "power_additional_city".to_string(),
+                power_additional_city
             );
 
             let entities = world.entities();

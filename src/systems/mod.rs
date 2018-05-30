@@ -1,6 +1,7 @@
 mod animation_system;
 mod build_gatherer;
 mod button_hover;
+mod cities_to_power;
 mod gathering;
 mod power_usage;
 mod research;
@@ -15,6 +16,7 @@ mod tech_tree;
 pub use self::animation_system::*;
 pub use self::build_gatherer::*;
 pub use self::button_hover::*;
+pub use self::cities_to_power::*;
 pub use self::gathering::*;
 pub use self::pollution::*;
 pub use self::power_usage::*;

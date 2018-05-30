@@ -18,7 +18,7 @@
 },
 {
 	"filename": "coal.png",
-	"frame": {"x":302,"y":300,"w":32,"h":32},
+	"frame": {"x":234,"y":372,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
@@ -34,7 +34,7 @@
 },
 {
 	"filename": "hydro.png",
-	"frame": {"x":432,"y":238,"w":64,"h":64},
+	"frame": {"x":432,"y":272,"w":64,"h":64},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":64,"h":64},
@@ -42,7 +42,7 @@
 },
 {
 	"filename": "hydro_button.png",
-	"frame": {"x":366,"y":234,"w":64,"h":64},
+	"frame": {"x":366,"y":268,"w":64,"h":64},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":64,"h":64},
@@ -50,7 +50,7 @@
 },
 {
 	"filename": "hydro_button_2.png",
-	"frame": {"x":300,"y":234,"w":64,"h":64},
+	"frame": {"x":300,"y":268,"w":64,"h":64},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":64,"h":64},
@@ -58,7 +58,7 @@
 },
 {
 	"filename": "oil.png",
-	"frame": {"x":268,"y":300,"w":32,"h":32},
+	"frame": {"x":234,"y":338,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
@@ -74,7 +74,7 @@
 },
 {
 	"filename": "plant_button_1.png",
-	"frame": {"x":234,"y":234,"w":64,"h":64},
+	"frame": {"x":234,"y":268,"w":64,"h":64},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":64,"h":64},
@@ -82,7 +82,7 @@
 },
 {
 	"filename": "plant_button_2.png",
-	"frame": {"x":432,"y":172,"w":64,"h":64},
+	"frame": {"x":432,"y":206,"w":64,"h":64},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":64,"h":64},
@@ -90,7 +90,7 @@
 },
 {
 	"filename": "pollution_1.png",
-	"frame": {"x":366,"y":168,"w":64,"h":64},
+	"frame": {"x":366,"y":202,"w":64,"h":64},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":64,"h":64},
@@ -98,7 +98,7 @@
 },
 {
 	"filename": "pollution_2.png",
-	"frame": {"x":300,"y":168,"w":64,"h":64},
+	"frame": {"x":300,"y":202,"w":64,"h":64},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":64,"h":64},
@@ -114,7 +114,7 @@
 },
 {
 	"filename": "pollution_4.png",
-	"frame": {"x":234,"y":168,"w":64,"h":64},
+	"frame": {"x":234,"y":202,"w":64,"h":64},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":64,"h":64},
@@ -143,6 +143,22 @@
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":64,"h":64},
 	"sourceSize": {"w":64,"h":64}
+},
+{
+	"filename": "power_additional_city.png",
+	"frame": {"x":362,"y":36,"w":96,"h":32},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":96,"h":32},
+	"sourceSize": {"w":96,"h":32}
+},
+{
+	"filename": "power_additional_city_hover.png",
+	"frame": {"x":264,"y":36,"w":96,"h":32},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":96,"h":32},
+	"sourceSize": {"w":96,"h":32}
 },
 {
 	"filename": "power_btn.png",
@@ -202,7 +218,7 @@
 },
 {
 	"filename": "refinery_4.png",
-	"frame": {"x":396,"y":102,"w":64,"h":64},
+	"frame": {"x":396,"y":136,"w":64,"h":64},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":64,"h":64},
@@ -210,7 +226,7 @@
 },
 {
 	"filename": "refinery_5.png",
-	"frame": {"x":330,"y":102,"w":64,"h":64},
+	"frame": {"x":330,"y":136,"w":64,"h":64},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":64,"h":64},
@@ -218,7 +234,7 @@
 },
 {
 	"filename": "refinery_6.png",
-	"frame": {"x":396,"y":102,"w":64,"h":64},
+	"frame": {"x":396,"y":136,"w":64,"h":64},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":64,"h":64},
@@ -282,7 +298,7 @@
 },
 {
 	"filename": "river_highlight.png",
-	"frame": {"x":264,"y":102,"w":64,"h":64},
+	"frame": {"x":264,"y":136,"w":64,"h":64},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":64,"h":64},
@@ -306,7 +322,7 @@
 },
 {
 	"filename": "sun.png",
-	"frame": {"x":234,"y":300,"w":32,"h":32},
+	"frame": {"x":200,"y":452,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
@@ -346,14 +362,6 @@
 },
 {
 	"filename": "techtree/automatedrefiners.png",
-	"frame": {"x":200,"y":452,"w":32,"h":32},
-	"rotated": false,
-	"trimmed": false,
-	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
-	"sourceSize": {"w":32,"h":32}
-},
-{
-	"filename": "techtree/coalnode.png",
 	"frame": {"x":200,"y":418,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
@@ -361,7 +369,7 @@
 	"sourceSize": {"w":32,"h":32}
 },
 {
-	"filename": "techtree/conveyerbelts.png",
+	"filename": "techtree/coalnode.png",
 	"frame": {"x":200,"y":384,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
@@ -369,7 +377,7 @@
 	"sourceSize": {"w":32,"h":32}
 },
 {
-	"filename": "techtree/fudgethenumbers.png",
+	"filename": "techtree/conveyerbelts.png",
 	"frame": {"x":200,"y":350,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
@@ -377,7 +385,7 @@
 	"sourceSize": {"w":32,"h":32}
 },
 {
-	"filename": "techtree/hydro.png",
+	"filename": "techtree/fudgethenumbers.png",
 	"frame": {"x":134,"y":326,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
@@ -385,7 +393,7 @@
 	"sourceSize": {"w":32,"h":32}
 },
 {
-	"filename": "techtree/improvedpaneltech.png",
+	"filename": "techtree/hydro.png",
 	"frame": {"x":134,"y":292,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
@@ -393,7 +401,7 @@
 	"sourceSize": {"w":32,"h":32}
 },
 {
-	"filename": "techtree/oilnode.png",
+	"filename": "techtree/improvedpaneltech.png",
 	"frame": {"x":134,"y":258,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
@@ -401,8 +409,16 @@
 	"sourceSize": {"w":32,"h":32}
 },
 {
-	"filename": "techtree/pollutionfilters.png",
+	"filename": "techtree/oilnode.png",
 	"frame": {"x":134,"y":224,"w":32,"h":32},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
+	"sourceSize": {"w":32,"h":32}
+},
+{
+	"filename": "techtree/pollutionfilters.png",
+	"frame": {"x":462,"y":172,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
@@ -418,14 +434,6 @@
 },
 {
 	"filename": "techtree/purifier.png",
-	"frame": {"x":462,"y":104,"w":32,"h":32},
-	"rotated": false,
-	"trimmed": false,
-	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
-	"sourceSize": {"w":32,"h":32}
-},
-{
-	"filename": "techtree/reinforcedturbines.png",
 	"frame": {"x":134,"y":190,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
@@ -433,7 +441,7 @@
 	"sourceSize": {"w":32,"h":32}
 },
 {
-	"filename": "techtree/resourcetrading.png",
+	"filename": "techtree/reinforcedturbines.png",
 	"frame": {"x":134,"y":156,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
@@ -441,7 +449,7 @@
 	"sourceSize": {"w":32,"h":32}
 },
 {
-	"filename": "techtree/roboticloaders.png",
+	"filename": "techtree/resourcetrading.png",
 	"frame": {"x":134,"y":122,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
@@ -449,8 +457,16 @@
 	"sourceSize": {"w":32,"h":32}
 },
 {
-	"filename": "techtree/salmoncannon.png",
+	"filename": "techtree/roboticloaders.png",
 	"frame": {"x":134,"y":88,"w":32,"h":32},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
+	"sourceSize": {"w":32,"h":32}
+},
+{
+	"filename": "techtree/salmoncannon.png",
+	"frame": {"x":462,"y":104,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
@@ -466,7 +482,7 @@
 },
 {
 	"filename": "techtree/solar.png",
-	"frame": {"x":462,"y":36,"w":32,"h":32},
+	"frame": {"x":460,"y":36,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
@@ -474,7 +490,7 @@
 },
 {
 	"filename": "tiles.png",
-	"frame": {"x":396,"y":36,"w":64,"h":64},
+	"frame": {"x":396,"y":70,"w":64,"h":64},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":64,"h":64},
@@ -482,7 +498,7 @@
 },
 {
 	"filename": "tiles_highlight.png",
-	"frame": {"x":330,"y":36,"w":64,"h":64},
+	"frame": {"x":330,"y":70,"w":64,"h":64},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":64,"h":64},
@@ -506,7 +522,7 @@
 },
 {
 	"filename": "wheelbarrel_button_1.png",
-	"frame": {"x":264,"y":36,"w":64,"h":64},
+	"frame": {"x":264,"y":70,"w":64,"h":64},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":64,"h":64},
@@ -527,6 +543,6 @@
 	"format": "RGBA8888",
 	"size": {"w":512,"h":512},
 	"scale": "1",
-	"smartupdate": "$TexturePacker:SmartUpdate:029ed41fd86cb77da457ff8895facf3d:bea8f2c5cae5c4886979b5d4988d775d:a759b6bbc8381ac9c472b28f589ad0d6$"
+	"smartupdate": "$TexturePacker:SmartUpdate:1a3968acc392cdccf9afacc7e6599f57:94c6b41ee8c885dcdb981f1a9fd2dbe2:a759b6bbc8381ac9c472b28f589ad0d6$"
 }
 }
