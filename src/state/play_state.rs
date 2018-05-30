@@ -330,7 +330,7 @@ impl<'a> State for PlayState<'a> {
             .with(ResourceCount {
                 resource_type: ResourceType::Coal,
             })
-            .with(Transform::visible(30.0, 108.0, 0.0, 32, 32, 0.0, 1.0, 1.0))
+            .with(Transform::visible(30.0, 158.0, 0.0, 32, 32, 0.0, 1.0, 1.0))
             .with(Sprite {
                 frame_name: "coal.png".to_string(),
             })
@@ -343,7 +343,7 @@ impl<'a> State for PlayState<'a> {
             .with(ResourceCount {
                 resource_type: ResourceType::Oil,
             })
-            .with(Transform::visible(30.0, 154.0, 0.0, 32, 32, 0.0, 1.0, 1.0))
+            .with(Transform::visible(30.0, 204.0, 0.0, 32, 32, 0.0, 1.0, 1.0))
             .with(Sprite {
                 frame_name: "oil.png".to_string(),
             })
@@ -356,7 +356,7 @@ impl<'a> State for PlayState<'a> {
             .with(ResourceCount {
                 resource_type: ResourceType::Solar,
             })
-            .with(Transform::visible(30.0, 200.0, 0.0, 32, 32, 0.0, 1.0, 1.0))
+            .with(Transform::visible(30.0, 250.0, 0.0, 32, 32, 0.0, 1.0, 1.0))
             .with(Sprite {
                 frame_name: "sun.png".to_string(),
             })
@@ -369,7 +369,7 @@ impl<'a> State for PlayState<'a> {
             .with(ResourceCount {
                 resource_type: ResourceType::Hydro,
             })
-            .with(Transform::visible(33.0, 246.0, 0.0, 26, 32, 0.0, 1.0, 1.0))
+            .with(Transform::visible(33.0, 296.0, 0.0, 26, 32, 0.0, 1.0, 1.0))
             .with(Sprite {
                 frame_name: "water.png".to_string(),
             })
@@ -380,7 +380,7 @@ impl<'a> State for PlayState<'a> {
         let entity = world
             .create_entity()
             .with(WalletUI {})
-            .with(Transform::visible(33.0, 294.0, 0.0, 26, 32, 0.0, 1.0, 1.0))
+            .with(Transform::visible(33.0, 344.0, 0.0, 26, 32, 0.0, 1.0, 1.0))
             .with(Sprite {
                 frame_name: "dollarsign.png".to_string(),
             })
@@ -390,7 +390,7 @@ impl<'a> State for PlayState<'a> {
         // pollution levels
         let entity = world
             .create_entity()
-            .with(Transform::visible(33.0, 340.0, 0.0, 200, 32, 0.0, 1.0, 1.0))
+            .with(Transform::visible(33.0, 390.0, 0.0, 200, 32, 0.0, 1.0, 1.0))
             .with(PollutionCount { count: 0 })
             .with(Text::new_with_text(
                 32.0,
@@ -476,7 +476,7 @@ impl<'a> State for PlayState<'a> {
                 "".to_string(),
                 32.0,
                 80.0,
-                108.0,
+                158.0,
                 0.0,
                 160,
                 32,
@@ -498,7 +498,7 @@ impl<'a> State for PlayState<'a> {
                 "".to_string(),
                 32.0,
                 80.0,
-                154.0,
+                204.0,
                 0.0,
                 160,
                 32,
@@ -520,7 +520,7 @@ impl<'a> State for PlayState<'a> {
                 "".to_string(),
                 32.0,
                 80.0,
-                200.0,
+                250.0,
                 0.0,
                 160,
                 32,
@@ -541,7 +541,7 @@ impl<'a> State for PlayState<'a> {
                 format!("{}", Wallet::start_amount()),
                 32.0,
                 80.0,
-                246.0,
+                296.0,
                 0.0,
                 160,
                 32,
@@ -563,7 +563,7 @@ impl<'a> State for PlayState<'a> {
                 format!("{}", Wallet::start_amount()),
                 32.0,
                 80.0,
-                294.0,
+                344.0,
                 0.0,
                 160,
                 32,
