@@ -2,7 +2,7 @@ use std::ops::{Deref, DerefMut};
 use specs::{Join, Read, ReadStorage, System, Write, WriteStorage};
 use components::{DeltaTime, Gatherer, GathererType, ResearchedBuffs, Text, Wallet,
                  ui::{PollutionCount, WalletUI}, upgrade::Buff};
-use systems::{logic};
+use systems::logic;
 
 pub struct Pollution {
     ticker: f32,

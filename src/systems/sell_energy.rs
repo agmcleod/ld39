@@ -1,7 +1,7 @@
 use std::ops::{Deref, DerefMut};
 use specs::{Join, Read, System, Write, WriteStorage};
-use components::{Button, ClickSound, DeltaTime, Input, PowerBar, ResearchedBuffs, ResourceType, Resources,
-                 Text, Wallet, upgrade::Buff};
+use components::{Button, ClickSound, DeltaTime, Input, PowerBar, ResearchedBuffs, ResourceType,
+                 Resources, Text, Transform, Wallet, upgrade::Buff};
 use components::ui::WalletUI;
 
 pub struct SellEnergy {
@@ -38,6 +38,7 @@ impl<'a> System<'a> for SellEnergy {
         Read<'a, ResearchedBuffs>,
         Write<'a, Resources>,
         WriteStorage<'a, Text>,
+        WriteStorage<'a, Transform>,
         Write<'a, Wallet>,
         WriteStorage<'a, WalletUI>,
     );
@@ -52,6 +53,7 @@ impl<'a> System<'a> for SellEnergy {
             researched_buffs_storage,
             mut resources_storage,
             mut text_storage,
+            mut transform_storage,
             mut wallet_storage,
             mut wallet_ui_storage,
         ) = data;
@@ -80,8 +82,22 @@ impl<'a> System<'a> for SellEnergy {
             let oil_amount = resources.withdraw_all_for_type(ResourceType::Oil) / 3;
             let solar_amount = resources.withdraw_all_for_type(ResourceType::Solar) / 2;
             let hydro_amount = resources.withdraw_all_for_type(ResourceType::Hydro) / 2;
-            for power_bar in (&mut power_bar_storage).join() {
-                power_bar.add_power((coal_amount + oil_amount + solar_amount + hydro_amount) * 100);
+            let mut power_to_spend = (coal_amount + oil_amount + solar_amount + hydro_amount) * 100;
+            for (transform, power_bar) in (&mut transform_storage, &mut power_bar_storage).join() {
+                let amount_to_power = PowerBar::get_max() - power_bar.power_left;
+                power_to_spend -= amount_to_power;
+                if power_to_spend >= 0 {
+                    power_bar.add_power(amount_to_power);
+                // we do addition here since the number will be negative
+                } else if amount_to_power + power_to_spend > 0 {
+                    // add the larger number of amount to power (which was subtracted) by the negative value
+                    // this will give us the amount left over
+                    power_bar.add_power(amount_to_power + power_to_spend);
+                }
+
+                let width =
+                    PowerBar::get_max_width() * (power_bar.power_left as f32 / PowerBar::get_max_f32());
+                transform.size.x = width as u16;
             }
 
             self.add_money(

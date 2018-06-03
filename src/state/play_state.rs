@@ -5,14 +5,14 @@ use scene::Node;
 use state::State;
 use std::ops::DerefMut;
 
-use components::{Button, Color, EntityLookup, GathererPositions, PowerBar,
+use components::{Button, CityPowerState, Color, EntityLookup, GathererPositions, PowerBar,
                  ProtectedNodes, Rect, ResearchedBuffs, ResearchingEntities, ResourceCount,
                  ResourceType, Resources, SelectedTile, Sprite, Text, Tile, TileType, Transform,
-                 Wallet, ui::PollutionCount};
+                 Wallet, ui::PollutionCount, CITY_POWER_STATE_COORDS};
 use components::ui::WalletUI;
 use systems;
 use renderer;
-use entities::{create_text, tech_tree};
+use entities::{create_power_bar, create_text, tech_tree};
 use storage_types::*;
 use rand::{thread_rng, Rng};
 
@@ -71,7 +71,13 @@ impl<'a> PlayState<'a> {
             )
             .with(systems::Research::new(scene.clone()), "research", &[])
             .with(systems::Pollution::new(), "pollution", &[])
-            .with(systems::CitiesToPower{}, "cities_to_power", &["button_hover"])
+            .with(
+                systems::CitiesToPower {
+                    scene: scene.clone(),
+                },
+                "cities_to_power",
+                &["button_hover"],
+            )
             .build();
 
         let tech_tree_dispatcher = DispatcherBuilder::new()
@@ -290,7 +296,9 @@ impl<'a> State for PlayState<'a> {
             None,
         );
 
-        for (i, coords) in [(30.0, 32.0), (162.0, 32.0), (30.0, 50.0), (162.0, 50.0)].iter().enumerate() {
+        let mut powerbar_frame_entities = Vec::new();
+
+        for (i, coords) in CITY_POWER_STATE_COORDS.iter().enumerate() {
             let frame_name = if i == 0 {
                 "powerbar.png".to_string()
             } else {
@@ -299,37 +307,55 @@ impl<'a> State for PlayState<'a> {
 
             let entity = world
                 .create_entity()
-                .with(Transform::visible(coords.0, coords.1, 0.0, 130, 16, 0.0, 1.0, 1.0))
-                .with(Sprite {
-                    frame_name,
-                })
+                .with(Transform::visible(
+                    coords.0,
+                    coords.1,
+                    0.0,
+                    130,
+                    16,
+                    0.0,
+                    1.0,
+                    1.0,
+                ))
+                .with(Sprite { frame_name })
                 .build();
-            side_bar_container.add(Node::new(Some(entity), None));
+            side_bar_container.add(Node::new(Some(entity.clone()), None));
+            powerbar_frame_entities.push(entity);
         }
 
-        let entity = world
-            .create_entity()
-            .with(PowerBar::new())
-            .with(Transform::visible(
-                33.0,
-                35.0,
-                1.0,
-                PowerBar::get_max_width() as u16,
-                10,
-                0.0,
-                1.0,
-                1.0,
-            ))
-            .with(Rect::new())
-            .with(Color([0.0, 1.0, 0.0, 1.0]))
-            .build();
-        side_bar_container.add(Node::new(Some(entity), None));
+        world.add_resource(CityPowerState::new(powerbar_frame_entities));
+
+        {
+            let entities = world.entities();
+            let mut color_storage = world.write_storage::<Color>();
+            let mut power_bar_storage = world.write_storage::<PowerBar>();
+            let mut rect_storage = world.write_storage::<Rect>();
+            let mut transform_storage = world.write_storage::<Transform>();
+            let mut storages = PowerBarStorage {
+                entities: &entities,
+                color_storage: &mut color_storage,
+                power_bar_storage: &mut power_bar_storage,
+                rect_storage: &mut rect_storage,
+                transform_storage: &mut transform_storage,
+            };
+
+            let entity = create_power_bar::create(&mut storages, 33.0, 35.0);
+            side_bar_container.add(Node::new(Some(entity), None));
+        }
 
         // add city power target
         let power_additional_city = world
             .create_entity()
-            .with(Sprite{ frame_name: "power_additional_city.png".to_string() })
-            .with(Button::new("power_additional_city".to_string(), ["power_additional_city.png".to_string(), "power_additional_city_hover.png".to_string()]))
+            .with(Sprite {
+                frame_name: "power_additional_city.png".to_string(),
+            })
+            .with(Button::new(
+                "power_additional_city".to_string(),
+                [
+                    "power_additional_city.png".to_string(),
+                    "power_additional_city_hover.png".to_string(),
+                ],
+            ))
             .with(Transform::visible(30.0, 80.0, 0.0, 96, 32, 0.0, 1.0, 1.0))
             .build();
         side_bar_container.add(Node::new(Some(power_additional_city.clone()), None));
@@ -466,10 +492,9 @@ impl<'a> State for PlayState<'a> {
                 side_bar_container.entity.unwrap(),
             );
 
-            lookup.entities.insert(
-                "power_additional_city".to_string(),
-                power_additional_city
-            );
+            lookup
+                .entities
+                .insert("power_additional_city".to_string(), power_additional_city);
 
             let entities = world.entities();
             let mut color_storage = world.write_storage::<Color>();

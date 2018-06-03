@@ -38,7 +38,7 @@ pub fn create_music_sink(music_path: &str, endpoint: &Endpoint) -> Sink {
 
     let music_file = File::open(&Path::new(&get_exe_path().join(music_path))).unwrap();
     let source = SoundDecoder::new(BufReader::new(music_file)).unwrap();
-    sink.set_volume(0.5);
+    sink.set_volume(0.0);
     sink.append(source.repeat_infinite());
     sink
 }

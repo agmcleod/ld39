@@ -11,10 +11,7 @@ impl AnimationSystem {
 }
 
 impl<'a> System<'a> for AnimationSystem {
-    type SystemData = (
-        WriteStorage<'a, AnimationSheet>,
-        Read<'a, DeltaTime>,
-    );
+    type SystemData = (WriteStorage<'a, AnimationSheet>, Read<'a, DeltaTime>);
 
     fn run(&mut self, data: Self::SystemData) {
         let (mut animation_sheet_storage, delta_time_storage) = data;

@@ -13,11 +13,17 @@ impl PowerBar {
         }
     }
 
-    pub fn get_max() -> f32 {
+    pub fn get_max_f32() -> f32 {
         MAX_POWER as f32
     }
 
-    pub fn get_max_width() -> f32 { 124.0 }
+    pub fn get_max() -> i32 {
+        MAX_POWER
+    }
+
+    pub fn get_max_width() -> f32 {
+        124.0
+    }
 
     pub fn add_power(&mut self, power: i32) {
         self.power_left += power;

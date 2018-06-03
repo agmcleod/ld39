@@ -43,9 +43,10 @@ impl<'b> System<'b> for PowerUsage {
 
         self.frame_count += 1.0;
         let dt = delta_time_storage.deref().dt;
+        let mut reset_frame_counter = false;
         for (transform, power_bar) in (&mut transform_storage, &mut power_storage).join() {
             if self.frame_count * dt >= 1.0 {
-                self.frame_count = 0.0;
+                reset_frame_counter = true;
                 self.instant = Instant::now();
                 if power_bar.power_left > 0 {
                     power_bar.power_left -= 100;
@@ -57,9 +58,13 @@ impl<'b> System<'b> for PowerUsage {
                 }
 
                 let width =
-                    PowerBar::get_max_width() * (power_bar.power_left as f32 / PowerBar::get_max());
+                    PowerBar::get_max_width() * (power_bar.power_left as f32 / PowerBar::get_max_f32());
                 transform.size.x = width as u16;
             }
+        }
+
+        if reset_frame_counter {
+            self.frame_count = 0.0;
         }
 
         for (resource_count, text) in (&resource_count_storage, &mut text_storage).join() {

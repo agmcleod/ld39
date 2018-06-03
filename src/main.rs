@@ -33,8 +33,8 @@ mod utils;
 
 use std::ops::DerefMut;
 use std::time;
-use components::{AnimationSheet, BuildCost, Button, Camera, ClickSound, Color,
-                 DeltaTime, EntityLookup, Gatherer, HighlightTile, Input, PowerBar, Rect, ResourceCount,
+use components::{AnimationSheet, BuildCost, Button, Camera, ClickSound, Color, DeltaTime,
+                 EntityLookup, Gatherer, HighlightTile, Input, PowerBar, Rect, ResourceCount,
                  Resources, SelectedTile, Shape, Sprite, StateChange, Text, Tile, Transform,
                  Wallet, upgrade::{LearnProgress, Upgrade}};
 use components::ui::{PollutionCount, TechTreeButton, WalletUI};
@@ -67,7 +67,7 @@ fn setup_world(world: &mut World, window: &glutin::Window) {
     world.add_resource::<ClickSound>(ClickSound { play: false });
     world.add_resource::<Wallet>(Wallet::new());
     world.add_resource::<EntityLookup>(EntityLookup::new());
-    world.add_resource::<DeltaTime>(DeltaTime{ dt: 0.0 });
+    world.add_resource::<DeltaTime>(DeltaTime { dt: 0.0 });
     world.register::<AnimationSheet>();
     world.register::<BuildCost>();
     world.register::<Button>();
@@ -360,12 +360,12 @@ fn main() {
             let click_sound: &mut ClickSound = click_sound_storage.deref_mut();
             if click_sound.play {
                 click_sound.play = false;
-                let mut sink = rodio::Sink::new(&audio_endpoint);
-
-                sink.set_volume(0.5);
-                sink.append(click_sound_source.clone());
-                sink.play();
-                sink.detach();
+                //                let mut sink = rodio::Sink::new(&audio_endpoint);
+                //
+                //                sink.set_volume(0.0);
+                //                sink.append(click_sound_source.clone());
+                //                sink.play();
+                //                sink.detach();
             }
 
             let scene = state_manager.get_current_scene();
