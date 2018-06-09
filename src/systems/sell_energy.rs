@@ -4,6 +4,8 @@ use components::{Button, ClickSound, DeltaTime, Input, PowerBar, ResearchedBuffs
                  Resources, Text, Transform, Wallet, upgrade::Buff};
 use components::ui::WalletUI;
 
+const POWER_FACTOR: i32 = 100;
+
 pub struct SellEnergy {
     minute_ticker: f32,
 }
@@ -74,15 +76,40 @@ impl<'a> System<'a> for SellEnergy {
         let researched_buffs = researched_buffs_storage.deref();
 
         if sell_button_clicked {
-            let mut coal_amount = resources.withdraw_all_for_type(ResourceType::Coal) / 4;
-            if researched_buffs.0.contains(&Buff::Purifier) {
-                coal_amount += coal_amount * 5 / 100;
+            // divide by power factor, so demand can be met based on resource numbers
+            let mut amount_to_power = (&power_bar_storage).join().fold(0, |sum, power_bar| {
+                PowerBar::get_max() - power_bar.power_left + sum
+            }) / POWER_FACTOR;
+
+            let mut power_to_spend = 0i32;
+
+            for r_type in &[ResourceType::Coal, ResourceType::Oil, ResourceType::Solar, ResourceType::Hydro] {
+                let power = resources.withdraw_amount_for_type(*r_type, amount_to_power);
+
+                let power_to_add = match *r_type {
+                    ResourceType::Coal => power / 4,
+                    ResourceType::Oil => power / 3,
+                    ResourceType::Solar => power / 2,
+                    ResourceType::Hydro => power / 2,
+                };
+
+                amount_to_power -= power_to_add;
+                power_to_spend += power_to_add;
+
+                if amount_to_power <= 0 {
+                    break
+                }
             }
 
-            let oil_amount = resources.withdraw_all_for_type(ResourceType::Oil) / 3;
-            let solar_amount = resources.withdraw_all_for_type(ResourceType::Solar) / 2;
-            let hydro_amount = resources.withdraw_all_for_type(ResourceType::Hydro) / 2;
-            let mut power_to_spend = (coal_amount + oil_amount + solar_amount + hydro_amount) * 100;
+            self.add_money(
+                power_to_spend,
+                &mut wallet_storage,
+                &mut wallet_ui_storage,
+                &mut text_storage,
+            );
+
+            power_to_spend *= POWER_FACTOR;
+
             for (transform, power_bar) in (&mut transform_storage, &mut power_bar_storage).join() {
                 let amount_to_power = PowerBar::get_max() - power_bar.power_left;
                 power_to_spend -= amount_to_power;
@@ -100,12 +127,7 @@ impl<'a> System<'a> for SellEnergy {
                 transform.size.x = width as u16;
             }
 
-            self.add_money(
-                coal_amount + oil_amount + solar_amount,
-                &mut wallet_storage,
-                &mut wallet_ui_storage,
-                &mut text_storage,
-            );
+
         }
 
         if researched_buffs.0.contains(&Buff::SellPanelsToConsumers) {

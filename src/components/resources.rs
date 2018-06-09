@@ -1,3 +1,4 @@
+use std::cmp;
 use components::GathererType;
 
 #[derive(Copy, Clone, Debug, PartialEq)]
@@ -27,27 +28,27 @@ impl Resources {
     }
 
     // TODO: Consider overflow
-    pub fn withdraw_all_for_type(&mut self, resource_type: ResourceType) -> i32 {
+    pub fn withdraw_amount_for_type(&mut self, resource_type: ResourceType, amount: i32) -> i32 {
         match resource_type {
             ResourceType::Coal => {
-                let amount = self.coal;
-                self.coal = 0;
-                amount
+                let amt = cmp::min(self.coal, amount);
+                self.coal -= amt;
+                amt
             }
             ResourceType::Oil => {
-                let amount = self.oil;
-                self.oil = 0;
-                amount
+                let amt = cmp::min(self.oil, amount);
+                self.oil -= amt;
+                amt
             }
             ResourceType::Solar => {
-                let amount = self.solar;
-                self.solar = 0;
-                amount
+                let amt = cmp::min(self.solar, amount);
+                self.solar -= amt;
+                amt
             }
             ResourceType::Hydro => {
-                let amount = self.hydro;
-                self.hydro = 0;
-                amount
+                let amt = cmp::min(self.hydro, amount);
+                self.hydro -= amt;
+                amt
             }
         }
     }
