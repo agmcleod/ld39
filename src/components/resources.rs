@@ -9,6 +9,17 @@ pub enum ResourceType {
     Hydro,
 }
 
+impl ResourceType {
+    pub fn get_efficiency_rate(&self) -> i32 {
+        match *self {
+            ResourceType::Coal => 4,
+            ResourceType::Oil => 3,
+            ResourceType::Solar => 2,
+            ResourceType::Hydro => 2,
+        }
+    }
+}
+
 #[derive(Default)]
 pub struct Resources {
     pub coal: i32,
@@ -27,26 +38,29 @@ impl Resources {
         }
     }
 
-    // TODO: Consider overflow
     pub fn withdraw_amount_for_type(&mut self, resource_type: ResourceType, amount: i32) -> i32 {
         match resource_type {
             ResourceType::Coal => {
-                let amt = cmp::min(self.coal, amount);
+                let mut amt = cmp::min(self.coal, amount);
+                amt = amt / 4 * 4;
                 self.coal -= amt;
-                amt
+                amt / 4
             }
             ResourceType::Oil => {
-                let amt = cmp::min(self.oil, amount);
+                let mut amt = cmp::min(self.oil, amount);
+                amt = amt / 3 * 3;
                 self.oil -= amt;
-                amt
+                amt / 3
             }
             ResourceType::Solar => {
-                let amt = cmp::min(self.solar, amount);
+                let mut amt = cmp::min(self.solar, amount);
+                amt = amt / 2 * 2;
                 self.solar -= amt;
                 amt
             }
             ResourceType::Hydro => {
-                let amt = cmp::min(self.hydro, amount);
+                let mut amt = cmp::min(self.hydro, amount);
+                amt = amt / 2 * 2;
                 self.hydro -= amt;
                 amt
             }

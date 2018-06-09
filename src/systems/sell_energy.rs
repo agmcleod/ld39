@@ -4,7 +4,7 @@ use components::{Button, ClickSound, DeltaTime, Input, PowerBar, ResearchedBuffs
                  Resources, Text, Transform, Wallet, upgrade::Buff};
 use components::ui::WalletUI;
 
-const POWER_FACTOR: i32 = 100;
+const POWER_FACTOR: i32 = 70;
 
 pub struct SellEnergy {
     minute_ticker: f32,
@@ -83,21 +83,22 @@ impl<'a> System<'a> for SellEnergy {
 
             let mut power_to_spend = 0i32;
 
-            for r_type in &[ResourceType::Coal, ResourceType::Oil, ResourceType::Solar, ResourceType::Hydro] {
-                let power = resources.withdraw_amount_for_type(*r_type, amount_to_power);
+            'resources: for r_type in &[ResourceType::Coal, ResourceType::Oil, ResourceType::Solar, ResourceType::Hydro] {
+                loop {
+                    let power = resources.withdraw_amount_for_type(*r_type, amount_to_power);
 
-                let power_to_add = match *r_type {
-                    ResourceType::Coal => power / 4,
-                    ResourceType::Oil => power / 3,
-                    ResourceType::Solar => power / 2,
-                    ResourceType::Hydro => power / 2,
-                };
+                    amount_to_power -= power;
+                    power_to_spend += power;
 
-                amount_to_power -= power_to_add;
-                power_to_spend += power_to_add;
+                    // filled power requirement, exit top loop
+                    if amount_to_power < r_type.get_efficiency_rate() {
+                        break 'resources
+                    }
 
-                if amount_to_power <= 0 {
-                    break
+                    // ran out of this resource, break the infinite loop
+                    if resources.get_amount_for_type(r_type) < r_type.get_efficiency_rate() {
+                        break
+                    }
                 }
             }
 
