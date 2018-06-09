@@ -1,7 +1,7 @@
 use std::time::Instant;
 use std::ops::{Deref, DerefMut};
 use specs::{Join, Read, System, Write, WriteStorage};
-use components::{Gatherer, GathererType, ResearchedBuffs, Resources, upgrade::Buff};
+use components::{Gatherer, GathererType, GatheringRate, ResearchedBuffs, Resources, upgrade::Buff};
 use utils::math;
 
 pub struct Gathering;
@@ -20,15 +20,24 @@ impl Gathering {
 impl<'a> System<'a> for Gathering {
     type SystemData = (
         WriteStorage<'a, Gatherer>,
+        Write<'a, GatheringRate>,
         Read<'a, ResearchedBuffs>,
         Write<'a, Resources>,
     );
 
     fn run(&mut self, data: Self::SystemData) {
-        let (mut gatherer_storage, researched_buffs_storage, mut resources_storage) = data;
+        let (
+            mut gatherer_storage,
+            mut gathering_rate_storage,
+            researched_buffs_storage,
+            mut resources_storage,
+        ) = data;
 
         let resources: &mut Resources = resources_storage.deref_mut();
         let researched_buffs = researched_buffs_storage.deref();
+
+        let gathering_rate = gathering_rate_storage.deref_mut();
+        gathering_rate.reset();
 
         for gatherer in (&mut gatherer_storage).join() {
             if math::get_seconds(&gatherer.gather_tick.elapsed()) >= 1.2 {
@@ -64,8 +73,13 @@ impl<'a> System<'a> for Gathering {
                     }
                 }
 
-                resources.increase_resource_for_gatherer_type(&gatherer.gatherer_type, amount);
+                gathering_rate.add_to_resource_amount(&gatherer.gatherer_type, amount);
             }
         }
+
+        resources.increase_resource_for_gatherer_type(&GathererType::Coal, gathering_rate.coal);
+        resources.increase_resource_for_gatherer_type(&GathererType::Oil, gathering_rate.oil);
+        resources.increase_resource_for_gatherer_type(&GathererType::Solar, gathering_rate.solar);
+        resources.increase_resource_for_gatherer_type(&GathererType::Hydro, gathering_rate.hydro);
     }
 }

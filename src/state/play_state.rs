@@ -5,10 +5,10 @@ use scene::Node;
 use state::State;
 use std::ops::DerefMut;
 
-use components::{Button, CityPowerState, Color, EntityLookup, GathererPositions, PowerBar,
-                 ProtectedNodes, Rect, ResearchedBuffs, ResearchingEntities, ResourceCount,
-                 ResourceType, Resources, SelectedTile, Sprite, Text, Tile, TileType, Transform,
-                 Wallet, ui::PollutionCount, CITY_POWER_STATE_COORDS};
+use components::{Button, CityPowerState, Color, EntityLookup, GathererPositions, GatheringRate,
+                 PowerBar, ProtectedNodes, Rect, ResearchedBuffs, ResearchingEntities,
+                 ResourceCount, ResourceType, Resources, SelectedTile, Sprite, Text, Tile,
+                 TileType, Transform, Wallet, ui::PollutionCount, CITY_POWER_STATE_COORDS};
 use components::ui::WalletUI;
 use systems;
 use renderer;
@@ -35,7 +35,6 @@ impl<'a> PlayState<'a> {
 
         let dispatcher = DispatcherBuilder::new()
             .with(systems::AnimationSystem::new(), "animation_system", &[])
-            .with(systems::PowerUsage::new(), "power_usage", &[])
             .with(
                 systems::ButtonHover {
                     scene: scene.clone(),
@@ -64,6 +63,7 @@ impl<'a> PlayState<'a> {
                 &["build_gatherer"],
             )
             .with(systems::Gathering {}, "gathering", &[])
+            .with(systems::PowerUsage::new(), "power_usage", &["gathering"])
             .with(
                 systems::ToggleTechTree::new(scene.clone()),
                 "toggle_tech_tree",
@@ -260,18 +260,9 @@ impl<'a> State for PlayState<'a> {
 
         world.add_resource(ProtectedNodes { nodes: set_nodes });
         world.add_resource(GathererPositions::new());
-
-        {
-            let mut resources_storage = world.write_resource::<Resources>();
-            let resources: &mut Resources = resources_storage.deref_mut();
-
-            resources.reset();
-
-            let mut wallet_storage = world.write_resource::<Wallet>();
-            let wallet: &mut Wallet = wallet_storage.deref_mut();
-
-            wallet.reset();
-        }
+        world.add_resource(GatheringRate::new());
+        world.add_resource(Resources::new());
+        world.add_resource(Wallet::new());
 
         scene.add_many(tile_nodes);
 

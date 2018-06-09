@@ -4,7 +4,7 @@ use components::{Button, ClickSound, DeltaTime, Input, PowerBar, ResearchedBuffs
                  Resources, Text, Transform, Wallet, upgrade::Buff};
 use components::ui::WalletUI;
 
-const POWER_FACTOR: i32 = 70;
+pub const POWER_FACTOR: i32 = 70;
 
 pub struct SellEnergy {
     minute_ticker: f32,
@@ -83,7 +83,12 @@ impl<'a> System<'a> for SellEnergy {
 
             let mut power_to_spend = 0i32;
 
-            'resources: for r_type in &[ResourceType::Coal, ResourceType::Oil, ResourceType::Solar, ResourceType::Hydro] {
+            'resources: for r_type in &[
+                ResourceType::Coal,
+                ResourceType::Oil,
+                ResourceType::Solar,
+                ResourceType::Hydro,
+            ] {
                 loop {
                     let power = resources.withdraw_amount_for_type(*r_type, amount_to_power);
 
@@ -92,12 +97,12 @@ impl<'a> System<'a> for SellEnergy {
 
                     // filled power requirement, exit top loop
                     if amount_to_power < r_type.get_efficiency_rate() {
-                        break 'resources
+                        break 'resources;
                     }
 
                     // ran out of this resource, break the infinite loop
                     if resources.get_amount_for_type(r_type) < r_type.get_efficiency_rate() {
-                        break
+                        break;
                     }
                 }
             }
@@ -118,17 +123,16 @@ impl<'a> System<'a> for SellEnergy {
                     power_bar.add_power(amount_to_power);
                 // we do addition here since the number will be negative
                 } else if amount_to_power + power_to_spend > 0 {
-                    // add the larger number of amount to power (which was subtracted) by the negative value
+                    // add the larger number of amount to power
+                    // (which was subtracted) by the negative value
                     // this will give us the amount left over
                     power_bar.add_power(amount_to_power + power_to_spend);
                 }
 
-                let width =
-                    PowerBar::get_max_width() * (power_bar.power_left as f32 / PowerBar::get_max_f32());
+                let width = PowerBar::get_max_width()
+                    * (power_bar.power_left as f32 / PowerBar::get_max_f32());
                 transform.size.x = width as u16;
             }
-
-
         }
 
         if researched_buffs.0.contains(&Buff::SellPanelsToConsumers) {
