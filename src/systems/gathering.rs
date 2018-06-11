@@ -4,9 +4,17 @@ use specs::{Join, Read, System, Write, WriteStorage};
 use components::{Gatherer, GathererType, GatheringRate, ResearchedBuffs, Resources, upgrade::Buff};
 use utils::math;
 
-pub struct Gathering;
+pub struct Gathering {
+    gathering_tick: Instant,
+}
 
 impl Gathering {
+    pub fn new () -> Self {
+        Gathering{
+            gathering_tick: Instant::now()
+        }
+    }
+
     fn get_resource_gain(&self, gatherer_type: &GathererType) -> i32 {
         match *gatherer_type {
             GathererType::Coal => 4,
@@ -39,9 +47,10 @@ impl<'a> System<'a> for Gathering {
         let gathering_rate = gathering_rate_storage.deref_mut();
         gathering_rate.reset();
 
+        let mut time_passed = false;
         for gatherer in (&mut gatherer_storage).join() {
-            if math::get_seconds(&gatherer.gather_tick.elapsed()) >= 1.2 {
-                gatherer.gather_tick = Instant::now();
+            if math::get_seconds(&self.gathering_tick.elapsed()) >= 1.2 {
+                time_passed = true;
                 let mut amount = self.get_resource_gain(&gatherer.gatherer_type);
                 if gatherer.has_adjancent_of_same_type
                     && researched_buffs.0.contains(&Buff::ResourceTrading)
@@ -75,6 +84,10 @@ impl<'a> System<'a> for Gathering {
 
                 gathering_rate.add_to_resource_amount(&gatherer.gatherer_type, amount);
             }
+        }
+
+        if time_passed {
+            self.gathering_tick = Instant::now();
         }
 
         resources.increase_resource_for_gatherer_type(&GathererType::Coal, gathering_rate.coal);

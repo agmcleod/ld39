@@ -4,7 +4,7 @@ use components::{Button, ClickSound, DeltaTime, Input, PowerBar, ResearchedBuffs
                  Resources, Text, Transform, Wallet, upgrade::Buff};
 use components::ui::WalletUI;
 
-pub const POWER_FACTOR: i32 = 70;
+pub const POWER_FACTOR: i32 = 1;
 
 pub struct SellEnergy {
     minute_ticker: f32,

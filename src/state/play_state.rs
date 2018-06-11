@@ -62,7 +62,7 @@ impl<'a> PlayState<'a> {
                 "tile_selection",
                 &["build_gatherer"],
             )
-            .with(systems::Gathering {}, "gathering", &[])
+            .with(systems::Gathering::new(), "gathering", &[])
             .with(systems::PowerUsage::new(), "power_usage", &["gathering"])
             .with(
                 systems::ToggleTechTree::new(scene.clone()),
