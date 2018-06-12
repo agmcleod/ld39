@@ -6,7 +6,7 @@ use state::play_state::PlayState;
 use specs::{Join, Read, ReadStorage, System, Write, WriteStorage};
 use systems::POWER_FACTOR;
 
-const POWER_PER_TICK: i32 = 100;
+const POWER_PER_TICK: i32 = 80;
 
 pub struct PowerUsage {
     instant: Instant,
