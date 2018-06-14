@@ -4,12 +4,14 @@ const MAX_POWER: i32 = 10_000;
 
 pub struct PowerBar {
     pub power_left: i32,
+    pub power_per_tick: i32,
 }
 
 impl PowerBar {
-    pub fn new() -> PowerBar {
+    pub fn new(power_per_tick: i32) -> PowerBar {
         PowerBar {
             power_left: MAX_POWER,
+            power_per_tick,
         }
     }
 

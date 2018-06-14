@@ -53,13 +53,15 @@ impl<'a> System<'a> for Pollution {
                 if gatherer.gatherer_type == GathererType::Coal {
                     if researched_buffs.0.contains(&Buff::ConveyerBelts) {
                         amount += 1;
-                    } else if researched_buffs.0.contains(&Buff::PollutionFilters) {
+                    }
+                    if researched_buffs.0.contains(&Buff::PollutionFilters) {
                         amount -= amount * 20 / 100;
                     }
                 } else if gatherer.gatherer_type == GathererType::Oil {
                     if researched_buffs.0.contains(&Buff::AutomatedRefiners) {
                         amount += 1;
-                    } else if researched_buffs.0.contains(&Buff::FudgeTheNumbers) {
+                    }
+                    if researched_buffs.0.contains(&Buff::FudgeTheNumbers) {
                         amount -= amount * 20 / 100;
                     }
                 } else if gatherer.gatherer_type == GathererType::Hydro {
@@ -74,7 +76,7 @@ impl<'a> System<'a> for Pollution {
 
         if pollution > 0 {
             let wallet = wallet_storage.deref_mut();
-            wallet.money -= pollution % 100 * 2;
+            wallet.money -= pollution / 100;
             logic::update_text(
                 format!("{}", wallet.money),
                 &mut text_storage,

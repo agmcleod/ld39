@@ -2,11 +2,11 @@ use specs::Entity;
 use components::{Color, PowerBar, Rect, Transform};
 use storage_types::PowerBarStorage;
 
-pub fn create(power_bar_storage: &mut PowerBarStorage, x: f32, y: f32) -> Entity {
+pub fn create(power_bar_storage: &mut PowerBarStorage, x: f32, y: f32, power_per_tick: i32) -> Entity {
     let entity = power_bar_storage.entities.create();
     power_bar_storage
         .power_bar_storage
-        .insert(entity, PowerBar::new())
+        .insert(entity, PowerBar::new(power_per_tick))
         .unwrap();
     power_bar_storage
         .transform_storage

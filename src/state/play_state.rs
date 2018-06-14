@@ -330,7 +330,7 @@ impl<'a> State for PlayState<'a> {
                 transform_storage: &mut transform_storage,
             };
 
-            let entity = create_power_bar::create(&mut storages, 33.0, 35.0);
+            let entity = create_power_bar::create(&mut storages, 33.0, 35.0, 40);
             side_bar_container.add(Node::new(Some(entity), None));
         }
 

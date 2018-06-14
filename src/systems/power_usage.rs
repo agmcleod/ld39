@@ -6,8 +6,6 @@ use state::play_state::PlayState;
 use specs::{Join, Read, ReadStorage, System, Write, WriteStorage};
 use systems::POWER_FACTOR;
 
-const POWER_PER_TICK: i32 = 80;
-
 pub struct PowerUsage {
     instant: Instant,
     frame_count: f32,
@@ -39,7 +37,7 @@ impl<'b> System<'b> for PowerUsage {
             resource_count_storage,
             delta_time_storage,
             gathering_rate_storage,
-            mut power_storage,
+            mut power_bar_storage,
             mut resources_storage,
             mut state_change_storage,
             mut text_storage,
@@ -52,12 +50,12 @@ impl<'b> System<'b> for PowerUsage {
         let mut reset_frame_counter = false;
 
         let mut num_of_cites_to_power = 0;
-        for (transform, power_bar) in (&mut transform_storage, &mut power_storage).join() {
+        for (transform, power_bar) in (&mut transform_storage, &mut power_bar_storage).join() {
             if self.frame_count * dt >= 5.0 {
                 reset_frame_counter = true;
                 self.instant = Instant::now();
                 if power_bar.power_left > 0 {
-                    power_bar.power_left -= POWER_PER_TICK;
+                    power_bar.power_left -= power_bar.power_per_tick;
                     if power_bar.power_left <= 0 {
                         let state_change: &mut StateChange = state_change_storage.deref_mut();
                         state_change.state = PlayState::get_name();
@@ -80,7 +78,9 @@ impl<'b> System<'b> for PowerUsage {
         // 4 is the max
         if num_of_cites_to_power >= 4 {
             let gathering_rate = gathering_rate_storage.deref();
-            let power_demands = (POWER_PER_TICK * 4) / POWER_FACTOR;
+            let power_demands = (&power_bar_storage).join().fold(0, |sum, power_bar| {
+                sum + power_bar.power_per_tick
+            }) / POWER_FACTOR;
 
             if gathering_rate.coal / ResourceType::Coal.get_efficiency_rate()
                 + gathering_rate.oil / ResourceType::Oil.get_efficiency_rate()

@@ -1,4 +1,3 @@
-use std::time::Instant;
 use specs::{Component, VecStorage};
 
 #[derive(Copy, Clone, Debug, PartialEq)]
