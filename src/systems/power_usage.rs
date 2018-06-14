@@ -53,7 +53,7 @@ impl<'b> System<'b> for PowerUsage {
 
         let mut num_of_cites_to_power = 0;
         for (transform, power_bar) in (&mut transform_storage, &mut power_storage).join() {
-            if self.frame_count * dt >= 1.0 {
+            if self.frame_count * dt >= 5.0 {
                 reset_frame_counter = true;
                 self.instant = Instant::now();
                 if power_bar.power_left > 0 {

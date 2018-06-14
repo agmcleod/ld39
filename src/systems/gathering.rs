@@ -49,7 +49,7 @@ impl<'a> System<'a> for Gathering {
 
         let mut time_passed = false;
         for gatherer in (&mut gatherer_storage).join() {
-            if math::get_seconds(&self.gathering_tick.elapsed()) >= 1.2 {
+            if math::get_seconds(&self.gathering_tick.elapsed()) >= 5.0 {
                 time_passed = true;
                 let mut amount = self.get_resource_gain(&gatherer.gatherer_type);
                 if gatherer.has_adjancent_of_same_type
