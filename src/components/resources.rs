@@ -90,7 +90,7 @@ impl Resources {
     }
 
     pub fn reset(&mut self) {
-        self.coal = 50;
+        self.coal = 0;
         self.oil = 0;
         self.solar = 0;
     }

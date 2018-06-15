@@ -11,10 +11,10 @@ pub enum GathererType {
 impl GathererType {
     pub fn get_build_cost(&self) -> i32 {
         match *self {
-            GathererType::Coal => 10,
-            GathererType::Oil => 15,
-            GathererType::Solar => 25,
-            GathererType::Hydro => 20,
+            GathererType::Coal => 25,
+            GathererType::Oil => 35,
+            GathererType::Solar => 50,
+            GathererType::Hydro => 70,
         }
     }
 

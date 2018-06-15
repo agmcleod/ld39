@@ -1,9 +1,8 @@
 use std::sync::{Arc, Mutex};
 use std::collections::{HashMap, HashSet};
-use specs::{Dispatcher, DispatcherBuilder, World};
+use specs::{Dispatcher, DispatcherBuilder, Entity, World};
 use scene::Node;
 use state::State;
-use std::ops::DerefMut;
 
 use components::{Button, CityPowerState, Color, EntityLookup, GathererPositions, GatheringRate,
                  PowerBar, ProtectedNodes, Rect, ResearchedBuffs, ResearchingEntities,
@@ -116,23 +115,13 @@ impl<'a> PlayState<'a> {
     pub fn get_name() -> String {
         "play_state".to_string()
     }
-}
 
-impl<'a> State for PlayState<'a> {
-    fn get_scene(&self) -> Arc<Mutex<Node>> {
-        self.scene.clone()
-    }
-
-    fn setup(&mut self, world: &mut World) {
-        let mut scene = self.scene.lock().unwrap();
-        scene.clear();
-
-        let mut tile_nodes: Vec<Node> = Vec::with_capacity(100);
+    pub fn create_random_map(&self) -> HashMap<(i32, i32), (TileType, Option<Entity>)> {
         let mut rng = thread_rng();
 
         let mut set_nodes = HashMap::new();
-        // we'll build 3 pockets of protected nodes
-        for _ in 0..3 {
+        // we'll build pockets of protected nodes
+        for _ in 0..4 {
             let mut x;
             let mut y;
             // find the center first
@@ -219,6 +208,22 @@ impl<'a> State for PlayState<'a> {
             }
         }
 
+        set_nodes
+    }
+}
+
+impl<'a> State for PlayState<'a> {
+    fn get_scene(&self) -> Arc<Mutex<Node>> {
+        self.scene.clone()
+    }
+
+    fn setup(&mut self, world: &mut World) {
+        let mut scene = self.scene.lock().unwrap();
+        scene.clear();
+
+        let mut tile_nodes: Vec<Node> = Vec::with_capacity(100);
+        let mut set_nodes = self.create_random_map();
+
         for row in 0..10 {
             for col in 0..10 {
                 let size = Tile::get_size();
@@ -251,6 +256,7 @@ impl<'a> State for PlayState<'a> {
                     .build();
 
                 if tile_type != TileType::Open {
+                    // replace the empty entity at this position with the entity
                     set_nodes.insert((col, row), (tile_type, Some(tile_entity.clone())));
                 }
 

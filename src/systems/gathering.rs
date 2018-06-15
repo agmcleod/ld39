@@ -17,10 +17,10 @@ impl Gathering {
 
     fn get_resource_gain(&self, gatherer_type: &GathererType) -> i32 {
         match *gatherer_type {
-            GathererType::Coal => 4,
-            GathererType::Oil => 4,
-            GathererType::Solar => 6,
-            GathererType::Hydro => 7,
+            GathererType::Coal => 12,
+            GathererType::Oil => 16,
+            GathererType::Solar => 19,
+            GathererType::Hydro => 22,
         }
     }
 }
