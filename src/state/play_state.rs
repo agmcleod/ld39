@@ -1,19 +1,20 @@
-use std::sync::{Arc, Mutex};
-use std::collections::{HashMap, HashSet};
-use specs::{Dispatcher, DispatcherBuilder, Entity, World};
 use scene::Node;
+use specs::{Dispatcher, DispatcherBuilder, World};
 use state::State;
+use std::collections::HashSet;
+use std::sync::{Arc, Mutex};
 
-use components::{Button, CityPowerState, Color, EntityLookup, GathererPositions, GatheringRate,
-                 PowerBar, ProtectedNodes, Rect, ResearchedBuffs, ResearchingEntities,
-                 ResourceCount, ResourceType, Resources, SelectedTile, Sprite, Text, Tile,
-                 TileType, Transform, Wallet, ui::PollutionCount, CITY_POWER_STATE_COORDS};
 use components::ui::WalletUI;
-use systems;
-use renderer;
-use entities::{create_power_bar, create_text, tech_tree};
-use storage_types::*;
+use components::{ui::PollutionCount, Button, CityPowerState, Color, EntityLookup,
+                 GathererPositions, GatheringRate, PowerBar, ProtectedNodes, Rect,
+                 ResearchedBuffs, ResearchingEntities, ResourceCount, ResourceType, Resources,
+                 SelectedTile, Sprite, Text, Tile, TileType, Transform, Wallet,
+                 CITY_POWER_STATE_COORDS};
+use entities::{create_map, create_power_bar, create_text, tech_tree};
 use rand::{thread_rng, Rng};
+use renderer;
+use storage_types::*;
+use systems;
 
 enum InternalState {
     Game,
@@ -115,101 +116,6 @@ impl<'a> PlayState<'a> {
     pub fn get_name() -> String {
         "play_state".to_string()
     }
-
-    pub fn create_random_map(&self) -> HashMap<(i32, i32), (TileType, Option<Entity>)> {
-        let mut rng = thread_rng();
-
-        let mut set_nodes = HashMap::new();
-        // we'll build pockets of protected nodes
-        for _ in 0..4 {
-            let mut x;
-            let mut y;
-            // find the center first
-            loop {
-                x = rng.gen_range(1, 9);
-                y = rng.gen_range(1, 9);
-
-                let mut all_nodes_free = true;
-
-                'check_nodes: for i in 0..3 {
-                    for j in 0..3 {
-                        if set_nodes.contains_key(&(x + i, y + j)) {
-                            all_nodes_free = false;
-                            break 'check_nodes;
-                        }
-                    }
-                }
-
-                if all_nodes_free {
-                    break;
-                }
-            }
-
-            // set the type for the center
-            let weight: u32 = rng.gen_range(0, 101);
-            let mut highest = 2;
-            let tile_type = if weight >= 90 {
-                highest = 4;
-                TileType::City
-            } else if weight >= 75 {
-                highest = 3;
-                TileType::River
-            } else {
-                TileType::EcoSystem
-            };
-
-            set_nodes.insert((x, y), (tile_type, None));
-
-            let center_x = x;
-            let center_y = y;
-
-            x -= 1;
-            y -= 1;
-
-            // fill the surrounding tiles from the center with other types
-            for i in 0..3 {
-                for j in 0..3 {
-                    if x + i == center_x && y + j == center_y {
-                        continue;
-                    }
-                    let tile_type = if highest == 4 {
-                        let weight: u32 = rng.gen_range(0, 101);
-                        if weight >= 90 {
-                            TileType::City
-                        } else if weight >= 75 {
-                            TileType::River
-                        } else if weight >= 55 {
-                            TileType::EcoSystem
-                        } else {
-                            TileType::Open
-                        }
-                    } else if highest == 3 {
-                        let weight: u32 = rng.gen_range(0, 101);
-                        if weight >= 75 {
-                            TileType::River
-                        } else if weight >= 50 {
-                            TileType::EcoSystem
-                        } else {
-                            TileType::Open
-                        }
-                    } else if highest == 2 {
-                        let weight: u32 = rng.gen_range(0, 101);
-                        if weight >= 60 {
-                            TileType::EcoSystem
-                        } else {
-                            TileType::Open
-                        }
-                    } else {
-                        TileType::Open
-                    };
-
-                    set_nodes.insert((x + i, y + j), (tile_type, None));
-                }
-            }
-        }
-
-        set_nodes
-    }
 }
 
 impl<'a> State for PlayState<'a> {
@@ -222,7 +128,8 @@ impl<'a> State for PlayState<'a> {
         scene.clear();
 
         let mut tile_nodes: Vec<Node> = Vec::with_capacity(100);
-        let mut set_nodes = self.create_random_map();
+        let mut set_nodes = create_map::create();
+        let mut rng = thread_rng();
 
         for row in 0..10 {
             for col in 0..10 {
@@ -230,7 +137,14 @@ impl<'a> State for PlayState<'a> {
                 let tile_type = if let Some(&(tile_type, _)) = set_nodes.get(&(col, row)) {
                     tile_type.clone()
                 } else {
-                    TileType::Open
+                    let r = rng.gen_range(0, 3);
+                    if r == 0 {
+                        TileType::EcoSystem
+                    } else if r == 1 {
+                        TileType::River
+                    } else {
+                        TileType::City
+                    }
                 };
                 let tile = Tile::new(tile_type);
                 let sprite_frames = Tile::get_sprite_frames(&tile.tile_type);
@@ -305,14 +219,7 @@ impl<'a> State for PlayState<'a> {
             let entity = world
                 .create_entity()
                 .with(Transform::visible(
-                    coords.0,
-                    coords.1,
-                    0.0,
-                    130,
-                    16,
-                    0.0,
-                    1.0,
-                    1.0,
+                    coords.0, coords.1, 0.0, 130, 16, 0.0, 1.0, 1.0,
                 ))
                 .with(Sprite { frame_name })
                 .build();

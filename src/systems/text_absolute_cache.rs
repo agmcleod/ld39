@@ -1,7 +1,7 @@
-use specs::{Entities, Join, ReadStorage, System, WriteStorage};
-use std::sync::{Arc, Mutex};
 use components::{Text, Transform};
 use scene::Node;
+use specs::{Entities, Join, ReadStorage, System, WriteStorage};
+use std::sync::{Arc, Mutex};
 
 pub struct TextAbsoluteCache {
     pub scene: Arc<Mutex<Node>>,

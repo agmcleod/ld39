@@ -1,13 +1,13 @@
 pub use components::upgrade::*;
 
-use specs::{Entity, World};
-use renderer;
-use components::{Color, Shape, Sprite, Transform};
-use components::ui;
-use loader;
-use serde_json::{self, Value};
-use scene::Node;
 use cgmath::Vector2;
+use components::ui;
+use components::{Color, Shape, Sprite, Transform};
+use loader;
+use renderer;
+use scene::Node;
+use serde_json::{self, Value};
+use specs::{Entity, World};
 
 pub struct TechTreeNode {
     pub entity: Entity,
@@ -35,14 +35,7 @@ fn build_entity_nodes(
         .create_entity()
         .with(upgrade)
         .with(Transform::visible(
-            x,
-            y as f32,
-            1.0,
-            SIZE,
-            SIZE,
-            0.0,
-            1.0,
-            1.0,
+            x, y as f32, 1.0, SIZE, SIZE, 0.0, 1.0, 1.0,
         ))
         .with(Color(get_color_from_status(&status)))
         .with(Sprite {

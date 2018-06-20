@@ -1,6 +1,6 @@
-use specs::{Entities, Entity, WriteStorage};
 use cgmath::Vector3;
 use components::Transform;
+use specs::{Entities, Entity, WriteStorage};
 
 pub struct Node {
     pub entity: Option<Entity>,

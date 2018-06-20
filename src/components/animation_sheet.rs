@@ -1,5 +1,5 @@
-use std::collections::HashMap;
 use specs::{Component, VecStorage};
+use std::collections::HashMap;
 
 pub struct AnimationSheet {
     pub animations: HashMap<String, Vec<String>>,

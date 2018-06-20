@@ -1,5 +1,5 @@
-use specs::{Component, VecStorage};
 use components::ResourceType;
+use specs::{Component, VecStorage};
 
 pub struct ResourceCount {
     pub resource_type: ResourceType,

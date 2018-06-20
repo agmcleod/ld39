@@ -1,5 +1,5 @@
-use std::cmp;
 use components::GathererType;
+use std::cmp;
 
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub enum ResourceType {

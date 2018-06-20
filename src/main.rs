@@ -31,24 +31,44 @@ mod storage_types;
 mod systems;
 mod utils;
 
-use std::ops::DerefMut;
-use std::time;
-use components::{AnimationSheet, BuildCost, Button, Camera, ClickSound, Color, DeltaTime,
-                 EntityLookup, Gatherer, HighlightTile, Input, PowerBar, Rect, ResourceCount,
-                 Resources, SelectedTile, Shape, Sprite, StateChange, Text, Tile, Transform,
-                 Wallet, upgrade::{LearnProgress, Upgrade}};
 use components::ui::{PollutionCount, TechTreeButton, WalletUI};
-use specs::{Entity, ReadStorage, World, WriteStorage};
-use renderer::{ColorFormat, DepthFormat};
-use spritesheet::Spritesheet;
-use glutin::{ElementState, Event, MouseButton, VirtualKeyCode, WindowEvent};
-use glutin::GlContext;
+use components::{upgrade::{LearnProgress, Upgrade},
+                 AnimationSheet,
+                 BuildCost,
+                 Button,
+                 Camera,
+                 ClickSound,
+                 Color,
+                 DeltaTime,
+                 EntityLookup,
+                 Gatherer,
+                 HighlightTile,
+                 Input,
+                 PowerBar,
+                 Rect,
+                 ResourceCount,
+                 Resources,
+                 SelectedTile,
+                 Shape,
+                 Sprite,
+                 StateChange,
+                 Text,
+                 Tile,
+                 Transform,
+                 Wallet};
 use gfx::Device;
+use gfx_glyph::{GlyphBrush, GlyphBrushBuilder};
+use glutin::GlContext;
+use glutin::{ElementState, Event, MouseButton, VirtualKeyCode, WindowEvent};
+use renderer::{ColorFormat, DepthFormat};
 use rodio::Source;
 use scene::Node;
+use specs::{Entity, ReadStorage, World, WriteStorage};
+use spritesheet::Spritesheet;
 use state::play_state::PlayState;
 use state::StateManager;
-use gfx_glyph::{GlyphBrush, GlyphBrushBuilder};
+use std::ops::DerefMut;
+use std::time;
 use utils::math;
 
 fn setup_world(world: &mut World, window: &glutin::Window) {

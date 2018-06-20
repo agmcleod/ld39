@@ -1,6 +1,6 @@
-use specs::{Component, VecStorage};
-use rusttype::Scale;
 use cgmath::Vector2;
+use rusttype::Scale;
+use specs::{Component, VecStorage};
 
 pub struct Text {
     pub scale: Scale,

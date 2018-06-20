@@ -1,5 +1,5 @@
-use specs::{Component, VecStorage};
 use cgmath::{Vector2, Vector3};
+use specs::{Component, VecStorage};
 
 pub struct Transform {
     pos: Vector3<f32>,

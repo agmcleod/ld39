@@ -1,13 +1,13 @@
 extern crate gfx;
 extern crate image;
+use gfx::texture::Mipmap;
+use rodio::{decoder::Decoder, Decoder as SoundDecoder, Endpoint, Sink, Source};
 use std::env;
 use std::fs::File;
-use std::path::{Path, PathBuf};
-use std::io::Result;
 use std::io::prelude::Read;
-use gfx::texture::Mipmap;
 use std::io::BufReader;
-use rodio::{Decoder as SoundDecoder, Endpoint, Sink, Source, decoder::Decoder};
+use std::io::Result;
+use std::path::{Path, PathBuf};
 
 pub fn gfx_load_texture<F, R>(
     path: &str,

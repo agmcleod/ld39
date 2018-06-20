@@ -1,10 +1,10 @@
-use std::ops::{Deref, DerefMut};
-use std::sync::{Arc, Mutex};
-use specs::{Entities, Join, Read, ReadStorage, System, Write, WriteStorage};
 use components::{Button, Color, EntityLookup, Input, Rect, StateChange, Tile, Transform};
-use state::play_state::PlayState;
 use entities::create_colored_rect;
 use scene::Node;
+use specs::{Entities, Join, Read, ReadStorage, System, Write, WriteStorage};
+use state::play_state::PlayState;
+use std::ops::{Deref, DerefMut};
+use std::sync::{Arc, Mutex};
 
 pub struct ToggleTechTree {
     scene: Arc<Mutex<Node>>,

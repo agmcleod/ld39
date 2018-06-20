@@ -3,15 +3,15 @@ mod build_gatherer;
 mod button_hover;
 mod cities_to_power;
 mod gathering;
+pub mod logic;
+mod pollution;
 mod power_usage;
 mod research;
 mod sell_energy;
-pub mod logic;
-mod pollution;
+mod tech_tree;
 mod text_absolute_cache;
 mod tile_selection;
 mod toggle_tech_tree;
-mod tech_tree;
 
 pub use self::animation_system::*;
 pub use self::build_gatherer::*;

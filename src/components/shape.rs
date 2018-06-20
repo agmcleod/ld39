@@ -1,9 +1,11 @@
-use specs::{Component, VecStorage};
 use cgmath::Vector2;
 use lyon_path::{builder::FlatPathBuilder, default::Path, math::point as lyon_point};
-use lyon_tessellation::{FillOptions, FillTessellator, FillVertex,
-                        geometry_builder::{BuffersBuilder, VertexBuffers, VertexConstructor}};
+use lyon_tessellation::{geometry_builder::{BuffersBuilder, VertexBuffers, VertexConstructor},
+                        FillOptions,
+                        FillTessellator,
+                        FillVertex};
 use renderer::Vertex;
+use specs::{Component, VecStorage};
 
 pub struct Shape {
     pub buffers: VertexBuffers<Vertex>,

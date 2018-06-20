@@ -1,6 +1,6 @@
-use specs::{Entities, WriteStorage};
-use scene::Node;
 use components::{Color, Rect, Transform};
+use scene::Node;
+use specs::{Entities, WriteStorage};
 
 pub fn create(
     x: f32,

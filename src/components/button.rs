@@ -1,5 +1,5 @@
-use specs::{Component, VecStorage};
 use components::Input;
+use specs::{Component, VecStorage};
 
 pub struct Button {
     pub name: String,

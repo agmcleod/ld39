@@ -1,5 +1,5 @@
-use std::collections::HashMap;
 use glutin::VirtualKeyCode;
+use std::collections::HashMap;
 
 #[derive(Debug, Default)]
 pub struct Input {

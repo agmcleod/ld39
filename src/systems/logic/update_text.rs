@@ -1,5 +1,5 @@
-use specs::{Component, Join, ReadStorage, WriteStorage};
 use components::Text;
+use specs::{Component, Join, ReadStorage, WriteStorage};
 
 pub fn update_text<'a, C>(
     message: String,

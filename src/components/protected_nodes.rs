@@ -1,6 +1,6 @@
-use std::collections::HashMap;
-use specs::Entity;
 use components::tile::TileType;
+use specs::Entity;
+use std::collections::HashMap;
 
 #[derive(Default)]
 pub struct ProtectedNodes {

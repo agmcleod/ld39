@@ -1,7 +1,13 @@
-use std::ops::{Deref, DerefMut};
+use components::{ui::{PollutionCount, WalletUI},
+                 upgrade::Buff,
+                 DeltaTime,
+                 Gatherer,
+                 GathererType,
+                 ResearchedBuffs,
+                 Text,
+                 Wallet};
 use specs::{Join, Read, ReadStorage, System, Write, WriteStorage};
-use components::{DeltaTime, Gatherer, GathererType, ResearchedBuffs, Text, Wallet,
-                 ui::{PollutionCount, WalletUI}, upgrade::Buff};
+use std::ops::{Deref, DerefMut};
 use systems::logic;
 
 pub struct Pollution {

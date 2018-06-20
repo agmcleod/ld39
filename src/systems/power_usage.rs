@@ -1,9 +1,9 @@
-use std::ops::{Deref, DerefMut};
-use std::time::Instant;
 use components::{DeltaTime, GatheringRate, PowerBar, ResourceCount, ResourceType, Resources,
                  StateChange, Text, Transform};
-use state::play_state::PlayState;
 use specs::{Join, Read, ReadStorage, System, Write, WriteStorage};
+use state::play_state::PlayState;
+use std::ops::{Deref, DerefMut};
+use std::time::Instant;
 use systems::POWER_FACTOR;
 
 pub struct PowerUsage {
@@ -78,14 +78,16 @@ impl<'b> System<'b> for PowerUsage {
         // 4 is the max
         if num_of_cites_to_power >= 4 {
             let gathering_rate = gathering_rate_storage.deref();
-            let power_demands = (&power_bar_storage).join().fold(0, |sum, power_bar| {
-                sum + power_bar.power_per_tick
-            }) / POWER_FACTOR;
+            let power_demands = (&power_bar_storage)
+                .join()
+                .fold(0, |sum, power_bar| sum + power_bar.power_per_tick)
+                / POWER_FACTOR;
 
             if gathering_rate.coal / ResourceType::Coal.get_efficiency_rate()
                 + gathering_rate.oil / ResourceType::Oil.get_efficiency_rate()
                 + gathering_rate.solar / ResourceType::Solar.get_efficiency_rate()
-                + gathering_rate.hydro / ResourceType::Hydro.get_efficiency_rate() >= power_demands
+                + gathering_rate.hydro / ResourceType::Hydro.get_efficiency_rate()
+                >= power_demands
             {
                 println!("~~~~~Meeting demands~~~~");
             }

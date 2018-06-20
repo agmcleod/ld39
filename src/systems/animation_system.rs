@@ -1,6 +1,6 @@
-use std::ops::Deref;
-use specs::{Join, Read, System, WriteStorage};
 use components::{AnimationSheet, DeltaTime};
+use specs::{Join, Read, System, WriteStorage};
+use std::ops::Deref;
 
 pub struct AnimationSystem;
 

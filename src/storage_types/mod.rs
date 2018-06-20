@@ -1,5 +1,5 @@
-use specs::{Entities, WriteStorage};
 use components::{Color, PowerBar, Rect, Text, Transform};
+use specs::{Entities, WriteStorage};
 
 pub struct TextStorage<'a, 'b: 'a> {
     pub entities: &'a Entities<'a>,

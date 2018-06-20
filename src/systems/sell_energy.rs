@@ -1,8 +1,8 @@
-use std::ops::{Deref, DerefMut};
-use specs::{Join, Read, System, Write, WriteStorage};
-use components::{Button, ClickSound, DeltaTime, Input, PowerBar, ResearchedBuffs, ResourceType,
-                 Resources, Text, Transform, Wallet, upgrade::Buff};
 use components::ui::WalletUI;
+use components::{upgrade::Buff, Button, ClickSound, DeltaTime, Input, PowerBar, ResearchedBuffs,
+                 ResourceType, Resources, Text, Transform, Wallet};
+use specs::{Join, Read, System, Write, WriteStorage};
+use std::ops::{Deref, DerefMut};
 
 pub const POWER_FACTOR: i32 = 1;
 

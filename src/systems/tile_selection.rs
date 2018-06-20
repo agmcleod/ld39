@@ -1,10 +1,10 @@
-use std::ops::Deref;
-use std::sync::{Arc, Mutex};
-use specs::{Entities, Entity, Join, Read, ReadStorage, System, WriteStorage};
 use components::{Button, Color, Gatherer, Input, Rect, ResearchedBuffs, SelectedTile, Sprite,
                  Tile, Transform};
-use scene::Node;
 use entities::create_build_ui;
+use scene::Node;
+use specs::{Entities, Entity, Join, Read, ReadStorage, System, WriteStorage};
+use std::ops::Deref;
+use std::sync::{Arc, Mutex};
 
 pub struct TileSelection {
     pub scene: Arc<Mutex<Node>>,

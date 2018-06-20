@@ -1,7 +1,7 @@
-use std::time::Instant;
-use std::ops::{Deref, DerefMut};
+use components::{upgrade::Buff, Gatherer, GathererType, GatheringRate, ResearchedBuffs, Resources};
 use specs::{Join, Read, System, Write, WriteStorage};
-use components::{Gatherer, GathererType, GatheringRate, ResearchedBuffs, Resources, upgrade::Buff};
+use std::ops::{Deref, DerefMut};
+use std::time::Instant;
 use utils::math;
 
 pub struct Gathering {
@@ -9,9 +9,9 @@ pub struct Gathering {
 }
 
 impl Gathering {
-    pub fn new () -> Self {
-        Gathering{
-            gathering_tick: Instant::now()
+    pub fn new() -> Self {
+        Gathering {
+            gathering_tick: Instant::now(),
         }
     }
 

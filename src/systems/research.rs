@@ -1,11 +1,15 @@
-use std::ops::{Deref, DerefMut};
-use std::collections::HashMap;
-use std::sync::{Arc, Mutex};
-use specs::{Entities, Join, Read, ReadExpect, ReadStorage, System, Write, WriteStorage};
+use components::{upgrade::{Buff, LearnProgress, Status, Upgrade},
+                 Color,
+                 DeltaTime,
+                 ResearchedBuffs,
+                 ResearchingEntities,
+                 Transform};
 use entities::tech_tree::{get_color_from_status, traverse_tree, TechTreeNode};
-use components::{Color, DeltaTime, ResearchedBuffs, ResearchingEntities, Transform,
-                 upgrade::{Buff, LearnProgress, Status, Upgrade}};
 use scene::Node;
+use specs::{Entities, Join, Read, ReadExpect, ReadStorage, System, Write, WriteStorage};
+use std::collections::HashMap;
+use std::ops::{Deref, DerefMut};
+use std::sync::{Arc, Mutex};
 
 type ResearchingUpgrades = HashMap<Buff, (f32, f32)>;
 

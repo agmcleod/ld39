@@ -1,5 +1,5 @@
-use specs::Entity;
 use components::{Color, Text, Transform};
+use specs::Entity;
 use storage_types::TextStorage;
 
 pub fn create(

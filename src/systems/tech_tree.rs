@@ -1,12 +1,21 @@
-use std::sync::{Arc, Mutex};
-use std::ops::{Deref, DerefMut};
-use specs::{Entities, Entity, Join, Read, ReadStorage, System, Write, WriteStorage};
-use scene::Node;
-use components::{Color, EntityLookup, Input, Rect, ResearchingEntities, Sprite, Text, Transform,
-                 Wallet, ui::WalletUI, upgrade::{Buff, LearnProgress}};
 use components::ui;
-use entities::{create_text, create_tooltip};
+use components::{ui::WalletUI,
+                 upgrade::{Buff, LearnProgress},
+                 Color,
+                 EntityLookup,
+                 Input,
+                 Rect,
+                 ResearchingEntities,
+                 Sprite,
+                 Text,
+                 Transform,
+                 Wallet};
 use entities::tech_tree::{get_color_from_status, Status, Upgrade};
+use entities::{create_text, create_tooltip};
+use scene::Node;
+use specs::{Entities, Entity, Join, Read, ReadStorage, System, Write, WriteStorage};
+use std::ops::{Deref, DerefMut};
+use std::sync::{Arc, Mutex};
 use storage_types::*;
 use systems::logic;
 

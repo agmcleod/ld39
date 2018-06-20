@@ -1,9 +1,9 @@
-use std::ops::{Deref, DerefMut};
-use std::sync::{Arc, Mutex};
-use specs::{Entities, Read, System, Write, WriteStorage};
 use components::{Button, CityPowerState, Color, EntityLookup, Input, PowerBar, Rect, Sprite,
                  Transform, CITY_POWER_STATE_COORDS};
 use scene::Node;
+use specs::{Entities, Read, System, Write, WriteStorage};
+use std::ops::{Deref, DerefMut};
+use std::sync::{Arc, Mutex};
 
 use entities::create_power_bar;
 use storage_types::PowerBarStorage;
@@ -73,7 +73,12 @@ impl<'a> System<'a> for CitiesToPower {
                 transform_storage: &mut transform_storage,
             };
 
-            let entity = create_power_bar::create(&mut storages, x + 3.0, y + 3.0, 40 + (20 * (city_power_state.current_city_count as i32 - 1)));
+            let entity = create_power_bar::create(
+                &mut storages,
+                x + 3.0,
+                y + 3.0,
+                40 + (20 * (city_power_state.current_city_count as i32 - 1)),
+            );
             let mut scene = self.scene.lock().unwrap();
             {
                 let side_bar_container = entity_lookup.get("side_bar_container").unwrap();

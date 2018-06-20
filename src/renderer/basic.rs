@@ -2,14 +2,14 @@ extern crate cgmath;
 extern crate gfx;
 extern crate specs;
 
-use specs::World;
-use renderer::{ColorFormat, DepthFormat};
 use cgmath::{Matrix4, SquareMatrix, Transform};
-use gfx::traits::FactoryExt;
-use gfx::texture;
 use components;
-use spritesheet::{Frame, Spritesheet};
+use gfx::texture;
+use gfx::traits::FactoryExt;
 use gfx_glyph::{GlyphBrush, Section};
+use renderer::{ColorFormat, DepthFormat};
+use specs::World;
+use spritesheet::{Frame, Spritesheet};
 
 gfx_defines!{
     vertex Vertex {

@@ -1,6 +1,6 @@
-use std::collections::HashMap;
-use specs::Entity;
 use components::GathererType;
+use specs::Entity;
+use std::collections::HashMap;
 
 #[derive(Default)]
 pub struct GathererPositions {
