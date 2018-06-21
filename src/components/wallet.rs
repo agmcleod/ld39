@@ -1,4 +1,4 @@
-const START_AMOUNT: i32 = 20;
+const START_AMOUNT: i32 = 25;
 
 #[derive(Default)]
 pub struct Wallet {
