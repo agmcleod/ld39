@@ -1,6 +1,7 @@
 use components::{Color, Rect, Text, Transform};
 use scene::Node;
 use specs::{Entities, WriteStorage};
+use std::cmp;
 
 pub fn create(
     entities: &Entities,
@@ -10,6 +11,8 @@ pub fn create(
     transform_storage: &mut WriteStorage<Transform>,
     x: f32,
     y: f32,
+    right_max: i32,
+    bottom_max: i32,
     w: u16,
     h: u16,
     text: String,
@@ -27,10 +30,16 @@ pub fn create(
     rect_storage.insert(background.clone(), Rect {}).unwrap();
 
     let tooltip_container = entities.create();
+    let x = cmp::max(0, x as i32);
+    let x = cmp::min(x, right_max - w as i32);
+
+    let y = cmp::max(0, y as i32);
+    let y = cmp::min(y, bottom_max - h as i32);
+
     transform_storage
         .insert(
             tooltip_container.clone(),
-            Transform::visible(x, y, 50.0, w, h, 0.0, 1.0, 1.0),
+            Transform::visible(x as f32, y as f32, 50.0, w, h, 0.0, 1.0, 1.0),
         )
         .unwrap();
     let mut container_node = Node::new(

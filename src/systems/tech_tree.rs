@@ -171,15 +171,20 @@ impl<'a> System<'a> for TechTree {
                     self.current_tooltip = None;
                     self.current_tech_tree_node_entity = None;
                 }
-                if let Some(container_node) = scene
-                    .get_node_for_entity(*lookup.get(&"tech_tree_container".to_string()).unwrap())
-                {
+                let container_entity = *lookup.get(&"tech_tree_container".to_string()).unwrap();
+                if let Some(container_node) = scene.get_node_for_entity(container_entity) {
                     let tech_tree_node_ui = tech_tree_node_storage
                         .get(mouse_over_tech_tree_node_entity)
                         .unwrap();
                     let upgrade = upgrade_storage
                         .get(mouse_over_tech_tree_node_entity)
                         .unwrap();
+
+                    let (container_w, container_h) = {
+                        let transform = transform_storage.get(container_entity).unwrap();
+                        (transform.size.x, transform.size.y)
+                    };
+
                     let mut tooltip_node = create_tooltip::create(
                         &entities,
                         &mut color_storage,
@@ -188,6 +193,8 @@ impl<'a> System<'a> for TechTree {
                         &mut transform_storage,
                         tooltip_position[0] - 70.0,
                         tooltip_position[1] + 32.0,
+                        container_w as i32,
+                        container_h as i32,
                         160,
                         160,
                         tech_tree_node_ui.text.clone(),
