@@ -102,23 +102,6 @@ pub fn build_tech_tree(world: &mut World, container: &mut Node) -> TechTreeNode 
     build_entity_nodes(world, container, width, node, None)
 }
 
-pub fn traverse_tree_mut<F>(node: &mut TechTreeNode, cb: &mut F) -> bool
-where
-    F: FnMut(&mut TechTreeNode) -> bool,
-{
-    if cb(node) {
-        return true;
-    } else {
-        for mut sub_node in node.sub_nodes.iter_mut() {
-            if traverse_tree_mut(&mut sub_node, cb) {
-                return true;
-            }
-        }
-    }
-
-    false
-}
-
 pub fn traverse_tree<F>(node: &TechTreeNode, cb: &mut F) -> bool
 where
     F: FnMut(&TechTreeNode) -> bool,

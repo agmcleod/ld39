@@ -20,10 +20,6 @@ impl Wallet {
         self.money += amount;
     }
 
-    pub fn reset(&mut self) {
-        self.money = START_AMOUNT;
-    }
-
     pub fn spend(&mut self, amount: i32) -> bool {
         if amount > self.money {
             false

@@ -88,10 +88,4 @@ impl Resources {
             GathererType::Hydro => self.hydro += amount,
         }
     }
-
-    pub fn reset(&mut self) {
-        self.coal = 0;
-        self.oil = 0;
-        self.solar = 0;
-    }
 }

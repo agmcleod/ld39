@@ -82,7 +82,7 @@ impl<'a> System<'a> for CitiesToPower {
             let mut scene = self.scene.lock().unwrap();
             {
                 let side_bar_container = entity_lookup.get("side_bar_container").unwrap();
-                let mut container = scene.get_node_for_entity(*side_bar_container).unwrap();
+                let container = scene.get_node_for_entity(*side_bar_container).unwrap();
                 container.add(Node::new(Some(entity), None));
             }
 

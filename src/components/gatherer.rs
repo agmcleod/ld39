@@ -38,9 +38,9 @@ impl GathererType {
 
     pub fn get_pollution_amount(&self) -> i32 {
         match *self {
-            GathererType::Coal => 10,
-            GathererType::Oil => 8,
-            GathererType::Hydro => 5,
+            GathererType::Coal => 4,
+            GathererType::Oil => 3,
+            GathererType::Hydro => 2,
             _ => 0,
         }
     }

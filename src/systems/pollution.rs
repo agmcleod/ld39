@@ -50,39 +50,45 @@ impl<'a> System<'a> for Pollution {
 
         self.ticker = 0.0;
 
-        let mut pollution = 0;
+        let mut coal_pollution = 0;
+        let mut oil_pollution = 0;
+        let mut hydro_pollution = 0;
         let researched_buffs = researched_buffs_storage.deref();
 
         for gatherer in (&gatherer_storage).join() {
             let mut amount = gatherer.pollution;
             if amount > 0 {
                 if gatherer.gatherer_type == GathererType::Coal {
+                    coal_pollution += amount;
                     if researched_buffs.0.contains(&Buff::ConveyerBelts) {
-                        amount += 1;
-                    }
-                    if researched_buffs.0.contains(&Buff::PollutionFilters) {
-                        amount -= amount * 20 / 100;
+                        coal_pollution += 1;
                     }
                 } else if gatherer.gatherer_type == GathererType::Oil {
+                    oil_pollution += amount;
                     if researched_buffs.0.contains(&Buff::AutomatedRefiners) {
-                        amount += 1;
-                    }
-                    if researched_buffs.0.contains(&Buff::FudgeTheNumbers) {
-                        amount -= amount * 20 / 100;
+                        oil_pollution += 1;
                     }
                 } else if gatherer.gatherer_type == GathererType::Hydro {
-                    if researched_buffs.0.contains(&Buff::SalmonCannon) {
-                        amount -= amount * 20 / 100;
-                    }
+                    hydro_pollution += amount;
                 }
             }
-
-            pollution += amount;
         }
+
+        if researched_buffs.0.contains(&Buff::PollutionFilters) {
+            coal_pollution -= coal_pollution * 20 / 100;
+        }
+        if researched_buffs.0.contains(&Buff::FudgeTheNumbers) {
+            oil_pollution -= oil_pollution * 20 / 100;
+        }
+        if researched_buffs.0.contains(&Buff::SalmonCannon) {
+            hydro_pollution -= hydro_pollution * 20 / 100;
+        }
+
+        let pollution = coal_pollution + oil_pollution + hydro_pollution;
 
         if pollution > 0 {
             let wallet = wallet_storage.deref_mut();
-            wallet.money -= pollution / 100;
+            wallet.money -= pollution;
             logic::update_text(
                 format!("{}", wallet.money),
                 &mut text_storage,
