@@ -154,7 +154,7 @@ pub fn create(
     transform_storage
         .insert(
             container_entity,
-            Transform::visible(x, y, 2.0, 32, 32 * new_entities.len() as u16, 0.0, 1.0, 1.0),
+            Transform::visible(x, y, 4.0, 32, 32 * new_entities.len() as u16, 0.0, 1.0, 1.0),
         )
         .unwrap();
 
