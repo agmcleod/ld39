@@ -1,6 +1,6 @@
 {
   "buff": "Coal",
-  "time_to_research": 0.0,
+  "time_to_research": 20.0,
   "cost": 0,
   "status": "Researched",
   "x": 0.5,
@@ -10,7 +10,7 @@
   "children": [{
     "buff": "ResourceTrading",
     "time_to_research": 20.0,
-    "cost": 15,
+    "cost": 50,
     "status": "Researchable",
     "x": 0.75,
     "y_tier": 1,
@@ -18,8 +18,8 @@
     "frame_name": "resourcetrading.png"
   }, {
     "buff": "ConveyerBelts",
-    "time_to_research": 35.0,
-    "cost": 25,
+    "time_to_research": 20.0,
+    "cost": 50,
     "status": "Researchable",
     "x": 0.20,
     "y_tier": 1,
@@ -27,8 +27,8 @@
     "frame_name": "conveyerbelts.png",
     "children": [{
       "buff": "RoboticLoaders",
-      "time_to_research": 30.0,
-      "cost": 35,
+      "time_to_research": 20.0,
+      "cost": 65,
       "status": "Locked",
       "x": 0.20,
       "y_tier": 2,
@@ -36,8 +36,8 @@
       "frame_name": "roboticloaders.png",
       "children": [{
         "buff": "PollutionFilters",
-        "time_to_research": 45.0,
-        "cost": 45,
+        "time_to_research": 20.0,
+        "cost": 90,
         "status": "Locked",
         "x": 0.1,
         "y_tier": 3,
@@ -47,8 +47,8 @@
     }]
   }, {
     "buff": "Oil",
-    "time_to_research": 5.0,
-    "cost": 10,
+    "time_to_research": 20.0,
+    "cost": 120,
     "status": "Researchable",
     "x": 0.5,
     "y_tier": 1,
@@ -56,8 +56,8 @@
     "frame_name": "oilnode.png",
     "children": [{
       "buff": "FudgeTheNumbers",
-      "time_to_research": 45.0,
-      "cost": 50,
+      "time_to_research": 20.0,
+      "cost": 90,
       "status": "Locked",
       "x": 0.35,
       "y_tier": 2,
@@ -65,8 +65,8 @@
       "frame_name": "fudgethenumbers.png"
     }, {
       "buff": "AutomatedRefiners",
-      "time_to_research": 50.0,
-      "cost": 70,
+      "time_to_research": 20.0,
+      "cost": 120,
       "status": "Locked",
       "x": 0.65,
       "y_tier": 2,
@@ -74,7 +74,7 @@
       "frame_name": "automatedrefiners.png"
     }, {
       "buff": "Purifier",
-      "time_to_research": 30.0,
+      "time_to_research": 20.0,
       "cost": 100,
       "status": "Locked",
       "x": 0.85,
@@ -83,8 +83,8 @@
       "frame_name": "purifier.png"
     }, {
       "buff": "Hydro",
-      "time_to_research": 5.0,
-      "cost": 30,
+      "time_to_research": 20.0,
+      "cost": 300,
       "status": "Locked",
       "x": 0.35,
       "y_tier": 4,
@@ -92,8 +92,8 @@
       "frame_name": "hydro.png",
       "children": [{
         "buff": "SalmonCannon",
-        "time_to_research": 40.0,
-        "cost": 120,
+        "time_to_research": 20.0,
+        "cost": 250,
         "status": "Locked",
         "x": 0.20,
         "y_tier": 5,
@@ -101,8 +101,8 @@
         "frame_name": "salmoncannon.png"
       }, {
         "buff": "ReinforcedTurbines",
-        "time_to_research": 50.0,
-        "cost": 70,
+        "time_to_research": 20.0,
+        "cost": 220,
         "status": "Locked",
         "x": 0.35,
         "y_tier": 5,
@@ -111,8 +111,8 @@
       }]
     }, {
       "buff": "Solar",
-      "time_to_research": 45.0,
-      "cost": 45,
+      "time_to_research": 20.0,
+      "cost": 320,
       "status": "Locked",
       "x": 0.65,
       "y_tier": 4,
@@ -120,8 +120,8 @@
       "frame_name": "solar.png",
       "children": [{
         "buff": "PurchaseSolarCellCompany",
-        "time_to_research": 150.0,
-        "cost": 500,
+        "time_to_research": 20.0,
+        "cost": 200,
         "status": "Locked",
         "x": 0.65,
         "y_tier": 5,
@@ -129,7 +129,7 @@
         "frame_name": "purchasesolarcellcompany.png",
         "children": [{
           "buff": "SellPanelsToConsumers",
-          "time_to_research": 350.0,
+          "time_to_research": 20.0,
           "cost": 1500,
           "status": "Locked",
           "x": 0.65,
@@ -139,8 +139,8 @@
         }]
       }, {
         "buff": "ImprovePanelTech",
-        "time_to_research": 90.0,
-        "cost": 150,
+        "time_to_research": 20.0,
+        "cost": 300,
         "status": "Locked",
         "x": 0.85,
         "y_tier": 5,
