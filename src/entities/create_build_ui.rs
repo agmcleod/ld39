@@ -85,7 +85,7 @@ pub fn create(
         transform_storage
             .insert(
                 solar_entity,
-                Transform::visible(0.0, 64.0, 0.0, 32, 32, 0.0, 1.0, 1.0),
+                Transform::visible(32.0, 0.0, 0.0, 32, 32, 0.0, 1.0, 1.0),
             )
             .unwrap();
         button_storage
