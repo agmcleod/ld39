@@ -1,4 +1,4 @@
-use components::{DeltaTime, GatheringRate, PowerBar, ResourceCount, ResourceType, Resources,
+use components::{Color, DeltaTime, EntityLookup, GatheringRate, PowerBar, ResourceCount, ResourceType, Resources,
                  StateChange, Text, Transform};
 use specs::{Join, Read, ReadStorage, System, Write, WriteStorage};
 use state::play_state::PlayState;
@@ -22,10 +22,12 @@ impl PowerUsage {
 
 impl<'b> System<'b> for PowerUsage {
     type SystemData = (
-        ReadStorage<'b, ResourceCount>,
+        WriteStorage<'b, Color>,
         Read<'b, DeltaTime>,
+        Read<'b, EntityLookup>,
         Read<'b, GatheringRate>,
         WriteStorage<'b, PowerBar>,
+        ReadStorage<'b, ResourceCount>,
         Write<'b, Resources>,
         Write<'b, StateChange>,
         WriteStorage<'b, Text>,
@@ -34,10 +36,12 @@ impl<'b> System<'b> for PowerUsage {
 
     fn run(&mut self, data: Self::SystemData) {
         let (
-            resource_count_storage,
+            mut color_storage,
             delta_time_storage,
+            entity_lookup_storage,
             gathering_rate_storage,
             mut power_bar_storage,
+            resource_count_storage,
             mut resources_storage,
             mut state_change_storage,
             mut text_storage,
@@ -75,22 +79,31 @@ impl<'b> System<'b> for PowerUsage {
             self.frame_count = 0.0;
         }
 
-        // 4 is the max
-        if num_of_cites_to_power >= 4 {
-            let gathering_rate = gathering_rate_storage.deref();
-            let power_demands = (&power_bar_storage)
-                .join()
-                .fold(0, |sum, power_bar| sum + power_bar.power_per_tick)
-                / POWER_FACTOR;
+        let lookup = entity_lookup_storage.deref();
 
-            if gathering_rate.coal / ResourceType::Coal.get_efficiency_rate()
-                + gathering_rate.oil / ResourceType::Oil.get_efficiency_rate()
-                + gathering_rate.solar / ResourceType::Solar.get_efficiency_rate()
-                + gathering_rate.hydro / ResourceType::Hydro.get_efficiency_rate()
-                >= power_demands
-            {
-                println!("~~~~~Meeting demands~~~~");
+        let power_gain_entity = lookup.entities.get(&"power_gain_text".to_string()).unwrap();
+        let gathering_rate = gathering_rate_storage.deref();
+        let power_demands = (&power_bar_storage)
+            .join()
+            .fold(0, |sum, power_bar| sum + power_bar.power_per_tick)
+            / POWER_FACTOR;
+
+        let total_gathering_rate = gathering_rate.coal / ResourceType::Coal.get_efficiency_rate()
+            + gathering_rate.oil / ResourceType::Oil.get_efficiency_rate()
+            + gathering_rate.solar / ResourceType::Solar.get_efficiency_rate()
+            + gathering_rate.hydro / ResourceType::Hydro.get_efficiency_rate();
+
+        text_storage.get_mut(*power_gain_entity).unwrap().text = format!("Power: {}", total_gathering_rate - power_demands);
+        color_storage.insert(*power_gain_entity, Color(
+            if total_gathering_rate >= power_demands {
+                [0.0, 0.6, 0.0, 1.0]
+            } else {
+                [0.6, 0.0, 0.0, 1.0]
             }
+        )).unwrap();
+
+        if num_of_cites_to_power >= 4 && total_gathering_rate >= power_demands {
+            println!("~~~~~Meeting demands~~~~");
         }
 
         for (resource_count, text) in (&resource_count_storage, &mut text_storage).join() {

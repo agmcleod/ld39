@@ -386,8 +386,9 @@ impl<'a> State for PlayState<'a> {
             .build();
         side_bar_container.add(Node::new(Some(entity), None));
 
+        let mut lookup = EntityLookup::new();
+
         {
-            let mut lookup = world.write_resource::<EntityLookup>();
             lookup
                 .entities
                 .insert("show_button_entity".to_string(), entity);
@@ -515,6 +516,22 @@ impl<'a> State for PlayState<'a> {
             );
             wallet_ui_storage.insert(entity, WalletUI {}).unwrap();
             side_bar_container.add(Node::new(Some(entity), None));
+
+            // power gain text
+            let entity = create_text::create(
+                &mut text_storages,
+                "Power: ".to_string(),
+                24.0,
+                30.0,
+                120.0,
+                0.0,
+                160,
+                32,
+                Color([0.0, 0.6, 0.0, 1.0]),
+            );
+
+            lookup.entities.insert("power_gain_text".to_string(), entity.clone());
+            side_bar_container.add(Node::new(Some(entity), None));
         }
 
         scene.add(side_bar_container);
@@ -557,8 +574,6 @@ impl<'a> State for PlayState<'a> {
         world.add_resource::<ResearchedBuffs>(ResearchedBuffs(HashSet::new()));
         world.add_resource::<ResearchingEntities>(ResearchingEntities::new());
 
-        let mut lookup = world.write_resource::<EntityLookup>();
-
         lookup.entities.insert(
             "tech_tree_container".to_string(),
             tech_tree_container_entity,
@@ -574,6 +589,8 @@ impl<'a> State for PlayState<'a> {
             tech_tree_container.entity.unwrap(),
         );
         scene.add(tech_tree_container);
+
+        world.add_resource(lookup);
     }
 
     fn update(&mut self, world: &mut World) {

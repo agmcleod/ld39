@@ -45,12 +45,10 @@ impl<'a> System<'a> for Gathering {
         let researched_buffs = researched_buffs_storage.deref();
 
         let gathering_rate = gathering_rate_storage.deref_mut();
-        gathering_rate.reset();
 
-        let mut time_passed = false;
-        for gatherer in (&mut gatherer_storage).join() {
-            if math::get_seconds(&self.gathering_tick.elapsed()) >= 5.0 {
-                time_passed = true;
+        if math::get_seconds(&self.gathering_tick.elapsed()) >= 5.0 {
+            gathering_rate.reset();
+            for gatherer in (&mut gatherer_storage).join() {
                 let mut amount = self.get_resource_gain(&gatherer.gatherer_type);
                 if gatherer.has_adjancent_of_same_type
                     && researched_buffs.0.contains(&Buff::ResourceTrading)
@@ -84,15 +82,12 @@ impl<'a> System<'a> for Gathering {
 
                 gathering_rate.add_to_resource_amount(&gatherer.gatherer_type, amount);
             }
-        }
-
-        if time_passed {
             self.gathering_tick = Instant::now();
-        }
 
-        resources.increase_resource_for_gatherer_type(&GathererType::Coal, gathering_rate.coal);
-        resources.increase_resource_for_gatherer_type(&GathererType::Oil, gathering_rate.oil);
-        resources.increase_resource_for_gatherer_type(&GathererType::Solar, gathering_rate.solar);
-        resources.increase_resource_for_gatherer_type(&GathererType::Hydro, gathering_rate.hydro);
+            resources.increase_resource_for_gatherer_type(&GathererType::Coal, gathering_rate.coal);
+            resources.increase_resource_for_gatherer_type(&GathererType::Oil, gathering_rate.oil);
+            resources.increase_resource_for_gatherer_type(&GathererType::Solar, gathering_rate.solar);
+            resources.increase_resource_for_gatherer_type(&GathererType::Hydro, gathering_rate.hydro);
+        }
     }
 }

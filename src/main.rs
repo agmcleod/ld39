@@ -40,7 +40,6 @@ use components::{upgrade::{LearnProgress, Upgrade},
                  ClickSound,
                  Color,
                  DeltaTime,
-                 EntityLookup,
                  Gatherer,
                  HighlightTile,
                  Input,
@@ -86,7 +85,6 @@ fn setup_world(world: &mut World, window: &glutin::Window) {
     world.add_resource::<Resources>(Resources::new());
     world.add_resource::<ClickSound>(ClickSound { play: false });
     world.add_resource::<Wallet>(Wallet::new());
-    world.add_resource::<EntityLookup>(EntityLookup::new());
     world.add_resource::<DeltaTime>(DeltaTime { dt: 0.0 });
     world.register::<AnimationSheet>();
     world.register::<BuildCost>();
