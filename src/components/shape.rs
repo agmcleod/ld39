@@ -9,12 +9,14 @@ use specs::{Component, VecStorage};
 
 pub struct Shape {
     pub buffers: VertexBuffers<Vertex>,
+    pub points: Vec<Vector2<f32>>,
 }
 
 impl Shape {
     pub fn new(points: Vec<Vector2<f32>>, color: [f32; 4]) -> Self {
         Shape {
-            buffers: Self::build_buffers(points, color),
+            buffers: Self::build_buffers(points.clone(), color),
+            points,
         }
     }
 

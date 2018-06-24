@@ -1,8 +1,9 @@
-use components::{upgrade::{Buff, LearnProgress, Status, Upgrade},
+use components::{upgrade::{Buff, LearnProgress, Status, Upgrade, UpgradeLinesLookup},
                  Color,
                  DeltaTime,
                  ResearchedBuffs,
                  ResearchingEntities,
+                 Shape,
                  Transform};
 use entities::tech_tree::{get_color_from_status, traverse_tree, TechTreeNode};
 use scene::Node;
@@ -75,9 +76,11 @@ impl<'a> System<'a> for Research {
         ReadStorage<'a, LearnProgress>,
         Write<'a, ResearchedBuffs>,
         Write<'a, ResearchingEntities>,
+        WriteStorage<'a, Shape>,
         ReadExpect<'a, TechTreeNode>,
         WriteStorage<'a, Transform>,
         WriteStorage<'a, Upgrade>,
+        Read<'a, UpgradeLinesLookup>
     );
 
     fn run(&mut self, data: Self::SystemData) {
@@ -88,9 +91,11 @@ impl<'a> System<'a> for Research {
             learn_progress_storage,
             mut researched_buffs,
             mut researching_entities_storage,
+            mut shape_storage,
             tech_tree_storage,
             transform_storage,
             mut upgrade_storage,
+            upgrade_lines_lookup,
         ) = data;
 
         let dt = delta_time_storage.deref().dt;
@@ -128,6 +133,13 @@ impl<'a> System<'a> for Research {
             let tech_tree: &TechTreeNode = tech_tree_storage.deref();
             let mut unlock_next_nodes = |node: &TechTreeNode| {
                 if node.entity == *upgrade_entity_researched {
+                    // update colour of sub node line bars
+                    if let Some(line_entities) = upgrade_lines_lookup.entities.get(&node.entity) {
+                        for entity in line_entities {
+                            let mut shape = shape_storage.get_mut(*entity).unwrap();
+                            shape.buffers = Shape::build_buffers(shape.points.clone(), [0.7, 0.7, 0.7, 1.0]);
+                        }
+                    }
                     for sub_node in &node.sub_nodes {
                         upgrade_storage.get_mut(sub_node.entity).unwrap().status =
                             Status::Researchable;

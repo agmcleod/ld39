@@ -1,4 +1,5 @@
-use specs::{Component, HashMapStorage, VecStorage};
+use std::collections::HashMap;
+use specs::{Component, Entity, HashMapStorage, VecStorage};
 
 #[derive(Copy, Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub enum Status {
@@ -61,4 +62,17 @@ pub struct LearnProgress {
 
 impl Component for LearnProgress {
     type Storage = HashMapStorage<Self>;
+}
+
+#[derive(Default)]
+pub struct UpgradeLinesLookup {
+    pub entities: HashMap<Entity, Vec<Entity>>,
+}
+
+impl UpgradeLinesLookup {
+    pub fn new() -> Self {
+        UpgradeLinesLookup{
+            entities: HashMap::new()
+        }
+    }
 }
