@@ -206,34 +206,32 @@ impl<'a> System<'a> for BuildGatherer {
             );
 
             // check for adjacent gatherers
-            if researched_buffs.0.contains(&Buff::ResourceTrading) {
-                let mut at_least_one_adjacent = false;
-                for i in -1..2 {
-                    for j in -1..2 {
-                        if i == 0 && j == 0 {
-                            continue;
-                        }
-                        if let Some(&(other_gatherer_type, entity)) = gatherer_positions
-                            .gatherers
-                            .get(&(selected_tile_col + i, selected_tile_row + j))
-                        {
-                            if gatherer_type == other_gatherer_type {
-                                gatherer_storage
-                                    .get_mut(entity)
-                                    .unwrap()
-                                    .has_adjancent_of_same_type = true;
-                                at_least_one_adjacent = true;
-                            }
+            let mut at_least_one_adjacent = false;
+            for i in -1..2 {
+                for j in -1..2 {
+                    if i == 0 && j == 0 {
+                        continue;
+                    }
+                    if let Some(&(other_gatherer_type, entity)) = gatherer_positions
+                        .gatherers
+                        .get(&(selected_tile_col + i, selected_tile_row + j))
+                    {
+                        if gatherer_type == other_gatherer_type {
+                            gatherer_storage
+                                .get_mut(entity)
+                                .unwrap()
+                                .has_adjancent_of_same_type = true;
+                            at_least_one_adjacent = true;
                         }
                     }
                 }
+            }
 
-                if at_least_one_adjacent {
-                    gatherer_storage
-                        .get_mut(gatherer_entity)
-                        .unwrap()
-                        .has_adjancent_of_same_type = true;
-                }
+            if at_least_one_adjacent {
+                gatherer_storage
+                    .get_mut(gatherer_entity)
+                    .unwrap()
+                    .has_adjancent_of_same_type = true;
             }
 
             let mut scene = self.scene.lock().unwrap();

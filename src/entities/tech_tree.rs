@@ -24,7 +24,13 @@ pub const SIZE: u16 = 32;
 const SIZE_F: f32 = SIZE as f32;
 const Y_INCREMENT: f32 = 64.0;
 
-fn create_line(world: &mut World, last_position: Vector2<f32>, x: f32, y: f32, last_status: Status) -> Entity {
+fn create_line(
+    world: &mut World,
+    last_position: Vector2<f32>,
+    x: f32,
+    y: f32,
+    last_status: Status,
+) -> Entity {
     let last_half_x = last_position.x + SIZE_F / 2.0;
     let last_half_y = last_position.y + SIZE_F / 2.0;
     let half_x = x + SIZE_F / 2.0;
@@ -80,9 +86,15 @@ fn build_entity_nodes(
         if let Some(last_entity) = last_upgrade.entity {
             let entity = create_line(world, last_position, x, y, last_upgrade.status.clone());
             if upgrade_lines_lookup.entities.contains_key(&last_entity) {
-                upgrade_lines_lookup.entities.get_mut(&last_entity).unwrap().push(entity.clone());
+                upgrade_lines_lookup
+                    .entities
+                    .get_mut(&last_entity)
+                    .unwrap()
+                    .push(entity.clone());
             } else {
-                upgrade_lines_lookup.entities.insert(last_entity, vec![entity.clone()]);
+                upgrade_lines_lookup
+                    .entities
+                    .insert(last_entity, vec![entity.clone()]);
             }
             container.add(Node::new(Some(entity), None));
         }
@@ -103,7 +115,11 @@ fn build_entity_nodes(
                 upgrade_lines_lookup,
                 width,
                 child.clone(),
-                LastUpgrade{ position: Some(Vector2 { x, y }), status, entity: Some(entity) },
+                LastUpgrade {
+                    position: Some(Vector2 { x, y }),
+                    status,
+                    entity: Some(entity),
+                },
             ));
         }
     }
@@ -115,7 +131,11 @@ fn build_entity_nodes(
  * This builds out the tech tree from a data source. It creates the entities to draw stuff on the screen
  * It then creates the hierarchy for dependencies, so we know when something becomes researchable upon its parent being researched.
  */
-pub fn build_tech_tree(world: &mut World, container: &mut Node, upgrade_lines_lookup: &mut UpgradeLinesLookup) -> TechTreeNode {
+pub fn build_tech_tree(
+    world: &mut World,
+    container: &mut Node,
+    upgrade_lines_lookup: &mut UpgradeLinesLookup,
+) -> TechTreeNode {
     let tech_tree_data = loader::read_text_from_file("resources/tech_tree.json").unwrap();
     let tech_tree_data: serde_json::Value = serde_json::from_str(tech_tree_data.as_ref()).unwrap();
 
@@ -123,8 +143,19 @@ pub fn build_tech_tree(world: &mut World, container: &mut Node, upgrade_lines_lo
     let width = dimensions[0] - 640.0;
 
     let node = tech_tree_data;
-    let last_upgrade = LastUpgrade{ position: None, status: Status::Researchable, entity: None };
-    build_entity_nodes(world, container, upgrade_lines_lookup, width, node, last_upgrade)
+    let last_upgrade = LastUpgrade {
+        position: None,
+        status: Status::Researchable,
+        entity: None,
+    };
+    build_entity_nodes(
+        world,
+        container,
+        upgrade_lines_lookup,
+        width,
+        node,
+        last_upgrade,
+    )
 }
 
 pub fn traverse_tree<F>(node: &TechTreeNode, cb: &mut F) -> bool

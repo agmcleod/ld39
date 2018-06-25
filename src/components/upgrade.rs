@@ -1,5 +1,5 @@
-use std::collections::HashMap;
 use specs::{Component, Entity, HashMapStorage, VecStorage};
+use std::collections::HashMap;
 
 #[derive(Copy, Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub enum Status {
@@ -71,8 +71,8 @@ pub struct UpgradeLinesLookup {
 
 impl UpgradeLinesLookup {
     pub fn new() -> Self {
-        UpgradeLinesLookup{
-            entities: HashMap::new()
+        UpgradeLinesLookup {
+            entities: HashMap::new(),
         }
     }
 }

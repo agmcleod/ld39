@@ -40,6 +40,7 @@ use components::{upgrade::{LearnProgress, Upgrade},
                  ClickSound,
                  Color,
                  DeltaTime,
+                 FloatingText,
                  Gatherer,
                  HighlightTile,
                  Input,
@@ -90,6 +91,7 @@ fn setup_world(world: &mut World, window: &glutin::Window) {
     world.register::<BuildCost>();
     world.register::<Button>();
     world.register::<Color>();
+    world.register::<FloatingText>();
     world.register::<Gatherer>();
     world.register::<HighlightTile>();
     world.register::<LearnProgress>();

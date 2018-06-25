@@ -1,5 +1,5 @@
-use components::{Color, DeltaTime, EntityLookup, GatheringRate, PowerBar, ResourceCount, ResourceType, Resources,
-                 StateChange, Text, Transform};
+use components::{Color, DeltaTime, EntityLookup, GatheringRate, PowerBar, ResourceCount,
+                 ResourceType, Resources, StateChange, Text, Transform};
 use specs::{Join, Read, ReadStorage, System, Write, WriteStorage};
 use state::play_state::PlayState;
 use std::ops::{Deref, DerefMut};
@@ -93,14 +93,18 @@ impl<'b> System<'b> for PowerUsage {
             + gathering_rate.solar / ResourceType::Solar.get_efficiency_rate()
             + gathering_rate.hydro / ResourceType::Hydro.get_efficiency_rate();
 
-        text_storage.get_mut(*power_gain_entity).unwrap().text = format!("Power: {}", total_gathering_rate - power_demands);
-        color_storage.insert(*power_gain_entity, Color(
-            if total_gathering_rate >= power_demands {
-                [0.0, 0.6, 0.0, 1.0]
-            } else {
-                [0.6, 0.0, 0.0, 1.0]
-            }
-        )).unwrap();
+        text_storage.get_mut(*power_gain_entity).unwrap().text =
+            format!("Power: {}", total_gathering_rate - power_demands);
+        color_storage
+            .insert(
+                *power_gain_entity,
+                Color(if total_gathering_rate >= power_demands {
+                    [0.0, 0.6, 0.0, 1.0]
+                } else {
+                    [0.6, 0.0, 0.0, 1.0]
+                }),
+            )
+            .unwrap();
 
         if num_of_cites_to_power >= 4 && total_gathering_rate >= power_demands {
             println!("~~~~~Meeting demands~~~~");

@@ -1,15 +1,15 @@
-use std::sync::{Arc, Mutex};
-use std::collections::HashSet;
 use scene::Node;
 use specs::{Dispatcher, DispatcherBuilder, World};
 use state::State;
+use std::collections::HashSet;
+use std::sync::{Arc, Mutex};
 
 use components::ui::WalletUI;
-use components::{ui::PollutionCount, Button, CityPowerState, Color, EntityLookup,
+use components::{ui::PollutionCount, upgrade, Button, CityPowerState, Color, EntityLookup,
                  GathererPositions, GatheringRate, PowerBar, ProtectedNodes, Rect,
                  ResearchedBuffs, ResearchingEntities, ResourceCount, ResourceType, Resources,
                  SelectedTile, Sprite, Text, Tile, TileType, Transform, Wallet,
-                 CITY_POWER_STATE_COORDS, upgrade};
+                 CITY_POWER_STATE_COORDS};
 use entities::{create_map, create_power_bar, create_text, tech_tree};
 use rand::{thread_rng, Rng};
 use renderer;
@@ -62,7 +62,7 @@ impl<'a> PlayState<'a> {
                 "tile_selection",
                 &["build_gatherer"],
             )
-            .with(systems::Gathering::new(), "gathering", &[])
+            .with(systems::Gathering::new(scene.clone()), "gathering", &[])
             .with(systems::PowerUsage::new(), "power_usage", &["gathering"])
             .with(
                 systems::ToggleTechTree::new(scene.clone()),
@@ -77,6 +77,11 @@ impl<'a> PlayState<'a> {
                 },
                 "cities_to_power",
                 &["button_hover"],
+            )
+            .with(
+                systems::FloatingTextSystem::new(scene.clone()),
+                "floating_text_system",
+                &[],
             )
             .build();
 
@@ -530,7 +535,9 @@ impl<'a> State for PlayState<'a> {
                 Color([0.0, 0.6, 0.0, 1.0]),
             );
 
-            lookup.entities.insert("power_gain_text".to_string(), entity.clone());
+            lookup
+                .entities
+                .insert("power_gain_text".to_string(), entity.clone());
             side_bar_container.add(Node::new(Some(entity), None));
         }
 
@@ -554,7 +561,8 @@ impl<'a> State for PlayState<'a> {
             .build();
         let mut tech_tree_container = Node::new(Some(tech_tree_container_entity.clone()), None);
         let mut upgrade_lines_lookup = upgrade::UpgradeLinesLookup::new();
-        let tech_tree_node = tech_tree::build_tech_tree(world, &mut tech_tree_container, &mut upgrade_lines_lookup);
+        let tech_tree_node =
+            tech_tree::build_tech_tree(world, &mut tech_tree_container, &mut upgrade_lines_lookup);
 
         world.add_resource(upgrade_lines_lookup);
 

@@ -80,7 +80,7 @@ impl<'a> System<'a> for Research {
         ReadExpect<'a, TechTreeNode>,
         WriteStorage<'a, Transform>,
         WriteStorage<'a, Upgrade>,
-        Read<'a, UpgradeLinesLookup>
+        Read<'a, UpgradeLinesLookup>,
     );
 
     fn run(&mut self, data: Self::SystemData) {
@@ -137,7 +137,8 @@ impl<'a> System<'a> for Research {
                     if let Some(line_entities) = upgrade_lines_lookup.entities.get(&node.entity) {
                         for entity in line_entities {
                             let mut shape = shape_storage.get_mut(*entity).unwrap();
-                            shape.buffers = Shape::build_buffers(shape.points.clone(), [0.7, 0.7, 0.7, 1.0]);
+                            shape.buffers =
+                                Shape::build_buffers(shape.points.clone(), [0.7, 0.7, 0.7, 1.0]);
                         }
                     }
                     for sub_node in &node.sub_nodes {
