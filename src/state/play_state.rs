@@ -212,6 +212,17 @@ impl<'a> State for PlayState<'a> {
             None,
         );
 
+        let entity = world
+            .create_entity()
+            .with(Transform::visible(
+                dimensions[0] - 640.0 - 52.0, 4.0, 0.0, 22, 22, 0.0, 1.0, 1.0
+            ))
+            .with(Sprite{ frame_name: "menu.png".to_string() })
+            .with(Button::new("menu".to_string(), ["menu.png".to_string(), "menu_hover.png".to_string()]))
+            .build();
+
+        side_bar_container.add(Node::new(Some(entity), None));
+
         let mut powerbar_frame_entities = Vec::new();
 
         for (i, coords) in CITY_POWER_STATE_COORDS.iter().enumerate() {
@@ -234,6 +245,7 @@ impl<'a> State for PlayState<'a> {
 
         world.add_resource(CityPowerState::new(powerbar_frame_entities));
 
+        // create first ppower bar
         {
             let entities = world.entities();
             let mut color_storage = world.write_storage::<Color>();
