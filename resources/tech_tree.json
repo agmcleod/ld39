@@ -1,6 +1,6 @@
 {
   "buff": "Coal",
-  "time_to_research": 20.0,
+  "time_to_research": 10.0,
   "cost": 0,
   "status": "Researched",
   "x": 0.5,
@@ -9,7 +9,7 @@
   "frame_name": "coalnode.png",
   "children": [{
     "buff": "ResourceTrading",
-    "time_to_research": 20.0,
+    "time_to_research": 10.0,
     "cost": 50,
     "status": "Researchable",
     "x": 0.75,
@@ -18,7 +18,7 @@
     "frame_name": "resourcetrading.png"
   }, {
     "buff": "ConveyerBelts",
-    "time_to_research": 20.0,
+    "time_to_research": 10.0,
     "cost": 50,
     "status": "Researchable",
     "x": 0.20,
@@ -27,8 +27,8 @@
     "frame_name": "conveyerbelts.png",
     "children": [{
       "buff": "RoboticLoaders",
-      "time_to_research": 20.0,
-      "cost": 65,
+      "time_to_research": 10.0,
+      "cost": 120,
       "status": "Locked",
       "x": 0.20,
       "y_tier": 2,
@@ -36,8 +36,8 @@
       "frame_name": "roboticloaders.png",
       "children": [{
         "buff": "PollutionFilters",
-        "time_to_research": 20.0,
-        "cost": 90,
+        "time_to_research": 10.0,
+        "cost": 180,
         "status": "Locked",
         "x": 0.1,
         "y_tier": 3,
@@ -47,7 +47,7 @@
     }]
   }, {
     "buff": "Oil",
-    "time_to_research": 20.0,
+    "time_to_research": 10.0,
     "cost": 120,
     "status": "Researchable",
     "x": 0.5,
@@ -56,7 +56,7 @@
     "frame_name": "oilnode.png",
     "children": [{
       "buff": "FudgeTheNumbers",
-      "time_to_research": 20.0,
+      "time_to_research": 10.0,
       "cost": 90,
       "status": "Locked",
       "x": 0.35,
@@ -65,7 +65,7 @@
       "frame_name": "fudgethenumbers.png"
     }, {
       "buff": "AutomatedRefiners",
-      "time_to_research": 20.0,
+      "time_to_research": 10.0,
       "cost": 120,
       "status": "Locked",
       "x": 0.65,
@@ -74,7 +74,7 @@
       "frame_name": "automatedrefiners.png"
     }, {
       "buff": "Purifier",
-      "time_to_research": 20.0,
+      "time_to_research": 10.0,
       "cost": 100,
       "status": "Locked",
       "x": 0.85,
@@ -83,8 +83,8 @@
       "frame_name": "purifier.png"
     }, {
       "buff": "Hydro",
-      "time_to_research": 20.0,
-      "cost": 300,
+      "time_to_research": 10.0,
+      "cost": 1000,
       "status": "Locked",
       "x": 0.35,
       "y_tier": 4,
@@ -92,8 +92,8 @@
       "frame_name": "hydro.png",
       "children": [{
         "buff": "SalmonCannon",
-        "time_to_research": 20.0,
-        "cost": 250,
+        "time_to_research": 10.0,
+        "cost": 400,
         "status": "Locked",
         "x": 0.20,
         "y_tier": 5,
@@ -101,18 +101,18 @@
         "frame_name": "salmoncannon.png"
       }, {
         "buff": "ReinforcedTurbines",
-        "time_to_research": 20.0,
-        "cost": 220,
+        "time_to_research": 10.0,
+        "cost": 600,
         "status": "Locked",
         "x": 0.35,
         "y_tier": 5,
-        "description": "+1 energy harvested from the water",
+        "description": "+2 energy harvested from the water",
         "frame_name": "reinforcedturbines.png"
       }]
     }, {
       "buff": "Solar",
-      "time_to_research": 20.0,
-      "cost": 320,
+      "time_to_research": 10.0,
+      "cost": 600,
       "status": "Locked",
       "x": 0.65,
       "y_tier": 4,
@@ -120,8 +120,8 @@
       "frame_name": "solar.png",
       "children": [{
         "buff": "PurchaseSolarCellCompany",
-        "time_to_research": 20.0,
-        "cost": 200,
+        "time_to_research": 10.0,
+        "cost": 500,
         "status": "Locked",
         "x": 0.65,
         "y_tier": 5,
@@ -129,7 +129,7 @@
         "frame_name": "purchasesolarcellcompany.png",
         "children": [{
           "buff": "SellPanelsToConsumers",
-          "time_to_research": 20.0,
+          "time_to_research": 10.0,
           "cost": 1500,
           "status": "Locked",
           "x": 0.65,
@@ -139,7 +139,7 @@
         }]
       }, {
         "buff": "ImprovePanelTech",
-        "time_to_research": 20.0,
+        "time_to_research": 10.0,
         "cost": 300,
         "status": "Locked",
         "x": 0.85,

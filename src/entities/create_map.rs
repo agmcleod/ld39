@@ -84,17 +84,20 @@ pub fn create() -> TileTypeMap {
     let mut rng = thread_rng();
 
     let mut set_nodes = HashMap::new();
+    let mut directions = [0, 0, 1, 1];
+    rng.shuffle(&mut directions);
+
     // used to track what half the last path way was in said direction
     // stores 0 for lower half, 1 for higher half
     let mut horizontal_paths: Vec<usize> = Vec::new();
     let mut vertical_paths: Vec<usize> = Vec::new();
-    // build 4 paths
-    for _ in 0..4 {
-        let horizontal = rng.gen_range(0, 2) == 0;
+
+    for direction in &directions {
+        let horizontal = *direction == 0;
 
         let mut long_length = rng.gen_range(2, 11);
         // bias being longer
-        if long_length >= 5 {
+        if long_length >= 7 {
             long_length = 10;
         } else {
             long_length *= 2;

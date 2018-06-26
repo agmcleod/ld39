@@ -4,7 +4,7 @@ use specs::{Join, Read, ReadStorage, System, Write, WriteStorage};
 use state::play_state::PlayState;
 use std::ops::{Deref, DerefMut};
 use std::time::Instant;
-use systems::POWER_FACTOR;
+use systems::{POWER_FACTOR, TICK_RATE};
 
 pub struct PowerUsage {
     instant: Instant,
@@ -55,7 +55,7 @@ impl<'b> System<'b> for PowerUsage {
 
         let mut num_of_cites_to_power = 0;
         for (transform, power_bar) in (&mut transform_storage, &mut power_bar_storage).join() {
-            if self.frame_count * dt >= 5.0 {
+            if self.frame_count * dt >= TICK_RATE {
                 reset_frame_counter = true;
                 self.instant = Instant::now();
                 if power_bar.power_left > 0 {

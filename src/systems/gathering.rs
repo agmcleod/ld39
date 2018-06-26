@@ -7,6 +7,7 @@ use std::ops::{Deref, DerefMut};
 use std::sync::{Arc, Mutex};
 use std::time::Instant;
 use storage_types::TextStorage;
+use systems::TICK_RATE;
 use utils::math;
 
 pub struct Gathering {
@@ -64,7 +65,7 @@ impl<'a> System<'a> for Gathering {
         let gathering_rate = gathering_rate_storage.deref_mut();
         let mut scene = self.scene.lock().unwrap();
 
-        if math::get_seconds(&self.gathering_tick.elapsed()) >= 5.0 {
+        if math::get_seconds(&self.gathering_tick.elapsed()) >= TICK_RATE {
             gathering_rate.reset();
             for (entity, gatherer) in (&*entities, &mut gatherer_storage).join() {
                 let mut amount = self.get_resource_gain(&gatherer.gatherer_type);
@@ -90,7 +91,7 @@ impl<'a> System<'a> for Gathering {
                     }
                 } else if gatherer.gatherer_type == GathererType::Hydro {
                     if researched_buffs.0.contains(&Buff::ReinforcedTurbines) {
-                        amount += 1;
+                        amount += 2;
                     }
                 } else if gatherer.gatherer_type == GathererType::Solar {
                     if researched_buffs.0.contains(&Buff::ImprovePanelTech) {

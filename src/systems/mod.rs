@@ -14,6 +14,9 @@ mod text_absolute_cache;
 mod tile_selection;
 mod toggle_tech_tree;
 
+pub const TICK_RATE: f32 = 3.0;
+pub const POWER_FACTOR: i32 = 1;
+
 pub use self::animation_system::*;
 pub use self::build_gatherer::*;
 pub use self::button_hover::*;

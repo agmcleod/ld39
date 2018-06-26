@@ -142,13 +142,13 @@ impl<'a> State for PlayState<'a> {
                 let tile_type = if let Some(&(tile_type, _)) = set_nodes.get(&(col, row)) {
                     tile_type.clone()
                 } else {
-                    let r = rng.gen_range(0, 3);
-                    if r == 0 {
-                        TileType::EcoSystem
-                    } else if r == 1 {
+                    let r = rng.gen_range(0, 10);
+                    if r >= 9 {
                         TileType::River
-                    } else {
+                    } else if r >= 6 {
                         TileType::City
+                    } else {
+                        TileType::EcoSystem
                     }
                 };
                 let tile = Tile::new(tile_type);

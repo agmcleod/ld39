@@ -3,8 +3,7 @@ use components::{upgrade::Buff, Button, ClickSound, DeltaTime, Input, PowerBar, 
                  ResourceType, Resources, Text, Transform, Wallet};
 use specs::{Join, Read, System, Write, WriteStorage};
 use std::ops::{Deref, DerefMut};
-
-pub const POWER_FACTOR: i32 = 1;
+use systems::POWER_FACTOR;
 
 pub struct SellEnergy {
     minute_ticker: f32,
