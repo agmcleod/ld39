@@ -99,6 +99,8 @@ pub fn create() -> TileTypeMap {
         // bias being longer
         if long_length >= 7 {
             long_length = 10;
+        } else if long_length >= 5 {
+            long_length = 9;
         } else {
             long_length *= 2;
         }
