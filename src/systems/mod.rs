@@ -12,6 +12,7 @@ mod sell_energy;
 mod tech_tree;
 mod text_absolute_cache;
 mod tile_selection;
+mod toggle_pause;
 mod toggle_tech_tree;
 
 pub const TICK_RATE: f32 = 3.0;
@@ -30,4 +31,5 @@ pub use self::sell_energy::*;
 pub use self::tech_tree::*;
 pub use self::text_absolute_cache::*;
 pub use self::tile_selection::*;
+pub use self::toggle_pause::*;
 pub use self::toggle_tech_tree::*;

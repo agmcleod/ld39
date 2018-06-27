@@ -25,6 +25,7 @@ enum InternalState {
 pub struct PlayState<'a> {
     dispatcher: Dispatcher<'a, 'a>,
     tech_tree_dispatcher: Dispatcher<'a, 'a>,
+    pause_dispatcher: Dispatcher<'a, 'a>,
     scene: Arc<Mutex<Node>>,
     state: InternalState,
 }
@@ -83,6 +84,11 @@ impl<'a> PlayState<'a> {
                 "floating_text_system",
                 &[],
             )
+            .with(
+                systems::TogglePause{ scene: scene.clone() },
+                "toggle_pause",
+                &["button_hover"]
+            )
             .build();
 
         let tech_tree_dispatcher = DispatcherBuilder::new()
@@ -108,9 +114,32 @@ impl<'a> PlayState<'a> {
             )
             .build();
 
+        let pause_dispatcher = DispatcherBuilder::new()
+            .with(
+                systems::ButtonHover {
+                    scene: scene.clone(),
+                },
+                "button_hover",
+                &[],
+            )
+            .with(
+                systems::TextAbsoluteCache {
+                    scene: scene.clone(),
+                },
+                "text_absolute_cache",
+                &[],
+            )
+            .with(
+                systems::TogglePause{ scene: scene.clone() },
+                "toggle_pause",
+                &["button_hover"]
+            )
+            .build();
+
         let ps = PlayState {
             dispatcher,
             tech_tree_dispatcher,
+            pause_dispatcher,
             scene,
             state: InternalState::Game,
         };
@@ -624,8 +653,10 @@ impl<'a> State for PlayState<'a> {
     fn handle_custom_change(&mut self, action: &String) {
         if action == "tech_tree_pause" {
             self.state = InternalState::TechTree;
-        } else if action == "tech_tree_resume" {
+        } else if action == "resume" {
             self.state = InternalState::Game;
+        } else if action == "pause" {
+            self.state = InternalState::Pause;
         }
     }
 }
