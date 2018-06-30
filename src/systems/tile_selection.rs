@@ -1,5 +1,6 @@
-use components::{Button, Color, Gatherer, Input, Rect, ResearchedBuffs, SelectedTile, Sprite,
-                 Tile, Transform};
+use components::{
+    Button, Color, Gatherer, Input, Rect, ResearchedBuffs, SelectedTile, Sprite, Tile, Transform,
+};
 use entities::create_build_ui;
 use scene::Node;
 use specs::{Entities, Entity, Join, Read, ReadStorage, System, WriteStorage};

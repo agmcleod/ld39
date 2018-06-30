@@ -1,9 +1,16 @@
 use components::{Button, Color, Rect, ResearchedBuffs, Sprite, TileType, Transform};
 use entities::tech_tree::Buff;
 use scene::Node;
-use specs::{Entity, Entities, WriteStorage};
+use specs::{Entities, Entity, WriteStorage};
 
-fn create_gray_background(entities: &Entities, color_storage: &mut WriteStorage<Color>, rect_storage: &mut WriteStorage<Rect>, transform_storage: &mut WriteStorage<Transform>, x: f32, y: f32) -> Entity {
+fn create_gray_background(
+    entities: &Entities,
+    color_storage: &mut WriteStorage<Color>,
+    rect_storage: &mut WriteStorage<Rect>,
+    transform_storage: &mut WriteStorage<Transform>,
+    x: f32,
+    y: f32,
+) -> Entity {
     let entity = entities.create();
 
     color_storage
@@ -11,10 +18,7 @@ fn create_gray_background(entities: &Entities, color_storage: &mut WriteStorage<
         .unwrap();
     rect_storage.insert(entity, Rect::new()).unwrap();
     transform_storage
-        .insert(
-            entity,
-            Transform::visible(x, y, 0.0, 32, 32, 0.0, 1.0, 1.0),
-        )
+        .insert(entity, Transform::visible(x, y, 0.0, 32, 32, 0.0, 1.0, 1.0))
         .unwrap();
 
     entity
@@ -35,7 +39,14 @@ pub fn create(
     let mut new_entities = Vec::new();
 
     if *selected_tile_type == TileType::Open {
-        let background_entity = create_gray_background(entities, color_storage, rect_storage, transform_storage, 0.0, 0.0);
+        let background_entity = create_gray_background(
+            entities,
+            color_storage,
+            rect_storage,
+            transform_storage,
+            0.0,
+            0.0,
+        );
         new_entities.push(Node::new(Some(background_entity), None));
 
         let coal_entity = entities.create();
@@ -69,7 +80,14 @@ pub fn create(
     }
 
     if researched_buffs.0.contains(&Buff::Oil) && *selected_tile_type == TileType::Open {
-        let background_entity = create_gray_background(entities, color_storage, rect_storage, transform_storage, 0.0, 32.0);
+        let background_entity = create_gray_background(
+            entities,
+            color_storage,
+            rect_storage,
+            transform_storage,
+            0.0,
+            32.0,
+        );
         new_entities.push(Node::new(Some(background_entity), None));
         let oil_entity = entities.create();
         transform_storage
@@ -103,7 +121,14 @@ pub fn create(
     }
 
     if researched_buffs.0.contains(&Buff::Solar) && *selected_tile_type == TileType::Open {
-        let background_entity = create_gray_background(entities, color_storage, rect_storage, transform_storage, 32.0, 0.0);
+        let background_entity = create_gray_background(
+            entities,
+            color_storage,
+            rect_storage,
+            transform_storage,
+            32.0,
+            0.0,
+        );
         new_entities.push(Node::new(Some(background_entity), None));
         let solar_entity = entities.create();
         transform_storage
@@ -137,7 +162,14 @@ pub fn create(
     }
 
     if researched_buffs.0.contains(&Buff::Hydro) && *selected_tile_type == TileType::River {
-        let background_entity = create_gray_background(entities, color_storage, rect_storage, transform_storage, 0.0, 0.0);
+        let background_entity = create_gray_background(
+            entities,
+            color_storage,
+            rect_storage,
+            transform_storage,
+            0.0,
+            0.0,
+        );
         new_entities.push(Node::new(Some(background_entity), None));
         let hydro_entity = entities.create();
         transform_storage

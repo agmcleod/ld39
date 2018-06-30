@@ -2,6 +2,8 @@ extern crate gfx;
 extern crate image;
 use gfx::texture::Mipmap;
 use rodio::{decoder::Decoder, Decoder as SoundDecoder, Endpoint, Sink, Source};
+use serde_json;
+use settings::Settings;
 use std::env;
 use std::fs::File;
 use std::io::prelude::Read;
@@ -33,12 +35,12 @@ pub fn create_sound(sound_file_path: &str) -> Decoder<BufReader<File>> {
     SoundDecoder::new(BufReader::new(audio_file)).unwrap()
 }
 
-pub fn create_music_sink(music_path: &str, endpoint: &Endpoint) -> Sink {
+pub fn create_music_sink(music_path: &str, endpoint: &Endpoint, volume: f32) -> Sink {
     let mut sink = Sink::new(&endpoint);
 
     let music_file = File::open(&Path::new(&get_exe_path().join(music_path))).unwrap();
     let source = SoundDecoder::new(BufReader::new(music_file)).unwrap();
-    sink.set_volume(0.0);
+    sink.set_volume(volume);
     sink.append(source.repeat_infinite());
     sink
 }
@@ -58,5 +60,15 @@ pub fn get_exe_path() -> PathBuf {
             p
         }
         Err(_) => PathBuf::new(),
+    }
+}
+
+pub fn load_settings() -> Settings {
+    let file_name = "settings.json";
+    if get_exe_path().join(file_name).exists() {
+        let settings_text = read_text_from_file(file_name).unwrap();
+        serde_json::from_str(settings_text.as_ref()).unwrap()
+    } else {
+        Settings::default()
     }
 }

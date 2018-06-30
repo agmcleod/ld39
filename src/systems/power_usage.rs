@@ -1,5 +1,7 @@
-use components::{Color, DeltaTime, EntityLookup, GatheringRate, PowerBar, ResourceCount,
-                 ResourceType, Resources, StateChange, Text, Transform};
+use components::{
+    Color, DeltaTime, EntityLookup, GatheringRate, PowerBar, ResourceCount, ResourceType,
+    Resources, StateChange, Text, Transform,
+};
 use specs::{Join, Read, ReadStorage, System, Write, WriteStorage};
 use state::play_state::PlayState;
 use std::ops::{Deref, DerefMut};

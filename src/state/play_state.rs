@@ -5,11 +5,12 @@ use std::collections::HashSet;
 use std::sync::{Arc, Mutex};
 
 use components::ui::WalletUI;
-use components::{ui::PollutionCount, upgrade, Button, CityPowerState, Color, EntityLookup,
-                 GathererPositions, GatheringRate, PowerBar, ProtectedNodes, Rect,
-                 ResearchedBuffs, ResearchingEntities, ResourceCount, ResourceType, Resources,
-                 SelectedTile, Sprite, Text, Tile, TileType, Transform, Wallet,
-                 CITY_POWER_STATE_COORDS};
+use components::{
+    ui::PollutionCount, upgrade, Button, CityPowerState, Color, EntityLookup, GathererPositions,
+    GatheringRate, PowerBar, ProtectedNodes, Rect, ResearchedBuffs, ResearchingEntities,
+    ResourceCount, ResourceType, Resources, SelectedTile, Sprite, Text, Tile, TileType, Transform,
+    Wallet, CITY_POWER_STATE_COORDS,
+};
 use entities::{create_map, create_power_bar, create_text, tech_tree};
 use rand::{thread_rng, Rng};
 use renderer;
@@ -85,9 +86,11 @@ impl<'a> PlayState<'a> {
                 &[],
             )
             .with(
-                systems::TogglePause{ scene: scene.clone() },
+                systems::TogglePause {
+                    scene: scene.clone(),
+                },
                 "toggle_pause",
-                &["button_hover"]
+                &["button_hover"],
             )
             .build();
 
@@ -130,9 +133,11 @@ impl<'a> PlayState<'a> {
                 &[],
             )
             .with(
-                systems::TogglePause{ scene: scene.clone() },
+                systems::TogglePause {
+                    scene: scene.clone(),
+                },
                 "toggle_pause",
-                &["button_hover"]
+                &["button_hover"],
             )
             .build();
 
@@ -244,10 +249,22 @@ impl<'a> State for PlayState<'a> {
         let entity = world
             .create_entity()
             .with(Transform::visible(
-                dimensions[0] - 640.0 - 52.0, 4.0, 0.0, 22, 22, 0.0, 1.0, 1.0
+                dimensions[0] - 640.0 - 52.0,
+                4.0,
+                0.0,
+                22,
+                22,
+                0.0,
+                1.0,
+                1.0,
             ))
-            .with(Sprite{ frame_name: "menu.png".to_string() })
-            .with(Button::new("menu".to_string(), ["menu.png".to_string(), "menu_hover.png".to_string()]))
+            .with(Sprite {
+                frame_name: "menu.png".to_string(),
+            })
+            .with(Button::new(
+                "menu".to_string(),
+                ["menu.png".to_string(), "menu_hover.png".to_string()],
+            ))
             .build();
 
         side_bar_container.add(Node::new(Some(entity), None));
@@ -646,6 +663,7 @@ impl<'a> State for PlayState<'a> {
         match self.state {
             InternalState::Game => self.dispatcher.dispatch(&mut world.res),
             InternalState::TechTree => self.tech_tree_dispatcher.dispatch(&mut world.res),
+            InternalState::Pause => self.pause_dispatcher.dispatch(&mut world.res),
             _ => {}
         }
     }

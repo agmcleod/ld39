@@ -1,10 +1,7 @@
-use components::{upgrade::{Buff, LearnProgress, Status, Upgrade, UpgradeLinesLookup},
-                 Color,
-                 DeltaTime,
-                 ResearchedBuffs,
-                 ResearchingEntities,
-                 Shape,
-                 Transform};
+use components::{
+    upgrade::{Buff, LearnProgress, Status, Upgrade, UpgradeLinesLookup}, Color, DeltaTime,
+    ResearchedBuffs, ResearchingEntities, Shape, Transform,
+};
 use entities::tech_tree::{get_color_from_status, traverse_tree, TechTreeNode};
 use scene::Node;
 use specs::{Entities, Join, Read, ReadExpect, ReadStorage, System, Write, WriteStorage};

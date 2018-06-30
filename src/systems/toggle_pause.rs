@@ -1,15 +1,16 @@
-use std::ops::{Deref, DerefMut};
-use std::sync::{Arc, Mutex};
-use specs::{Entities, Join, Read, Write, WriteStorage, System};
-use scene::Node;
 use components::{Button, Color, EntityLookup, Input, Rect, StateChange, Transform};
 use entities::create_colored_rect;
+use scene::Node;
+use specs::{Entities, Join, Read, System, Write, WriteStorage};
+use state::play_state::PlayState;
+use std::ops::{Deref, DerefMut};
+use std::sync::{Arc, Mutex};
 
 pub struct TogglePause {
     pub scene: Arc<Mutex<Node>>,
 }
 
-impl <'a>System<'a> for TogglePause {
+impl<'a> System<'a> for TogglePause {
     type SystemData = (
         Entities<'a>,
         WriteStorage<'a, Button>,
@@ -61,6 +62,8 @@ impl <'a>System<'a> for TogglePause {
                 .insert("pause_black".to_string(), node.entity.unwrap());
             let mut scene = self.scene.lock().unwrap();
             scene.add(node);
+            let state_change: &mut StateChange = state_change_storage.deref_mut();
+            state_change.set(PlayState::get_name(), "pause".to_string());
         }
     }
 }

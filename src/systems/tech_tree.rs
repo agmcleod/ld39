@@ -1,15 +1,8 @@
 use components::ui;
-use components::{ui::WalletUI,
-                 upgrade::{Buff, LearnProgress},
-                 Color,
-                 EntityLookup,
-                 Input,
-                 Rect,
-                 ResearchingEntities,
-                 Sprite,
-                 Text,
-                 Transform,
-                 Wallet};
+use components::{
+    ui::WalletUI, upgrade::{Buff, LearnProgress}, Color, EntityLookup, Input, Rect,
+    ResearchingEntities, Sprite, Text, Transform, Wallet,
+};
 use entities::tech_tree::{get_color_from_status, Status, Upgrade};
 use entities::{create_text, create_tooltip};
 use scene::Node;

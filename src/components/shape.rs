@@ -1,9 +1,9 @@
 use cgmath::Vector2;
 use lyon_path::{builder::FlatPathBuilder, default::Path, math::point as lyon_point};
-use lyon_tessellation::{geometry_builder::{BuffersBuilder, VertexBuffers, VertexConstructor},
-                        FillOptions,
-                        FillTessellator,
-                        FillVertex};
+use lyon_tessellation::{
+    geometry_builder::{BuffersBuilder, VertexBuffers, VertexConstructor}, FillOptions,
+    FillTessellator, FillVertex,
+};
 use renderer::Vertex;
 use specs::{Component, VecStorage};
 

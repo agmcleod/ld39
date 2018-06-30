@@ -1,6 +1,6 @@
 use components::{Color, DeltaTime, FloatingText, Transform};
 use scene::Node;
-use specs::{Entities, Join, Read, ReadStorage, System, WriteStorage};
+use specs::{Entities, Join, Read, System, WriteStorage};
 use std::ops::Deref;
 use std::sync::{Arc, Mutex};
 
@@ -43,7 +43,6 @@ impl<'a> System<'a> for FloatingTextSystem {
         {
             floating_text.time_passed += delta_time.dt;
             let x = transform.get_pos().x;
-            let y = transform.get_pos().y;
             transform.set_pos2(x, 0.0 - (20.0 * floating_text.time_passed));
 
             color.0[3] = 1.0 - floating_text.time_passed;

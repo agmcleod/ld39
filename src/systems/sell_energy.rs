@@ -1,6 +1,8 @@
 use components::ui::WalletUI;
-use components::{upgrade::Buff, Button, ClickSound, DeltaTime, Input, PowerBar, ResearchedBuffs,
-                 ResourceType, Resources, Text, Transform, Wallet};
+use components::{
+    upgrade::Buff, Button, ClickSound, DeltaTime, Input, PowerBar, ResearchedBuffs, ResourceType,
+    Resources, Text, Transform, Wallet,
+};
 use specs::{Join, Read, System, Write, WriteStorage};
 use std::ops::{Deref, DerefMut};
 use systems::POWER_FACTOR;

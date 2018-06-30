@@ -15,10 +15,9 @@ extern crate rodio;
 extern crate serde;
 #[macro_use]
 extern crate serde_derive;
+extern crate conrod;
 extern crate serde_json;
 extern crate specs;
-#[macro_use]
-extern crate conrod;
 
 extern crate rusttype;
 
@@ -27,6 +26,7 @@ mod entities;
 mod loader;
 mod renderer;
 mod scene;
+mod settings;
 mod spritesheet;
 mod state;
 mod storage_types;
@@ -34,30 +34,11 @@ mod systems;
 mod utils;
 
 use components::ui::{PollutionCount, TechTreeButton, WalletUI};
-use components::{upgrade::{LearnProgress, Upgrade},
-                 AnimationSheet,
-                 BuildCost,
-                 Button,
-                 Camera,
-                 ClickSound,
-                 Color,
-                 DeltaTime,
-                 FloatingText,
-                 Gatherer,
-                 HighlightTile,
-                 Input,
-                 PowerBar,
-                 Rect,
-                 ResourceCount,
-                 Resources,
-                 SelectedTile,
-                 Shape,
-                 Sprite,
-                 StateChange,
-                 Text,
-                 Tile,
-                 Transform,
-                 Wallet};
+use components::{
+    upgrade::{LearnProgress, Upgrade}, AnimationSheet, BuildCost, Button, Camera, ClickSound,
+    Color, DeltaTime, FloatingText, Gatherer, HighlightTile, Input, PowerBar, Rect, ResourceCount,
+    Resources, SelectedTile, Shape, Sprite, StateChange, Text, Tile, Transform, Wallet,
+};
 
 use conrod::widget::Slider;
 use gfx::Device;
@@ -71,8 +52,8 @@ use specs::{Entity, ReadStorage, World, WriteStorage};
 use spritesheet::Spritesheet;
 use state::play_state::PlayState;
 use state::StateManager;
-use std::path::Path;
 use std::ops::DerefMut;
+use std::path::Path;
 use std::time;
 use utils::math;
 
@@ -291,7 +272,9 @@ fn main() {
 
     let audio_endpoint = rodio::default_endpoint().unwrap();
     let click_sound_source = loader::create_sound("resources/click.ogg").buffered();
-    let music = loader::create_music_sink("resources/ld39.ogg", &audio_endpoint);
+    let settings = loader::load_settings();
+    let music =
+        loader::create_music_sink("resources/ld39.ogg", &audio_endpoint, settings.music_volume);
 
     setup_world(&mut world, &window);
 
@@ -301,10 +284,17 @@ fn main() {
     state_manager.swap_state(PlayState::get_name(), &mut world);
 
     let mut ui = conrod::UiBuilder::new([dim[0] as f64, dim[1] as f64]).build();
-    ui.fonts.insert_from_file(Path::new(&loader::get_exe_path().join("resources/MunroSmall.ttf"))).unwrap();
+    ui.fonts
+        .insert_from_file(Path::new(
+            &loader::get_exe_path().join("resources/MunroSmall.ttf")
+        ))
+        .unwrap();
 
     let mut running = true;
     let mut frame_start = time::Instant::now();
+
+    let mut conrod_renderer = conrod::backend::gfx::Renderer::new(&mut factory, &main_color, window.hidpi_factor() as f64).unwrap();
+
     while running {
         let duration = time::Instant::now() - frame_start;
 
@@ -388,12 +378,12 @@ fn main() {
             let click_sound: &mut ClickSound = click_sound_storage.deref_mut();
             if click_sound.play {
                 click_sound.play = false;
-                //                let mut sink = rodio::Sink::new(&audio_endpoint);
-                //
-                //                sink.set_volume(0.0);
-                //                sink.append(click_sound_source.clone());
-                //                sink.play();
-                //                sink.detach();
+                let mut sink = rodio::Sink::new(&audio_endpoint);
+
+                sink.set_volume(settings.sound_volume);
+                sink.append(click_sound_source.clone());
+                sink.play();
+                sink.detach();
             }
 
             let scene = state_manager.get_current_scene();
