@@ -2,7 +2,7 @@ use cgmath::{ortho, Matrix4};
 use gfx;
 mod basic;
 
-pub type ColorFormat = gfx::format::Rgba8;
+pub type ColorFormat = gfx::format::Srgba8;
 pub type DepthFormat = gfx::format::Depth;
 
 pub use self::basic::*;

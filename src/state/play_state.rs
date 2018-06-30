@@ -3,6 +3,9 @@ use specs::{Dispatcher, DispatcherBuilder, World};
 use state::State;
 use std::collections::HashSet;
 use std::sync::{Arc, Mutex};
+use std::path::{Path};
+use loader;
+use conrod::{widget, Ui, UiBuilder};
 
 use components::ui::WalletUI;
 use components::{
@@ -16,7 +19,9 @@ use rand::{thread_rng, Rng};
 use renderer;
 use storage_types::*;
 use systems;
+use gfx;
 
+#[derive(PartialEq)]
 enum InternalState {
     Game,
     TechTree,
@@ -29,6 +34,7 @@ pub struct PlayState<'a> {
     pause_dispatcher: Dispatcher<'a, 'a>,
     scene: Arc<Mutex<Node>>,
     state: InternalState,
+    ui: Ui,
 }
 
 impl<'a> PlayState<'a> {
@@ -141,12 +147,21 @@ impl<'a> PlayState<'a> {
             )
             .build();
 
+        let dim = renderer::get_dimensions();
+        let mut ui = UiBuilder::new([dim[0] as f64, dim[1] as f64]).build();
+        ui.fonts
+            .insert_from_file(Path::new(
+                &loader::get_exe_path().join("resources/MunroSmall.ttf")
+            ))
+            .unwrap();
+
         let ps = PlayState {
             dispatcher,
             tech_tree_dispatcher,
             pause_dispatcher,
             scene,
             state: InternalState::Game,
+            ui,
         };
 
         ps
@@ -675,6 +690,15 @@ impl<'a> State for PlayState<'a> {
             self.state = InternalState::Game;
         } else if action == "pause" {
             self.state = InternalState::Pause;
+        }
+    }
+
+    fn get_ui_to_render(&mut self) -> Option<&Ui> {
+        if self.state == InternalState::Pause {
+            widget::Slider::new(value, min, max)
+            Some(&self.ui)
+        } else {
+            None
         }
     }
 }

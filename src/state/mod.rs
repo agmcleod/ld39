@@ -6,7 +6,7 @@ use specs::World;
 use std::collections::HashMap;
 
 use scene::Node;
-
+use conrod::Ui;
 use components::StateChange;
 
 pub trait State {
@@ -14,6 +14,7 @@ pub trait State {
     fn get_scene(&self) -> Arc<Mutex<Node>>;
     fn update(&mut self, &mut World);
     fn handle_custom_change(&mut self, &String);
+    fn get_ui_to_render(&mut self) -> Option<&Ui>;
 }
 
 pub struct StateManager {
@@ -91,6 +92,13 @@ impl StateManager {
             .get_mut(&self.current_state)
             .unwrap()
             .setup(world);
+    }
+
+    pub fn get_ui_to_render(&mut self) -> Option<&Ui> {
+        self.states
+            .get_mut(&self.current_state)
+            .unwrap()
+            .get_ui_to_render()
     }
 
     pub fn update(&mut self, world: &mut World) {

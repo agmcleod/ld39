@@ -40,7 +40,6 @@ use components::{
     Resources, SelectedTile, Shape, Sprite, StateChange, Text, Tile, Transform, Wallet,
 };
 
-use conrod::widget::Slider;
 use gfx::Device;
 use gfx_glyph::{GlyphBrush, GlyphBrushBuilder};
 use glutin::GlContext;
@@ -283,17 +282,10 @@ fn main() {
     state_manager.add_state(PlayState::get_name(), Box::new(play_state));
     state_manager.swap_state(PlayState::get_name(), &mut world);
 
-    let mut ui = conrod::UiBuilder::new([dim[0] as f64, dim[1] as f64]).build();
-    ui.fonts
-        .insert_from_file(Path::new(
-            &loader::get_exe_path().join("resources/MunroSmall.ttf")
-        ))
-        .unwrap();
-
     let mut running = true;
     let mut frame_start = time::Instant::now();
 
-    let mut conrod_renderer = conrod::backend::gfx::Renderer::new(&mut factory, &main_color, window.hidpi_factor() as f64).unwrap();
+    let mut conrod_renderer = conrod::backend::gfx::Renderer::new(&mut factory, &target.color, window.hidpi_factor() as f64).unwrap();
 
     while running {
         let duration = time::Instant::now() - frame_start;
