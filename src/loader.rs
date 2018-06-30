@@ -51,7 +51,7 @@ pub fn read_text_from_file(path: &str) -> Result<String> {
     Ok(text)
 }
 
-fn get_exe_path() -> PathBuf {
+pub fn get_exe_path() -> PathBuf {
     match env::current_exe() {
         Ok(mut p) => {
             p.pop();

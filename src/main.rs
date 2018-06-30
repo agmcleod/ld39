@@ -17,6 +17,8 @@ extern crate serde;
 extern crate serde_derive;
 extern crate serde_json;
 extern crate specs;
+#[macro_use]
+extern crate conrod;
 
 extern crate rusttype;
 
@@ -56,6 +58,8 @@ use components::{upgrade::{LearnProgress, Upgrade},
                  Tile,
                  Transform,
                  Wallet};
+
+use conrod::widget::Slider;
 use gfx::Device;
 use gfx_glyph::{GlyphBrush, GlyphBrushBuilder};
 use glutin::GlContext;
@@ -67,6 +71,7 @@ use specs::{Entity, ReadStorage, World, WriteStorage};
 use spritesheet::Spritesheet;
 use state::play_state::PlayState;
 use state::StateManager;
+use std::path::Path;
 use std::ops::DerefMut;
 use std::time;
 use utils::math;
@@ -294,6 +299,9 @@ fn main() {
     let play_state = PlayState::new();
     state_manager.add_state(PlayState::get_name(), Box::new(play_state));
     state_manager.swap_state(PlayState::get_name(), &mut world);
+
+    let mut ui = conrod::UiBuilder::new([dim[0] as f64, dim[1] as f64]).build();
+    ui.fonts.insert_from_file(Path::new(&loader::get_exe_path().join("resources/MunroSmall.ttf"))).unwrap();
 
     let mut running = true;
     let mut frame_start = time::Instant::now();
