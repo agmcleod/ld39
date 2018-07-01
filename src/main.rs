@@ -260,7 +260,8 @@ fn main() {
     };
 
     let mut encoder: gfx::Encoder<_, _> = factory.create_command_buffer().into();
-    let mut basic = renderer::Basic::new(&mut factory, &target, window.hidpi_factor());
+    let hidpi_factor = window.hidpi_factor();
+    let mut basic = renderer::Basic::new(&mut factory, &target, hidpi_factor);
 
     let asset_data = loader::read_text_from_file("resources/assets.json").unwrap();
     let spritesheet: Spritesheet = serde_json::from_str(asset_data.as_ref()).unwrap();
@@ -272,7 +273,7 @@ fn main() {
 
     let audio_endpoint = rodio::default_endpoint().unwrap();
     let click_sound_source = loader::create_sound("resources/click.ogg").buffered();
-    let settings = loader::load_settings();
+    let mut settings = loader::load_settings();
     let music =
         loader::create_music_sink("resources/ld39.ogg", &audio_endpoint, settings.music_volume);
 
@@ -426,13 +427,13 @@ fn main() {
                 };
 
                 if create_widgets {
-                    state_manager.create_ui_widgets(&settings);
+                    state_manager.create_ui_widgets(&mut settings);
                 }
 
-                if let Some(primitives) = state_manager.get_ui_to_render().draw_if_changed() {
-                    conrod_renderer.fill(&mut encoder, (dim[0], dim[1]), primitives, &image_map);
-                    conrod_renderer.draw(&mut factory, &mut encoder, &image_map);
-                }
+                let ui = state_manager.get_ui_to_render();
+                let primitives = ui.draw();
+                conrod_renderer.fill(&mut encoder, (dim[0] * hidpi_factor, dim[1] * hidpi_factor), primitives, &image_map);
+                conrod_renderer.draw(&mut factory, &mut encoder, &image_map);
 
                 encoder.flush(&mut device);
 

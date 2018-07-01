@@ -5,7 +5,7 @@ use std::collections::HashSet;
 use std::sync::{Arc, Mutex};
 use std::path::{Path};
 use loader;
-use conrod::{widget, Widget, Colorable, Ui, UiBuilder, Positionable};
+use conrod::{widget, Widget, Colorable, Ui, UiBuilder, Positionable, Sizeable, Labelable};
 use conrod;
 
 use components::ui::WalletUI;
@@ -708,17 +708,26 @@ impl<'a> State for PlayState<'a> {
         &mut self.ui
     }
 
-    fn create_ui_widgets(&mut self, settings: &Settings) {
+    fn create_ui_widgets(&mut self, settings: &mut Settings) {
         let ui = &mut self.ui.set_widgets();
-        widget::Slider::new(settings.music_volume, 0.0, 1.0)
+        if let Some(volume) = widget::Slider::new(settings.music_volume, 0.0, 1.0)
             .middle_of(ui.window)
             .color(conrod::color::rgb(0.0, 1.0, 0.0))
-            .set(self.ids.music_volume, ui);
+            .w_h(200.0, 50.0)
+            .label("Music Volume")
+            .set(self.ids.music_volume, ui) {
+                settings.set_music_volume(volume);
+            }
 
-        widget::Slider::new(settings.sound_volume, 0.0, 1.0)
+        if let Some(volume) = widget::Slider::new(settings.sound_volume, 0.0, 1.0)
             .middle_of(ui.window)
             .color(conrod::color::rgb(0.0, 1.0, 0.0))
-            .set(self.ids.sound_volume, ui);
+            .w_h(200.0, 50.0)
+            .label("Sound Volume")
+            .down_from(self.ids.music_volume, 45.0)
+            .set(self.ids.sound_volume, ui) {
+                settings.set_sound_volume(volume);
+            }
     }
 
     fn should_render_ui(&self) -> bool {
