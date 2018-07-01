@@ -56,7 +56,7 @@ impl<'a> System<'a> for TogglePause {
                 &mut color_storage,
                 &mut rect_storage,
             );
-            let mut lookup: &mut EntityLookup = entity_lookup_storage.deref_mut();
+            let lookup: &mut EntityLookup = entity_lookup_storage.deref_mut();
             lookup
                 .entities
                 .insert("pause_black".to_string(), node.entity.unwrap());

@@ -5,7 +5,8 @@ use std::collections::HashSet;
 use std::sync::{Arc, Mutex};
 use std::path::{Path};
 use loader;
-use conrod::{widget, Ui, UiBuilder};
+use conrod::{widget, Widget, Colorable, Ui, UiBuilder, Positionable};
+use conrod;
 
 use components::ui::WalletUI;
 use components::{
@@ -17,9 +18,16 @@ use components::{
 use entities::{create_map, create_power_bar, create_text, tech_tree};
 use rand::{thread_rng, Rng};
 use renderer;
+use settings::Settings;
 use storage_types::*;
 use systems;
-use gfx;
+
+widget_ids! {
+    struct Ids {
+        music_volume,
+        sound_volume,
+    }
+}
 
 #[derive(PartialEq)]
 enum InternalState {
@@ -35,6 +43,7 @@ pub struct PlayState<'a> {
     scene: Arc<Mutex<Node>>,
     state: InternalState,
     ui: Ui,
+    ids: Ids,
 }
 
 impl<'a> PlayState<'a> {
@@ -155,6 +164,8 @@ impl<'a> PlayState<'a> {
             ))
             .unwrap();
 
+        let ids = Ids::new(ui.widget_id_generator());
+
         let ps = PlayState {
             dispatcher,
             tech_tree_dispatcher,
@@ -162,6 +173,7 @@ impl<'a> PlayState<'a> {
             scene,
             state: InternalState::Game,
             ui,
+            ids,
         };
 
         ps
@@ -679,7 +691,6 @@ impl<'a> State for PlayState<'a> {
             InternalState::Game => self.dispatcher.dispatch(&mut world.res),
             InternalState::TechTree => self.tech_tree_dispatcher.dispatch(&mut world.res),
             InternalState::Pause => self.pause_dispatcher.dispatch(&mut world.res),
-            _ => {}
         }
     }
 
@@ -693,12 +704,24 @@ impl<'a> State for PlayState<'a> {
         }
     }
 
-    fn get_ui_to_render(&mut self) -> Option<&Ui> {
-        if self.state == InternalState::Pause {
-            widget::Slider::new(value, min, max)
-            Some(&self.ui)
-        } else {
-            None
-        }
+    fn get_ui_to_render(&mut self) -> &mut Ui {
+        &mut self.ui
+    }
+
+    fn create_ui_widgets(&mut self, settings: &Settings) {
+        let ui = &mut self.ui.set_widgets();
+        widget::Slider::new(settings.music_volume, 0.0, 1.0)
+            .middle_of(ui.window)
+            .color(conrod::color::rgb(0.0, 1.0, 0.0))
+            .set(self.ids.music_volume, ui);
+
+        widget::Slider::new(settings.sound_volume, 0.0, 1.0)
+            .middle_of(ui.window)
+            .color(conrod::color::rgb(0.0, 1.0, 0.0))
+            .set(self.ids.sound_volume, ui);
+    }
+
+    fn should_render_ui(&self) -> bool {
+        self.state == InternalState::Pause
     }
 }

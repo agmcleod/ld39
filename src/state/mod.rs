@@ -3,6 +3,7 @@ pub mod play_state;
 use std::sync::{Arc, Mutex};
 
 use specs::World;
+use settings::Settings;
 use std::collections::HashMap;
 
 use scene::Node;
@@ -14,7 +15,9 @@ pub trait State {
     fn get_scene(&self) -> Arc<Mutex<Node>>;
     fn update(&mut self, &mut World);
     fn handle_custom_change(&mut self, &String);
-    fn get_ui_to_render(&mut self) -> Option<&Ui>;
+    fn get_ui_to_render(&mut self) -> &mut Ui;
+    fn should_render_ui(&self) -> bool;
+    fn create_ui_widgets(&mut self, settings: &Settings);
 }
 
 pub struct StateManager {
@@ -94,11 +97,25 @@ impl StateManager {
             .setup(world);
     }
 
-    pub fn get_ui_to_render(&mut self) -> Option<&Ui> {
+    pub fn get_ui_to_render(&mut self) -> &mut Ui {
         self.states
             .get_mut(&self.current_state)
             .unwrap()
             .get_ui_to_render()
+    }
+
+    pub fn should_render_ui(&self) -> bool {
+        self.states
+            .get(&self.current_state)
+            .unwrap()
+            .should_render_ui()
+    }
+
+    pub fn create_ui_widgets(&mut self, settings: &Settings) {
+        self.states
+            .get_mut(&self.current_state)
+            .unwrap()
+            .create_ui_widgets(settings)
     }
 
     pub fn update(&mut self, world: &mut World) {

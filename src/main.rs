@@ -15,11 +15,13 @@ extern crate rodio;
 extern crate serde;
 #[macro_use]
 extern crate serde_derive;
+#[macro_use]
 extern crate conrod;
 extern crate serde_json;
 extern crate specs;
 
 extern crate rusttype;
+extern crate winit;
 
 mod components;
 mod entities;
@@ -42,8 +44,7 @@ use components::{
 
 use gfx::Device;
 use gfx_glyph::{GlyphBrush, GlyphBrushBuilder};
-use glutin::GlContext;
-use glutin::{ElementState, Event, MouseButton, VirtualKeyCode, WindowEvent};
+use glutin::{Event, GlContext, ElementState, MouseButton, VirtualKeyCode, WindowEvent, Window};
 use renderer::{ColorFormat, DepthFormat};
 use rodio::Source;
 use scene::Node;
@@ -241,7 +242,7 @@ fn render_node<R: gfx::Resources, C: gfx::CommandBuffer<R>, F: gfx::Factory<R>>(
 }
 
 fn main() {
-    let mut events_loop = glutin::EventsLoop::new();
+    let mut events_loop = winit::EventsLoop::new();
     let dim = renderer::get_dimensions();
     let builder = glutin::WindowBuilder::new()
         .with_title("ld39".to_string())
@@ -286,59 +287,69 @@ fn main() {
     let mut frame_start = time::Instant::now();
 
     let mut conrod_renderer = conrod::backend::gfx::Renderer::new(&mut factory, &target.color, window.hidpi_factor() as f64).unwrap();
+    let image_map = conrod::image::Map::new();
 
     while running {
         let duration = time::Instant::now() - frame_start;
 
         frame_start = time::Instant::now();
 
-        events_loop.poll_events(|event| match event {
-            Event::WindowEvent { event, .. } => match event {
-                WindowEvent::CursorMoved {
-                    position: (x, y), ..
-                } => {
-                    let mut input_res = world.write_resource::<Input>();
-                    let input = input_res.deref_mut();
-                    input.mouse_pos.0 = x as f32 / input.hidpi_factor;
-                    input.mouse_pos.1 = y as f32 / input.hidpi_factor;
+        events_loop.poll_events(|event| {
+            if state_manager.should_render_ui() {
+                let ui = state_manager.get_ui_to_render();
+                if let Some(event) = conrod::backend::winit::convert_event(event.clone(), window.window()) {
+                    ui.handle_event(event);
                 }
-                WindowEvent::MouseInput {
-                    button: MouseButton::Left,
-                    state,
-                    ..
-                } => {
-                    let mut input_res = world.write_resource::<Input>();
-                    let input = input_res.deref_mut();
-                    match state {
-                        ElementState::Pressed => input.mouse_pressed = true,
-                        ElementState::Released => input.mouse_pressed = false,
-                    };
-                }
-                WindowEvent::KeyboardInput {
-                    input:
-                        glutin::KeyboardInput {
-                            virtual_keycode: Some(VirtualKeyCode::Escape),
-                            ..
-                        },
-                    ..
-                }
-                | glutin::WindowEvent::Closed => running = false,
-                WindowEvent::KeyboardInput { input, .. } => {
-                    let input_event = input;
-                    let mut input_res = world.write_resource::<Input>();
-                    let input = input_res.deref_mut();
-                    if let Some(key) = input_event.virtual_keycode {
-                        if input.pressed_keys.contains_key(&key) {
-                            match input_event.state {
-                                ElementState::Pressed => input.pressed_keys.insert(key, true),
-                                ElementState::Released => input.pressed_keys.insert(key, false),
-                            };
+            }
+
+            match event {
+                Event::WindowEvent { event, .. } => match event {
+                    WindowEvent::CursorMoved {
+                        position: (x, y), ..
+                    } => {
+                        let mut input_res = world.write_resource::<Input>();
+                        let input = input_res.deref_mut();
+                        input.mouse_pos.0 = x as f32 / input.hidpi_factor;
+                        input.mouse_pos.1 = y as f32 / input.hidpi_factor;
+                    }
+                    WindowEvent::MouseInput {
+                        button: MouseButton::Left,
+                        state,
+                        ..
+                    } => {
+                        let mut input_res = world.write_resource::<Input>();
+                        let input = input_res.deref_mut();
+                        match state {
+                            ElementState::Pressed => input.mouse_pressed = true,
+                            ElementState::Released => input.mouse_pressed = false,
+                        };
+                    }
+                    WindowEvent::KeyboardInput {
+                        input:
+                            glutin::KeyboardInput {
+                                virtual_keycode: Some(VirtualKeyCode::Escape),
+                                ..
+                            },
+                        ..
+                    }
+                    | glutin::WindowEvent::Closed => running = false,
+                    WindowEvent::KeyboardInput { input, .. } => {
+                        let input_event = input;
+                        let mut input_res = world.write_resource::<Input>();
+                        let input = input_res.deref_mut();
+                        if let Some(key) = input_event.virtual_keycode {
+                            if input.pressed_keys.contains_key(&key) {
+                                match input_event.state {
+                                    ElementState::Pressed => input.pressed_keys.insert(key, true),
+                                    ElementState::Released => input.pressed_keys.insert(key, false),
+                                };
+                            }
                         }
                     }
-                }
-                _ => {}
-            },
-            _ => (),
+                    _ => {}
+                },
+                _ => (),
+            }
         });
 
         {
@@ -407,6 +418,27 @@ fn main() {
             window.swap_buffers().unwrap();
             device.cleanup();
             basic.reset_transform();
+
+            if state_manager.should_render_ui() {
+                let create_widgets = {
+                    let ui = state_manager.get_ui_to_render();
+                    ui.global_input().events().next().is_some()
+                };
+
+                if create_widgets {
+                    state_manager.create_ui_widgets(&settings);
+                }
+
+                if let Some(primitives) = state_manager.get_ui_to_render().draw_if_changed() {
+                    conrod_renderer.fill(&mut encoder, (dim[0], dim[1]), primitives, &image_map);
+                    conrod_renderer.draw(&mut factory, &mut encoder, &image_map);
+                }
+
+                encoder.flush(&mut device);
+
+                window.swap_buffers().unwrap();
+                device.cleanup();
+            }
         }
 
         let mut state_change = {
