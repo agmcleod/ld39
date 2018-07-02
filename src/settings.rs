@@ -4,8 +4,14 @@ use std::fs;
 
 #[derive(Serialize, Deserialize)]
 pub struct Settings {
+    #[serde(default)]
     pub music_volume: f32,
+    #[serde(default)]
     pub sound_volume: f32,
+    #[serde(default)]
+    pub mute_music: bool,
+    #[serde(default)]
+    pub mute_sound_effects: bool,
 }
 
 impl Settings {
@@ -16,6 +22,16 @@ impl Settings {
 
     pub fn set_sound_volume(&mut self, volume: f32) {
         self.sound_volume = volume;
+        self.save();
+    }
+
+    pub fn set_mute_music(&mut self, mute: bool) {
+        self.mute_music = mute;
+        self.save();
+    }
+
+    pub fn set_mute_sound_effects(&mut self, mute: bool) {
+        self.mute_sound_effects = mute;
         self.save();
     }
 
@@ -31,6 +47,8 @@ impl Default for Settings {
         Settings {
             music_volume: 0.5,
             sound_volume: 0.5,
+            mute_music: false,
+            mute_sound_effects: false,
         }
     }
 }

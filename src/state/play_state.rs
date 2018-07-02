@@ -25,6 +25,8 @@ widget_ids! {
     struct Ids {
         music_volume,
         sound_volume,
+        mute_music,
+        mute_sound_effects,
     }
 }
 
@@ -737,6 +739,28 @@ impl<'a> State for PlayState<'a> {
             .set(self.ids.sound_volume, ui)
         {
             settings.set_sound_volume(volume);
+        }
+
+        if let Some(state) = widget::Toggle::new(settings.mute_music)
+            .down_from(self.ids.sound_volume, 25.0)
+            .color(conrod::color::rgb(0.0, 1.0, 0.0))
+            .label("Mute music")
+            .w_h(35.0, 35.0)
+            .set(self.ids.mute_music, ui)
+            .last()
+        {
+            settings.set_mute_music(state);
+        }
+
+        if let Some(state) = widget::Toggle::new(settings.mute_sound_effects)
+            .right_from(self.ids.mute_music, 120.0)
+            .color(conrod::color::rgb(0.0, 1.0, 0.0))
+            .label("Mute sound effects")
+            .w_h(35.0, 35.0)
+            .set(self.ids.mute_sound_effects, ui)
+            .last()
+        {
+            settings.set_mute_sound_effects(state);
         }
     }
 
