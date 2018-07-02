@@ -712,8 +712,9 @@ impl<'a> State for PlayState<'a> {
         let ui = &mut self.ui.set_widgets();
         if let Some(volume) = widget::Slider::new(settings.music_volume, 0.0, 1.0)
             .middle_of(ui.window)
+            .x_align(conrod::position::Align::Middle)
             .color(conrod::color::rgb(0.0, 1.0, 0.0))
-            .w_h(200.0, 50.0)
+            .w_h(200.0, 35.0)
             .label("Music Volume")
             .set(self.ids.music_volume, ui) {
                 settings.set_music_volume(volume);
@@ -722,9 +723,9 @@ impl<'a> State for PlayState<'a> {
         if let Some(volume) = widget::Slider::new(settings.sound_volume, 0.0, 1.0)
             .middle_of(ui.window)
             .color(conrod::color::rgb(0.0, 1.0, 0.0))
-            .w_h(200.0, 50.0)
+            .w_h(200.0, 35.0)
             .label("Sound Volume")
-            .down_from(self.ids.music_volume, 45.0)
+            .down_from(self.ids.music_volume, 25.0)
             .set(self.ids.sound_volume, ui) {
                 settings.set_sound_volume(volume);
             }

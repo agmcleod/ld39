@@ -274,7 +274,7 @@ fn main() {
     let audio_endpoint = rodio::default_endpoint().unwrap();
     let click_sound_source = loader::create_sound("resources/click.ogg").buffered();
     let mut settings = loader::load_settings();
-    let music =
+    let mut music =
         loader::create_music_sink("resources/ld39.ogg", &audio_endpoint, settings.music_volume);
 
     setup_world(&mut world, &window);
@@ -439,6 +439,10 @@ fn main() {
 
                 window.swap_buffers().unwrap();
                 device.cleanup();
+
+                if music.volume() != settings.music_volume {
+                    music.set_volume(settings.music_volume);
+                }
             }
         }
 
