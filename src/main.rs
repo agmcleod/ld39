@@ -416,8 +416,6 @@ fn main() {
 
             encoder.flush(&mut device);
 
-            window.swap_buffers().unwrap();
-            device.cleanup();
             basic.reset_transform();
 
             if state_manager.should_render_ui() {
@@ -437,13 +435,13 @@ fn main() {
 
                 encoder.flush(&mut device);
 
-                window.swap_buffers().unwrap();
-                device.cleanup();
-
                 if music.volume() != settings.music_volume {
                     music.set_volume(settings.music_volume);
                 }
             }
+
+            window.swap_buffers().unwrap();
+            device.cleanup();
         }
 
         let mut state_change = {
