@@ -36,15 +36,34 @@ mod systems;
 mod utils;
 
 use components::ui::{PollutionCount, TechTreeButton, WalletUI};
-use components::{
-    upgrade::{LearnProgress, Upgrade}, AnimationSheet, BuildCost, Button, Camera, ClickSound,
-    Color, DeltaTime, FloatingText, Gatherer, HighlightTile, Input, PowerBar, Rect, ResourceCount,
-    Resources, SelectedTile, Shape, Sprite, StateChange, Text, Tile, Transform, Wallet,
-};
+use components::{upgrade::{LearnProgress, Upgrade},
+                 AnimationSheet,
+                 BuildCost,
+                 Button,
+                 Camera,
+                 ClickSound,
+                 Color,
+                 DeltaTime,
+                 FloatingText,
+                 Gatherer,
+                 HighlightTile,
+                 Input,
+                 PowerBar,
+                 Rect,
+                 ResourceCount,
+                 Resources,
+                 SelectedTile,
+                 Shape,
+                 Sprite,
+                 StateChange,
+                 Text,
+                 Tile,
+                 Transform,
+                 Wallet};
 
 use gfx::Device;
 use gfx_glyph::{GlyphBrush, GlyphBrushBuilder};
-use glutin::{Event, GlContext, ElementState, MouseButton, VirtualKeyCode, WindowEvent, Window};
+use glutin::{ElementState, Event, GlContext, MouseButton, VirtualKeyCode, Window, WindowEvent};
 use renderer::{ColorFormat, DepthFormat};
 use rodio::Source;
 use scene::Node;
@@ -62,16 +81,9 @@ fn setup_world(world: &mut World, window: &glutin::Window) {
     world.add_resource::<StateChange>(StateChange::new());
     world.add_resource::<Input>(Input::new(
         window.hidpi_factor(),
-        vec![
-            VirtualKeyCode::W,
-            VirtualKeyCode::A,
-            VirtualKeyCode::S,
-            VirtualKeyCode::D,
-        ],
+        vec![VirtualKeyCode::Escape],
     ));
-    world.add_resource::<Resources>(Resources::new());
     world.add_resource::<ClickSound>(ClickSound { play: false });
-    world.add_resource::<Wallet>(Wallet::new());
     world.add_resource::<DeltaTime>(DeltaTime { dt: 0.0 });
     world.register::<AnimationSheet>();
     world.register::<BuildCost>();
@@ -287,7 +299,11 @@ fn main() {
     let mut running = true;
     let mut frame_start = time::Instant::now();
 
-    let mut conrod_renderer = conrod::backend::gfx::Renderer::new(&mut factory, &target.color, window.hidpi_factor() as f64).unwrap();
+    let mut conrod_renderer = conrod::backend::gfx::Renderer::new(
+        &mut factory,
+        &target.color,
+        window.hidpi_factor() as f64,
+    ).unwrap();
     let image_map = conrod::image::Map::new();
 
     while running {
@@ -298,7 +314,9 @@ fn main() {
         events_loop.poll_events(|event| {
             if state_manager.should_render_ui() {
                 let ui = state_manager.get_ui_to_render();
-                if let Some(event) = conrod::backend::winit::convert_event(event.clone(), window.window()) {
+                if let Some(event) =
+                    conrod::backend::winit::convert_event(event.clone(), window.window())
+                {
                     ui.handle_event(event);
                 }
             }
@@ -325,15 +343,7 @@ fn main() {
                             ElementState::Released => input.mouse_pressed = false,
                         };
                     }
-                    WindowEvent::KeyboardInput {
-                        input:
-                            glutin::KeyboardInput {
-                                virtual_keycode: Some(VirtualKeyCode::Escape),
-                                ..
-                            },
-                        ..
-                    }
-                    | glutin::WindowEvent::Closed => running = false,
+                    glutin::WindowEvent::Closed => running = false,
                     WindowEvent::KeyboardInput { input, .. } => {
                         let input_event = input;
                         let mut input_res = world.write_resource::<Input>();
@@ -430,7 +440,12 @@ fn main() {
 
                 let ui = state_manager.get_ui_to_render();
                 let primitives = ui.draw();
-                conrod_renderer.fill(&mut encoder, (dim[0] * hidpi_factor, dim[1] * hidpi_factor), primitives, &image_map);
+                conrod_renderer.fill(
+                    &mut encoder,
+                    (dim[0] * hidpi_factor, dim[1] * hidpi_factor),
+                    primitives,
+                    &image_map,
+                );
                 conrod_renderer.draw(&mut factory, &mut encoder, &image_map);
 
                 encoder.flush(&mut device);

@@ -1,20 +1,19 @@
+use conrod;
+use conrod::{widget, Colorable, Labelable, Positionable, Sizeable, Ui, UiBuilder, Widget};
+use loader;
 use scene::Node;
 use specs::{Dispatcher, DispatcherBuilder, World};
 use state::State;
 use std::collections::HashSet;
+use std::path::Path;
 use std::sync::{Arc, Mutex};
-use std::path::{Path};
-use loader;
-use conrod::{widget, Widget, Colorable, Ui, UiBuilder, Positionable, Sizeable, Labelable};
-use conrod;
 
 use components::ui::WalletUI;
-use components::{
-    ui::PollutionCount, upgrade, Button, CityPowerState, Color, EntityLookup, GathererPositions,
-    GatheringRate, PowerBar, ProtectedNodes, Rect, ResearchedBuffs, ResearchingEntities,
-    ResourceCount, ResourceType, Resources, SelectedTile, Sprite, Text, Tile, TileType, Transform,
-    Wallet, CITY_POWER_STATE_COORDS,
-};
+use components::{ui::PollutionCount, upgrade, Button, CityPowerState, Color, EntityLookup,
+                 GathererPositions, GatheringRate, PowerBar, ProtectedNodes, Rect,
+                 ResearchedBuffs, ResearchingEntities, ResourceCount, ResourceType, Resources,
+                 SelectedTile, Sprite, Text, Tile, TileType, Transform, Wallet,
+                 CITY_POWER_STATE_COORDS};
 use entities::{create_map, create_power_bar, create_text, tech_tree};
 use rand::{thread_rng, Rng};
 use renderer;
@@ -30,10 +29,16 @@ widget_ids! {
 }
 
 #[derive(PartialEq)]
-enum InternalState {
+pub enum InternalState {
     Game,
     TechTree,
     Pause,
+}
+
+impl Default for InternalState {
+    fn default() -> Self {
+        InternalState::Game
+    }
 }
 
 pub struct PlayState<'a> {
@@ -159,9 +164,7 @@ impl<'a> PlayState<'a> {
         let dim = renderer::get_dimensions();
         let mut ui = UiBuilder::new([dim[0] as f64, dim[1] as f64]).build();
         ui.fonts
-            .insert_from_file(Path::new(
-                &loader::get_exe_path().join("resources/MunroSmall.ttf")
-            ))
+            .insert_from_file(Path::new(&loader::get_exe_path().join("resources/MunroSmall.ttf")))
             .unwrap();
 
         let ids = Ids::new(ui.widget_id_generator());
@@ -249,6 +252,7 @@ impl<'a> State for PlayState<'a> {
         world.add_resource(GatheringRate::new());
         world.add_resource(Resources::new());
         world.add_resource(Wallet::new());
+        world.add_resource(InternalState::Game);
 
         scene.add_many(tile_nodes);
 
@@ -694,13 +698,16 @@ impl<'a> State for PlayState<'a> {
         }
     }
 
-    fn handle_custom_change(&mut self, action: &String) {
+    fn handle_custom_change(&mut self, action: &String, world: &mut World) {
         if action == "tech_tree_pause" {
             self.state = InternalState::TechTree;
+            world.add_resource(InternalState::TechTree);
         } else if action == "resume" {
             self.state = InternalState::Game;
+            world.add_resource(InternalState::Game);
         } else if action == "pause" {
             self.state = InternalState::Pause;
+            world.add_resource(InternalState::Pause);
         }
     }
 
@@ -716,9 +723,10 @@ impl<'a> State for PlayState<'a> {
             .color(conrod::color::rgb(0.0, 1.0, 0.0))
             .w_h(200.0, 35.0)
             .label("Music Volume")
-            .set(self.ids.music_volume, ui) {
-                settings.set_music_volume(volume);
-            }
+            .set(self.ids.music_volume, ui)
+        {
+            settings.set_music_volume(volume);
+        }
 
         if let Some(volume) = widget::Slider::new(settings.sound_volume, 0.0, 1.0)
             .middle_of(ui.window)
@@ -726,9 +734,10 @@ impl<'a> State for PlayState<'a> {
             .w_h(200.0, 35.0)
             .label("Sound Volume")
             .down_from(self.ids.music_volume, 25.0)
-            .set(self.ids.sound_volume, ui) {
-                settings.set_sound_volume(volume);
-            }
+            .set(self.ids.sound_volume, ui)
+        {
+            settings.set_sound_volume(volume);
+        }
     }
 
     fn should_render_ui(&self) -> bool {

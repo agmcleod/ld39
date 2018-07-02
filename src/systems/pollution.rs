@@ -1,7 +1,11 @@
-use components::{
-    ui::{PollutionCount, WalletUI}, upgrade::Buff, DeltaTime, Gatherer, GathererType,
-    ResearchedBuffs, Text, Wallet,
-};
+use components::{ui::{PollutionCount, WalletUI},
+                 upgrade::Buff,
+                 DeltaTime,
+                 Gatherer,
+                 GathererType,
+                 ResearchedBuffs,
+                 Text,
+                 Wallet};
 use specs::{Join, Read, ReadStorage, System, Write, WriteStorage};
 use std::ops::{Deref, DerefMut};
 use systems::logic;

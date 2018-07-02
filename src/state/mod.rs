@@ -2,19 +2,19 @@ pub mod play_state;
 
 use std::sync::{Arc, Mutex};
 
-use specs::World;
 use settings::Settings;
+use specs::World;
 use std::collections::HashMap;
 
-use scene::Node;
-use conrod::Ui;
 use components::StateChange;
+use conrod::Ui;
+use scene::Node;
 
 pub trait State {
     fn setup(&mut self, world: &mut World);
     fn get_scene(&self) -> Arc<Mutex<Node>>;
     fn update(&mut self, &mut World);
-    fn handle_custom_change(&mut self, &String);
+    fn handle_custom_change(&mut self, &String, &mut World);
     fn get_ui_to_render(&mut self) -> &mut Ui;
     fn should_render_ui(&self) -> bool;
     fn create_ui_widgets(&mut self, settings: &mut Settings);
@@ -69,7 +69,7 @@ impl StateManager {
                 self.states
                     .get_mut(&self.current_state)
                     .unwrap()
-                    .handle_custom_change(&state_change.action);
+                    .handle_custom_change(&state_change.action, world);
             }
         }
     }

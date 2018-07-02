@@ -1,8 +1,9 @@
 use components::{Button, Color, EntityLookup, Input, Rect, StateChange, Transform};
 use entities::create_colored_rect;
+use glutin::VirtualKeyCode;
 use scene::Node;
 use specs::{Entities, Join, Read, System, Write, WriteStorage};
-use state::play_state::PlayState;
+use state::play_state::{InternalState, PlayState};
 use std::ops::{Deref, DerefMut};
 use std::sync::{Arc, Mutex};
 
@@ -17,6 +18,7 @@ impl<'a> System<'a> for TogglePause {
         WriteStorage<'a, Color>,
         Write<'a, EntityLookup>,
         Read<'a, Input>,
+        Read<'a, InternalState>,
         WriteStorage<'a, Rect>,
         Write<'a, StateChange>,
         WriteStorage<'a, Transform>,
@@ -29,18 +31,33 @@ impl<'a> System<'a> for TogglePause {
             mut color_storage,
             mut entity_lookup_storage,
             input,
+            internal_state_storage,
             mut rect_storage,
             mut state_change_storage,
             mut transform_storage,
         ) = data;
 
         let input: &Input = input.deref();
+        let internal_state: &InternalState = internal_state_storage.deref();
         let mut transition_to_pause = false;
-        for (button, transform) in (&mut button_storage, &mut transform_storage).join() {
-            if button.name == "menu".to_string() && button.clicked(input) {
-                transition_to_pause = true;
-                transform.visible = false;
+
+        if *internal_state == InternalState::Game {
+            for button in (&mut button_storage).join() {
+                if button.name == "menu".to_string() && button.clicked(input) {
+                    transition_to_pause = true;
+                }
             }
+        }
+
+        if *internal_state == InternalState::Pause
+            && *input.pressed_keys.get(&VirtualKeyCode::Escape).unwrap()
+        {
+            let lookup: &mut EntityLookup = entity_lookup_storage.deref_mut();
+            let entity = lookup.entities.get(&"pause_black".to_string()).unwrap();
+            let mut scene = self.scene.lock().unwrap();
+            scene.remove_node_with_entity(&entities, *entity);
+            let state_change: &mut StateChange = state_change_storage.deref_mut();
+            state_change.set(PlayState::get_name(), "resume".to_string());
         }
 
         if transition_to_pause {

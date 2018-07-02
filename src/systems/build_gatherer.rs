@@ -1,9 +1,7 @@
 use components::ui::WalletUI;
-use components::{
-    upgrade::Buff, AnimationSheet, Button, ClickSound, Color, Gatherer, GathererPositions,
-    GathererType, Input, ProtectedNodes, ResearchedBuffs, SelectedTile, Text, Tile, TileType,
-    Transform, Wallet,
-};
+use components::{upgrade::Buff, AnimationSheet, Button, ClickSound, Color, Gatherer,
+                 GathererPositions, GathererType, Input, ProtectedNodes, ResearchedBuffs,
+                 SelectedTile, Text, Tile, TileType, Transform, Wallet};
 use scene::Node;
 use specs::{Entities, Join, Read, ReadStorage, System, Write, WriteStorage};
 use std::ops::{Deref, DerefMut};

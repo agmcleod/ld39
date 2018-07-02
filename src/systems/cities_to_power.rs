@@ -1,7 +1,5 @@
-use components::{
-    Button, CityPowerState, Color, EntityLookup, Input, PowerBar, Rect, Sprite, Transform,
-    CITY_POWER_STATE_COORDS,
-};
+use components::{Button, CityPowerState, Color, EntityLookup, Input, PowerBar, Rect, Sprite,
+                 Transform, CITY_POWER_STATE_COORDS};
 use scene::Node;
 use specs::{Entities, Read, System, Write, WriteStorage};
 use std::ops::{Deref, DerefMut};

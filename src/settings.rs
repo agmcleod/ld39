@@ -1,5 +1,5 @@
-use serde_json;
 use loader::get_exe_path;
+use serde_json;
 use std::fs;
 
 #[derive(Serialize, Deserialize)]
@@ -21,7 +21,8 @@ impl Settings {
 
     fn save(&self) {
         let text = serde_json::to_string(&self).unwrap();
-        fs::write(get_exe_path().join("settings.json").to_str().unwrap(), text).expect("Unable to write settings");
+        fs::write(get_exe_path().join("settings.json").to_str().unwrap(), text)
+            .expect("Unable to write settings");
     }
 }
 
