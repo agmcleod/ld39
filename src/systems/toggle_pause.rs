@@ -1,4 +1,4 @@
-use components::{Button, Color, EntityLookup, Input, Rect, StateChange, Transform};
+use components::{Actions, Button, Color, EntityLookup, Input, Rect, StateChange, Transform};
 use entities::create_colored_rect;
 use glutin::VirtualKeyCode;
 use scene::Node;
@@ -14,6 +14,7 @@ pub struct TogglePause {
 impl<'a> System<'a> for TogglePause {
     type SystemData = (
         Entities<'a>,
+        Read<'a, Actions>,
         WriteStorage<'a, Button>,
         WriteStorage<'a, Color>,
         Write<'a, EntityLookup>,
@@ -27,6 +28,7 @@ impl<'a> System<'a> for TogglePause {
     fn run(&mut self, data: Self::SystemData) {
         let (
             entities,
+            actions_storage,
             mut button_storage,
             mut color_storage,
             mut entity_lookup_storage,
@@ -49,8 +51,15 @@ impl<'a> System<'a> for TogglePause {
             }
         }
 
+        let actions: &Actions = actions_storage.deref();
+        let action_name = if let Some(action) = actions.next() {
+            action
+        } else {
+            "".to_string()
+        };
+
         if *internal_state == InternalState::Pause
-            && *input.pressed_keys.get(&VirtualKeyCode::Escape).unwrap()
+            && (*input.pressed_keys.get(&VirtualKeyCode::Escape).unwrap() || action_name == "resume_game")
         {
             let lookup: &mut EntityLookup = entity_lookup_storage.deref_mut();
             let entity = lookup.entities.get(&"pause_black".to_string()).unwrap();
@@ -73,6 +82,7 @@ impl<'a> System<'a> for TogglePause {
                 &mut color_storage,
                 &mut rect_storage,
             );
+            println!("Add black background");
             let lookup: &mut EntityLookup = entity_lookup_storage.deref_mut();
             lookup
                 .entities

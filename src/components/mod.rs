@@ -1,3 +1,4 @@
+mod actions;
 mod animation_sheet;
 mod build_cost;
 mod button;
@@ -32,6 +33,7 @@ mod wallet;
 
 pub mod ui;
 
+pub use self::actions::*;
 pub use self::animation_sheet::*;
 pub use self::build_cost::*;
 pub use self::button::*;

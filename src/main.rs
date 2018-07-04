@@ -37,6 +37,7 @@ mod utils;
 
 use components::ui::{PollutionCount, TechTreeButton, WalletUI};
 use components::{upgrade::{LearnProgress, Upgrade},
+                 Actions,
                  AnimationSheet,
                  BuildCost,
                  Button,
@@ -85,6 +86,7 @@ fn setup_world(world: &mut World, window: &glutin::Window) {
     ));
     world.add_resource::<ClickSound>(ClickSound { play: false });
     world.add_resource::<DeltaTime>(DeltaTime { dt: 0.0 });
+    world.add_resource(Actions::new());
     world.register::<AnimationSheet>();
     world.register::<BuildCost>();
     world.register::<Button>();
@@ -371,6 +373,11 @@ fn main() {
         state_manager.update(&mut world);
         world.maintain();
 
+        {
+            let mut actions = world.write_resource::<Actions>();
+            actions.clear();
+        }
+
         basic.reset_transform();
 
         encoder.clear(
@@ -390,7 +397,7 @@ fn main() {
 
             let mut click_sound_storage = world.write_resource::<ClickSound>();
             let click_sound: &mut ClickSound = click_sound_storage.deref_mut();
-            if click_sound.play {
+            if click_sound.play && !settings.mute_sound_effects {
                 click_sound.play = false;
                 let mut sink = rodio::Sink::new(&audio_endpoint);
 
@@ -402,6 +409,12 @@ fn main() {
 
             let scene = state_manager.get_current_scene();
             let mut scene = scene.lock().unwrap();
+
+            if settings.mute_music && !music.is_paused() {
+                music.pause();
+            } else if !settings.mute_music && music.is_paused() {
+                music.play();
+            }
 
             scene.sort_children(&mut transforms);
             for node in &mut scene.sub_nodes {
@@ -423,41 +436,34 @@ fn main() {
                     &shapes,
                 );
             }
+        }
+
+        encoder.flush(&mut device);
+
+        basic.reset_transform();
+
+        if state_manager.should_render_ui() {
+            state_manager.create_ui_widgets(&mut settings, &mut world);
+
+            let ui = state_manager.get_ui_to_render();
+            let primitives = ui.draw();
+            conrod_renderer.fill(
+                &mut encoder,
+                (dim[0] * hidpi_factor, dim[1] * hidpi_factor),
+                primitives,
+                &image_map,
+            );
+            conrod_renderer.draw(&mut factory, &mut encoder, &image_map);
 
             encoder.flush(&mut device);
 
-            basic.reset_transform();
-
-            if state_manager.should_render_ui() {
-                let create_widgets = {
-                    let ui = state_manager.get_ui_to_render();
-                    ui.global_input().events().next().is_some()
-                };
-
-                if create_widgets {
-                    state_manager.create_ui_widgets(&mut settings);
-                }
-
-                let ui = state_manager.get_ui_to_render();
-                let primitives = ui.draw();
-                conrod_renderer.fill(
-                    &mut encoder,
-                    (dim[0] * hidpi_factor, dim[1] * hidpi_factor),
-                    primitives,
-                    &image_map,
-                );
-                conrod_renderer.draw(&mut factory, &mut encoder, &image_map);
-
-                encoder.flush(&mut device);
-
-                if music.volume() != settings.music_volume {
-                    music.set_volume(settings.music_volume);
-                }
+            if music.volume() != settings.music_volume {
+                music.set_volume(settings.music_volume);
             }
-
-            window.swap_buffers().unwrap();
-            device.cleanup();
         }
+
+        window.swap_buffers().unwrap();
+        device.cleanup();
 
         let mut state_change = {
             let mut state_change_storage = world.write_resource::<StateChange>();
