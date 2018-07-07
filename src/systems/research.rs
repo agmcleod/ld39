@@ -6,21 +6,17 @@ use components::{upgrade::{Buff, LearnProgress, Status, Upgrade, UpgradeLinesLoo
                  Shape,
                  Transform};
 use entities::tech_tree::{get_color_from_status, traverse_tree, TechTreeNode};
-use scene::Node;
 use specs::{Entities, Join, Read, ReadExpect, ReadStorage, System, Write, WriteStorage};
 use std::collections::HashMap;
 use std::ops::{Deref, DerefMut};
-use std::sync::{Arc, Mutex};
 
 type ResearchingUpgrades = HashMap<Buff, (f32, f32)>;
 
-pub struct Research {
-    scene: Arc<Mutex<Node>>,
-}
+pub struct Research;
 
 impl Research {
-    pub fn new(scene: Arc<Mutex<Node>>) -> Self {
-        Research { scene }
+    pub fn new() -> Self {
+        Research { }
     }
 
     fn research_finished(&self, buff: Buff, researched_buffs: &mut ResearchedBuffs) {
@@ -43,9 +39,7 @@ impl Research {
             if let Some(progress_time) = researching_upgrades.get(&learn_progress.buff) {
                 transform.size.x = (32.0 * (progress_time.0 / progress_time.1)) as u16;
                 if progress_time.0 / progress_time.1 >= 1.0 {
-                    let mut scene = self.scene.lock().unwrap();
                     entities.delete(entity).unwrap();
-                    scene.remove_node_with_entity(&entities, entity);
                     let entity_position = researching_entities
                         .entities
                         .iter()

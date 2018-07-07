@@ -1,18 +1,14 @@
 pub mod play_state;
 
-use std::sync::{Arc, Mutex};
-
 use settings::Settings;
 use specs::World;
 use std::collections::HashMap;
 
 use components::StateChange;
 use conrod::Ui;
-use scene::Node;
 
 pub trait State {
     fn setup(&mut self, world: &mut World);
-    fn get_scene(&self) -> Arc<Mutex<Node>>;
     fn update(&mut self, &mut World);
     fn handle_custom_change(&mut self, &String, &mut World);
     fn get_ui_to_render(&mut self) -> &mut Ui;
@@ -39,26 +35,8 @@ impl StateManager {
         self.states.insert(name, state);
     }
 
-    fn cleanup_state(&self, state: &Box<State>, world: &mut World) {
-        let scene = state.get_scene();
-        let scene = scene.lock().unwrap();
-        for node in scene.get_sub_nodes() {
-            self.delete_entities_from_node(node, world);
-        }
-    }
-
-    fn delete_entities_from_node(&self, node: &Node, world: &mut World) {
-        if let Some(entity) = node.entity {
-            world.delete_entity(entity).unwrap();
-        }
-
-        for node in node.get_sub_nodes() {
-            self.delete_entities_from_node(node, world);
-        }
-    }
-
-    pub fn get_current_scene(&self) -> Arc<Mutex<Node>> {
-        self.states.get(&self.current_state).unwrap().get_scene()
+    pub fn cleanup_state(&self, world: &mut World) {
+        world.delete_all();
     }
 
     pub fn process_state_change(&mut self, state_change: &mut StateChange, world: &mut World) {
@@ -75,21 +53,14 @@ impl StateManager {
     }
 
     pub fn restart_current_state(&mut self, world: &mut World) {
-        // separate if blocks to have different mutable/immutable borrows
-        if let Some(current_state) = self.states.get(&self.current_state) {
-            self.cleanup_state(current_state, world);
-        }
-
+        self.cleanup_state(world);
         if let Some(current_state) = self.states.get_mut(&self.current_state) {
             current_state.setup(world);
         }
     }
 
     pub fn swap_state(&mut self, name: String, world: &mut World) {
-        if let Some(current_state) = self.states.get(&self.current_state) {
-            self.cleanup_state(current_state, world);
-        }
-
+        self.cleanup_state(world);
         self.current_state = name;
         self.states
             .get_mut(&self.current_state)

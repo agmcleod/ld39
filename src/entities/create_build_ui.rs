@@ -1,6 +1,5 @@
-use components::{Button, Color, Rect, ResearchedBuffs, Sprite, TileType, Transform};
+use components::{Button, Color, Node, Rect, ResearchedBuffs, Sprite, TileType, Transform};
 use entities::tech_tree::Buff;
-use scene::Node;
 use specs::{Entities, Entity, WriteStorage};
 
 fn create_gray_background(
@@ -31,11 +30,12 @@ pub fn create(
     entities: &Entities,
     button_storage: &mut WriteStorage<Button>,
     color_storage: &mut WriteStorage<Color>,
+    node_storage: &mut WriteStorage<Node>,
     rect_storage: &mut WriteStorage<Rect>,
     sprite_storage: &mut WriteStorage<Sprite>,
     transform_storage: &mut WriteStorage<Transform>,
     researched_buffs: &ResearchedBuffs,
-) -> Node {
+) -> Entity {
     let mut new_entities = Vec::new();
 
     if *selected_tile_type == TileType::Open {
@@ -47,7 +47,7 @@ pub fn create(
             0.0,
             0.0,
         );
-        new_entities.push(Node::new(Some(background_entity), None));
+        new_entities.push(background_entity);
 
         let coal_entity = entities.create();
         transform_storage
@@ -76,7 +76,7 @@ pub fn create(
                 },
             )
             .unwrap();
-        new_entities.push(Node::new(Some(coal_entity), None));
+        new_entities.push(coal_entity);
     }
 
     if researched_buffs.0.contains(&Buff::Oil) && *selected_tile_type == TileType::Open {
@@ -88,7 +88,7 @@ pub fn create(
             0.0,
             32.0,
         );
-        new_entities.push(Node::new(Some(background_entity), None));
+        new_entities.push(background_entity);
         let oil_entity = entities.create();
         transform_storage
             .insert(
@@ -117,7 +117,7 @@ pub fn create(
             )
             .unwrap();
 
-        new_entities.push(Node::new(Some(oil_entity), None));
+        new_entities.push(oil_entity);
     }
 
     if researched_buffs.0.contains(&Buff::Solar) && *selected_tile_type == TileType::Open {
@@ -129,7 +129,7 @@ pub fn create(
             32.0,
             0.0,
         );
-        new_entities.push(Node::new(Some(background_entity), None));
+        new_entities.push(background_entity);
         let solar_entity = entities.create();
         transform_storage
             .insert(
@@ -158,7 +158,7 @@ pub fn create(
             )
             .unwrap();
 
-        new_entities.push(Node::new(Some(solar_entity), None));
+        new_entities.push(solar_entity);
     }
 
     if researched_buffs.0.contains(&Buff::Hydro) && *selected_tile_type == TileType::River {
@@ -170,7 +170,7 @@ pub fn create(
             0.0,
             0.0,
         );
-        new_entities.push(Node::new(Some(background_entity), None));
+        new_entities.push(background_entity);
         let hydro_entity = entities.create();
         transform_storage
             .insert(
@@ -201,7 +201,7 @@ pub fn create(
             )
             .unwrap();
 
-        new_entities.push(Node::new(Some(hydro_entity), None));
+        new_entities.push(hydro_entity);
     }
 
     let container_entity = entities.create();
@@ -212,5 +212,9 @@ pub fn create(
         )
         .unwrap();
 
-    Node::new(Some(container_entity), Some(new_entities))
+    let mut node = Node::new();
+    node.add_many(new_entities);
+    node_storage.insert(container_entity, node).unwrap();
+
+    container_entity
 }

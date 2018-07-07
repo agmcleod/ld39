@@ -1,53 +1,30 @@
-use components::{Button, Color, Gatherer, Input, Rect, ResearchedBuffs, SelectedTile, Sprite,
+use components::{Button, Color, EntityLookup, Gatherer, Input, Node, Rect, ResearchedBuffs, SelectedTile, Sprite,
                  Tile, Transform};
 use entities::create_build_ui;
-use scene::Node;
 use specs::{Entities, Entity, Join, Read, ReadStorage, System, WriteStorage};
 use std::ops::Deref;
-use std::sync::{Arc, Mutex};
 
 pub struct TileSelection {
-    pub scene: Arc<Mutex<Node>>,
-    pub build_ui_entity: Option<Entity>,
+    build_ui_entity: Option<Entity>,
 }
 
 impl TileSelection {
-    pub fn new(scene: Arc<Mutex<Node>>) -> TileSelection {
+    pub fn new() -> TileSelection {
         TileSelection {
-            scene: scene,
             build_ui_entity: None,
-        }
-    }
-
-    fn remove_build_ui_entity(&mut self, entities: &Entities) {
-        if let Some(build_ui_entity) = self.build_ui_entity {
-            let mut scene = self.scene.lock().unwrap();
-
-            let mut node_to_delete = -1i32;
-            for (i, node) in scene.get_sub_nodes().iter().enumerate() {
-                if let Some(entity) = node.entity {
-                    if entity == build_ui_entity {
-                        node_to_delete = i as i32;
-                    }
-                }
-            }
-
-            if node_to_delete > -1i32 {
-                scene.remove_by_index(node_to_delete as usize);
-                entities.delete(build_ui_entity).unwrap();
-                self.build_ui_entity = None;
-            }
         }
     }
 }
 
 impl<'a> System<'a> for TileSelection {
     type SystemData = (
+        Entities<'a>,
         WriteStorage<'a, Button>,
         WriteStorage<'a, Color>,
-        Entities<'a>,
+        Read<'a, EntityLookup>,
         ReadStorage<'a, Gatherer>,
         Read<'a, Input>,
+        WriteStorage<'a, Node>,
         WriteStorage<'a, Rect>,
         Read<'a, ResearchedBuffs>,
         ReadStorage<'a, SelectedTile>,
@@ -58,11 +35,13 @@ impl<'a> System<'a> for TileSelection {
 
     fn run(&mut self, data: Self::SystemData) {
         let (
+            entities,
             mut button_storage,
             mut color_storage,
-            entities,
+            entity_lookup_storage,
             gatherer_storage,
             input_storage,
+            mut node_storage,
             mut rect_storage,
             researched_buffs,
             selected_tile_storage,
@@ -107,28 +86,36 @@ impl<'a> System<'a> for TileSelection {
                 }
 
                 // if build UI showing, clean it up, as tile type may be different
-                self.remove_build_ui_entity(&entities);
+                if let Some(build_ui_entity) = self.build_ui_entity {
+                    entities.delete(build_ui_entity).unwrap();
+                    self.build_ui_entity = None;
+                }
                 // create build ui
-                let node = create_build_ui::create(
+                let entity = create_build_ui::create(
                     tile_mouse_x + Tile::get_size(),
                     tile_mouse_y,
                     &tile_type_selected.unwrap(),
                     &entities,
                     &mut button_storage,
                     &mut color_storage,
+                    &mut node_storage,
                     &mut rect_storage,
                     &mut sprite_storage,
                     &mut transform_storage,
                     &researched_buffs,
                 );
-                self.build_ui_entity = Some(node.entity.unwrap().clone());
-                let mut scene = self.scene.lock().unwrap();
-                scene.add(node);
+                self.build_ui_entity = Some(entity);
+
+                let lookup = entity_lookup_storage.deref();
+                node_storage.get_mut(*lookup.get("root").unwrap()).unwrap().add(entity);
             }
         } else {
             for (_, transform) in (&selected_tile_storage, &transform_storage).join() {
                 if !transform.visible {
-                    self.remove_build_ui_entity(&entities);
+                    if let Some(build_ui_entity) = self.build_ui_entity {
+                        entities.delete(build_ui_entity).unwrap();
+                        self.build_ui_entity = None;
+                    }
                 }
             }
         }

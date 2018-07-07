@@ -1,16 +1,12 @@
-use components::{Button, CityPowerState, Color, EntityLookup, Input, PowerBar, Rect, Sprite,
+use components::{Button, CityPowerState, Color, EntityLookup, Input, Node, PowerBar, Rect, Sprite,
                  Transform, CITY_POWER_STATE_COORDS};
-use scene::Node;
 use specs::{Entities, Read, System, Write, WriteStorage};
 use std::ops::{Deref, DerefMut};
-use std::sync::{Arc, Mutex};
 
 use entities::create_power_bar;
 use storage_types::PowerBarStorage;
 
-pub struct CitiesToPower {
-    pub scene: Arc<Mutex<Node>>,
-}
+pub struct CitiesToPower;
 
 impl<'a> System<'a> for CitiesToPower {
     type SystemData = (
@@ -20,6 +16,7 @@ impl<'a> System<'a> for CitiesToPower {
         WriteStorage<'a, Color>,
         Write<'a, EntityLookup>,
         Read<'a, Input>,
+        WriteStorage<'a, Node>,
         WriteStorage<'a, PowerBar>,
         WriteStorage<'a, Rect>,
         WriteStorage<'a, Sprite>,
@@ -34,6 +31,7 @@ impl<'a> System<'a> for CitiesToPower {
             mut color_storage,
             mut entity_lookup_storage,
             input_storage,
+            mut node_storage,
             mut power_bar_storage,
             mut rect_storage,
             mut sprite_storage,
@@ -79,15 +77,14 @@ impl<'a> System<'a> for CitiesToPower {
                 y + 3.0,
                 40 + (20 * (city_power_state.current_city_count as i32 - 1)),
             );
-            let mut scene = self.scene.lock().unwrap();
-            {
-                let side_bar_container = entity_lookup.get("side_bar_container").unwrap();
-                let container = scene.get_node_for_entity(*side_bar_container).unwrap();
-                container.add(Node::new(Some(entity), None));
-            }
+
+            let side_bar_container = {
+                entity_lookup.get("side_bar_container").unwrap().clone()
+            };
+            let node = node_storage.get_mut(side_bar_container).unwrap();
+            node.add(entity);
 
             if city_power_state.current_city_count == 4 {
-                scene.remove_node_with_entity(&entities, power_additional_city_button_entity);
                 entities
                     .delete(power_additional_city_button_entity)
                     .unwrap();

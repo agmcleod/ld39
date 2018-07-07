@@ -1,18 +1,15 @@
-use components::{Button, Color, EntityLookup, Input, Rect, StateChange, Tile, Transform};
+use components::{Button, Color, EntityLookup, Input, Node, Rect, StateChange, Tile, Transform};
 use entities::create_colored_rect;
-use scene::Node;
 use specs::{Entities, Join, Read, ReadStorage, System, Write, WriteStorage};
 use state::play_state::PlayState;
 use std::ops::{Deref, DerefMut};
-use std::sync::{Arc, Mutex};
+use systems::logic;
 
-pub struct ToggleTechTree {
-    scene: Arc<Mutex<Node>>,
-}
+pub struct ToggleTechTree;
 
 impl ToggleTechTree {
-    pub fn new(scene: Arc<Mutex<Node>>) -> ToggleTechTree {
-        ToggleTechTree { scene: scene }
+    pub fn new() -> ToggleTechTree {
+        ToggleTechTree {}
     }
 
     fn check_show_tech_button(
@@ -22,6 +19,7 @@ impl ToggleTechTree {
         entities: &Entities,
         button_storage: &mut WriteStorage<Button>,
         color_storage: &mut WriteStorage<Color>,
+        node_storage: &mut WriteStorage<Node>,
         rect_storage: &mut WriteStorage<Rect>,
         transform_storage: &mut WriteStorage<Transform>,
         state_change_res: &mut Write<StateChange>,
@@ -50,7 +48,7 @@ impl ToggleTechTree {
                 let state_change: &mut StateChange = state_change_res.deref_mut();
                 state_change.set(PlayState::get_name(), "tech_tree_pause".to_string());
 
-                let node = create_colored_rect::create(
+                let rect = create_colored_rect::create(
                     0.0,
                     0.0,
                     10.0,
@@ -64,9 +62,9 @@ impl ToggleTechTree {
                 );
                 lookup
                     .entities
-                    .insert("pause_black".to_string(), node.entity.unwrap());
-                let mut scene = self.scene.lock().unwrap();
-                scene.add(node);
+                    .insert("pause_black".to_string(), rect);
+                let node = logic::get_root(&lookup, node_storage);
+                node.add(rect);
 
                 was_clicked = true;
             }
@@ -111,10 +109,9 @@ impl ToggleTechTree {
 
                 let state_change: &mut StateChange = state_change_res.deref_mut();
                 state_change.set(PlayState::get_name(), "resume".to_string());
-                let overlay_entity = *lookup.get(&"pause_black".to_string()).unwrap();
-                let mut scene = self.scene.lock().unwrap();
-                scene.remove_node_with_entity(entities, overlay_entity);
-                lookup.entities.remove(&"pause_black".to_string());
+                let overlay_entity = *lookup.get("pause_black").unwrap();
+                entities.delete(overlay_entity).unwrap();
+                lookup.entities.remove("pause_black");
                 was_clicked = true;
             }
         }
@@ -134,6 +131,7 @@ impl<'a> System<'a> for ToggleTechTree {
         WriteStorage<'a, Color>,
         Write<'a, EntityLookup>,
         Read<'a, Input>,
+        WriteStorage<'a, Node>,
         WriteStorage<'a, Rect>,
         Write<'a, StateChange>,
         ReadStorage<'a, Tile>,
@@ -147,6 +145,7 @@ impl<'a> System<'a> for ToggleTechTree {
             mut color_storage,
             mut lookup,
             input,
+            mut node_storage,
             mut rect_storage,
             mut state_change_res,
             tile_storage,
@@ -161,6 +160,7 @@ impl<'a> System<'a> for ToggleTechTree {
             &entities,
             &mut button_storage,
             &mut color_storage,
+            &mut node_storage,
             &mut rect_storage,
             &mut transform_storage,
             &mut state_change_res,

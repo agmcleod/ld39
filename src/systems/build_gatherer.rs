@@ -1,27 +1,25 @@
 use components::ui::WalletUI;
-use components::{upgrade::Buff, AnimationSheet, Button, ClickSound, Color, Gatherer,
-                 GathererPositions, GathererType, Input, ProtectedNodes, ResearchedBuffs,
+use components::{upgrade::Buff, AnimationSheet, Button, ClickSound, Color, EntityLookup, Gatherer,
+                 GathererPositions, GathererType, Input, Node, ProtectedNodes, ResearchedBuffs,
                  SelectedTile, Text, Tile, TileType, Transform, Wallet};
-use scene::Node;
 use specs::{Entities, Join, Read, ReadStorage, System, Write, WriteStorage};
 use std::ops::{Deref, DerefMut};
-use std::sync::{Arc, Mutex};
 use systems::logic;
 
-pub struct BuildGatherer {
-    pub scene: Arc<Mutex<Node>>,
-}
+pub struct BuildGatherer;
 
 impl<'a> System<'a> for BuildGatherer {
     type SystemData = (
+        Entities<'a>,
         WriteStorage<'a, AnimationSheet>,
         WriteStorage<'a, Button>,
         Write<'a, ClickSound>,
         WriteStorage<'a, Color>,
-        Entities<'a>,
+        Read<'a, EntityLookup>,
         WriteStorage<'a, Gatherer>,
         Write<'a, GathererPositions>,
         Read<'a, Input>,
+        WriteStorage<'a, Node>,
         Read<'a, ProtectedNodes>,
         Read<'a, ResearchedBuffs>,
         ReadStorage<'a, SelectedTile>,
@@ -33,14 +31,16 @@ impl<'a> System<'a> for BuildGatherer {
 
     fn run(&mut self, data: Self::SystemData) {
         let (
+            entities,
             mut animation_sheet_storage,
             mut button_storage,
             mut click_sound_storage,
             mut color_storage,
-            entities,
+            entity_lookup_storage,
             mut gatherer_storage,
             mut gatherer_positions_storage,
             input_storage,
+            mut nodes_storage,
             protected_nodes_storage,
             researched_buffs_storage,
             selected_tile_storage,
@@ -53,6 +53,7 @@ impl<'a> System<'a> for BuildGatherer {
         let input: &Input = input_storage.deref();
         let click_sound: &mut ClickSound = click_sound_storage.deref_mut();
         let wallet: &mut Wallet = wallet_storage.deref_mut();
+        let lookup = entity_lookup_storage.deref();
 
         let mut button_pressed = false;
         let mut gatherer_type = None;
@@ -166,8 +167,9 @@ impl<'a> System<'a> for BuildGatherer {
                                     .insert(pollution_entity, Color([1.0, 1.0, 1.0, 1.0]))
                                     .unwrap();
 
-                                let mut scene = self.scene.lock().unwrap();
-                                scene.add(Node::new(Some(pollution_entity), None));
+
+                                let node = logic::get_root(&lookup, &mut nodes_storage);
+                                node.add(pollution_entity);
                             }
                         }
                     }
@@ -198,6 +200,7 @@ impl<'a> System<'a> for BuildGatherer {
                     ),
                 )
                 .unwrap();
+            nodes_storage.insert(gatherer_entity, Node::new()).unwrap();
 
             let gatherer_positions = gatherer_positions_storage.deref_mut();
             gatherer_positions.gatherers.insert(
@@ -234,8 +237,8 @@ impl<'a> System<'a> for BuildGatherer {
                     .has_adjancent_of_same_type = true;
             }
 
-            let mut scene = self.scene.lock().unwrap();
-            scene.add(Node::new(Some(gatherer_entity), None));
+            let node = logic::get_root(&lookup, &mut nodes_storage);
+            node.add(gatherer_entity);
         }
     }
 }

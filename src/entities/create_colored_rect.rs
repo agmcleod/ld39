@@ -1,6 +1,5 @@
 use components::{Color, Rect, Transform};
-use scene::Node;
-use specs::{Entities, WriteStorage};
+use specs::{Entity, Entities, WriteStorage};
 
 pub fn create(
     x: f32,
@@ -13,7 +12,7 @@ pub fn create(
     transform_storage: &mut WriteStorage<Transform>,
     color_storage: &mut WriteStorage<Color>,
     rect_storage: &mut WriteStorage<Rect>,
-) -> Node {
+) -> Entity {
     let entity = entities.create();
 
     transform_storage
@@ -22,6 +21,5 @@ pub fn create(
     color_storage.insert(entity, Color(color)).unwrap();
     rect_storage.insert(entity, Rect {}).unwrap();
 
-    let node = Node::new(Some(entity), None);
-    node
+    entity
 }

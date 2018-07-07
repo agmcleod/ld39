@@ -1,16 +1,14 @@
 use conrod;
 use conrod::{widget, Colorable, Labelable, Positionable, Sizeable, Ui, UiBuilder, Widget};
 use loader;
-use scene::Node;
 use specs::{Dispatcher, DispatcherBuilder, World};
 use state::State;
 use std::collections::HashSet;
 use std::path::Path;
-use std::sync::{Arc, Mutex};
 
 use components::ui::WalletUI;
 use components::{ui::PollutionCount, Actions, upgrade, Button, CityPowerState, Color, EntityLookup,
-                 GathererPositions, GatheringRate, PowerBar, ProtectedNodes, Rect,
+                 GathererPositions, GatheringRate, Node, PowerBar, ProtectedNodes, Rect,
                  ResearchedBuffs, ResearchingEntities, ResourceCount, ResourceType, Resources,
                  SelectedTile, Sprite, Text, Tile, TileType, Transform, Wallet,
                  CITY_POWER_STATE_COORDS};
@@ -51,7 +49,6 @@ pub struct PlayState<'a> {
     dispatcher: Dispatcher<'a, 'a>,
     tech_tree_dispatcher: Dispatcher<'a, 'a>,
     pause_dispatcher: Dispatcher<'a, 'a>,
-    scene: Arc<Mutex<Node>>,
     state: InternalState,
     ui: Ui,
     ids: Ids,
@@ -59,62 +56,50 @@ pub struct PlayState<'a> {
 
 impl<'a> PlayState<'a> {
     pub fn new() -> PlayState<'a> {
-        let scene = Arc::new(Mutex::new(Node::new(None, None)));
-
         let dispatcher = DispatcherBuilder::new()
             .with(systems::AnimationSystem::new(), "animation_system", &[])
             .with(
-                systems::ButtonHover {
-                    scene: scene.clone(),
-                },
+                systems::ButtonHover{},
                 "button_hover",
                 &[],
             )
             .with(systems::SellEnergy::new(), "sell_energy", &["button_hover"])
             .with(
-                systems::BuildGatherer {
-                    scene: scene.clone(),
-                },
+                systems::BuildGatherer{},
                 "build_gatherer",
                 &["button_hover"],
             )
             .with(
-                systems::TextAbsoluteCache {
-                    scene: scene.clone(),
-                },
+                systems::TextAbsoluteCache{},
                 "text_absolute_cache",
                 &[],
             )
             .with(
-                systems::TileSelection::new(scene.clone()),
+                systems::TileSelection::new(),
                 "tile_selection",
                 &["build_gatherer"],
             )
-            .with(systems::Gathering::new(scene.clone()), "gathering", &[])
+            .with(systems::Gathering::new(), "gathering", &[])
             .with(systems::PowerUsage::new(), "power_usage", &["gathering"])
             .with(
-                systems::ToggleTechTree::new(scene.clone()),
+                systems::ToggleTechTree::new(),
                 "toggle_tech_tree",
                 &["button_hover"],
             )
-            .with(systems::Research::new(scene.clone()), "research", &[])
+            .with(systems::Research::new(), "research", &[])
             .with(systems::Pollution::new(), "pollution", &[])
             .with(
-                systems::CitiesToPower {
-                    scene: scene.clone(),
-                },
+                systems::CitiesToPower {},
                 "cities_to_power",
                 &["button_hover"],
             )
             .with(
-                systems::FloatingTextSystem::new(scene.clone()),
+                systems::FloatingTextSystem::new(),
                 "floating_text_system",
                 &[],
             )
             .with(
-                systems::TogglePause {
-                    scene: scene.clone(),
-                },
+                systems::TogglePause {},
                 "toggle_pause",
                 &["button_hover"],
             )
@@ -122,22 +107,18 @@ impl<'a> PlayState<'a> {
 
         let tech_tree_dispatcher = DispatcherBuilder::new()
             .with(
-                systems::ButtonHover {
-                    scene: scene.clone(),
-                },
+                systems::ButtonHover {},
                 "button_hover",
                 &[],
             )
             .with(
-                systems::ToggleTechTree::new(scene.clone()),
+                systems::ToggleTechTree::new(),
                 "toggle_tech_tree",
                 &["button_hover"],
             )
-            .with(systems::TechTree::new(scene.clone()), "tech_tree", &[])
+            .with(systems::TechTree::new(), "tech_tree", &[])
             .with(
-                systems::TextAbsoluteCache {
-                    scene: scene.clone(),
-                },
+                systems::TextAbsoluteCache {},
                 "text_absolute_cache",
                 &[],
             )
@@ -145,23 +126,17 @@ impl<'a> PlayState<'a> {
 
         let pause_dispatcher = DispatcherBuilder::new()
             .with(
-                systems::ButtonHover {
-                    scene: scene.clone(),
-                },
+                systems::ButtonHover {},
                 "button_hover",
                 &[],
             )
             .with(
-                systems::TextAbsoluteCache {
-                    scene: scene.clone(),
-                },
+                systems::TextAbsoluteCache {},
                 "text_absolute_cache",
                 &[],
             )
             .with(
-                systems::TogglePause {
-                    scene: scene.clone(),
-                },
+                systems::TogglePause {},
                 "toggle_pause",
                 &["button_hover"],
             )
@@ -179,7 +154,6 @@ impl<'a> PlayState<'a> {
             dispatcher,
             tech_tree_dispatcher,
             pause_dispatcher,
-            scene,
             state: InternalState::Game,
             ui,
             ids,
@@ -194,17 +168,11 @@ impl<'a> PlayState<'a> {
 }
 
 impl<'a> State for PlayState<'a> {
-    fn get_scene(&self) -> Arc<Mutex<Node>> {
-        self.scene.clone()
-    }
-
     fn setup(&mut self, world: &mut World) {
-        let mut scene = self.scene.lock().unwrap();
-        scene.clear();
-
-        let mut tile_nodes: Vec<Node> = Vec::with_capacity(100);
         let mut set_nodes = create_map::create();
         let mut rng = thread_rng();
+
+        let mut entities_under_root = Vec::new();
 
         for row in 0..10 {
             for col in 0..10 {
@@ -249,7 +217,7 @@ impl<'a> State for PlayState<'a> {
                     set_nodes.insert((col, row), (tile_type, Some(tile_entity.clone())));
                 }
 
-                tile_nodes.push(Node::new(Some(tile_entity), None));
+                entities_under_root.push(tile_entity);
             }
         }
 
@@ -260,28 +228,9 @@ impl<'a> State for PlayState<'a> {
         world.add_resource(Wallet::new());
         world.add_resource(InternalState::Game);
 
-        scene.add_many(tile_nodes);
-
         let dimensions = renderer::get_dimensions();
 
-        let mut side_bar_container = Node::new(
-            Some(
-                world
-                    .create_entity()
-                    .with(Transform::visible(
-                        640.0,
-                        0.0,
-                        0.0,
-                        (dimensions[0] - 640.0) as u16,
-                        dimensions[1] as u16,
-                        0.0,
-                        1.0,
-                        1.0,
-                    ))
-                    .build(),
-            ),
-            None,
-        );
+        let mut side_bar_container_node = Node::new();
 
         let entity = world
             .create_entity()
@@ -304,7 +253,7 @@ impl<'a> State for PlayState<'a> {
             ))
             .build();
 
-        side_bar_container.add(Node::new(Some(entity), None));
+        side_bar_container_node.add(entity);
 
         let mut powerbar_frame_entities = Vec::new();
 
@@ -322,7 +271,7 @@ impl<'a> State for PlayState<'a> {
                 ))
                 .with(Sprite { frame_name })
                 .build();
-            side_bar_container.add(Node::new(Some(entity.clone()), None));
+            side_bar_container_node.add(entity);
             powerbar_frame_entities.push(entity);
         }
 
@@ -344,7 +293,7 @@ impl<'a> State for PlayState<'a> {
             };
 
             let entity = create_power_bar::create(&mut storages, 33.0, 35.0, 40);
-            side_bar_container.add(Node::new(Some(entity), None));
+            side_bar_container_node.add(entity);
         }
 
         // add city power target
@@ -362,7 +311,7 @@ impl<'a> State for PlayState<'a> {
             ))
             .with(Transform::visible(30.0, 80.0, 0.0, 96, 32, 0.0, 1.0, 1.0))
             .build();
-        side_bar_container.add(Node::new(Some(power_additional_city.clone()), None));
+        side_bar_container_node.add(power_additional_city);
 
         // coal sprite
         let entity = world
@@ -375,7 +324,7 @@ impl<'a> State for PlayState<'a> {
                 frame_name: "coal.png".to_string(),
             })
             .build();
-        side_bar_container.add(Node::new(Some(entity), None));
+        side_bar_container_node.add(entity);
 
         // oil sprite
         let entity = world
@@ -388,7 +337,7 @@ impl<'a> State for PlayState<'a> {
                 frame_name: "oil.png".to_string(),
             })
             .build();
-        side_bar_container.add(Node::new(Some(entity), None));
+        side_bar_container_node.add(entity);
 
         // solar sprite
         let entity = world
@@ -401,7 +350,7 @@ impl<'a> State for PlayState<'a> {
                 frame_name: "sun.png".to_string(),
             })
             .build();
-        side_bar_container.add(Node::new(Some(entity), None));
+        side_bar_container_node.add(entity);
 
         // water sprite
         let entity = world
@@ -414,7 +363,7 @@ impl<'a> State for PlayState<'a> {
                 frame_name: "water.png".to_string(),
             })
             .build();
-        side_bar_container.add(Node::new(Some(entity), None));
+        side_bar_container_node.add(entity);
 
         // money sprite
         let entity = world
@@ -425,7 +374,7 @@ impl<'a> State for PlayState<'a> {
                 frame_name: "dollarsign.png".to_string(),
             })
             .build();
-        side_bar_container.add(Node::new(Some(entity), None));
+        side_bar_container_node.add(entity);
 
         // pollution levels
         let entity = world
@@ -440,7 +389,7 @@ impl<'a> State for PlayState<'a> {
             ))
             .with(Color([0.0, 1.0, 0.0, 1.0]))
             .build();
-        side_bar_container.add(Node::new(Some(entity), None));
+        side_bar_container_node.add(entity);
 
         // selected
         let entity = world
@@ -450,7 +399,7 @@ impl<'a> State for PlayState<'a> {
             .with(Rect::new())
             .with(Color([1.0, 1.0, 1.0, 0.6]))
             .build();
-        scene.add(Node::new(Some(entity), None));
+        entities_under_root.push(entity);
 
         // sell button
         let entity = world
@@ -467,7 +416,7 @@ impl<'a> State for PlayState<'a> {
                 frame_name: "power_btn.png".to_string(),
             })
             .build();
-        side_bar_container.add(Node::new(Some(entity), None));
+        side_bar_container_node.add(entity);
 
         // tech tree button
         let entity = world
@@ -484,7 +433,7 @@ impl<'a> State for PlayState<'a> {
                 frame_name: "show_tech.png".to_string(),
             })
             .build();
-        side_bar_container.add(Node::new(Some(entity), None));
+        side_bar_container_node.add(entity);
 
         let mut lookup = EntityLookup::new();
 
@@ -492,11 +441,6 @@ impl<'a> State for PlayState<'a> {
             lookup
                 .entities
                 .insert("show_button_entity".to_string(), entity);
-            lookup.entities.insert(
-                "side_bar_container".to_string(),
-                side_bar_container.entity.unwrap(),
-            );
-
             lookup
                 .entities
                 .insert("power_additional_city".to_string(), power_additional_city);
@@ -535,7 +479,7 @@ impl<'a> State for PlayState<'a> {
                     },
                 )
                 .unwrap();
-            side_bar_container.add(Node::new(Some(entity), None));
+            side_bar_container_node.add(entity);
 
             // oil text
             let entity = create_text::create(
@@ -557,7 +501,7 @@ impl<'a> State for PlayState<'a> {
                     },
                 )
                 .unwrap();
-            side_bar_container.add(Node::new(Some(entity), None));
+            side_bar_container_node.add(entity);
 
             // solar text
             let entity = create_text::create(
@@ -579,7 +523,7 @@ impl<'a> State for PlayState<'a> {
                     },
                 )
                 .unwrap();
-            side_bar_container.add(Node::new(Some(entity), None));
+            side_bar_container_node.add(entity);
 
             let water_text = create_text::create(
                 &mut text_storages,
@@ -600,7 +544,7 @@ impl<'a> State for PlayState<'a> {
                     },
                 )
                 .unwrap();
-            side_bar_container.add(Node::new(Some(water_text), None));
+            side_bar_container_node.add(water_text);
 
             // money text
             let entity = create_text::create(
@@ -615,7 +559,7 @@ impl<'a> State for PlayState<'a> {
                 Color([0.0, 1.0, 0.0, 1.0]),
             );
             wallet_ui_storage.insert(entity, WalletUI {}).unwrap();
-            side_bar_container.add(Node::new(Some(entity), None));
+            side_bar_container_node.add(entity);
 
             // power gain text
             let entity = create_text::create(
@@ -633,28 +577,32 @@ impl<'a> State for PlayState<'a> {
             lookup
                 .entities
                 .insert("power_gain_text".to_string(), entity.clone());
-            side_bar_container.add(Node::new(Some(entity), None));
+            side_bar_container_node.add(entity);
         }
 
-        scene.add(side_bar_container);
-
-        let tech_tree_container_entity = world
+        let side_bar_container = world
             .create_entity()
-            .with(Transform::new(
+            .with(Transform::visible(
                 640.0,
                 0.0,
-                2.0,
+                0.0,
                 (dimensions[0] - 640.0) as u16,
                 dimensions[1] as u16,
                 0.0,
                 1.0,
                 1.0,
-                false,
             ))
-            .with(Rect {})
-            .with(Color([16.0 / 256.0, 14.0 / 256.0, 22.0 / 256.0, 1.0]))
+            .with(side_bar_container_node)
             .build();
-        let mut tech_tree_container = Node::new(Some(tech_tree_container_entity.clone()), None);
+
+        lookup.entities.insert(
+            "side_bar_container".to_string(),
+            side_bar_container,
+        );
+
+        entities_under_root.push(side_bar_container);
+
+        let mut tech_tree_container = Node::new();
         let mut upgrade_lines_lookup = upgrade::UpgradeLinesLookup::new();
         let tech_tree_node =
             tech_tree::build_tech_tree(world, &mut tech_tree_container, &mut upgrade_lines_lookup);
@@ -677,21 +625,52 @@ impl<'a> State for PlayState<'a> {
         world.add_resource::<ResearchedBuffs>(ResearchedBuffs(HashSet::new()));
         world.add_resource::<ResearchingEntities>(ResearchingEntities::new());
 
+        lookup
+            .entities
+            .insert("resume_from_upgrades".to_string(), resume_from_upgrades);
+        tech_tree_container.add(resume_from_upgrades);
+
+        let tech_tree_container_entity = world
+            .create_entity()
+            .with(Transform::new(
+                640.0,
+                0.0,
+                2.0,
+                (dimensions[0] - 640.0) as u16,
+                dimensions[1] as u16,
+                0.0,
+                1.0,
+                1.0,
+                false,
+            ))
+            .with(Rect {})
+            .with(Color([16.0 / 256.0, 14.0 / 256.0, 22.0 / 256.0, 1.0]))
+            .with(tech_tree_container)
+            .build();
+
         lookup.entities.insert(
             "tech_tree_container".to_string(),
             tech_tree_container_entity,
         );
 
-        lookup
-            .entities
-            .insert("resume_from_upgrades".to_string(), resume_from_upgrades);
-        tech_tree_container.add(Node::new(Some(resume_from_upgrades), None));
-
         lookup.entities.insert(
             "tech_tree_container".to_string(),
-            tech_tree_container.entity.unwrap(),
+            tech_tree_container_entity,
         );
-        scene.add(tech_tree_container);
+        entities_under_root.push(tech_tree_container_entity);
+
+        let mut root_node = Node::new();
+        root_node.add_many(entities_under_root);
+
+        let root_entity = world.
+            create_entity()
+            .with(root_node)
+            .build();
+
+        lookup.entities.insert(
+            "root".to_string(),
+            root_entity
+        );
 
         world.add_resource(lookup);
     }

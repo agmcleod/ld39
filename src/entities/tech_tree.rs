@@ -2,10 +2,9 @@ pub use components::upgrade::*;
 
 use cgmath::Vector2;
 use components::ui;
-use components::{Color, Shape, Sprite, Transform};
+use components::{Color, Node, Shape, Sprite, Transform};
 use loader;
 use renderer;
-use scene::Node;
 use serde_json::{self, Value};
 use specs::{Entity, World};
 
@@ -84,19 +83,19 @@ fn build_entity_nodes(
 
     if let Some(last_position) = last_upgrade.position {
         if let Some(last_entity) = last_upgrade.entity {
-            let entity = create_line(world, last_position, x, y, last_upgrade.status.clone());
+            let line_entity = create_line(world, last_position, x, y, last_upgrade.status.clone());
             if upgrade_lines_lookup.entities.contains_key(&last_entity) {
                 upgrade_lines_lookup
                     .entities
                     .get_mut(&last_entity)
                     .unwrap()
-                    .push(entity.clone());
+                    .push(line_entity.clone());
             } else {
                 upgrade_lines_lookup
                     .entities
-                    .insert(last_entity, vec![entity.clone()]);
+                    .insert(last_entity, vec![line_entity.clone()]);
             }
-            container.add(Node::new(Some(entity), None));
+            container.add(line_entity);
         }
     }
 
@@ -105,7 +104,7 @@ fn build_entity_nodes(
         sub_nodes: Vec::new(),
     };
 
-    container.add(Node::new(Some(entity), None));
+    container.add(entity);
 
     if let Some(children) = node.get("children") {
         for child in children.as_array().unwrap().iter() {

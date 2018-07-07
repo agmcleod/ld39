@@ -1,15 +1,12 @@
-use components::{Actions, Button, Color, EntityLookup, Input, Rect, StateChange, Transform};
+use components::{Actions, Button, Color, EntityLookup, Input, Node, Rect, StateChange, Transform};
 use entities::create_colored_rect;
 use glutin::VirtualKeyCode;
-use scene::Node;
 use specs::{Entities, Join, Read, System, Write, WriteStorage};
 use state::play_state::{InternalState, PlayState};
 use std::ops::{Deref, DerefMut};
-use std::sync::{Arc, Mutex};
+use systems::logic;
 
-pub struct TogglePause {
-    pub scene: Arc<Mutex<Node>>,
-}
+pub struct TogglePause;
 
 impl<'a> System<'a> for TogglePause {
     type SystemData = (
@@ -20,6 +17,7 @@ impl<'a> System<'a> for TogglePause {
         Write<'a, EntityLookup>,
         Read<'a, Input>,
         Read<'a, InternalState>,
+        WriteStorage<'a, Node>,
         WriteStorage<'a, Rect>,
         Write<'a, StateChange>,
         WriteStorage<'a, Transform>,
@@ -34,6 +32,7 @@ impl<'a> System<'a> for TogglePause {
             mut entity_lookup_storage,
             input,
             internal_state_storage,
+            mut node_storage,
             mut rect_storage,
             mut state_change_storage,
             mut transform_storage,
@@ -61,16 +60,18 @@ impl<'a> System<'a> for TogglePause {
         if *internal_state == InternalState::Pause
             && (*input.pressed_keys.get(&VirtualKeyCode::Escape).unwrap() || action_name == "resume_game")
         {
-            let lookup: &mut EntityLookup = entity_lookup_storage.deref_mut();
-            let entity = lookup.entities.get(&"pause_black".to_string()).unwrap();
-            let mut scene = self.scene.lock().unwrap();
-            scene.remove_node_with_entity(&entities, *entity);
+            let lookup = entity_lookup_storage.deref_mut();
+            {
+                let entity = lookup.get("pause_black").unwrap();
+                entities.delete(*entity).unwrap();
+            }
+            lookup.entities.remove("pause_black");
             let state_change: &mut StateChange = state_change_storage.deref_mut();
             state_change.set(PlayState::get_name(), "resume".to_string());
         }
 
         if transition_to_pause {
-            let node = create_colored_rect::create(
+            let entity = create_colored_rect::create(
                 0.0,
                 0.0,
                 10.0,
@@ -82,13 +83,12 @@ impl<'a> System<'a> for TogglePause {
                 &mut color_storage,
                 &mut rect_storage,
             );
-            println!("Add black background");
             let lookup: &mut EntityLookup = entity_lookup_storage.deref_mut();
             lookup
                 .entities
-                .insert("pause_black".to_string(), node.entity.unwrap());
-            let mut scene = self.scene.lock().unwrap();
-            scene.add(node);
+                .insert("pause_black".to_string(), entity);
+            let root_node = logic::get_root(&lookup, &mut node_storage);
+            root_node.add(entity);
             let state_change: &mut StateChange = state_change_storage.deref_mut();
             state_change.set(PlayState::get_name(), "pause".to_string());
         }

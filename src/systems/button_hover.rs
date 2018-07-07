@@ -1,25 +1,23 @@
 use cgmath::Vector3;
-use components::{Button, Input, Sprite, Transform};
-use scene::Node;
+use components::{Button, EntityLookup, Input, Node, Sprite, Transform};
 use specs::{Entities, Entity, Join, Read, System, WriteStorage};
 use std::ops::Deref;
-use std::sync::{Arc, Mutex};
 
-pub struct ButtonHover {
-    pub scene: Arc<Mutex<Node>>,
-}
+pub struct ButtonHover;
 
 impl<'a> System<'a> for ButtonHover {
     type SystemData = (
-        WriteStorage<'a, Button>,
         Entities<'a>,
+        WriteStorage<'a, Button>,
+        Read<'a, EntityLookup>,
         Read<'a, Input>,
+        WriteStorage<'a, Node>,
         WriteStorage<'a, Transform>,
         WriteStorage<'a, Sprite>,
     );
 
     fn run(&mut self, data: Self::SystemData) {
-        let (mut button_storage, entities, input_storage, transform_storage, mut sprite_storage) =
+        let (entities, mut button_storage, entity_lookup_storage, input_storage, node_storage, transform_storage, mut sprite_storage) =
             data;
 
         let input: &Input = input_storage.deref();
@@ -27,7 +25,9 @@ impl<'a> System<'a> for ButtonHover {
         let mouse_x = input.mouse_pos.0;
         let mouse_y = input.mouse_pos.1;
 
-        let scene = self.scene.lock().unwrap();
+        let lookup = entity_lookup_storage.deref();
+
+        let root_entity = lookup.get("root").unwrap();
 
         let mut button_entities: Vec<(i32, Entity, Vector3<f32>)> = Vec::new();
 
@@ -39,7 +39,7 @@ impl<'a> System<'a> for ButtonHover {
         ).join()
         {
             button.mouse_is_over = false;
-            let absolute_pos = scene.get_absolute_pos(&entity, &transform_storage);
+            let absolute_pos = Node::get_absolute_pos(root_entity, &entity, &transform_storage, &node_storage);
             button_entities.push((absolute_pos.z as i32, entity.clone(), absolute_pos));
         }
 

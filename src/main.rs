@@ -27,7 +27,6 @@ mod components;
 mod entities;
 mod loader;
 mod renderer;
-mod scene;
 mod settings;
 mod spritesheet;
 mod state;
@@ -45,35 +44,33 @@ use components::{upgrade::{LearnProgress, Upgrade},
                  ClickSound,
                  Color,
                  DeltaTime,
+                 EntityLookup,
                  FloatingText,
                  Gatherer,
                  HighlightTile,
                  Input,
+                 Node,
                  PowerBar,
                  Rect,
                  ResourceCount,
-                 Resources,
                  SelectedTile,
                  Shape,
                  Sprite,
                  StateChange,
                  Text,
                  Tile,
-                 Transform,
-                 Wallet};
+                 Transform};
 
 use gfx::Device;
 use gfx_glyph::{GlyphBrush, GlyphBrushBuilder};
-use glutin::{ElementState, Event, GlContext, MouseButton, VirtualKeyCode, Window, WindowEvent};
+use glutin::{ElementState, Event, GlContext, MouseButton, VirtualKeyCode, WindowEvent};
 use renderer::{ColorFormat, DepthFormat};
 use rodio::Source;
-use scene::Node;
 use specs::{Entity, ReadStorage, World, WriteStorage};
 use spritesheet::Spritesheet;
 use state::play_state::PlayState;
 use state::StateManager;
 use std::ops::DerefMut;
-use std::path::Path;
 use std::time;
 use utils::math;
 
@@ -95,6 +92,7 @@ fn setup_world(world: &mut World, window: &glutin::Window) {
     world.register::<Gatherer>();
     world.register::<HighlightTile>();
     world.register::<LearnProgress>();
+    world.register::<Node>();
     world.register::<PollutionCount>();
     world.register::<PowerBar>();
     world.register::<Rect>();
@@ -185,9 +183,9 @@ fn render_entity<R: gfx::Resources, C: gfx::CommandBuffer<R>, F: gfx::Factory<R>
 }
 
 fn render_node<R: gfx::Resources, C: gfx::CommandBuffer<R>, F: gfx::Factory<R>>(
-    node: &mut Node,
     basic: &mut renderer::Basic<R>,
     encoder: &mut gfx::Encoder<R, C>,
+    entity: Entity,
     world: &World,
     factory: &mut F,
     spritesheet: &Spritesheet,
@@ -200,39 +198,43 @@ fn render_node<R: gfx::Resources, C: gfx::CommandBuffer<R>, F: gfx::Factory<R>>(
     texts: &mut WriteStorage<Text>,
     rects: &ReadStorage<Rect>,
     shapes: &ReadStorage<Shape>,
+    nodes: &mut WriteStorage<Node>,
 ) {
-    node.sort_children(transforms);
-    if let Some(entity) = node.entity {
-        if let Some(transform) = transforms.get(entity) {
-            if !transform.visible {
-                return;
-            }
-            basic.transform(&transform, false);
+    if let Some(transform) = transforms.get(entity) {
+        if !transform.visible {
+            return;
         }
-        render_entity(
-            basic,
-            encoder,
-            world,
-            factory,
-            spritesheet,
-            asset_texture,
-            glyph_brush,
-            &entity,
-            sprites,
-            transforms,
-            animation_sheets,
-            colors,
-            texts,
-            rects,
-            shapes,
-        );
+        basic.transform(&transform, false);
+    }
+    render_entity(
+        basic,
+        encoder,
+        world,
+        factory,
+        spritesheet,
+        asset_texture,
+        glyph_brush,
+        &entity,
+        sprites,
+        transforms,
+        animation_sheets,
+        colors,
+        texts,
+        rects,
+        shapes,
+    );
+
+    let mut entities = Vec::new();
+    if let Some(node) = nodes.get_mut(entity) {
+        node.sort_children(world, transforms);
+        entities.append(&mut node.entities.iter().cloned().collect());
     }
 
-    for node in &mut node.sub_nodes {
+    for entity in &entities {
         render_node(
-            node,
             basic,
             encoder,
+            *entity,
             world,
             factory,
             spritesheet,
@@ -245,13 +247,14 @@ fn render_node<R: gfx::Resources, C: gfx::CommandBuffer<R>, F: gfx::Factory<R>>(
             texts,
             rects,
             shapes,
+            nodes,
         );
     }
 
-    if let Some(entity) = node.entity {
-        if let Some(transform) = transforms.get(entity) {
-            basic.transform(&transform, true);
-        }
+
+
+    if let Some(transform) = transforms.get(entity) {
+        basic.transform(&transform, true);
     }
 }
 
@@ -387,6 +390,12 @@ fn main() {
         encoder.clear_depth(&target.depth, 1.0);
 
         {
+
+            let root_node = {
+                let lookup = world.read_resource::<EntityLookup>();
+                lookup.entities.get("root").unwrap().clone()
+            };
+
             let sprites = world.read_storage::<Sprite>();
             let mut transforms = world.write_storage::<Transform>();
             let animation_sheets = world.read_storage::<AnimationSheet>();
@@ -394,6 +403,7 @@ fn main() {
             let mut texts = world.write_storage::<Text>();
             let rects = world.read_storage::<Rect>();
             let shapes = world.read_storage::<Shape>();
+            let mut nodes = world.write_storage::<Node>();
 
             let mut click_sound_storage = world.write_resource::<ClickSound>();
             let click_sound: &mut ClickSound = click_sound_storage.deref_mut();
@@ -407,21 +417,24 @@ fn main() {
                 sink.detach();
             }
 
-            let scene = state_manager.get_current_scene();
-            let mut scene = scene.lock().unwrap();
-
             if settings.mute_music && !music.is_paused() {
                 music.pause();
             } else if !settings.mute_music && music.is_paused() {
                 music.play();
             }
 
-            scene.sort_children(&mut transforms);
-            for node in &mut scene.sub_nodes {
+            let mut entities = Vec::new();
+            {
+                let node = nodes.get_mut(root_node).unwrap();
+                node.sort_children(&world, &mut transforms);
+                entities.append(&mut node.entities.iter().cloned().collect());
+            }
+
+            for entity in &entities {
                 render_node(
-                    node,
                     &mut basic,
                     &mut encoder,
+                    *entity,
                     &world,
                     &mut factory,
                     &spritesheet,
@@ -434,6 +447,7 @@ fn main() {
                     &mut texts,
                     &rects,
                     &shapes,
+                    &mut nodes,
                 );
             }
         }

@@ -1,16 +1,12 @@
 use components::{Color, DeltaTime, FloatingText, Transform};
-use scene::Node;
 use specs::{Entities, Join, Read, System, WriteStorage};
 use std::ops::Deref;
-use std::sync::{Arc, Mutex};
 
-pub struct FloatingTextSystem {
-    scene: Arc<Mutex<Node>>,
-}
+pub struct FloatingTextSystem;
 
 impl FloatingTextSystem {
-    pub fn new(scene: Arc<Mutex<Node>>) -> Self {
-        FloatingTextSystem { scene }
+    pub fn new() -> Self {
+        FloatingTextSystem { }
     }
 }
 
@@ -48,8 +44,6 @@ impl<'a> System<'a> for FloatingTextSystem {
             color.0[3] = 1.0 - floating_text.time_passed;
 
             if floating_text.time_passed >= 1.0 {
-                let mut scene = self.scene.lock().unwrap();
-                scene.remove_node_with_entity(&entities, entity);
                 entities.delete(entity).unwrap();
             }
         }

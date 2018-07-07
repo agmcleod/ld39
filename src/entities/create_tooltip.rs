@@ -1,11 +1,11 @@
-use components::{Color, Rect, Text, Transform};
-use scene::Node;
-use specs::{Entities, WriteStorage};
+use components::{Color, Node, Rect, Text, Transform};
+use specs::{Entity, Entities, WriteStorage};
 use std::cmp;
 
 pub fn create(
     entities: &Entities,
     color_storage: &mut WriteStorage<Color>,
+    node_storage: &mut WriteStorage<Node>,
     rect_storage: &mut WriteStorage<Rect>,
     text_storage: &mut WriteStorage<Text>,
     transform_storage: &mut WriteStorage<Transform>,
@@ -16,7 +16,7 @@ pub fn create(
     w: u16,
     h: u16,
     text: String,
-) -> Node {
+) -> Entity {
     let background = entities.create();
     transform_storage
         .insert(
@@ -42,10 +42,8 @@ pub fn create(
             Transform::visible(x as f32, y as f32, 50.0, w, h, 0.0, 1.0, 1.0),
         )
         .unwrap();
-    let mut container_node = Node::new(
-        Some(tooltip_container.clone()),
-        Some(vec![Node::new(Some(background), None)]),
-    );
+    let mut container_node = Node::new();
+    container_node.add(background);
 
     let text_entity = entities.create();
     text_storage
@@ -73,7 +71,8 @@ pub fn create(
         .insert(text_entity.clone(), Color([1.0, 1.0, 1.0, 1.0]))
         .unwrap();
 
-    container_node.add(Node::new(Some(text_entity.clone()), None));
+    container_node.add(text_entity);
+    node_storage.insert(tooltip_container, container_node).unwrap();
 
-    container_node
+    tooltip_container
 }

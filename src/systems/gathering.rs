@@ -1,10 +1,8 @@
 use components::{upgrade::Buff, Color, FloatingText, Gatherer, GathererType, GatheringRate,
-                 ResearchedBuffs, Resources, Text, Transform};
+                 Node, ResearchedBuffs, Resources, Text, Transform};
 use entities::create_text;
-use scene::Node;
 use specs::{Entities, Join, Read, System, Write, WriteStorage};
 use std::ops::{Deref, DerefMut};
-use std::sync::{Arc, Mutex};
 use std::time::Instant;
 use storage_types::TextStorage;
 use systems::TICK_RATE;
@@ -12,14 +10,12 @@ use utils::math;
 
 pub struct Gathering {
     gathering_tick: Instant,
-    scene: Arc<Mutex<Node>>,
 }
 
 impl Gathering {
-    pub fn new(scene: Arc<Mutex<Node>>) -> Self {
+    pub fn new() -> Self {
         Gathering {
             gathering_tick: Instant::now(),
-            scene,
         }
     }
 
@@ -40,6 +36,7 @@ impl<'a> System<'a> for Gathering {
         WriteStorage<'a, FloatingText>,
         WriteStorage<'a, Gatherer>,
         Write<'a, GatheringRate>,
+        WriteStorage<'a, Node>,
         Read<'a, ResearchedBuffs>,
         Write<'a, Resources>,
         WriteStorage<'a, Text>,
@@ -53,6 +50,7 @@ impl<'a> System<'a> for Gathering {
             mut floating_text_storage,
             mut gatherer_storage,
             mut gathering_rate_storage,
+            mut node_storage,
             researched_buffs_storage,
             mut resources_storage,
             mut text_storage,
@@ -63,7 +61,6 @@ impl<'a> System<'a> for Gathering {
         let researched_buffs = researched_buffs_storage.deref();
 
         let gathering_rate = gathering_rate_storage.deref_mut();
-        let mut scene = self.scene.lock().unwrap();
 
         if math::get_seconds(&self.gathering_tick.elapsed()) >= TICK_RATE {
             gathering_rate.reset();
@@ -101,7 +98,7 @@ impl<'a> System<'a> for Gathering {
 
                 gathering_rate.add_to_resource_amount(&gatherer.gatherer_type, amount);
 
-                let mut entity_node = scene.get_node_for_entity(entity).unwrap();
+                let mut entity_node = node_storage.get_mut(entity).unwrap();
                 let mut text_storage = TextStorage {
                     entities: &entities,
                     color_storage: &mut color_storage,
@@ -123,9 +120,7 @@ impl<'a> System<'a> for Gathering {
                 floating_text_storage
                     .insert(floating_text.clone(), FloatingText::new())
                     .unwrap();
-                entity_node
-                    .sub_nodes
-                    .push(Node::new(Some(floating_text), None));
+                entity_node.add(floating_text);
             }
             self.gathering_tick = Instant::now();
 
