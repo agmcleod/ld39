@@ -7,10 +7,10 @@ use std::collections::HashSet;
 use std::path::Path;
 
 use components::ui::WalletUI;
-use components::{ui::PollutionCount, Actions, upgrade, Button, CityPowerState, Color, EntityLookup,
-                 GathererPositions, GatheringRate, Node, PowerBar, ProtectedNodes, Rect,
-                 ResearchedBuffs, ResearchingEntities, ResourceCount, ResourceType, Resources,
-                 SelectedTile, Sprite, Text, Tile, TileType, Transform, Wallet,
+use components::{ui::PollutionCount, upgrade, Actions, Button, CityPowerState, Color,
+                 EntityLookup, GathererPositions, GatheringRate, Node, PowerBar, ProtectedNodes,
+                 Rect, ResearchedBuffs, ResearchingEntities, ResourceCount, ResourceType,
+                 Resources, SelectedTile, Sprite, Text, Tile, TileType, Transform, Wallet,
                  CITY_POWER_STATE_COORDS};
 use entities::{create_map, create_power_bar, create_text, tech_tree};
 use rand::{thread_rng, Rng};
@@ -58,22 +58,14 @@ impl<'a> PlayState<'a> {
     pub fn new() -> PlayState<'a> {
         let dispatcher = DispatcherBuilder::new()
             .with(systems::AnimationSystem::new(), "animation_system", &[])
-            .with(
-                systems::ButtonHover{},
-                "button_hover",
-                &[],
-            )
+            .with(systems::ButtonHover {}, "button_hover", &[])
             .with(systems::SellEnergy::new(), "sell_energy", &["button_hover"])
             .with(
-                systems::BuildGatherer{},
+                systems::BuildGatherer {},
                 "build_gatherer",
                 &["button_hover"],
             )
-            .with(
-                systems::TextAbsoluteCache{},
-                "text_absolute_cache",
-                &[],
-            )
+            .with(systems::TextAbsoluteCache {}, "text_absolute_cache", &[])
             .with(
                 systems::TileSelection::new(),
                 "tile_selection",
@@ -98,48 +90,24 @@ impl<'a> PlayState<'a> {
                 "floating_text_system",
                 &[],
             )
-            .with(
-                systems::TogglePause {},
-                "toggle_pause",
-                &["button_hover"],
-            )
+            .with(systems::TogglePause {}, "toggle_pause", &["button_hover"])
             .build();
 
         let tech_tree_dispatcher = DispatcherBuilder::new()
-            .with(
-                systems::ButtonHover {},
-                "button_hover",
-                &[],
-            )
+            .with(systems::ButtonHover {}, "button_hover", &[])
             .with(
                 systems::ToggleTechTree::new(),
                 "toggle_tech_tree",
                 &["button_hover"],
             )
             .with(systems::TechTree::new(), "tech_tree", &[])
-            .with(
-                systems::TextAbsoluteCache {},
-                "text_absolute_cache",
-                &[],
-            )
+            .with(systems::TextAbsoluteCache {}, "text_absolute_cache", &[])
             .build();
 
         let pause_dispatcher = DispatcherBuilder::new()
-            .with(
-                systems::ButtonHover {},
-                "button_hover",
-                &[],
-            )
-            .with(
-                systems::TextAbsoluteCache {},
-                "text_absolute_cache",
-                &[],
-            )
-            .with(
-                systems::TogglePause {},
-                "toggle_pause",
-                &["button_hover"],
-            )
+            .with(systems::ButtonHover {}, "button_hover", &[])
+            .with(systems::TextAbsoluteCache {}, "text_absolute_cache", &[])
+            .with(systems::TogglePause {}, "toggle_pause", &["button_hover"])
             .build();
 
         let dim = renderer::get_dimensions();
@@ -595,10 +563,9 @@ impl<'a> State for PlayState<'a> {
             .with(side_bar_container_node)
             .build();
 
-        lookup.entities.insert(
-            "side_bar_container".to_string(),
-            side_bar_container,
-        );
+        lookup
+            .entities
+            .insert("side_bar_container".to_string(), side_bar_container);
 
         entities_under_root.push(side_bar_container);
 
@@ -662,15 +629,9 @@ impl<'a> State for PlayState<'a> {
         let mut root_node = Node::new();
         root_node.add_many(entities_under_root);
 
-        let root_entity = world.
-            create_entity()
-            .with(root_node)
-            .build();
+        let root_entity = world.create_entity().with(root_node).build();
 
-        lookup.entities.insert(
-            "root".to_string(),
-            root_entity
-        );
+        lookup.entities.insert("root".to_string(), root_entity);
 
         world.add_resource(lookup);
     }
@@ -756,11 +717,7 @@ impl<'a> State for PlayState<'a> {
             .down_from(self.ids.mute_music_label, 25.0)
             .color(conrod::color::rgb(0.0, 1.0, 0.0))
             .w_h(35.0, 35.0)
-            .label(if settings.mute_music {
-                "X"
-            } else {
-                ""
-            })
+            .label(if settings.mute_music { "X" } else { "" })
             .label_color(conrod::color::rgb(0.0, 0.0, 0.0))
             .set(self.ids.mute_music, ui)
             .last()
@@ -778,11 +735,7 @@ impl<'a> State for PlayState<'a> {
             .down_from(self.ids.mute_sound_effects_label, 25.0)
             .color(conrod::color::rgb(0.0, 1.0, 0.0))
             .w_h(35.0, 35.0)
-            .label(if settings.mute_sound_effects {
-                "X"
-            } else {
-                ""
-            })
+            .label(if settings.mute_sound_effects { "X" } else { "" })
             .label_color(conrod::color::rgb(0.0, 0.0, 0.0))
             .set(self.ids.mute_sound_effects, ui)
             .last()

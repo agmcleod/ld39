@@ -251,8 +251,6 @@ fn render_node<R: gfx::Resources, C: gfx::CommandBuffer<R>, F: gfx::Factory<R>>(
         );
     }
 
-
-
     if let Some(transform) = transforms.get(entity) {
         basic.transform(&transform, true);
     }
@@ -390,7 +388,6 @@ fn main() {
         encoder.clear_depth(&target.depth, 1.0);
 
         {
-
             let root_node = {
                 let lookup = world.read_resource::<EntityLookup>();
                 lookup.entities.get("root").unwrap().clone()

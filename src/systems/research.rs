@@ -16,7 +16,7 @@ pub struct Research;
 
 impl Research {
     pub fn new() -> Self {
-        Research { }
+        Research {}
     }
 
     fn research_finished(&self, buff: Buff, researched_buffs: &mut ResearchedBuffs) {

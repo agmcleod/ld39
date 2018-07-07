@@ -12,7 +12,7 @@ pub struct Actions {
 
 impl Actions {
     pub fn new() -> Self {
-        Actions{
+        Actions {
             actions: Vec::new(),
         }
     }

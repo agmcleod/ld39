@@ -1,5 +1,5 @@
-use components::{upgrade::Buff, Color, FloatingText, Gatherer, GathererType, GatheringRate,
-                 Node, ResearchedBuffs, Resources, Text, Transform};
+use components::{upgrade::Buff, Color, FloatingText, Gatherer, GathererType, GatheringRate, Node,
+                 ResearchedBuffs, Resources, Text, Transform};
 use entities::create_text;
 use specs::{Entities, Join, Read, System, Write, WriteStorage};
 use std::ops::{Deref, DerefMut};

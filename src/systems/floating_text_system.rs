@@ -6,7 +6,7 @@ pub struct FloatingTextSystem;
 
 impl FloatingTextSystem {
     pub fn new() -> Self {
-        FloatingTextSystem { }
+        FloatingTextSystem {}
     }
 }
 

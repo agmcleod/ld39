@@ -60,9 +60,7 @@ impl ToggleTechTree {
                     color_storage,
                     rect_storage,
                 );
-                lookup
-                    .entities
-                    .insert("pause_black".to_string(), rect);
+                lookup.entities.insert("pause_black".to_string(), rect);
                 let node = logic::get_root(&lookup, node_storage);
                 node.add(rect);
 

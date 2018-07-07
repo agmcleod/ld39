@@ -138,7 +138,8 @@ impl<'a> System<'a> for TechTree {
         for (entity, _, transform) in
             (&*entities, &tech_tree_node_storage, &transform_storage).join()
         {
-            let absolute_pos = Node::get_absolute_pos(root_entity, &entity, &transform_storage, &node_storage);
+            let absolute_pos =
+                Node::get_absolute_pos(root_entity, &entity, &transform_storage, &node_storage);
             let abs_transform = Transform::visible(
                 absolute_pos.x,
                 absolute_pos.y,
@@ -200,8 +201,7 @@ impl<'a> System<'a> for TechTree {
                     tech_tree_node_ui.text.clone(),
                 );
                 self.current_tooltip = Some(tooltip_entity.clone());
-                self.current_tech_tree_node_entity =
-                    Some(mouse_over_tech_tree_node_entity.clone());
+                self.current_tech_tree_node_entity = Some(mouse_over_tech_tree_node_entity.clone());
 
                 let mut text_storage_type = TextStorage {
                     entities: &entities,

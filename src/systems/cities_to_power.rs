@@ -78,9 +78,7 @@ impl<'a> System<'a> for CitiesToPower {
                 40 + (20 * (city_power_state.current_city_count as i32 - 1)),
             );
 
-            let side_bar_container = {
-                entity_lookup.get("side_bar_container").unwrap().clone()
-            };
+            let side_bar_container = { entity_lookup.get("side_bar_container").unwrap().clone() };
             let node = node_storage.get_mut(side_bar_container).unwrap();
             node.add(entity);
 

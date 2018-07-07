@@ -17,8 +17,15 @@ impl<'a> System<'a> for ButtonHover {
     );
 
     fn run(&mut self, data: Self::SystemData) {
-        let (entities, mut button_storage, entity_lookup_storage, input_storage, node_storage, transform_storage, mut sprite_storage) =
-            data;
+        let (
+            entities,
+            mut button_storage,
+            entity_lookup_storage,
+            input_storage,
+            node_storage,
+            transform_storage,
+            mut sprite_storage,
+        ) = data;
 
         let input: &Input = input_storage.deref();
 
@@ -39,7 +46,8 @@ impl<'a> System<'a> for ButtonHover {
         ).join()
         {
             button.mouse_is_over = false;
-            let absolute_pos = Node::get_absolute_pos(root_entity, &entity, &transform_storage, &node_storage);
+            let absolute_pos =
+                Node::get_absolute_pos(root_entity, &entity, &transform_storage, &node_storage);
             button_entities.push((absolute_pos.z as i32, entity.clone(), absolute_pos));
         }
 

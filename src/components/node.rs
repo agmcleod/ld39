@@ -1,6 +1,6 @@
 use cgmath::Vector3;
-use specs::{Component, Entity, VecStorage, World, WriteStorage};
 use components::Transform;
+use specs::{Component, Entity, VecStorage, World, WriteStorage};
 use std::cmp;
 
 #[derive(Default)]
@@ -11,7 +11,7 @@ pub struct Node {
 
 impl Node {
     pub fn new() -> Self {
-        Node{
+        Node {
             entities: Vec::new(),
             children_dirty: false,
         }
@@ -45,7 +45,13 @@ impl Node {
         if !found_entity {
             if let Some(node) = node_storage.get(*current_entity) {
                 for entity in &node.entities {
-                    if Node::check_node(entity, target_entity, position, node_storage, transform_storage) {
+                    if Node::check_node(
+                        entity,
+                        target_entity,
+                        position,
+                        node_storage,
+                        transform_storage,
+                    ) {
                         return true;
                     }
                 }
@@ -78,7 +84,13 @@ impl Node {
 
         let node = node_storage.get(*current_entity).unwrap();
         for entity in &node.entities {
-            if Node::check_node(entity, target_entity, &mut position, node_storage, transform_storage) {
+            if Node::check_node(
+                entity,
+                target_entity,
+                &mut position,
+                node_storage,
+                transform_storage,
+            ) {
                 break;
             }
         }
@@ -96,7 +108,11 @@ impl Node {
         self.children_dirty = true;
     }
 
-    pub fn sort_children<'a>(&mut self, world: &World, transform_storage: &WriteStorage<'a, Transform>) {
+    pub fn sort_children<'a>(
+        &mut self,
+        world: &World,
+        transform_storage: &WriteStorage<'a, Transform>,
+    ) {
         if self.children_dirty {
             let mut to_remove = Vec::new();
             for (i, entity) in self.entities.iter().enumerate() {
@@ -113,13 +129,13 @@ impl Node {
                 let transform_a = if let Some(t) = transform_storage.get(*entity_a) {
                     t
                 } else {
-                    return cmp::Ordering::Greater
+                    return cmp::Ordering::Greater;
                 };
 
                 let transform_b = if let Some(t) = transform_storage.get(*entity_b) {
                     t
                 } else {
-                    return cmp::Ordering::Greater
+                    return cmp::Ordering::Greater;
                 };
 
                 (transform_a.get_pos().z as i32).cmp(&(transform_b.get_pos().z as i32))

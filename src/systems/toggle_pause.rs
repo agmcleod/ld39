@@ -58,7 +58,8 @@ impl<'a> System<'a> for TogglePause {
         };
 
         if *internal_state == InternalState::Pause
-            && (*input.pressed_keys.get(&VirtualKeyCode::Escape).unwrap() || action_name == "resume_game")
+            && (*input.pressed_keys.get(&VirtualKeyCode::Escape).unwrap()
+                || action_name == "resume_game")
         {
             let lookup = entity_lookup_storage.deref_mut();
             {
@@ -84,9 +85,7 @@ impl<'a> System<'a> for TogglePause {
                 &mut rect_storage,
             );
             let lookup: &mut EntityLookup = entity_lookup_storage.deref_mut();
-            lookup
-                .entities
-                .insert("pause_black".to_string(), entity);
+            lookup.entities.insert("pause_black".to_string(), entity);
             let root_node = logic::get_root(&lookup, &mut node_storage);
             root_node.add(entity);
             let state_change: &mut StateChange = state_change_storage.deref_mut();

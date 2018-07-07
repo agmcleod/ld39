@@ -1,5 +1,5 @@
 use components::{Color, Node, Rect, Text, Transform};
-use specs::{Entity, Entities, WriteStorage};
+use specs::{Entities, Entity, WriteStorage};
 use std::cmp;
 
 pub fn create(
@@ -72,7 +72,9 @@ pub fn create(
         .unwrap();
 
     container_node.add(text_entity);
-    node_storage.insert(tooltip_container, container_node).unwrap();
+    node_storage
+        .insert(tooltip_container, container_node)
+        .unwrap();
 
     tooltip_container
 }

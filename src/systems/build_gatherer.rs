@@ -167,7 +167,6 @@ impl<'a> System<'a> for BuildGatherer {
                                     .insert(pollution_entity, Color([1.0, 1.0, 1.0, 1.0]))
                                     .unwrap();
 
-
                                 let node = logic::get_root(&lookup, &mut nodes_storage);
                                 node.add(pollution_entity);
                             }

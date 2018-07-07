@@ -1,5 +1,5 @@
 use components::{Color, Rect, Transform};
-use specs::{Entity, Entities, WriteStorage};
+use specs::{Entities, Entity, WriteStorage};
 
 pub fn create(
     x: f32,

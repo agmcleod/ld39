@@ -1,5 +1,5 @@
-use components::{Button, Color, EntityLookup, Gatherer, Input, Node, Rect, ResearchedBuffs, SelectedTile, Sprite,
-                 Tile, Transform};
+use components::{Button, Color, EntityLookup, Gatherer, Input, Node, Rect, ResearchedBuffs,
+                 SelectedTile, Sprite, Tile, Transform};
 use entities::create_build_ui;
 use specs::{Entities, Entity, Join, Read, ReadStorage, System, WriteStorage};
 use std::ops::Deref;
@@ -107,7 +107,10 @@ impl<'a> System<'a> for TileSelection {
                 self.build_ui_entity = Some(entity);
 
                 let lookup = entity_lookup_storage.deref();
-                node_storage.get_mut(*lookup.get("root").unwrap()).unwrap().add(entity);
+                node_storage
+                    .get_mut(*lookup.get("root").unwrap())
+                    .unwrap()
+                    .add(entity);
             }
         } else {
             for (_, transform) in (&selected_tile_storage, &transform_storage).join() {
