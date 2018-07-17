@@ -144,7 +144,7 @@
         "status": "Locked",
         "x": 0.85,
         "y_tier": 5,
-        "description": "+1 more energy harvested from the solar plants",
+        "description": "+2 more energy harvested from the solar plants",
         "frame_name": "improvedpaneltech.png"
       }]
     }]

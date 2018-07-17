@@ -38,7 +38,6 @@ use components::ui::{PollutionCount, TechTreeButton, WalletUI};
 use components::{upgrade::{LearnProgress, Upgrade},
                  Actions,
                  AnimationSheet,
-                 BuildCost,
                  Button,
                  Camera,
                  ClickSound,
@@ -85,7 +84,6 @@ fn setup_world(world: &mut World, window: &glutin::Window) {
     world.add_resource::<DeltaTime>(DeltaTime { dt: 0.0 });
     world.add_resource(Actions::new());
     world.register::<AnimationSheet>();
-    world.register::<BuildCost>();
     world.register::<Button>();
     world.register::<Color>();
     world.register::<FloatingText>();

@@ -3,12 +3,13 @@ use components::{ui::{PollutionCount, WalletUI},
                  DeltaTime,
                  Gatherer,
                  GathererType,
+                 GatheringRate,
                  ResearchedBuffs,
                  Text,
                  Wallet};
 use specs::{Join, Read, ReadStorage, System, Write, WriteStorage};
 use std::ops::{Deref, DerefMut};
-use systems::logic;
+use systems::{logic, TICK_RATE};
 
 pub struct Pollution {
     ticker: f32,
@@ -24,6 +25,7 @@ impl<'a> System<'a> for Pollution {
     type SystemData = (
         Read<'a, DeltaTime>,
         ReadStorage<'a, Gatherer>,
+        Read<'a, GatheringRate>,
         WriteStorage<'a, PollutionCount>,
         Read<'a, ResearchedBuffs>,
         WriteStorage<'a, Text>,
@@ -35,6 +37,7 @@ impl<'a> System<'a> for Pollution {
         let (
             delta_time_storage,
             gatherer_storage,
+            gathering_rate_storage,
             mut pollution_count_storage,
             researched_buffs_storage,
             mut text_storage,
@@ -44,7 +47,7 @@ impl<'a> System<'a> for Pollution {
 
         self.ticker += delta_time_storage.deref().dt;
 
-        if self.ticker < 1.0 {
+        if self.ticker < TICK_RATE {
             return;
         }
 
@@ -88,7 +91,10 @@ impl<'a> System<'a> for Pollution {
 
         if pollution > 0 {
             let wallet = wallet_storage.deref_mut();
-            wallet.money -= pollution;
+            let total_gathering_rate =
+                logic::get_total_gathering_rate(&gathering_rate_storage.deref());
+            println!("tgr: {}", total_gathering_rate);
+            wallet.money -= (total_gathering_rate as f32 * (pollution as f32 / 100.0)) as i32;
             logic::update_text(
                 format!("{}", wallet.money),
                 &mut text_storage,
@@ -98,7 +104,7 @@ impl<'a> System<'a> for Pollution {
             for (pollution_count, text) in (&mut pollution_count_storage, &mut text_storage).join()
             {
                 pollution_count.count = pollution;
-                text.set_text(format!("Pollution: {}", pollution));
+                text.set_text(format!("Pollution tax: {}%", pollution));
             }
         }
     }

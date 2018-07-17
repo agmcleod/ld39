@@ -1,6 +1,5 @@
 mod actions;
 mod animation_sheet;
-mod build_cost;
 mod button;
 mod camera;
 mod city_power_state;
@@ -36,7 +35,6 @@ pub mod ui;
 
 pub use self::actions::*;
 pub use self::animation_sheet::*;
-pub use self::build_cost::*;
 pub use self::button::*;
 pub use self::camera::*;
 pub use self::city_power_state::*;

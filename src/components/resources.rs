@@ -39,28 +39,29 @@ impl Resources {
     }
 
     pub fn withdraw_amount_for_type(&mut self, resource_type: ResourceType, amount: i32) -> i32 {
+        let rate = resource_type.get_efficiency_rate();
         match resource_type {
             ResourceType::Coal => {
                 let mut amt = cmp::min(self.coal, amount);
-                amt = amt / 4 * 4;
+                amt = amt / rate * rate;
                 self.coal -= amt;
                 amt / 4
             }
             ResourceType::Oil => {
                 let mut amt = cmp::min(self.oil, amount);
-                amt = amt / 3 * 3;
+                amt = amt / rate * rate;
                 self.oil -= amt;
                 amt / 3
             }
             ResourceType::Solar => {
                 let mut amt = cmp::min(self.solar, amount);
-                amt = amt / 2 * 2;
+                amt = amt / rate * rate;
                 self.solar -= amt;
                 amt
             }
             ResourceType::Hydro => {
                 let mut amt = cmp::min(self.hydro, amount);
-                amt = amt / 2 * 2;
+                amt = amt / rate * rate;
                 self.hydro -= amt;
                 amt
             }

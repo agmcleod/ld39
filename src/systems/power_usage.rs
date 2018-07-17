@@ -4,7 +4,7 @@ use specs::{Join, Read, ReadStorage, System, Write, WriteStorage};
 use state::play_state::PlayState;
 use std::ops::{Deref, DerefMut};
 use std::time::Instant;
-use systems::{POWER_FACTOR, TICK_RATE};
+use systems::{logic, POWER_FACTOR, TICK_RATE};
 
 pub struct PowerUsage {
     instant: Instant,
@@ -88,10 +88,7 @@ impl<'b> System<'b> for PowerUsage {
             .fold(0, |sum, power_bar| sum + power_bar.power_per_tick)
             / POWER_FACTOR;
 
-        let total_gathering_rate = gathering_rate.coal / ResourceType::Coal.get_efficiency_rate()
-            + gathering_rate.oil / ResourceType::Oil.get_efficiency_rate()
-            + gathering_rate.solar / ResourceType::Solar.get_efficiency_rate()
-            + gathering_rate.hydro / ResourceType::Hydro.get_efficiency_rate();
+        let total_gathering_rate = logic::get_total_gathering_rate(&gathering_rate);
 
         text_storage.get_mut(*power_gain_entity).unwrap().text =
             format!("Power: {}", total_gathering_rate - power_demands);

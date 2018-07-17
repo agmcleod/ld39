@@ -6,12 +6,11 @@ use state::State;
 use std::collections::HashSet;
 use std::path::Path;
 
-use components::ui::WalletUI;
-use components::{ui::PollutionCount, upgrade, Actions, Button, CityPowerState, Color,
+use components::{ui::{PollutionCount, WalletUI}, upgrade, Actions, Button, CityPowerState, Color,
                  EntityLookup, GathererPositions, GatheringRate, Node, PowerBar, ProtectedNodes,
                  Rect, ResearchedBuffs, ResearchingEntities, ResourceCount, ResourceType,
                  Resources, SelectedTile, Sprite, Text, Tile, TileType, Transform, Wallet,
-                 CITY_POWER_STATE_COORDS};
+                 CITY_POWER_STATE_COORDS, upgrade::{Buff}};
 use entities::{create_map, create_power_bar, create_text, tech_tree};
 use rand::{thread_rng, Rng};
 use renderer;
@@ -79,7 +78,7 @@ impl<'a> PlayState<'a> {
                 &["button_hover"],
             )
             .with(systems::Research::new(), "research", &[])
-            .with(systems::Pollution::new(), "pollution", &[])
+            .with(systems::Pollution::new(), "pollution", &["gathering"])
             .with(
                 systems::CitiesToPower {},
                 "cities_to_power",
@@ -350,10 +349,10 @@ impl<'a> State for PlayState<'a> {
             .with(Transform::visible(33.0, 390.0, 0.0, 200, 32, 0.0, 1.0, 1.0))
             .with(PollutionCount { count: 0 })
             .with(Text::new_with_text(
-                32.0,
-                200,
+                28.0,
+                280,
                 32,
-                "Pollution: 0".to_string(),
+                "Pollution tax: 0%".to_string(),
             ))
             .with(Color([0.0, 1.0, 0.0, 1.0]))
             .build();
@@ -589,7 +588,11 @@ impl<'a> State for PlayState<'a> {
             .build();
 
         world.add_resource::<tech_tree::TechTreeNode>(tech_tree_node);
-        world.add_resource::<ResearchedBuffs>(ResearchedBuffs(HashSet::new()));
+        let mut researched_buffs = ResearchedBuffs(HashSet::new());
+        researched_buffs.0.insert(Buff::Coal);
+        researched_buffs.0.insert(Buff::Oil);
+        researched_buffs.0.insert(Buff::Solar);
+        world.add_resource::<ResearchedBuffs>(researched_buffs);
         world.add_resource::<ResearchingEntities>(ResearchingEntities::new());
 
         lookup

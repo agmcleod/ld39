@@ -1,5 +1,5 @@
 use components::{Button, Color, EntityLookup, Gatherer, Input, Node, Rect, ResearchedBuffs,
-                 SelectedTile, Sprite, Tile, Transform};
+                 SelectedTile, Sprite, Text, Tile, Transform};
 use entities::create_build_ui;
 use specs::{Entities, Entity, Join, Read, ReadStorage, System, WriteStorage};
 use std::ops::Deref;
@@ -29,6 +29,7 @@ impl<'a> System<'a> for TileSelection {
         Read<'a, ResearchedBuffs>,
         ReadStorage<'a, SelectedTile>,
         WriteStorage<'a, Sprite>,
+        WriteStorage<'a, Text>,
         ReadStorage<'a, Tile>,
         WriteStorage<'a, Transform>,
     );
@@ -46,6 +47,7 @@ impl<'a> System<'a> for TileSelection {
             researched_buffs,
             selected_tile_storage,
             mut sprite_storage,
+            mut text_storage,
             tile_storage,
             mut transform_storage,
         ) = data;
@@ -101,6 +103,7 @@ impl<'a> System<'a> for TileSelection {
                     &mut node_storage,
                     &mut rect_storage,
                     &mut sprite_storage,
+                    &mut text_storage,
                     &mut transform_storage,
                     &researched_buffs,
                 );

@@ -23,7 +23,7 @@ impl Gathering {
         match *gatherer_type {
             GathererType::Coal => 12,
             GathererType::Oil => 16,
-            GathererType::Solar => 19,
+            GathererType::Solar => 14,
             GathererType::Hydro => 22,
         }
     }
@@ -92,7 +92,7 @@ impl<'a> System<'a> for Gathering {
                     }
                 } else if gatherer.gatherer_type == GathererType::Solar {
                     if researched_buffs.0.contains(&Buff::ImprovePanelTech) {
-                        amount += 1;
+                        amount += 2;
                     }
                 }
 
