@@ -590,8 +590,6 @@ impl<'a> State for PlayState<'a> {
         world.add_resource::<tech_tree::TechTreeNode>(tech_tree_node);
         let mut researched_buffs = ResearchedBuffs(HashSet::new());
         researched_buffs.0.insert(Buff::Coal);
-        researched_buffs.0.insert(Buff::Oil);
-        researched_buffs.0.insert(Buff::Solar);
         world.add_resource::<ResearchedBuffs>(researched_buffs);
         world.add_resource::<ResearchingEntities>(ResearchingEntities::new());
 
