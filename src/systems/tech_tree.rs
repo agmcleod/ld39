@@ -199,6 +199,7 @@ impl<'a> System<'a> for TechTree {
                     160,
                     160,
                     tech_tree_node_ui.text.clone(),
+                    None,
                 );
                 self.current_tooltip = Some(tooltip_entity.clone());
                 self.current_tech_tree_node_entity = Some(mouse_over_tech_tree_node_entity.clone());

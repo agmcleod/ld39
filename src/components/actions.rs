@@ -1,3 +1,5 @@
+use std::collections::HashSet;
+
 // Idea with this component is to dispatch arbitrary actions
 // potential maybe to refactor other more specific types
 
@@ -7,13 +9,13 @@
 
 #[derive(Default)]
 pub struct Actions {
-    pub actions: Vec<String>,
+    pub actions: HashSet<String>,
 }
 
 impl Actions {
     pub fn new() -> Self {
         Actions {
-            actions: Vec::new(),
+            actions: HashSet::new(),
         }
     }
 
@@ -22,7 +24,7 @@ impl Actions {
     }
 
     pub fn dispatch(&mut self, name: String) {
-        self.actions.push(name);
+        self.actions.insert(name);
     }
 
     pub fn clear(&mut self) {

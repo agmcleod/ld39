@@ -34,7 +34,7 @@ mod storage_types;
 mod systems;
 mod utils;
 
-use components::ui::{PollutionCount, TechTreeButton, WalletUI};
+use components::ui::{PollutionCount, TechTreeButton, TutorialUI, WalletUI};
 use components::{upgrade::{LearnProgress, Upgrade},
                  Actions,
                  AnimationSheet,
@@ -105,6 +105,7 @@ fn setup_world(world: &mut World, window: &glutin::Window) {
     world.register::<Text>();
     world.register::<Tile>();
     world.register::<Transform>();
+    world.register::<TutorialUI>();
     world.register::<Upgrade>();
     world.register::<WalletUI>();
 }

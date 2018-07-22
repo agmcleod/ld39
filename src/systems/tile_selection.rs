@@ -1,8 +1,9 @@
-use components::{Button, Color, EntityLookup, Gatherer, Input, Node, Rect, ResearchedBuffs,
-                 SelectedTile, Sprite, Text, Tile, Transform};
-use entities::create_build_ui;
-use specs::{Entities, Entity, Join, Read, ReadStorage, System, WriteStorage};
-use std::ops::Deref;
+use components::{Actions, Button, Color, EntityLookup, Gatherer, Input, Node, Rect, ResearchedBuffs,
+                 SelectedTile, Sprite, Text, Tile, TutorialStep, Transform, ui::TutorialUI};
+use entities::{create_build_ui, tutorial};
+use specs::{Entities, Entity, Join, Read, ReadStorage, System, Write, WriteStorage};
+use std::ops::{Deref, DerefMut};
+use systems::logic;
 
 pub struct TileSelection {
     build_ui_entity: Option<Entity>,
@@ -19,6 +20,7 @@ impl TileSelection {
 impl<'a> System<'a> for TileSelection {
     type SystemData = (
         Entities<'a>,
+        Write<'a, Actions>,
         WriteStorage<'a, Button>,
         WriteStorage<'a, Color>,
         Read<'a, EntityLookup>,
@@ -32,11 +34,14 @@ impl<'a> System<'a> for TileSelection {
         WriteStorage<'a, Text>,
         ReadStorage<'a, Tile>,
         WriteStorage<'a, Transform>,
+        Write<'a, TutorialStep>,
+        ReadStorage<'a, TutorialUI>,
     );
 
     fn run(&mut self, data: Self::SystemData) {
         let (
             entities,
+            mut actions_storage,
             mut button_storage,
             mut color_storage,
             entity_lookup_storage,
@@ -50,6 +55,8 @@ impl<'a> System<'a> for TileSelection {
             mut text_storage,
             tile_storage,
             mut transform_storage,
+            mut tutorial_step_storage,
+            tutorial_ui_storage,
         ) = data;
 
         let input: &Input = input_storage.deref();
@@ -89,6 +96,7 @@ impl<'a> System<'a> for TileSelection {
 
                 // if build UI showing, clean it up, as tile type may be different
                 if let Some(build_ui_entity) = self.build_ui_entity {
+                    println!("Delete build ui {:?}", build_ui_entity);
                     entities.delete(build_ui_entity).unwrap();
                     self.build_ui_entity = None;
                 }
@@ -110,15 +118,26 @@ impl<'a> System<'a> for TileSelection {
                 self.build_ui_entity = Some(entity);
 
                 let lookup = entity_lookup_storage.deref();
-                node_storage
-                    .get_mut(*lookup.get("root").unwrap())
-                    .unwrap()
-                    .add(entity);
+
+                let node = logic::get_root(lookup, &mut node_storage);
+                node.add(entity);
+
+                tutorial::next_step(
+                    &entities,
+                    &mut actions_storage,
+                    &mut tutorial_step_storage,
+                    &tutorial_ui_storage,
+                    TutorialStep::SelectTile,
+                    TutorialStep::BuildCoal,
+                );
             }
+
         } else {
             for (_, transform) in (&selected_tile_storage, &transform_storage).join() {
+                // if selected tile as hidden, clear out build entity
                 if !transform.visible {
                     if let Some(build_ui_entity) = self.build_ui_entity {
+                        println!("Delete build ui {:?}", build_ui_entity);
                         entities.delete(build_ui_entity).unwrap();
                         self.build_ui_entity = None;
                     }

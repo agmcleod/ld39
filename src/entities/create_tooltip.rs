@@ -16,8 +16,15 @@ pub fn create(
     w: u16,
     h: u16,
     text: String,
+    color: Option<Color>,
 ) -> Entity {
     let background = entities.create();
+    let color = if let Some(color) = color {
+        color
+    } else {
+        Color([0.0, 0.0, 0.0, 0.6])
+    };
+
     transform_storage
         .insert(
             background.clone(),
@@ -25,7 +32,7 @@ pub fn create(
         )
         .unwrap();
     color_storage
-        .insert(background.clone(), Color([0.0, 0.0, 0.0, 0.6]))
+        .insert(background.clone(), color)
         .unwrap();
     rect_storage.insert(background.clone(), Rect {}).unwrap();
 

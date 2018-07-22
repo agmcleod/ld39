@@ -248,6 +248,7 @@ pub fn create<'a, 'b: 'a>(
     let mut node = Node::new();
     node.add_many(new_entities);
     node_storage.insert(container_entity, node).unwrap();
+    println!("created build ui. container: {:?}", container_entity);
 
     container_entity
 }
