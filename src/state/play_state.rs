@@ -206,6 +206,11 @@ impl<'a> State for PlayState<'a> {
                     .with(tile)
                     .build();
 
+                if tile_type != TileType::Open {
+                    // replace the empty entity at this position with the entity
+                    set_nodes.insert((col, row), (tile_type, Some(tile_entity.clone())));
+                }
+
                 entities_under_root.push(tile_entity);
             }
         }
