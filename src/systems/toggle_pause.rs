@@ -51,15 +51,10 @@ impl<'a> System<'a> for TogglePause {
         }
 
         let actions: &Actions = actions_storage.deref();
-        let action_name = if let Some(action) = actions.next() {
-            action
-        } else {
-            "".to_string()
-        };
 
         if *internal_state == InternalState::Pause
             && (*input.pressed_keys.get(&VirtualKeyCode::Escape).unwrap()
-                || action_name == "resume_game")
+                || actions.action_fired("resume_game"))
         {
             let lookup = entity_lookup_storage.deref_mut();
             {

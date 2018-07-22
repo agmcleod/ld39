@@ -7,7 +7,7 @@
 
 #[derive(Default)]
 pub struct Actions {
-    actions: Vec<String>,
+    pub actions: Vec<String>,
 }
 
 impl Actions {
@@ -17,17 +17,12 @@ impl Actions {
         }
     }
 
-    pub fn dispatch(&mut self, name: String) {
-        self.actions.push(name);
+    pub fn action_fired(&self, name: &str) -> bool {
+        self.actions.contains(&String::from(name))
     }
 
-    pub fn next(&self) -> Option<String> {
-        if self.actions.len() > 0 {
-            let index = self.actions.len() - 1;
-            Some((self.actions.get(index).unwrap()).clone())
-        } else {
-            None
-        }
+    pub fn dispatch(&mut self, name: String) {
+        self.actions.push(name);
     }
 
     pub fn clear(&mut self) {

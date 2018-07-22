@@ -1,9 +1,10 @@
-use components::{Button, Color, GathererType, Node, Rect, ResearchedBuffs, Sprite, Text, TileType, Transform};
-use entities::{create_colored_rect, tech_tree::Buff, create_text};
+use components::{Button, Color, GathererType, Node, Rect, ResearchedBuffs, Sprite, Text, TileType,
+                 Transform};
+use entities::{create_colored_rect, create_text, tech_tree::Buff};
 use renderer;
 use specs::{Entities, Entity, WriteStorage};
-use storage_types::TextStorage;
 use std::cmp;
+use storage_types::TextStorage;
 
 const SPACING_F: f32 = 10.0;
 const SPACING: u16 = SPACING_F as u16;
@@ -60,7 +61,12 @@ pub fn create<'a, 'b: 'a>(
             .unwrap();
         new_entities.push(coal_entity);
         let text = create_text::create(
-            &mut TextStorage{ entities, color_storage, text_storage, transform_storage },
+            &mut TextStorage {
+                entities,
+                color_storage,
+                text_storage,
+                transform_storage,
+            },
             format!("${}", GathererType::Coal.get_build_cost()),
             16.0,
             29.0,
@@ -68,7 +74,7 @@ pub fn create<'a, 'b: 'a>(
             0.0,
             50,
             20,
-            Color([0.0, 1.0, 0.0, 1.0])
+            Color([0.0, 1.0, 0.0, 1.0]),
         );
         new_entities.push(text);
     }
@@ -78,7 +84,16 @@ pub fn create<'a, 'b: 'a>(
         transform_storage
             .insert(
                 oil_entity,
-                Transform::visible(SPACING_F, CELL_HEIGHT as f32, 0.0, SIZE, SIZE, 0.0, 1.0, 1.0),
+                Transform::visible(
+                    SPACING_F,
+                    CELL_HEIGHT as f32,
+                    0.0,
+                    SIZE,
+                    SIZE,
+                    0.0,
+                    1.0,
+                    1.0,
+                ),
             )
             .unwrap();
         button_storage
@@ -104,7 +119,12 @@ pub fn create<'a, 'b: 'a>(
 
         new_entities.push(oil_entity);
         let text = create_text::create(
-            &mut TextStorage{ entities, color_storage, text_storage, transform_storage },
+            &mut TextStorage {
+                entities,
+                color_storage,
+                text_storage,
+                transform_storage,
+            },
             format!("${}", GathererType::Oil.get_build_cost()),
             16.0,
             29.0,
@@ -112,7 +132,7 @@ pub fn create<'a, 'b: 'a>(
             0.0,
             50,
             20,
-            Color([0.0, 1.0, 0.0, 1.0])
+            Color([0.0, 1.0, 0.0, 1.0]),
         );
         new_entities.push(text);
     }
@@ -148,7 +168,12 @@ pub fn create<'a, 'b: 'a>(
 
         new_entities.push(solar_entity);
         let text = create_text::create(
-            &mut TextStorage{ entities, color_storage, text_storage, transform_storage },
+            &mut TextStorage {
+                entities,
+                color_storage,
+                text_storage,
+                transform_storage,
+            },
             format!("${}", GathererType::Oil.get_build_cost()),
             16.0,
             102.0,
@@ -156,7 +181,7 @@ pub fn create<'a, 'b: 'a>(
             0.0,
             50,
             20,
-            Color([0.0, 1.0, 0.0, 1.0])
+            Color([0.0, 1.0, 0.0, 1.0]),
         );
         new_entities.push(text);
     }
@@ -198,11 +223,13 @@ pub fn create<'a, 'b: 'a>(
     let dim = renderer::get_dimensions();
 
     let x = cmp::max(
-        0, cmp::min(x as i32, dim[0] as i32 - CONTAINER_WIDTH as i32)
+        0,
+        cmp::min(x as i32, dim[0] as i32 - CONTAINER_WIDTH as i32),
     );
 
     let y = cmp::max(
-        0, cmp::min(y as i32, dim[1] as i32 - CONTAINER_HEIGHT as i32)
+        0,
+        cmp::min(y as i32, dim[1] as i32 - CONTAINER_HEIGHT as i32),
     );
 
     let container_entity = create_colored_rect::create(
@@ -215,7 +242,7 @@ pub fn create<'a, 'b: 'a>(
         entities,
         transform_storage,
         color_storage,
-        rect_storage
+        rect_storage,
     );
 
     let mut node = Node::new();

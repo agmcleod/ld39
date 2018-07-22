@@ -12,6 +12,8 @@ pub struct Settings {
     pub mute_music: bool,
     #[serde(default)]
     pub mute_sound_effects: bool,
+    #[serde(default)]
+    pub completed_tutorial: bool,
 }
 
 impl Settings {
@@ -35,6 +37,11 @@ impl Settings {
         self.save();
     }
 
+    pub fn set_completed_tutorial(&mut self, completed: bool) {
+        self.completed_tutorial = completed;
+        self.save();
+    }
+
     fn save(&self) {
         let text = serde_json::to_string(&self).unwrap();
         fs::write(get_exe_path().join("settings.json").to_str().unwrap(), text)
@@ -49,6 +56,7 @@ impl Default for Settings {
             sound_volume: 0.5,
             mute_music: false,
             mute_sound_effects: false,
+            completed_tutorial: false,
         }
     }
 }

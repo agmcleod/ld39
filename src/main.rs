@@ -50,6 +50,7 @@ use components::{upgrade::{LearnProgress, Upgrade},
                  Input,
                  Node,
                  PowerBar,
+                 Pulse,
                  Rect,
                  ResourceCount,
                  SelectedTile,
@@ -58,7 +59,8 @@ use components::{upgrade::{LearnProgress, Upgrade},
                  StateChange,
                  Text,
                  Tile,
-                 Transform};
+                 Transform,
+                 TutorialStep};
 
 use gfx::Device;
 use gfx_glyph::{GlyphBrush, GlyphBrushBuilder};
@@ -93,6 +95,7 @@ fn setup_world(world: &mut World, window: &glutin::Window) {
     world.register::<Node>();
     world.register::<PollutionCount>();
     world.register::<PowerBar>();
+    world.register::<Pulse>();
     world.register::<Rect>();
     world.register::<ResourceCount>();
     world.register::<SelectedTile>();
@@ -306,6 +309,13 @@ fn main() {
         window.hidpi_factor() as f64,
     ).unwrap();
     let image_map = conrod::image::Map::new();
+
+    {
+        let mut actions = world.write_resource::<Actions>();
+        if !settings.completed_tutorial {
+            actions.dispatch(TutorialStep::SelectTile.as_string());
+        }
+    }
 
     while running {
         let duration = time::Instant::now() - frame_start;

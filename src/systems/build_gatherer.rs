@@ -1,6 +1,6 @@
 use components::ui::WalletUI;
 use components::{upgrade::Buff, AnimationSheet, Button, ClickSound, Color, EntityLookup, Gatherer,
-                 GathererPositions, GathererType, Input, Node, ProtectedNodes, ResearchedBuffs,
+                 GathererPositions, GathererType, Input, Node, TileNodes, ResearchedBuffs,
                  SelectedTile, Text, Tile, TileType, Transform, Wallet};
 use specs::{Entities, Join, Read, ReadStorage, System, Write, WriteStorage};
 use std::ops::{Deref, DerefMut};
@@ -20,7 +20,7 @@ impl<'a> System<'a> for BuildGatherer {
         Write<'a, GathererPositions>,
         Read<'a, Input>,
         WriteStorage<'a, Node>,
-        Read<'a, ProtectedNodes>,
+        Read<'a, TileNodes>,
         Read<'a, ResearchedBuffs>,
         ReadStorage<'a, SelectedTile>,
         WriteStorage<'a, Text>,
@@ -41,7 +41,7 @@ impl<'a> System<'a> for BuildGatherer {
             mut gatherer_positions_storage,
             input_storage,
             mut nodes_storage,
-            protected_nodes_storage,
+            tile_nodes_storage,
             researched_buffs_storage,
             selected_tile_storage,
             mut text_storage,
@@ -108,7 +108,7 @@ impl<'a> System<'a> for BuildGatherer {
 
         if create {
             // create gatherer
-            let protected_nodes = protected_nodes_storage.deref();
+            let tile_nodes = tile_nodes_storage.deref();
             let selected_tile_col = (selected_tile_x / Tile::get_size()) as i32;
             let selected_tile_row = (selected_tile_y / Tile::get_size()) as i32;
 
@@ -127,7 +127,7 @@ impl<'a> System<'a> for BuildGatherer {
                         } else if gatherer_type != GathererType::Hydro && i == 0 && j == 0 {
                             continue;
                         }
-                        if let Some(&(tile_type, _)) = protected_nodes
+                        if let Some(&(tile_type, _)) = tile_nodes
                             .nodes
                             .get(&(selected_tile_col + i, selected_tile_row + j))
                         {

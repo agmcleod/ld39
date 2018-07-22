@@ -1,3 +1,4 @@
+use cgmath::Vector2;
 use conrod;
 use conrod::{widget, Colorable, Labelable, Positionable, Sizeable, Ui, UiBuilder, Widget};
 use loader;
@@ -6,11 +7,35 @@ use state::State;
 use std::collections::HashSet;
 use std::path::Path;
 
-use components::{ui::{PollutionCount, WalletUI}, upgrade, Actions, Button, CityPowerState, Color,
-                 EntityLookup, GathererPositions, GatheringRate, Node, PowerBar, ProtectedNodes,
-                 Rect, ResearchedBuffs, ResearchingEntities, ResourceCount, ResourceType,
-                 Resources, SelectedTile, Sprite, Text, Tile, TileType, Transform, Wallet,
-                 CITY_POWER_STATE_COORDS, upgrade::{Buff}};
+use components::{ui::{PollutionCount, WalletUI},
+                 upgrade,
+                 upgrade::Buff,
+                 Actions,
+                 Button,
+                 CityPowerState,
+                 Color,
+                 EntityLookup,
+                 GathererPositions,
+                 GatheringRate,
+                 Node,
+                 PowerBar,
+                 TileNodes,
+                 Rect,
+                 ResearchedBuffs,
+                 ResearchingEntities,
+                 ResourceCount,
+                 ResourceType,
+                 Resources,
+                 SelectedTile,
+                 Shape,
+                 Sprite,
+                 Text,
+                 Tile,
+                 TileType,
+                 Transform,
+                 TutorialStep,
+                 Wallet,
+                 CITY_POWER_STATE_COORDS};
 use entities::{create_map, create_power_bar, create_text, tech_tree};
 use rand::{thread_rng, Rng};
 use renderer;
@@ -90,6 +115,8 @@ impl<'a> PlayState<'a> {
                 &[],
             )
             .with(systems::TogglePause {}, "toggle_pause", &["button_hover"])
+            .with(systems::Tutorial {}, "tutorial", &[])
+            .with(systems::PulseSystem {}, "pulse", &[])
             .build();
 
         let tech_tree_dispatcher = DispatcherBuilder::new()
@@ -179,21 +206,17 @@ impl<'a> State for PlayState<'a> {
                     .with(tile)
                     .build();
 
-                if tile_type != TileType::Open {
-                    // replace the empty entity at this position with the entity
-                    set_nodes.insert((col, row), (tile_type, Some(tile_entity.clone())));
-                }
-
                 entities_under_root.push(tile_entity);
             }
         }
 
-        world.add_resource(ProtectedNodes { nodes: set_nodes });
+        world.add_resource(TileNodes { nodes: set_nodes });
         world.add_resource(GathererPositions::new());
         world.add_resource(GatheringRate::new());
         world.add_resource(Resources::new());
         world.add_resource(Wallet::new());
         world.add_resource(InternalState::Game);
+        world.add_resource(TutorialStep::SelectTile);
 
         let dimensions = renderer::get_dimensions();
 

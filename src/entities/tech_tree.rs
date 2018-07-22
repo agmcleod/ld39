@@ -49,7 +49,7 @@ fn create_line(
 
     world
         .create_entity()
-        .with(Shape::new(points, color))
+        .with(Shape::new(points, color, true))
         .with(Transform::visible_identity())
         .build()
 }
