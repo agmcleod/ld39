@@ -46,17 +46,14 @@ impl<'a> System<'a> for Tutorial {
                 for y in 0i32..10i32 {
                     if let Some((tile_type, _)) = tile_nodes.nodes.get(&(x, y)) {
                         if *tile_type == TileType::Open {
-                            println!("\nChecking new area");
                             let mut safe_space = true;
                             'check_neighbours: for x2 in -1..2 {
                                 for y2 in -1..2 {
                                     if x2 == 0 && y2 == 0 {
                                         continue;
                                     }
-                                    println!("checking tile: {},{}", x2 + x, y2 + y);
                                     if let Some((tile_type, _)) = tile_nodes.nodes.get(&(x2 + x, y2 + y))
                                     {
-                                        println!("found tile type: {:?} {},{}", *tile_type, x2 + x, y2 + y);
                                         if *tile_type != TileType::Open {
                                             safe_space = false;
                                             break 'check_neighbours;
