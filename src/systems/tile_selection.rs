@@ -96,7 +96,6 @@ impl<'a> System<'a> for TileSelection {
 
                 // if build UI showing, clean it up, as tile type may be different
                 if let Some(build_ui_entity) = self.build_ui_entity {
-                    println!("Delete build ui {:?}", build_ui_entity);
                     entities.delete(build_ui_entity).unwrap();
                     self.build_ui_entity = None;
                 }
@@ -122,14 +121,29 @@ impl<'a> System<'a> for TileSelection {
                 let node = logic::get_root(lookup, &mut node_storage);
                 node.add(entity);
 
-                tutorial::next_step(
+                let build_entity_pos = transform_storage.get(entity).unwrap().get_pos();
+
+                let changed = tutorial::next_step(
                     &entities,
                     &mut actions_storage,
                     &mut tutorial_step_storage,
                     &tutorial_ui_storage,
                     TutorialStep::SelectTile,
-                    TutorialStep::BuildCoal,
+                    TutorialStep::BuildCoal(build_entity_pos.x, build_entity_pos.y),
                 );
+
+                if !changed {
+                    // could maybe do this by checking current state here.
+                    // Passing array of possible current states not super comparable :(
+                    tutorial::next_step(
+                        &entities,
+                        &mut actions_storage,
+                        &mut tutorial_step_storage,
+                        &tutorial_ui_storage,
+                        TutorialStep::BuildCoal(10.0, 10.0),
+                        TutorialStep::BuildCoal(build_entity_pos.x, build_entity_pos.y),
+                    );
+                }
             }
 
         } else {
@@ -137,7 +151,6 @@ impl<'a> System<'a> for TileSelection {
                 // if selected tile as hidden, clear out build entity
                 if !transform.visible {
                     if let Some(build_ui_entity) = self.build_ui_entity {
-                        println!("Delete build ui {:?}", build_ui_entity);
                         entities.delete(build_ui_entity).unwrap();
                         self.build_ui_entity = None;
                     }

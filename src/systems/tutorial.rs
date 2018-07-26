@@ -34,6 +34,7 @@ impl<'a> System<'a> for Tutorial {
         WriteStorage<'a, Text>,
         Read<'a, TileNodes>,
         WriteStorage<'a, Transform>,
+        Read<'a, TutorialStep>,
         WriteStorage<'a, TutorialUI>,
     );
 
@@ -50,6 +51,7 @@ impl<'a> System<'a> for Tutorial {
             mut text_storage,
             tile_nodes_storage,
             mut transform_storage,
+            tutorial_step_storage,
             mut tutorial_ui_storage,
         ) = data;
 
@@ -58,6 +60,8 @@ impl<'a> System<'a> for Tutorial {
         let actions = actions_storage.deref();
 
         let mut details = None;
+
+        let tutorial_step = tutorial_step_storage.deref();
 
         if actions.action_fired(&TutorialStep::SelectTile.as_string()) {
             let tile_nodes = tile_nodes_storage.deref();
@@ -98,14 +102,19 @@ impl<'a> System<'a> for Tutorial {
             target_cell.1 *= size;
 
             details = Some(StepCreationDetails::new(target_cell.0, target_cell.1, size, size, "To start collecting resources, click the glowing tile"));
-        } else if actions.action_fired(&TutorialStep::BuildCoal.as_string()) {
-            details = Some(StepCreationDetails::new(
-                0.0,
-                1.0,
-                64.0,
-                64.0,
-                "Click the icon here to build a coal mine operation",
-            ));
+        } else if actions.action_fired(&TutorialStep::BuildCoal(0.0, 0.0).as_string()) {
+            match *tutorial_step {
+                TutorialStep::BuildCoal(x, y) => {
+                    details = Some(StepCreationDetails::new(
+                        x + 10.0,
+                        y + 10.0,
+                        64.0,
+                        64.0,
+                        "Click the icon here to build a coal mine operation",
+                    ));
+                },
+                _ => {}
+            }
         }
 
 

@@ -682,7 +682,6 @@ impl<'a> State for PlayState<'a> {
             world.add_resource(InternalState::Game);
         } else if action == "pause" {
             self.state = InternalState::Pause;
-            println!("Set state to pause");
             world.add_resource(InternalState::Pause);
         }
     }

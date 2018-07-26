@@ -1,10 +1,11 @@
 use components::ui::WalletUI;
 use components::{upgrade::Buff, AnimationSheet, Button, ClickSound, Color, EntityLookup, Gatherer,
                  GathererPositions, GathererType, Input, Node, TileNodes, ResearchedBuffs,
-                 SelectedTile, Text, Tile, TileType, Transform, Wallet};
+                 SelectedTile, Text, Tile, TileType, Transform, TutorialStep, Wallet, ui::TutorialUI};
 use specs::{Entities, Join, Read, ReadStorage, System, Write, WriteStorage};
 use std::ops::{Deref, DerefMut};
 use systems::logic;
+use entities::tutorial;
 
 pub struct BuildGatherer;
 
@@ -25,6 +26,8 @@ impl<'a> System<'a> for BuildGatherer {
         ReadStorage<'a, SelectedTile>,
         WriteStorage<'a, Text>,
         WriteStorage<'a, Transform>,
+        Write<'a, TutorialStep>,
+        ReadStorage<'a, TutorialUI>,
         Write<'a, Wallet>,
         ReadStorage<'a, WalletUI>,
     );
@@ -46,6 +49,8 @@ impl<'a> System<'a> for BuildGatherer {
             selected_tile_storage,
             mut text_storage,
             mut transform_storage,
+            tutorial_step_storage,
+            tutorial_ui_storage,
             mut wallet_storage,
             wallet_ui_storage,
         ) = data;
@@ -107,6 +112,12 @@ impl<'a> System<'a> for BuildGatherer {
         }
 
         if create {
+            tutorial::clear_ui(
+                &entities,
+                &tutorial_step_storage,
+                &tutorial_ui_storage,
+                TutorialStep::BuildCoal(0.0, 0.0),
+            );
             // create gatherer
             let tile_nodes = tile_nodes_storage.deref();
             let selected_tile_col = (selected_tile_x / Tile::get_size()) as i32;

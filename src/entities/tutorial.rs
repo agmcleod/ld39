@@ -1,5 +1,5 @@
 use components::{Actions, Color, EntityLookup, Node, Pulse, Rect, Shape, Text, TutorialStep, Transform, ui::TutorialUI};
-use specs::{Entities, Join, Read, ReadStorage, Write, WriteStorage};
+use specs::{Entity, Entities, Join, Read, ReadStorage, Write, WriteStorage};
 use cgmath::Vector2;
 use entities::create_tooltip;
 use systems::logic;
@@ -63,7 +63,7 @@ pub fn create_step(
         960,
         640,
         560,
-        340,
+        220,
         message.to_string(),
         Some(Color([0.0, 0.0, 0.0, 0.8]))
     );
@@ -73,7 +73,6 @@ pub fn create_step(
     let lookup = entity_lookup_storage.deref();
     let node = logic::get_root(&lookup, node_storage);
 
-    println!("tutorial ids: {:?} {:?}", pulse_shape, tooltip);
     node.add(pulse_shape);
     node.add(tooltip);
 }
@@ -85,15 +84,31 @@ pub fn next_step(
     tutorial_ui_storage: &ReadStorage<TutorialUI>,
     current_step: TutorialStep,
     next_step: TutorialStep
-) {
+) -> bool {
     let tutorial_step = tutorial_step_storage.deref_mut();
-    if *tutorial_step == current_step {
+    if tutorial_step.as_string() == current_step.as_string() {
         for (entity, _) in (&**entities, tutorial_ui_storage).join() {
-            println!("Clear tutorial id: {:?}", entity);
             entities.delete(entity).unwrap();
         }
         let actions = actions_storage.deref_mut();
         actions.dispatch(next_step.as_string());
         *tutorial_step = next_step;
+        true
+    } else {
+        false
+    }
+}
+
+pub fn clear_ui(
+    entities: &Entities,
+    tutorial_step_storage: &Write<TutorialStep>,
+    tutorial_ui_storage: &ReadStorage<TutorialUI>,
+    current_step: TutorialStep,
+) {
+    let tutorial_step = tutorial_step_storage.deref();
+    if tutorial_step.as_string() == current_step.as_string() {
+        for (entity, _) in (&**entities, tutorial_ui_storage).join() {
+            entities.delete(entity).unwrap();
+        }
     }
 }

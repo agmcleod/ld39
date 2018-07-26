@@ -93,7 +93,6 @@ impl<'a> System<'a> for Pollution {
             let wallet = wallet_storage.deref_mut();
             let total_gathering_rate =
                 logic::get_total_gathering_rate(&gathering_rate_storage.deref());
-            println!("tgr: {}", total_gathering_rate);
             wallet.money -= (total_gathering_rate as f32 * (pollution as f32 / 100.0)) as i32;
             logic::update_text(
                 format!("{}", wallet.money),

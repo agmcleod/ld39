@@ -1,7 +1,9 @@
+use std::fmt::{self, Display};
+
 #[derive(Debug, PartialEq)]
 pub enum TutorialStep {
     SelectTile,
-    BuildCoal,
+    BuildCoal(f32, f32),
     CoalGathered,
     SellResources,
     ResourcesSold,
@@ -12,9 +14,18 @@ pub enum TutorialStep {
     Objective,
 }
 
+impl Display for TutorialStep {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match *self {
+            TutorialStep::BuildCoal(_, _) => write!(f, "BuildCoal"),
+            _ => write!(f, "{:?}", self),
+        }
+    }
+}
+
 impl TutorialStep {
     pub fn as_string(&self) -> String {
-        format!("{:?}", self)
+        format!("{}", self)
     }
 }
 

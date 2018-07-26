@@ -113,18 +113,21 @@ impl Node {
         world: &World,
         transform_storage: &WriteStorage<'a, Transform>,
     ) {
+        let mut removed = false;
+        self.entities.retain(|e| {
+            if world.is_alive(*e) {
+                return true
+            }
+
+            removed = true;
+            false
+        });
+
+        if removed {
+            self.children_dirty = true;
+        }
+
         if self.children_dirty {
-            let mut to_remove = Vec::new();
-            for (i, entity) in self.entities.iter().enumerate() {
-                if !world.is_alive(*entity) {
-                    to_remove.push(i);
-                }
-            }
-
-            for i in &to_remove {
-                self.entities.remove(*i);
-            }
-
             self.entities.sort_by(|entity_a, entity_b| {
                 let transform_a = if let Some(t) = transform_storage.get(*entity_a) {
                     t
