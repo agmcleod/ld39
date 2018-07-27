@@ -130,6 +130,10 @@ impl<'a> System<'a> for Gathering {
                 .increase_resource_for_gatherer_type(&GathererType::Solar, gathering_rate.solar);
             resources
                 .increase_resource_for_gatherer_type(&GathererType::Hydro, gathering_rate.hydro);
+
+            if resources.coal >= 50 {
+
+            }
         }
     }
 }
