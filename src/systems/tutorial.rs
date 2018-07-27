@@ -115,8 +115,23 @@ impl<'a> System<'a> for Tutorial {
                 },
                 _ => {}
             }
+        } else if actions.action_fired(&TutorialStep::CoalGathered.as_string()) {
+            details = Some(StepCreationDetails::new(
+                670.0,
+                158.0,
+                100.0,
+                40.0,
+                "After building the coal mine, you are now collecting coal as a resource."
+            ));
+        } else if actions.action_fired(&TutorialStep::SellResources.as_string()) {
+            details = Some(StepCreationDetails::new(
+                822.0,
+                576.0,
+                96.0,
+                32.0,
+                "Click the button at the bottom right to sell"
+            ));
         }
-
 
         if let Some(details) = details {
             tutorial::create_step(

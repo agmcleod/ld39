@@ -1,7 +1,7 @@
-use components::{upgrade::Buff, Color, FloatingText, Gatherer, GathererType, GatheringRate, Node,
-                 ResearchedBuffs, Resources, Text, Transform};
-use entities::create_text;
-use specs::{Entities, Join, Read, System, Write, WriteStorage};
+use components::{upgrade::Buff, Actions, Color, FloatingText, Gatherer, GathererType, GatheringRate, Node,
+                 ResearchedBuffs, Resources, Text, Transform, TutorialStep, ui::TutorialUI};
+use entities::{create_text, tutorial};
+use specs::{Entities, Join, Read, ReadStorage, System, Write, WriteStorage};
 use std::ops::{Deref, DerefMut};
 use std::time::Instant;
 use storage_types::TextStorage;
@@ -32,6 +32,7 @@ impl Gathering {
 impl<'a> System<'a> for Gathering {
     type SystemData = (
         Entities<'a>,
+        Write<'a, Actions>,
         WriteStorage<'a, Color>,
         WriteStorage<'a, FloatingText>,
         WriteStorage<'a, Gatherer>,
@@ -41,11 +42,14 @@ impl<'a> System<'a> for Gathering {
         Write<'a, Resources>,
         WriteStorage<'a, Text>,
         WriteStorage<'a, Transform>,
+        Write<'a, TutorialStep>,
+        ReadStorage<'a, TutorialUI>,
     );
 
     fn run(&mut self, data: Self::SystemData) {
         let (
             entities,
+            mut actions_storage,
             mut color_storage,
             mut floating_text_storage,
             mut gatherer_storage,
@@ -55,6 +59,8 @@ impl<'a> System<'a> for Gathering {
             mut resources_storage,
             mut text_storage,
             mut transform_storage,
+            mut tutorial_step_storage,
+            tutorial_ui_storage,
         ) = data;
 
         let resources: &mut Resources = resources_storage.deref_mut();
@@ -132,7 +138,23 @@ impl<'a> System<'a> for Gathering {
                 .increase_resource_for_gatherer_type(&GathererType::Hydro, gathering_rate.hydro);
 
             if resources.coal >= 50 {
-
+                tutorial::next_step(
+                    &entities,
+                    &mut actions_storage,
+                    &mut tutorial_step_storage,
+                    &tutorial_ui_storage,
+                    TutorialStep::CoalGathered,
+                    TutorialStep::SellResources,
+                );
+            } else if resources.coal > 0 {
+                tutorial::next_step(
+                    &entities,
+                    &mut actions_storage,
+                    &mut tutorial_step_storage,
+                    &tutorial_ui_storage,
+                    TutorialStep::BuildCoal(0.0, 0.0),
+                    TutorialStep::CoalGathered,
+                );
             }
         }
     }

@@ -294,6 +294,10 @@ fn main() {
     let mut music =
         loader::create_music_sink("resources/ld39.ogg", &audio_endpoint, settings.music_volume);
 
+    if settings.mute_music {
+        music.pause();
+    }
+
     setup_world(&mut world, &window);
 
     let mut state_manager = StateManager::new();

@@ -62,7 +62,7 @@ pub fn create_step(
         150.0,
         960,
         640,
-        560,
+        380,
         220,
         message.to_string(),
         Some(Color([0.0, 0.0, 0.0, 0.8]))

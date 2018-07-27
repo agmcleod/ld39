@@ -1,9 +1,10 @@
 use components::ui::WalletUI;
 use components::{upgrade::Buff, Button, ClickSound, DeltaTime, Input, PowerBar, ResearchedBuffs,
-                 ResourceType, Resources, Text, Transform, Wallet};
-use specs::{Join, Read, System, Write, WriteStorage};
+                 ResourceType, Resources, Text, Transform, TutorialStep, Wallet, ui::TutorialUI};
+use specs::{Entities, Join, Read, ReadStorage, System, Write, WriteStorage};
 use std::ops::{Deref, DerefMut};
 use systems::POWER_FACTOR;
+use entities::tutorial;
 
 pub struct SellEnergy {
     minute_ticker: f32,
@@ -31,6 +32,7 @@ impl SellEnergy {
 
 impl<'a> System<'a> for SellEnergy {
     type SystemData = (
+        Entities<'a>,
         WriteStorage<'a, Button>,
         Write<'a, ClickSound>,
         Read<'a, DeltaTime>,
@@ -40,12 +42,15 @@ impl<'a> System<'a> for SellEnergy {
         Write<'a, Resources>,
         WriteStorage<'a, Text>,
         WriteStorage<'a, Transform>,
+        Write<'a, TutorialStep>,
+        ReadStorage<'a, TutorialUI>,
         Write<'a, Wallet>,
         WriteStorage<'a, WalletUI>,
     );
 
     fn run(&mut self, data: Self::SystemData) {
         let (
+            entities,
             mut button_storage,
             mut click_sound_storage,
             delta_time_storage,
@@ -55,6 +60,8 @@ impl<'a> System<'a> for SellEnergy {
             mut resources_storage,
             mut text_storage,
             mut transform_storage,
+            tutorial_step_storage,
+            tutorial_ui_storage,
             mut wallet_storage,
             mut wallet_ui_storage,
         ) = data;
@@ -81,6 +88,13 @@ impl<'a> System<'a> for SellEnergy {
             }) / POWER_FACTOR;
 
             let mut power_to_spend = 0i32;
+
+            tutorial::clear_ui(
+                &entities,
+                &tutorial_step_storage,
+                &tutorial_ui_storage,
+                TutorialStep::SellResources,
+            );
 
             'resources: for r_type in &[
                 ResourceType::Coal,
