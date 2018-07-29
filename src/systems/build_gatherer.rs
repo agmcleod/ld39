@@ -118,6 +118,12 @@ impl<'a> System<'a> for BuildGatherer {
                 &tutorial_ui_storage,
                 TutorialStep::BuildCoal(0.0, 0.0),
             );
+            tutorial::clear_ui(
+                &entities,
+                &tutorial_step_storage,
+                &tutorial_ui_storage,
+                TutorialStep::ResourcesSold,
+            );
             // create gatherer
             let tile_nodes = tile_nodes_storage.deref();
             let selected_tile_col = (selected_tile_x / Tile::get_size()) as i32;

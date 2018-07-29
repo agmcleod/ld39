@@ -1,4 +1,4 @@
-use components::{Actions, Color, EntityLookup, Node, Rect, Pulse, Shape, Text, Tile, TileNodes, TileType, Transform, TutorialStep, ui::{TutorialUI}};
+use components::{Actions, Color, EntityLookup, Node, Rect, Pulse, Shape, Text, Tile, TileNodes, TileType, Transform, TutorialStep, ui::{TutorialUI}, CITY_POWER_STATE_COORDS};
 use specs::{Entities, Read, System, WriteStorage};
 use std::ops::Deref;
 use entities::tutorial;
@@ -130,6 +130,14 @@ impl<'a> System<'a> for Tutorial {
                 96.0,
                 32.0,
                 "Click the button at the bottom right to sell"
+            ));
+        } else if actions.action_fired(&TutorialStep::ResourcesSold.as_string()) {
+            details = Some(StepCreationDetails::new(
+                CITY_POWER_STATE_COORDS[0].0 + 640.0,
+                CITY_POWER_STATE_COORDS[0].1,
+                280.0,
+                360.0,
+                "When you sell, the resources go to the power grid filling up the city power bars. Your money also goes up.\n\nUse money to keep building. Be wary of building next to a tile occupied by a city or by nature."
             ));
         }
 

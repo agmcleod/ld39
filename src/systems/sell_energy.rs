@@ -1,5 +1,5 @@
 use components::ui::WalletUI;
-use components::{upgrade::Buff, Button, ClickSound, DeltaTime, Input, PowerBar, ResearchedBuffs,
+use components::{upgrade::Buff, Actions, Button, ClickSound, DeltaTime, Input, PowerBar, ResearchedBuffs,
                  ResourceType, Resources, Text, Transform, TutorialStep, Wallet, ui::TutorialUI};
 use specs::{Entities, Join, Read, ReadStorage, System, Write, WriteStorage};
 use std::ops::{Deref, DerefMut};
@@ -33,6 +33,7 @@ impl SellEnergy {
 impl<'a> System<'a> for SellEnergy {
     type SystemData = (
         Entities<'a>,
+        Write<'a, Actions>,
         WriteStorage<'a, Button>,
         Write<'a, ClickSound>,
         Read<'a, DeltaTime>,
@@ -51,6 +52,7 @@ impl<'a> System<'a> for SellEnergy {
     fn run(&mut self, data: Self::SystemData) {
         let (
             entities,
+            mut actions_storage,
             mut button_storage,
             mut click_sound_storage,
             delta_time_storage,
@@ -60,7 +62,7 @@ impl<'a> System<'a> for SellEnergy {
             mut resources_storage,
             mut text_storage,
             mut transform_storage,
-            tutorial_step_storage,
+            mut tutorial_step_storage,
             tutorial_ui_storage,
             mut wallet_storage,
             mut wallet_ui_storage,
@@ -89,11 +91,13 @@ impl<'a> System<'a> for SellEnergy {
 
             let mut power_to_spend = 0i32;
 
-            tutorial::clear_ui(
+            tutorial::next_step(
                 &entities,
-                &tutorial_step_storage,
+                &mut actions_storage,
+                &mut tutorial_step_storage,
                 &tutorial_ui_storage,
                 TutorialStep::SellResources,
+                TutorialStep::ResourcesSold
             );
 
             'resources: for r_type in &[

@@ -7,7 +7,6 @@ pub enum TutorialStep {
     CoalGathered,
     SellResources,
     ResourcesSold,
-    ContinueBuilding,
     ShowUpgrades,
     Upgrade,
     Resume,
