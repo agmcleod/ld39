@@ -9,7 +9,6 @@ use std::path::Path;
 use components::{ui::{PollutionCount, WalletUI},
                  upgrade,
                  upgrade::Buff,
-                 Actions,
                  Button,
                  CityPowerState,
                  Color,
@@ -88,7 +87,6 @@ impl<'a> PlayState<'a> {
                 "build_gatherer",
                 &["button_hover"],
             )
-            .with(systems::TextAbsoluteCache {}, "text_absolute_cache", &[])
             .with(
                 systems::TileSelection::new(),
                 "tile_selection",
@@ -116,6 +114,7 @@ impl<'a> PlayState<'a> {
             .with(systems::TogglePause {}, "toggle_pause", &["button_hover"])
             .with(systems::Tutorial::new(), "tutorial", &[])
             .with(systems::PulseSystem {}, "pulse", &[])
+            .with(systems::TextAbsoluteCache {}, "text_absolute_cache", &["build_gatherer", "floating_text_system", "toggle_tech_tree", "power_usage", "pollution", "sell_energy", "tutorial"])
             .build();
 
         let tech_tree_dispatcher = DispatcherBuilder::new()
@@ -126,9 +125,9 @@ impl<'a> PlayState<'a> {
                 &["button_hover"],
             )
             .with(systems::TechTree::new(), "tech_tree", &[])
-            .with(systems::TextAbsoluteCache {}, "text_absolute_cache", &[])
             .with(systems::Tutorial::new(), "tutorial", &[])
             .with(systems::PulseSystem {}, "pulse", &[])
+            .with(systems::TextAbsoluteCache {}, "text_absolute_cache", &["tutorial", "tech_tree", "toggle_tech_tree"])
             .build();
 
         let pause_dispatcher = DispatcherBuilder::new()
