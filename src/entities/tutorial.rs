@@ -1,9 +1,10 @@
-use components::{Actions, Color, EntityLookup, Node, Pulse, Rect, Shape, Text, TutorialStep, Transform, ui::TutorialUI};
-use specs::{Entity, Entities, Join, Read, ReadStorage, Write, WriteStorage};
 use cgmath::Vector2;
+use components::{ui::TutorialUI, Actions, Color, EntityLookup, Node, Pulse, Rect, Shape, Text,
+                 Transform, TutorialStep};
 use entities::create_tooltip;
-use systems::logic;
+use specs::{Entities, Entity, Join, Read, ReadStorage, Write, WriteStorage};
 use std::ops::{Deref, DerefMut};
+use systems::logic;
 
 pub fn create_step(
     entities: &Entities,
@@ -45,10 +46,12 @@ pub fn create_step(
 
     let shape = Shape::new(points, [1.0, 1.0, 0.0, 0.0], false);
     shape_storage.insert(pulse_shape, shape).unwrap();
-    transform_storage
-        .insert(pulse_shape, Transform::visible_identity())
+    let mut transform = Transform::visible_identity();
+    transform.set_pos(0.0, 0.0, 4.0);
+    transform_storage.insert(pulse_shape, transform).unwrap();
+    tutorial_ui_storage
+        .insert(pulse_shape, TutorialUI {})
         .unwrap();
-    tutorial_ui_storage.insert(pulse_shape, TutorialUI{}).unwrap();
     pulse_storage.insert(pulse_shape, Pulse::new(2.0)).unwrap();
 
     let tooltip = create_tooltip::create(
@@ -65,10 +68,10 @@ pub fn create_step(
         380,
         220,
         message.to_string(),
-        Some(Color([0.0, 0.0, 0.0, 0.8]))
+        Some(Color([0.0, 0.0, 0.0, 0.8])),
     );
 
-    tutorial_ui_storage.insert(tooltip, TutorialUI{}).unwrap();
+    tutorial_ui_storage.insert(tooltip, TutorialUI {}).unwrap();
 
     let lookup = entity_lookup_storage.deref();
     let node = logic::get_root(&lookup, node_storage);
@@ -83,7 +86,7 @@ pub fn next_step(
     tutorial_step_storage: &mut Write<TutorialStep>,
     tutorial_ui_storage: &ReadStorage<TutorialUI>,
     current_step: TutorialStep,
-    next_step: TutorialStep
+    next_step: TutorialStep,
 ) -> bool {
     let tutorial_step = tutorial_step_storage.deref_mut();
     if tutorial_step.as_string() == current_step.as_string() {

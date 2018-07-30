@@ -13,7 +13,7 @@ pub trait State {
     fn handle_custom_change(&mut self, &String, &mut World);
     fn get_ui_to_render(&mut self) -> &mut Ui;
     fn should_render_ui(&self) -> bool;
-    fn create_ui_widgets(&mut self, settings: &mut Settings, &mut World);
+    fn create_ui_widgets(&mut self, settings: &mut Settings) -> Option<String>;
 }
 
 pub struct StateManager {
@@ -82,11 +82,11 @@ impl StateManager {
             .should_render_ui()
     }
 
-    pub fn create_ui_widgets(&mut self, settings: &mut Settings, world: &mut World) {
+    pub fn create_ui_widgets(&mut self, settings: &mut Settings) -> Option<String> {
         self.states
             .get_mut(&self.current_state)
             .unwrap()
-            .create_ui_widgets(settings, world)
+            .create_ui_widgets(settings)
     }
 
     pub fn update(&mut self, world: &mut World) {

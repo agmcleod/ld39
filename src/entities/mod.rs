@@ -5,5 +5,5 @@ pub mod create_map;
 pub mod create_power_bar;
 pub mod create_text;
 pub mod create_tooltip;
-pub mod tutorial;
 pub mod tech_tree;
+pub mod tutorial;

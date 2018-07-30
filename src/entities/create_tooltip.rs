@@ -31,9 +31,7 @@ pub fn create(
             Transform::visible(0.0, 0.0, 0.0, w, h, 0.0, 1.0, 1.0),
         )
         .unwrap();
-    color_storage
-        .insert(background.clone(), color)
-        .unwrap();
+    color_storage.insert(background.clone(), color).unwrap();
     rect_storage.insert(background.clone(), Rect {}).unwrap();
 
     let tooltip_container = entities.create();

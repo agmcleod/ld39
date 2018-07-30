@@ -116,7 +116,7 @@ impl Node {
         let mut removed = false;
         self.entities.retain(|e| {
             if world.is_alive(*e) {
-                return true
+                return true;
             }
 
             removed = true;

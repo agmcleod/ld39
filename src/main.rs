@@ -67,6 +67,7 @@ use gfx_glyph::{GlyphBrush, GlyphBrushBuilder};
 use glutin::{ElementState, Event, GlContext, MouseButton, VirtualKeyCode, WindowEvent};
 use renderer::{ColorFormat, DepthFormat};
 use rodio::Source;
+use settings::Settings;
 use specs::{Entity, ReadStorage, World, WriteStorage};
 use spritesheet::Spritesheet;
 use state::play_state::PlayState;
@@ -290,7 +291,7 @@ fn main() {
 
     let audio_endpoint = rodio::default_endpoint().unwrap();
     let click_sound_source = loader::create_sound("resources/click.ogg").buffered();
-    let mut settings = loader::load_settings();
+    let settings = loader::load_settings();
     let mut music =
         loader::create_music_sink("resources/ld39.ogg", &audio_endpoint, settings.music_volume);
 
@@ -321,6 +322,8 @@ fn main() {
             actions.dispatch(TutorialStep::SelectTile.as_string());
         }
     }
+
+    world.add_resource(settings);
 
     while running {
         let duration = time::Instant::now() - frame_start;
@@ -417,6 +420,7 @@ fn main() {
 
             let mut click_sound_storage = world.write_resource::<ClickSound>();
             let click_sound: &mut ClickSound = click_sound_storage.deref_mut();
+            let settings = world.read_resource::<Settings>();
             if click_sound.play && !settings.mute_sound_effects {
                 click_sound.play = false;
                 let mut sink = rodio::Sink::new(&audio_endpoint);
@@ -467,7 +471,12 @@ fn main() {
         basic.reset_transform();
 
         if state_manager.should_render_ui() {
-            state_manager.create_ui_widgets(&mut settings, &mut world);
+            let mut settings_res = world.write_resource::<Settings>();
+            let mut settings = settings_res.deref_mut();
+            if let Some(action_name) = state_manager.create_ui_widgets(&mut settings) {
+                let mut actions = world.write_resource::<Actions>();
+                actions.dispatch(action_name);
+            }
 
             let ui = state_manager.get_ui_to_render();
             let primitives = ui.draw();

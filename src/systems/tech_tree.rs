@@ -1,6 +1,7 @@
 use components::ui;
-use components::{ui::WalletUI,
+use components::{ui::{TutorialUI, WalletUI},
                  upgrade::{Buff, LearnProgress},
+                 Actions,
                  Color,
                  EntityLookup,
                  Input,
@@ -10,9 +11,10 @@ use components::{ui::WalletUI,
                  Sprite,
                  Text,
                  Transform,
+                 TutorialStep,
                  Wallet};
 use entities::tech_tree::{get_color_from_status, Status, Upgrade};
-use entities::{create_text, create_tooltip};
+use entities::{create_text, create_tooltip, tutorial};
 use specs::{Entities, Entity, Join, Read, ReadStorage, System, Write, WriteStorage};
 use std::ops::{Deref, DerefMut};
 use storage_types::*;
@@ -92,6 +94,7 @@ impl TechTree {
 impl<'a> System<'a> for TechTree {
     type SystemData = (
         Entities<'a>,
+        Write<'a, Actions>,
         WriteStorage<'a, Color>,
         Read<'a, EntityLookup>,
         Read<'a, Input>,
@@ -102,6 +105,8 @@ impl<'a> System<'a> for TechTree {
         WriteStorage<'a, Sprite>,
         ReadStorage<'a, ui::TechTreeButton>,
         WriteStorage<'a, Text>,
+        Write<'a, TutorialStep>,
+        ReadStorage<'a, TutorialUI>,
         WriteStorage<'a, Transform>,
         WriteStorage<'a, Upgrade>,
         Write<'a, Wallet>,
@@ -111,6 +116,7 @@ impl<'a> System<'a> for TechTree {
     fn run(&mut self, data: Self::SystemData) {
         let (
             entities,
+            mut actions_storage,
             mut color_storage,
             entity_lookup_storage,
             input_storage,
@@ -121,6 +127,8 @@ impl<'a> System<'a> for TechTree {
             mut sprite_storage,
             tech_tree_node_storage,
             mut text_storage,
+            mut tutorial_step_storage,
+            tutorial_ui_storage,
             mut transform_storage,
             mut upgrade_storage,
             mut wallet_storage,
@@ -270,6 +278,16 @@ impl<'a> System<'a> for TechTree {
                     .get_mut(mouse_over_tech_tree_node_entity)
                     .unwrap();
                 if upgrade.status == Status::Researchable && wallet.spend(upgrade.cost) {
+                    if upgrade.buff == Buff::ResourceTrading {
+                        tutorial::next_step(
+                            &entities,
+                            &mut actions_storage,
+                            &mut tutorial_step_storage,
+                            &tutorial_ui_storage,
+                            TutorialStep::Upgrade,
+                            TutorialStep::Resume,
+                        );
+                    }
                     upgrade.start_learning();
                     *color_storage
                         .get_mut(mouse_over_tech_tree_node_entity)

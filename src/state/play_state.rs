@@ -1,4 +1,3 @@
-use cgmath::Vector2;
 use conrod;
 use conrod::{widget, Colorable, Labelable, Positionable, Sizeable, Ui, UiBuilder, Widget};
 use loader;
@@ -19,7 +18,6 @@ use components::{ui::{PollutionCount, WalletUI},
                  GatheringRate,
                  Node,
                  PowerBar,
-                 TileNodes,
                  Rect,
                  ResearchedBuffs,
                  ResearchingEntities,
@@ -31,6 +29,7 @@ use components::{ui::{PollutionCount, WalletUI},
                  Sprite,
                  Text,
                  Tile,
+                 TileNodes,
                  TileType,
                  Transform,
                  TutorialStep,
@@ -115,7 +114,7 @@ impl<'a> PlayState<'a> {
                 &[],
             )
             .with(systems::TogglePause {}, "toggle_pause", &["button_hover"])
-            .with(systems::Tutorial {}, "tutorial", &[])
+            .with(systems::Tutorial::new(), "tutorial", &[])
             .with(systems::PulseSystem {}, "pulse", &[])
             .build();
 
@@ -128,6 +127,8 @@ impl<'a> PlayState<'a> {
             )
             .with(systems::TechTree::new(), "tech_tree", &[])
             .with(systems::TextAbsoluteCache {}, "text_absolute_cache", &[])
+            .with(systems::Tutorial::new(), "tutorial", &[])
+            .with(systems::PulseSystem {}, "pulse", &[])
             .build();
 
         let pause_dispatcher = DispatcherBuilder::new()
@@ -690,7 +691,7 @@ impl<'a> State for PlayState<'a> {
         &mut self.ui
     }
 
-    fn create_ui_widgets(&mut self, settings: &mut Settings, world: &mut World) {
+    fn create_ui_widgets(&mut self, settings: &mut Settings) -> Option<String> {
         let ui = &mut self.ui.set_widgets();
 
         if widget::Button::new()
@@ -702,8 +703,7 @@ impl<'a> State for PlayState<'a> {
             .set(self.ids.close_button, ui)
             .was_clicked()
         {
-            let mut actions = world.write_resource::<Actions>();
-            actions.dispatch("resume_game".to_string());
+            return Some("resume_game".to_string());
         }
 
         widget::Text::new("Settings")
@@ -770,6 +770,8 @@ impl<'a> State for PlayState<'a> {
         {
             settings.set_mute_sound_effects(state);
         }
+
+        None
     }
 
     fn should_render_ui(&self) -> bool {

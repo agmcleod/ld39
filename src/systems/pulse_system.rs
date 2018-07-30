@@ -1,10 +1,10 @@
-use specs::{Join, Read, System, WriteStorage};
 use components::{DeltaTime, Pulse, Shape};
+use specs::{Join, Read, System, WriteStorage};
 use std::ops::Deref;
 
 pub struct PulseSystem;
 
-impl <'a>System<'a> for PulseSystem {
+impl<'a> System<'a> for PulseSystem {
     type SystemData = (
         Read<'a, DeltaTime>,
         WriteStorage<'a, Pulse>,
@@ -12,11 +12,7 @@ impl <'a>System<'a> for PulseSystem {
     );
 
     fn run(&mut self, data: Self::SystemData) {
-        let (
-            delta_time_storage,
-            mut pulse_storage,
-            mut shape_storage
-        ) = data;
+        let (delta_time_storage, mut pulse_storage, mut shape_storage) = data;
 
         let dt = delta_time_storage.deref().dt;
 

@@ -1,10 +1,11 @@
 use components::ui::WalletUI;
-use components::{upgrade::Buff, Actions, Button, ClickSound, DeltaTime, Input, PowerBar, ResearchedBuffs,
-                 ResourceType, Resources, Text, Transform, TutorialStep, Wallet, ui::TutorialUI};
+use components::{ui::TutorialUI, upgrade::Buff, Actions, Button, ClickSound, DeltaTime, Input,
+                 PowerBar, ResearchedBuffs, ResourceType, Resources, Text, Transform,
+                 TutorialStep, Wallet};
+use entities::tutorial;
 use specs::{Entities, Join, Read, ReadStorage, System, Write, WriteStorage};
 use std::ops::{Deref, DerefMut};
 use systems::POWER_FACTOR;
-use entities::tutorial;
 
 pub struct SellEnergy {
     minute_ticker: f32,
@@ -97,7 +98,7 @@ impl<'a> System<'a> for SellEnergy {
                 &mut tutorial_step_storage,
                 &tutorial_ui_storage,
                 TutorialStep::SellResources,
-                TutorialStep::ResourcesSold
+                TutorialStep::ResourcesSold,
             );
 
             'resources: for r_type in &[

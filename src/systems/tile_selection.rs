@@ -1,5 +1,5 @@
-use components::{Actions, Button, Color, EntityLookup, Gatherer, Input, Node, Rect, ResearchedBuffs,
-                 SelectedTile, Sprite, Text, Tile, TutorialStep, Transform, ui::TutorialUI};
+use components::{ui::TutorialUI, Actions, Button, Color, EntityLookup, Gatherer, Input, Node,
+                 Rect, ResearchedBuffs, SelectedTile, Sprite, Text, Tile, Transform, TutorialStep};
 use entities::{create_build_ui, tutorial};
 use specs::{Entities, Entity, Join, Read, ReadStorage, System, Write, WriteStorage};
 use std::ops::{Deref, DerefMut};
@@ -145,7 +145,6 @@ impl<'a> System<'a> for TileSelection {
                     );
                 }
             }
-
         } else {
             for (_, transform) in (&selected_tile_storage, &transform_storage).join() {
                 // if selected tile as hidden, clear out build entity

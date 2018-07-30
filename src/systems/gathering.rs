@@ -1,5 +1,6 @@
-use components::{upgrade::Buff, Actions, Color, FloatingText, Gatherer, GathererType, GatheringRate, Node,
-                 ResearchedBuffs, Resources, Text, Transform, TutorialStep, ui::TutorialUI};
+use components::{ui::TutorialUI, upgrade::Buff, Actions, Color, FloatingText, Gatherer,
+                 GathererType, GatheringRate, Node, ResearchedBuffs, Resources, Text, Transform,
+                 TutorialStep};
 use entities::{create_text, tutorial};
 use specs::{Entities, Join, Read, ReadStorage, System, Write, WriteStorage};
 use std::ops::{Deref, DerefMut};

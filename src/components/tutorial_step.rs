@@ -10,13 +10,14 @@ pub enum TutorialStep {
     ShowUpgrades,
     Upgrade,
     Resume,
-    Objective,
+    Objective(f32),
 }
 
 impl Display for TutorialStep {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
             TutorialStep::BuildCoal(_, _) => write!(f, "BuildCoal"),
+            TutorialStep::Objective(_) => write!(f, "Objective"),
             _ => write!(f, "{:?}", self),
         }
     }

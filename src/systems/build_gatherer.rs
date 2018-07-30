@@ -1,11 +1,12 @@
 use components::ui::WalletUI;
-use components::{upgrade::Buff, AnimationSheet, Button, ClickSound, Color, EntityLookup, Gatherer,
-                 GathererPositions, GathererType, Input, Node, TileNodes, ResearchedBuffs,
-                 SelectedTile, Text, Tile, TileType, Transform, TutorialStep, Wallet, ui::TutorialUI};
+use components::{ui::TutorialUI, upgrade::Buff, AnimationSheet, Button, ClickSound, Color,
+                 EntityLookup, Gatherer, GathererPositions, GathererType, Input, Node,
+                 ResearchedBuffs, SelectedTile, Text, Tile, TileNodes, TileType, Transform,
+                 TutorialStep, Wallet};
+use entities::tutorial;
 use specs::{Entities, Join, Read, ReadStorage, System, Write, WriteStorage};
 use std::ops::{Deref, DerefMut};
 use systems::logic;
-use entities::tutorial;
 
 pub struct BuildGatherer;
 
