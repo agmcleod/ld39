@@ -117,12 +117,14 @@ impl<'a> System<'a> for BuildGatherer {
                 &entities,
                 &tutorial_step_storage,
                 &tutorial_ui_storage,
+                &nodes_storage,
                 TutorialStep::BuildCoal(0.0, 0.0),
             );
             tutorial::clear_ui(
                 &entities,
                 &tutorial_step_storage,
                 &tutorial_ui_storage,
+                &nodes_storage,
                 TutorialStep::ResourcesSold,
             );
             // create gatherer

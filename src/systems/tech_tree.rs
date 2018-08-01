@@ -13,8 +13,7 @@ use components::{ui::{TutorialUI, WalletUI},
                  Transform,
                  TutorialStep,
                  Wallet};
-use entities::tech_tree::{get_color_from_status, Status, Upgrade};
-use entities::{create_text, create_tooltip, tutorial};
+use entities::{create_text, create_tooltip, recursive_delete, tutorial, tech_tree::{get_color_from_status, Status, Upgrade}};
 use specs::{Entities, Entity, Join, Read, ReadStorage, System, Write, WriteStorage};
 use std::ops::{Deref, DerefMut};
 use storage_types::*;
@@ -175,7 +174,7 @@ impl<'a> System<'a> for TechTree {
 
             if create_tooltip {
                 if let Some(current_tooltip) = self.current_tooltip {
-                    entities.delete(current_tooltip).unwrap();
+                    recursive_delete(&entities, &node_storage, &current_tooltip);
                     self.current_tooltip = None;
                     self.current_tech_tree_node_entity = None;
                 }
@@ -284,6 +283,7 @@ impl<'a> System<'a> for TechTree {
                             &mut actions_storage,
                             &mut tutorial_step_storage,
                             &tutorial_ui_storage,
+                            &node_storage,
                             TutorialStep::Upgrade,
                             TutorialStep::Resume,
                         );
@@ -320,7 +320,7 @@ impl<'a> System<'a> for TechTree {
             }
         } else {
             if let Some(current_tooltip) = self.current_tooltip {
-                entities.delete(current_tooltip).unwrap();
+                recursive_delete(&entities, &node_storage, &current_tooltip);
                 self.current_tooltip = None;
                 self.current_tech_tree_node_entity = None;
             }

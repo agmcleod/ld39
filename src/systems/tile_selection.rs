@@ -1,6 +1,6 @@
 use components::{ui::TutorialUI, Actions, Button, Color, EntityLookup, Gatherer, Input, Node,
                  Rect, ResearchedBuffs, SelectedTile, Sprite, Text, Tile, Transform, TutorialStep};
-use entities::{create_build_ui, tutorial};
+use entities::{create_build_ui, recursive_delete, tutorial};
 use specs::{Entities, Entity, Join, Read, ReadStorage, System, Write, WriteStorage};
 use std::ops::{Deref, DerefMut};
 use systems::logic;
@@ -96,7 +96,7 @@ impl<'a> System<'a> for TileSelection {
 
                 // if build UI showing, clean it up, as tile type may be different
                 if let Some(build_ui_entity) = self.build_ui_entity {
-                    entities.delete(build_ui_entity).unwrap();
+                    recursive_delete(&entities, &node_storage, &build_ui_entity);
                     self.build_ui_entity = None;
                 }
                 // create build ui
@@ -118,8 +118,10 @@ impl<'a> System<'a> for TileSelection {
 
                 let lookup = entity_lookup_storage.deref();
 
-                let node = logic::get_root(lookup, &mut node_storage);
-                node.add(entity);
+                {
+                    let node = logic::get_root(lookup, &mut node_storage);
+                    node.add(entity);
+                }
 
                 let build_entity_pos = transform_storage.get(entity).unwrap().get_pos();
 
@@ -128,6 +130,7 @@ impl<'a> System<'a> for TileSelection {
                     &mut actions_storage,
                     &mut tutorial_step_storage,
                     &tutorial_ui_storage,
+                    &node_storage,
                     TutorialStep::SelectTile,
                     TutorialStep::BuildCoal(build_entity_pos.x, build_entity_pos.y),
                 );
@@ -140,6 +143,7 @@ impl<'a> System<'a> for TileSelection {
                         &mut actions_storage,
                         &mut tutorial_step_storage,
                         &tutorial_ui_storage,
+                        &node_storage,
                         TutorialStep::BuildCoal(10.0, 10.0),
                         TutorialStep::BuildCoal(build_entity_pos.x, build_entity_pos.y),
                     );
@@ -150,7 +154,7 @@ impl<'a> System<'a> for TileSelection {
                 // if selected tile as hidden, clear out build entity
                 if !transform.visible {
                     if let Some(build_ui_entity) = self.build_ui_entity {
-                        entities.delete(build_ui_entity).unwrap();
+                        recursive_delete(&entities, &node_storage, &build_ui_entity);
                         self.build_ui_entity = None;
                     }
                 }

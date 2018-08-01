@@ -265,7 +265,7 @@ fn main() {
     let builder = glutin::WindowBuilder::new()
         .with_title("ld39".to_string())
         .with_dimensions(dim[0] as u32, dim[1] as u32);
-    let context = glutin::ContextBuilder::new();
+    let context = glutin::ContextBuilder::new().with_vsync(true);
 
     let (window, mut device, mut factory, main_color, main_depth) =
         gfx_window_glutin::init::<ColorFormat, DepthFormat>(builder, context, &events_loop);
@@ -324,6 +324,10 @@ fn main() {
     }
 
     world.add_resource(settings);
+
+    let mut frame_time_text = components::Text::new(25.0, 200, 30);
+    let frame_time_transform = components::Transform::visible(20.0, 20.0, 10.0, 200, 30, 0.0, 1.0, 1.0);
+    let frame_time_color = components::Color([1.0, 0.0, 0.0, 1.0]);
 
     while running {
         let duration = time::Instant::now() - frame_start;
@@ -465,6 +469,9 @@ fn main() {
                 );
             }
         }
+
+        frame_time_text.set_text(format!("dt: {}", math::get_milliseconds(&duration)));
+        basic.render_text(&mut encoder, &frame_time_text, &frame_time_transform, &frame_time_color, &mut glyph_brush);
 
         encoder.flush(&mut device);
 

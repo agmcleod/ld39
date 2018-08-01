@@ -144,6 +144,7 @@ impl<'a> System<'a> for Gathering {
                     &mut actions_storage,
                     &mut tutorial_step_storage,
                     &tutorial_ui_storage,
+                    &node_storage,
                     TutorialStep::CoalGathered,
                     TutorialStep::SellResources,
                 );
@@ -153,6 +154,7 @@ impl<'a> System<'a> for Gathering {
                     &mut actions_storage,
                     &mut tutorial_step_storage,
                     &tutorial_ui_storage,
+                    &node_storage,
                     TutorialStep::BuildCoal(0.0, 0.0),
                     TutorialStep::CoalGathered,
                 );

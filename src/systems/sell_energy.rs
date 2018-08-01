@@ -1,6 +1,6 @@
 use components::ui::WalletUI;
 use components::{ui::TutorialUI, upgrade::Buff, Actions, Button, ClickSound, DeltaTime, Input,
-                 PowerBar, ResearchedBuffs, ResourceType, Resources, Text, Transform,
+                 Node, PowerBar, ResearchedBuffs, ResourceType, Resources, Text, Transform,
                  TutorialStep, Wallet};
 use entities::tutorial;
 use specs::{Entities, Join, Read, ReadStorage, System, Write, WriteStorage};
@@ -39,6 +39,7 @@ impl<'a> System<'a> for SellEnergy {
         Write<'a, ClickSound>,
         Read<'a, DeltaTime>,
         Read<'a, Input>,
+        WriteStorage<'a, Node>,
         WriteStorage<'a, PowerBar>,
         Read<'a, ResearchedBuffs>,
         Write<'a, Resources>,
@@ -58,6 +59,7 @@ impl<'a> System<'a> for SellEnergy {
             mut click_sound_storage,
             delta_time_storage,
             input_storage,
+            node_storage,
             mut power_bar_storage,
             researched_buffs_storage,
             mut resources_storage,
@@ -97,6 +99,7 @@ impl<'a> System<'a> for SellEnergy {
                 &mut actions_storage,
                 &mut tutorial_step_storage,
                 &tutorial_ui_storage,
+                &node_storage,
                 TutorialStep::SellResources,
                 TutorialStep::ResourcesSold,
             );

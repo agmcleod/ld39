@@ -1,11 +1,12 @@
 use components::{upgrade::{Buff, LearnProgress, Status, Upgrade, UpgradeLinesLookup},
                  Color,
                  DeltaTime,
+                 Node,
                  ResearchedBuffs,
                  ResearchingEntities,
                  Shape,
                  Transform};
-use entities::tech_tree::{get_color_from_status, traverse_tree, TechTreeNode};
+use entities::{recursive_delete, tech_tree::{get_color_from_status, traverse_tree, TechTreeNode}};
 use specs::{Entities, Join, Read, ReadExpect, ReadStorage, System, Write, WriteStorage};
 use std::collections::HashMap;
 use std::ops::{Deref, DerefMut};
@@ -26,6 +27,7 @@ impl Research {
     fn update_progress_ui<'a>(
         &mut self,
         entities: Entities,
+        node_storage: &WriteStorage<'a, Node>,
         mut transform_storage: WriteStorage<'a, Transform>,
         learn_progress_storage: &ReadStorage<'a, LearnProgress>,
         researching_upgrades: &ResearchingUpgrades,
@@ -39,7 +41,7 @@ impl Research {
             if let Some(progress_time) = researching_upgrades.get(&learn_progress.buff) {
                 transform.size.x = (32.0 * (progress_time.0 / progress_time.1)) as u16;
                 if progress_time.0 / progress_time.1 >= 1.0 {
-                    entities.delete(entity).unwrap();
+                    recursive_delete(&entities, node_storage, &entity);
                     let entity_position = researching_entities
                         .entities
                         .iter()
@@ -68,6 +70,7 @@ impl<'a> System<'a> for Research {
         WriteStorage<'a, Color>,
         Read<'a, DeltaTime>,
         ReadStorage<'a, LearnProgress>,
+        WriteStorage<'a, Node>,
         Write<'a, ResearchedBuffs>,
         Write<'a, ResearchingEntities>,
         WriteStorage<'a, Shape>,
@@ -83,6 +86,7 @@ impl<'a> System<'a> for Research {
             mut color_storage,
             delta_time_storage,
             learn_progress_storage,
+            node_storage,
             mut researched_buffs,
             mut researching_entities_storage,
             mut shape_storage,
@@ -117,6 +121,7 @@ impl<'a> System<'a> for Research {
 
         self.update_progress_ui(
             entities,
+            &node_storage,
             transform_storage,
             &learn_progress_storage,
             &researching_upgrades,

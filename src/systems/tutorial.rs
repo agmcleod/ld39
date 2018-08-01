@@ -1,7 +1,7 @@
 use components::{ui::TutorialUI, Actions, Color, DeltaTime, EntityLookup, Node, Pulse, Rect,
                  Shape, Text, Tile, TileNodes, TileType, Transform, TutorialStep,
                  CITY_POWER_STATE_COORDS};
-use entities::tutorial;
+use entities::{recursive_delete, tutorial};
 use renderer;
 use settings::Settings;
 use specs::{Entities, Join, Read, System, Write, WriteStorage};
@@ -212,7 +212,7 @@ impl<'a> System<'a> for Tutorial {
                         TutorialStep::Objective(time_left - delta_time_storage.deref().dt);
                     if time_left - delta_time_storage.deref().dt <= 0.0 {
                         for (entity, _) in (&*entities, &tutorial_ui_storage).join() {
-                            entities.delete(entity).unwrap();
+                            recursive_delete(&entities, &node_storage, &entity);
                         }
                         let settings = settings_storage.deref_mut();
                         settings.set_completed_tutorial(true);

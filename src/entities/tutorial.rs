@@ -1,8 +1,8 @@
 use cgmath::Vector2;
 use components::{ui::TutorialUI, Actions, Color, EntityLookup, Node, Pulse, Rect, Shape, Text,
                  Transform, TutorialStep};
-use entities::create_tooltip;
-use specs::{Entities, Entity, Join, Read, ReadStorage, Write, WriteStorage};
+use entities::{create_tooltip, recursive_delete};
+use specs::{Entities, Join, Read, ReadStorage, Write, WriteStorage};
 use std::ops::{Deref, DerefMut};
 use systems::logic;
 
@@ -85,13 +85,14 @@ pub fn next_step(
     actions_storage: &mut Write<Actions>,
     tutorial_step_storage: &mut Write<TutorialStep>,
     tutorial_ui_storage: &ReadStorage<TutorialUI>,
+    node_storage: &WriteStorage<Node>,
     current_step: TutorialStep,
     next_step: TutorialStep,
 ) -> bool {
     let tutorial_step = tutorial_step_storage.deref_mut();
     if tutorial_step.as_string() == current_step.as_string() {
         for (entity, _) in (&**entities, tutorial_ui_storage).join() {
-            entities.delete(entity).unwrap();
+            recursive_delete(entities, node_storage, &entity);
         }
         let actions = actions_storage.deref_mut();
         actions.dispatch(next_step.as_string());
@@ -106,12 +107,13 @@ pub fn clear_ui(
     entities: &Entities,
     tutorial_step_storage: &Write<TutorialStep>,
     tutorial_ui_storage: &ReadStorage<TutorialUI>,
+    node_storage: &WriteStorage<Node>,
     current_step: TutorialStep,
 ) {
     let tutorial_step = tutorial_step_storage.deref();
     if tutorial_step.as_string() == current_step.as_string() {
         for (entity, _) in (&**entities, tutorial_ui_storage).join() {
-            entities.delete(entity).unwrap();
+            recursive_delete(entities, node_storage, &entity);
         }
     }
 }

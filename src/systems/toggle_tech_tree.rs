@@ -78,6 +78,7 @@ impl ToggleTechTree {
                 actions_storage,
                 tutorial_step_storage,
                 tutorial_ui_storage,
+                node_storage,
                 TutorialStep::ShowUpgrades,
                 TutorialStep::Upgrade,
             );
@@ -94,6 +95,7 @@ impl ToggleTechTree {
         entities: &Entities,
         actions_storage: &mut Write<Actions>,
         button_storage: &mut WriteStorage<Button>,
+        node_storage: &WriteStorage<Node>,
         transform_storage: &mut WriteStorage<Transform>,
         tutorial_step_storage: &mut Write<TutorialStep>,
         tutorial_ui_storage: &ReadStorage<TutorialUI>,
@@ -135,6 +137,7 @@ impl ToggleTechTree {
                 actions_storage,
                 tutorial_step_storage,
                 tutorial_ui_storage,
+                node_storage,
                 TutorialStep::Resume,
                 TutorialStep::Objective(20.0),
             );
@@ -195,6 +198,7 @@ impl<'a> System<'a> for ToggleTechTree {
                     &mut actions_storage,
                     &mut tutorial_step_storage,
                     &tutorial_ui_storage,
+                    &node_storage,
                     TutorialStep::ResourcesSold,
                     TutorialStep::ShowUpgrades,
                 );
@@ -205,6 +209,7 @@ impl<'a> System<'a> for ToggleTechTree {
                 &mut actions_storage,
                 &mut tutorial_step_storage,
                 &tutorial_ui_storage,
+                &node_storage,
                 TutorialStep::ResourcesSold,
                 TutorialStep::Objective(20.0),
             );
@@ -233,6 +238,7 @@ impl<'a> System<'a> for ToggleTechTree {
             &entities,
             &mut actions_storage,
             &mut button_storage,
+            &node_storage,
             &mut transform_storage,
             &mut tutorial_step_storage,
             &tutorial_ui_storage,
