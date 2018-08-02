@@ -199,7 +199,7 @@ impl<'a> System<'a> for Tutorial {
                 CITY_POWER_STATE_COORDS[0].0 + 640.0,
                 CITY_POWER_STATE_COORDS[0].1,
                 280.0,
-                100.0,
+                120.0,
                 "When the power # becomes positive, it means you are producing enough to supply this city. Click Power Additional City to add another city. Having a positive output with all 4 is the goal of the game.\n\nBest of luck!"
             ));
         }
