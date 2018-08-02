@@ -174,7 +174,7 @@ pub fn create<'a, 'b: 'a>(
                 text_storage,
                 transform_storage,
             },
-            format!("${}", GathererType::Oil.get_build_cost()),
+            format!("${}", GathererType::Solar.get_build_cost()),
             16.0,
             102.0,
             79.0,
@@ -218,6 +218,23 @@ pub fn create<'a, 'b: 'a>(
             .unwrap();
 
         new_entities.push(hydro_entity);
+        let text = create_text::create(
+            &mut TextStorage {
+                entities,
+                color_storage,
+                text_storage,
+                transform_storage,
+            },
+            format!("${}", GathererType::Hydro.get_build_cost()),
+            16.0,
+            29.0,
+            79.0,
+            0.0,
+            50,
+            20,
+            Color([0.0, 1.0, 0.0, 1.0]),
+        );
+        new_entities.push(text);
     }
 
     let dim = renderer::get_dimensions();
