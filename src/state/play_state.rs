@@ -32,8 +32,7 @@ use components::{ui::{PollutionCount, WalletUI},
                  TileType,
                  Transform,
                  TutorialStep,
-                 Wallet,
-                 CITY_POWER_STATE_COORDS};
+                 Wallet};
 use entities::{create_map, create_power_bar, create_text, tech_tree};
 use rand::{thread_rng, Rng};
 use renderer;
@@ -101,11 +100,6 @@ impl<'a> PlayState<'a> {
             )
             .with(systems::Research::new(), "research", &[])
             .with(systems::Pollution::new(), "pollution", &["gathering"])
-            .with(
-                systems::CitiesToPower {},
-                "cities_to_power",
-                &["button_hover"],
-            )
             .with(
                 systems::FloatingTextSystem::new(),
                 "floating_text_system",
@@ -221,7 +215,7 @@ impl<'a> State for PlayState<'a> {
         world.add_resource(Resources::new());
         world.add_resource(Wallet::new());
         world.add_resource(InternalState::Game);
-        world.add_resource(TutorialStep::SelectTile);
+        world.add_resource(TutorialStep::default());
 
         let dimensions = renderer::get_dimensions();
 
@@ -250,27 +244,16 @@ impl<'a> State for PlayState<'a> {
 
         side_bar_container_node.add(entity);
 
-        let mut powerbar_frame_entities = Vec::new();
+        let entity = world
+            .create_entity()
+            .with(Transform::visible(
+                30.0, 32.0, 0.0, 130, 16, 0.0, 1.0, 1.0,
+            ))
+            .with(Sprite { frame_name: "powerbar.png".to_string() })
+            .build();
+        side_bar_container_node.add(entity);
 
-        for (i, coords) in CITY_POWER_STATE_COORDS.iter().enumerate() {
-            let frame_name = if i == 0 {
-                "powerbar.png".to_string()
-            } else {
-                "powerbar_disabled.png".to_string()
-            };
-
-            let entity = world
-                .create_entity()
-                .with(Transform::visible(
-                    coords.0, coords.1, 0.0, 130, 16, 0.0, 1.0, 1.0,
-                ))
-                .with(Sprite { frame_name })
-                .build();
-            side_bar_container_node.add(entity);
-            powerbar_frame_entities.push(entity);
-        }
-
-        world.add_resource(CityPowerState::new(powerbar_frame_entities));
+        world.add_resource(CityPowerState::new());
 
         // create first ppower bar
         {
@@ -290,23 +273,6 @@ impl<'a> State for PlayState<'a> {
             let entity = create_power_bar::create(&mut storages, 33.0, 35.0, 40);
             side_bar_container_node.add(entity);
         }
-
-        // add city power target
-        let power_additional_city = world
-            .create_entity()
-            .with(Sprite {
-                frame_name: "power_additional_city.png".to_string(),
-            })
-            .with(Button::new(
-                "power_additional_city".to_string(),
-                [
-                    "power_additional_city.png".to_string(),
-                    "power_additional_city_hover.png".to_string(),
-                ],
-            ))
-            .with(Transform::visible(30.0, 80.0, 0.0, 96, 32, 0.0, 1.0, 1.0))
-            .build();
-        side_bar_container_node.add(power_additional_city);
 
         // coal sprite
         let entity = world
@@ -436,9 +402,6 @@ impl<'a> State for PlayState<'a> {
             lookup
                 .entities
                 .insert("show_button_entity".to_string(), entity);
-            lookup
-                .entities
-                .insert("power_additional_city".to_string(), power_additional_city);
 
             let entities = world.entities();
             let mut color_storage = world.write_storage::<Color>();
@@ -562,10 +525,10 @@ impl<'a> State for PlayState<'a> {
                 "Power: ".to_string(),
                 24.0,
                 30.0,
-                120.0,
+                90.0,
                 0.0,
                 160,
-                32,
+                64,
                 Color([0.0, 0.6, 0.0, 1.0]),
             );
 

@@ -1,7 +1,6 @@
 mod animation_system;
 mod build_gatherer;
 mod button_hover;
-mod cities_to_power;
 mod floating_text_system;
 mod gathering;
 pub mod logic;
@@ -17,13 +16,12 @@ mod toggle_pause;
 mod toggle_tech_tree;
 mod tutorial;
 
-pub const TICK_RATE: f32 = 3.0;
+pub const TICK_RATE: f32 = 2.5;
 pub const POWER_FACTOR: i32 = 1;
 
 pub use self::animation_system::*;
 pub use self::build_gatherer::*;
 pub use self::button_hover::*;
-pub use self::cities_to_power::*;
 pub use self::floating_text_system::*;
 pub use self::gathering::*;
 pub use self::pollution::*;

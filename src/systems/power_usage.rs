@@ -1,4 +1,4 @@
-use components::{Color, DeltaTime, EntityLookup, GatheringRate, PowerBar, ResourceCount,
+use components::{CityPowerState, Color, DeltaTime, EntityLookup, GatheringRate, PowerBar, ResourceCount,
                  Resources, StateChange, Text, Transform};
 use specs::{Join, Read, ReadStorage, System, Write, WriteStorage};
 use state::play_state::PlayState;
@@ -22,6 +22,7 @@ impl PowerUsage {
 
 impl<'b> System<'b> for PowerUsage {
     type SystemData = (
+        Write<'b, CityPowerState>,
         WriteStorage<'b, Color>,
         Read<'b, DeltaTime>,
         Read<'b, EntityLookup>,
@@ -36,6 +37,7 @@ impl<'b> System<'b> for PowerUsage {
 
     fn run(&mut self, data: Self::SystemData) {
         let (
+            mut city_power_state_storage,
             mut color_storage,
             delta_time_storage,
             entity_lookup_storage,
@@ -53,7 +55,7 @@ impl<'b> System<'b> for PowerUsage {
         let dt = delta_time_storage.deref().dt;
         let mut reset_frame_counter = false;
 
-        let mut num_of_cites_to_power = 0;
+        let city_power_state = city_power_state_storage.deref_mut();
         for (transform, power_bar) in (&mut transform_storage, &mut power_bar_storage).join() {
             if self.frame_count * dt >= TICK_RATE {
                 reset_frame_counter = true;
@@ -71,8 +73,6 @@ impl<'b> System<'b> for PowerUsage {
                     * (power_bar.power_left as f32 / PowerBar::get_max_f32());
                 transform.size.x = width as u16;
             }
-
-            num_of_cites_to_power += 1;
         }
 
         if reset_frame_counter {
@@ -83,6 +83,9 @@ impl<'b> System<'b> for PowerUsage {
 
         let power_gain_entity = lookup.entities.get(&"power_gain_text".to_string()).unwrap();
         let gathering_rate = gathering_rate_storage.deref();
+
+        // technically singular, so we could maybe make this a resource
+        // or at least lookup via entity
         let power_demands = (&power_bar_storage)
             .join()
             .fold(0, |sum, power_bar| sum + power_bar.power_per_tick)
@@ -90,8 +93,26 @@ impl<'b> System<'b> for PowerUsage {
 
         let total_gathering_rate = logic::get_total_gathering_rate(&gathering_rate);
 
-        text_storage.get_mut(*power_gain_entity).unwrap().text =
-            format!("Power: {}", total_gathering_rate - power_demands);
+        if total_gathering_rate - power_demands > 0 {
+            city_power_state.current_city_count += 1;
+            for power_bar in (&mut power_bar_storage).join() {
+                let mut per_tick = power_bar.power_per_tick;
+                // each city is more demanding
+                for n in 0..city_power_state.current_city_count {
+                    per_tick += power_bar.power_per_tick + 5 * n as i32;
+                }
+                power_bar.power_per_tick = per_tick;
+            }
+        }
+
+        let powering_text = if city_power_state.current_city_count > 1 {
+            format!("Power: {}\n{} cities", total_gathering_rate - power_demands, city_power_state.current_city_count)
+        } else {
+            format!("Power: {}", total_gathering_rate - power_demands)
+        };
+
+        text_storage.get_mut(*power_gain_entity).unwrap().text = powering_text;
+
         color_storage
             .insert(
                 *power_gain_entity,
@@ -102,10 +123,6 @@ impl<'b> System<'b> for PowerUsage {
                 }),
             )
             .unwrap();
-
-        if num_of_cites_to_power >= 4 && total_gathering_rate >= power_demands {
-            println!("~~~~~Meeting demands~~~~");
-        }
 
         for (resource_count, text) in (&resource_count_storage, &mut text_storage).join() {
             let new_text = format!(

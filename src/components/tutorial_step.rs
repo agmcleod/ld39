@@ -2,6 +2,7 @@ use std::fmt::{self, Display};
 
 #[derive(Debug, PartialEq)]
 pub enum TutorialStep {
+    NotStarted,
     SelectTile,
     BuildCoal(f32, f32),
     CoalGathered,
@@ -31,6 +32,6 @@ impl TutorialStep {
 
 impl Default for TutorialStep {
     fn default() -> Self {
-        TutorialStep::SelectTile
+        TutorialStep::NotStarted
     }
 }

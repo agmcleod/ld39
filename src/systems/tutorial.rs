@@ -1,6 +1,5 @@
 use components::{ui::TutorialUI, Actions, Color, DeltaTime, EntityLookup, Node, Pulse, Rect,
-                 Shape, Text, Tile, TileNodes, TileType, Transform, TutorialStep,
-                 CITY_POWER_STATE_COORDS};
+                 Shape, Text, Tile, TileNodes, TileType, Transform, TutorialStep};
 use entities::{recursive_delete, tutorial};
 use renderer;
 use settings::Settings;
@@ -161,8 +160,8 @@ impl<'a> System<'a> for Tutorial {
             ));
         } else if actions.action_fired(&TutorialStep::ResourcesSold.as_string()) {
             details = Some(StepCreationDetails::new(
-                CITY_POWER_STATE_COORDS[0].0 + 640.0,
-                CITY_POWER_STATE_COORDS[0].1,
+                670.0,
+                32.0,
                 280.0,
                 360.0,
                 "When you sell, the resources go to the power grid filling up the city power bars. Your money also goes up.\n\nUse money to keep building. Be wary of building next to a tile occupied by a city or by nature."
@@ -196,8 +195,8 @@ impl<'a> System<'a> for Tutorial {
         } else if actions.action_fired(&TutorialStep::Objective(0.0).as_string()) {
             self.hide_last_step_time = 10.0;
             details = Some(StepCreationDetails::new(
-                CITY_POWER_STATE_COORDS[0].0 + 640.0,
-                CITY_POWER_STATE_COORDS[0].1,
+                670.0,
+                32.0,
                 280.0,
                 120.0,
                 "When the power # becomes positive, it means you are producing enough to supply this city. Click Power Additional City to add another city. Having a positive output with all 4 is the goal of the game.\n\nBest of luck!"

@@ -167,6 +167,10 @@ pub fn create<'a, 'b: 'a>(
             .unwrap();
 
         new_entities.push(solar_entity);
+        let mut cost = GathererType::Solar.get_build_cost();
+        if researched_buffs.0.contains(&Buff::PurchaseSolarCellCompany) {
+            cost -= cost * 20 / 100;
+        }
         let text = create_text::create(
             &mut TextStorage {
                 entities,
@@ -174,7 +178,7 @@ pub fn create<'a, 'b: 'a>(
                 text_storage,
                 transform_storage,
             },
-            format!("${}", GathererType::Solar.get_build_cost()),
+            format!("${}", cost),
             16.0,
             102.0,
             79.0,

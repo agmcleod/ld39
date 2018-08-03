@@ -325,9 +325,9 @@ fn main() {
 
     world.add_resource(settings);
 
-    let mut frame_time_text = components::Text::new(25.0, 200, 30);
-    let frame_time_transform = components::Transform::visible(20.0, 20.0, 10.0, 200, 30, 0.0, 1.0, 1.0);
-    let frame_time_color = components::Color([1.0, 0.0, 0.0, 1.0]);
+    // let mut frame_time_text = components::Text::new(25.0, 200, 30);
+    // let frame_time_transform = components::Transform::visible(20.0, 20.0, 10.0, 200, 30, 0.0, 1.0, 1.0);
+    // let frame_time_color = components::Color([1.0, 0.0, 0.0, 1.0]);
 
     while running {
         let duration = time::Instant::now() - frame_start;
@@ -470,8 +470,8 @@ fn main() {
             }
         }
 
-        frame_time_text.set_text(format!("dt: {}", math::get_milliseconds(&duration)));
-        basic.render_text(&mut encoder, &frame_time_text, &frame_time_transform, &frame_time_color, &mut glyph_brush);
+        // frame_time_text.set_text(format!("dt: {}", math::get_milliseconds(&duration)));
+        // basic.render_text(&mut encoder, &frame_time_text, &frame_time_transform, &frame_time_color, &mut glyph_brush);
 
         encoder.flush(&mut device);
 
