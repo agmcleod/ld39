@@ -192,6 +192,8 @@ impl<'a> System<'a> for TechTree {
                     (transform.size.x, transform.size.y)
                 };
 
+                let tooltip_size = (180, 180);
+
                 let mut tooltip_entity = create_tooltip::create(
                     &entities,
                     &mut color_storage,
@@ -203,8 +205,8 @@ impl<'a> System<'a> for TechTree {
                     tooltip_position[1] + 32.0,
                     container_w as i32,
                     container_h as i32,
-                    160,
-                    160,
+                    tooltip_size.0,
+                    tooltip_size.1,
                     tech_tree_node_ui.text.clone(),
                     None,
                 );
@@ -219,6 +221,7 @@ impl<'a> System<'a> for TechTree {
                 };
 
                 {
+                    let text_y = (tooltip_size.1 - 30) as f32;
                     let tooltip_node = node_storage.get_mut(tooltip_entity).unwrap();
                     if upgrade.status == Status::Researched {
                         let text = create_text::create(
@@ -226,7 +229,7 @@ impl<'a> System<'a> for TechTree {
                             "Researched".to_string(),
                             20.0,
                             5.0,
-                            130.0,
+                            text_y,
                             0.0,
                             120,
                             20,
@@ -239,7 +242,7 @@ impl<'a> System<'a> for TechTree {
                             format!("${}", tech_tree_node_ui.cost),
                             20.0,
                             5.0,
-                            130.0,
+                            text_y,
                             0.0,
                             70,
                             20,
@@ -258,7 +261,7 @@ impl<'a> System<'a> for TechTree {
                             format!("{} sec", time_left),
                             20.0,
                             100.0,
-                            130.0,
+                            text_y,
                             0.0,
                             70,
                             20,

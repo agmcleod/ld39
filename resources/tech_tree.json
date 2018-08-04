@@ -5,7 +5,7 @@
   "status": "Researched",
   "x": 0.5,
   "y_tier": 0,
-  "description": "Unlocks ability to mine coal",
+  "description": "Coal Mining:\nUnlocks ability to mine coal",
   "frame_name": "coalnode.png",
   "children": [{
     "buff": "ResourceTrading",
@@ -14,7 +14,7 @@
     "status": "Researchable",
     "x": 0.75,
     "y_tier": 1,
-    "description": "+1 unit gained for having the same gatherer type as a neighbour",
+    "description": "Resource Trading:\n+1 unit gained for having the same gatherer type as a neighbour",
     "frame_name": "resourcetrading.png"
   }, {
     "buff": "ConveyerBelts",
@@ -23,7 +23,7 @@
     "status": "Researchable",
     "x": 0.20,
     "y_tier": 1,
-    "description": "+1 coal gain rate & +1 more pollution per gatherer.",
+    "description": "Conveyer Belts:\n+1 coal gain rate & +1 more pollution per gatherer.",
     "frame_name": "conveyerbelts.png",
     "children": [{
       "buff": "RoboticLoaders",
@@ -32,7 +32,7 @@
       "status": "Locked",
       "x": 0.20,
       "y_tier": 2,
-      "description": "+1 coal gain rate",
+      "description": "Robotic Loaders:\n+1 coal gain rate",
       "frame_name": "roboticloaders.png",
       "children": [{
         "buff": "PollutionFilters",
@@ -41,7 +41,7 @@
         "status": "Locked",
         "x": 0.1,
         "y_tier": 3,
-        "description": "+20% pollution reduction",
+        "description": "Pollution Filters:\n+20% pollution reduction for coal",
         "frame_name": "pollutionfilters.png"
       }]
     }]
@@ -52,7 +52,7 @@
     "status": "Researchable",
     "x": 0.5,
     "y_tier": 1,
-    "description": "Unlocks ability to dig for oil",
+    "description": "Oil Refineries:\nUnlocks ability to dig for oil",
     "frame_name": "oilnode.png",
     "children": [{
       "buff": "FudgeTheNumbers",
@@ -61,7 +61,7 @@
       "status": "Locked",
       "x": 0.35,
       "y_tier": 2,
-      "description": "20% pollution reduction",
+      "description": "Fudge The Numbers:\n20% pollution reduction for oil",
       "frame_name": "fudgethenumbers.png"
     }, {
       "buff": "AutomatedRefiners",
@@ -70,7 +70,7 @@
       "status": "Locked",
       "x": 0.65,
       "y_tier": 2,
-      "description": "+1 oil gain rate, +1 more pollution.",
+      "description": "Automatic Refiners:\n+1 oil gain rate, +1 more pollution.",
       "frame_name": "automatedrefiners.png"
     }, {
       "buff": "Purifier",
@@ -79,7 +79,7 @@
       "status": "Locked",
       "x": 0.85,
       "y_tier": 2,
-      "description": "+1 oil gain rate",
+      "description": "Oil Purifier:\n+1 oil gain rate",
       "frame_name": "purifier.png"
     }, {
       "buff": "Hydro",
@@ -88,7 +88,7 @@
       "status": "Locked",
       "x": 0.35,
       "y_tier": 4,
-      "description": "Unlocks ability to collect hydro power",
+      "description": "Hydro Power:\nUnlocks ability to collect hydro power by constructing hydro plants",
       "frame_name": "hydro.png",
       "children": [{
         "buff": "SalmonCannon",
@@ -97,7 +97,7 @@
         "status": "Locked",
         "x": 0.20,
         "y_tier": 5,
-        "description": "20% pollution reduction",
+        "description": "Salmon Cannon:\n20% pollution reduction",
         "frame_name": "salmoncannon.png"
       }, {
         "buff": "ReinforcedTurbines",
@@ -106,7 +106,7 @@
         "status": "Locked",
         "x": 0.35,
         "y_tier": 5,
-        "description": "+2 energy harvested from the water",
+        "description": "Reinforced Turbines:\n+2 energy harvested from the water",
         "frame_name": "reinforcedturbines.png"
       }]
     }, {
@@ -116,7 +116,7 @@
       "status": "Locked",
       "x": 0.65,
       "y_tier": 4,
-      "description": "Unlocks ability to harvest solar power",
+      "description": "Solar Power:\nUnlocks ability to harvest solar power",
       "frame_name": "solar.png",
       "children": [{
         "buff": "PurchaseSolarCellCompany",
@@ -125,7 +125,7 @@
         "status": "Locked",
         "x": 0.65,
         "y_tier": 5,
-        "description": "20% cost reduction to build solar.",
+        "description": "Purchase Solar Cell Company:\n20% cost reduction to build solar.",
         "frame_name": "purchasesolarcellcompany.png",
         "children": [{
           "buff": "SellPanelsToConsumers",
@@ -134,7 +134,7 @@
           "status": "Locked",
           "x": 0.65,
           "y_tier": 6,
-          "description": "$10 every minute",
+          "description": "Sell Panels to Consumers:\n$10 every minute",
           "frame_name": "sellpanels.png"
         }]
       }, {
@@ -144,7 +144,7 @@
         "status": "Locked",
         "x": 0.85,
         "y_tier": 5,
-        "description": "+2 more energy harvested from the solar plants",
+        "description": "Improved Panel Tech:\n+2 more energy harvested from the solar plants",
         "frame_name": "improvedpaneltech.png"
       }]
     }]
