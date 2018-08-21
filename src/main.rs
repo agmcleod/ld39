@@ -320,6 +320,8 @@ fn main() {
         let mut actions = world.write_resource::<Actions>();
         if !settings.completed_tutorial {
             actions.dispatch(TutorialStep::SelectTile.as_string());
+            let mut tutorial_step = world.write_resource::<TutorialStep>();
+            *tutorial_step = TutorialStep::SelectTile;
         }
     }
 

@@ -22,7 +22,7 @@ pub fn create(
                 y,
                 1.0,
                 PowerBar::get_max_width() as u16,
-                10,
+                24,
                 0.0,
                 1.0,
                 1.0,

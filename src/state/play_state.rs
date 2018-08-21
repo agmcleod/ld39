@@ -247,7 +247,7 @@ impl<'a> State for PlayState<'a> {
         let entity = world
             .create_entity()
             .with(Transform::visible(
-                30.0, 32.0, 0.0, 130, 16, 0.0, 1.0, 1.0,
+                30.0, 32.0, 0.0, 260, 32, 0.0, 1.0, 1.0,
             ))
             .with(Sprite { frame_name: "powerbar.png".to_string() })
             .build();
@@ -255,7 +255,7 @@ impl<'a> State for PlayState<'a> {
 
         world.add_resource(CityPowerState::new());
 
-        // create first ppower bar
+        // create first power bar
         {
             let entities = world.entities();
             let mut color_storage = world.write_storage::<Color>();
@@ -270,7 +270,7 @@ impl<'a> State for PlayState<'a> {
                 transform_storage: &mut transform_storage,
             };
 
-            let entity = create_power_bar::create(&mut storages, 33.0, 35.0, 40);
+            let entity = create_power_bar::create(&mut storages, 34.0, 36.0, 40);
             side_bar_container_node.add(entity);
         }
 
@@ -525,7 +525,7 @@ impl<'a> State for PlayState<'a> {
                 "Power: ".to_string(),
                 24.0,
                 30.0,
-                90.0,
+                70.0,
                 0.0,
                 160,
                 64,

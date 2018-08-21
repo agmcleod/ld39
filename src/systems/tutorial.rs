@@ -198,8 +198,8 @@ impl<'a> System<'a> for Tutorial {
                 670.0,
                 32.0,
                 280.0,
-                120.0,
-                "When the power # becomes positive, it means you are producing enough to supply this city. Click Power Additional City to add another city. Having a positive output with all 4 is the goal of the game.\n\nBest of luck!"
+                80.0,
+                "When the power # becomes positive, it means you are producing enough to supply this city. The demand will then increase by adding another city. Produce the most power for the most cities that you can.\n\nBest of luck!"
             ));
         }
 
