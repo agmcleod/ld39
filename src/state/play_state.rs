@@ -169,16 +169,26 @@ impl<'a> State for PlayState<'a> {
                     tile_type.clone()
                 } else {
                     let r = rng.gen_range(0, 10);
-                    if r >= 9 {
-                        TileType::River
-                    } else if r >= 6 {
-                        TileType::City
+                    if set_nodes.contains_key(&(col, row - 1)) && set_nodes.get(&(col, row - 1)).unwrap().0 == TileType::River {
+                        if r >= 4 {
+                            TileType::River
+                        } else if r >= 2 {
+                            TileType::City
+                        } else {
+                            TileType::EcoSystem
+                        }
                     } else {
-                        TileType::EcoSystem
+                        if r >= 9 {
+                            TileType::River
+                        } else if r >= 6 {
+                            TileType::City
+                        } else {
+                            TileType::EcoSystem
+                        }
                     }
                 };
                 let tile = Tile::new(tile_type);
-                let sprite_frames = Tile::get_sprite_frames(&tile.tile_type);
+                let sprite_frames = Tile::get_sprite_frames(&mut rng, &tile.tile_type);
                 let frame_one = sprite_frames[0].clone();
                 let tile_type = tile.tile_type.clone();
                 let tile_entity = world
