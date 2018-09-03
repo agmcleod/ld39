@@ -32,7 +32,14 @@ impl Tile {
                     ["river3.png".to_string(), "river3_highlight.png".to_string()]
                 }
             },
-            TileType::City => ["city.png".to_string(), "city_highlight.png".to_string()],
+            TileType::City => {
+                let rand = rng.gen_range(0, 2);
+                if rand == 0 {
+                    ["city.png".to_string(), "city_highlight.png".to_string()]
+                } else {
+                    ["city2.png".to_string(), "city2_highlight.png".to_string()]
+                }
+            },
         }
     }
 

@@ -24,7 +24,6 @@ use components::{ui::{PollutionCount, WalletUI},
                  ResourceType,
                  Resources,
                  SelectedTile,
-                 Shape,
                  Sprite,
                  Text,
                  Tile,
@@ -191,7 +190,7 @@ impl<'a> State for PlayState<'a> {
                 let sprite_frames = Tile::get_sprite_frames(&mut rng, &tile.tile_type);
                 let frame_one = sprite_frames[0].clone();
                 let tile_type = tile.tile_type.clone();
-                let tile_entity = world
+                let mut tile_entity = world
                     .create_entity()
                     .with(Transform::visible(
                         size * col as f32,
@@ -206,9 +205,13 @@ impl<'a> State for PlayState<'a> {
                     .with(Sprite {
                         frame_name: frame_one.clone(),
                     })
-                    .with(Button::new(frame_one, sprite_frames))
-                    .with(tile)
-                    .build();
+                    .with(tile);
+
+                if tile_type == TileType::Open || tile_type == TileType::River {
+                    tile_entity = tile_entity.with(Button::new(frame_one, sprite_frames));
+                }
+
+                let tile_entity = tile_entity.build();
 
                 if tile_type != TileType::Open {
                     // replace the empty entity at this position with the entity
