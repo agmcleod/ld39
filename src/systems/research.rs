@@ -6,7 +6,8 @@ use components::{upgrade::{Buff, LearnProgress, Status, Upgrade, UpgradeLinesLoo
                  ResearchingEntities,
                  Shape,
                  Transform};
-use entities::{recursive_delete, tech_tree::{get_color_from_status, traverse_tree, TechTreeNode}};
+use entities::{recursive_delete,
+               tech_tree::{get_color_from_status, traverse_tree, TechTreeNode}};
 use specs::{Entities, Join, Read, ReadExpect, ReadStorage, System, Write, WriteStorage};
 use std::collections::HashMap;
 use std::ops::{Deref, DerefMut};

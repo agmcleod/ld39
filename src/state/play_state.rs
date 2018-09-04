@@ -107,7 +107,19 @@ impl<'a> PlayState<'a> {
             .with(systems::TogglePause {}, "toggle_pause", &["button_hover"])
             .with(systems::Tutorial::new(), "tutorial", &[])
             .with(systems::PulseSystem {}, "pulse", &[])
-            .with(systems::TextAbsoluteCache {}, "text_absolute_cache", &["build_gatherer", "floating_text_system", "toggle_tech_tree", "power_usage", "pollution", "sell_energy", "tutorial"])
+            .with(
+                systems::TextAbsoluteCache {},
+                "text_absolute_cache",
+                &[
+                    "build_gatherer",
+                    "floating_text_system",
+                    "toggle_tech_tree",
+                    "power_usage",
+                    "pollution",
+                    "sell_energy",
+                    "tutorial",
+                ],
+            )
             .build();
 
         let tech_tree_dispatcher = DispatcherBuilder::new()
@@ -120,7 +132,11 @@ impl<'a> PlayState<'a> {
             .with(systems::TechTree::new(), "tech_tree", &[])
             .with(systems::Tutorial::new(), "tutorial", &[])
             .with(systems::PulseSystem {}, "pulse", &[])
-            .with(systems::TextAbsoluteCache {}, "text_absolute_cache", &["tutorial", "tech_tree", "toggle_tech_tree"])
+            .with(
+                systems::TextAbsoluteCache {},
+                "text_absolute_cache",
+                &["tutorial", "tech_tree", "toggle_tech_tree"],
+            )
             .build();
 
         let pause_dispatcher = DispatcherBuilder::new()
@@ -168,7 +184,9 @@ impl<'a> State for PlayState<'a> {
                     tile_type.clone()
                 } else {
                     let r = rng.gen_range(0, 10);
-                    if set_nodes.contains_key(&(col, row - 1)) && set_nodes.get(&(col, row - 1)).unwrap().0 == TileType::River {
+                    if set_nodes.contains_key(&(col, row - 1))
+                        && set_nodes.get(&(col, row - 1)).unwrap().0 == TileType::River
+                    {
                         if r >= 4 {
                             TileType::River
                         } else if r >= 2 {
@@ -259,10 +277,10 @@ impl<'a> State for PlayState<'a> {
 
         let entity = world
             .create_entity()
-            .with(Transform::visible(
-                30.0, 32.0, 0.0, 260, 32, 0.0, 1.0, 1.0,
-            ))
-            .with(Sprite { frame_name: "powerbar.png".to_string() })
+            .with(Transform::visible(30.0, 32.0, 0.0, 260, 32, 0.0, 1.0, 1.0))
+            .with(Sprite {
+                frame_name: "powerbar.png".to_string(),
+            })
             .build();
         side_bar_container_node.add(entity);
 

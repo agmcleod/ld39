@@ -13,7 +13,11 @@ use components::{ui::{TutorialUI, WalletUI},
                  Transform,
                  TutorialStep,
                  Wallet};
-use entities::{create_text, create_tooltip, recursive_delete, tutorial, tech_tree::{get_color_from_status, Status, Upgrade}};
+use entities::{create_text,
+               create_tooltip,
+               recursive_delete,
+               tech_tree::{get_color_from_status, Status, Upgrade},
+               tutorial};
 use specs::{Entities, Entity, Join, Read, ReadStorage, System, Write, WriteStorage};
 use std::ops::{Deref, DerefMut};
 use storage_types::*;

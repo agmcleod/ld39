@@ -2,7 +2,7 @@ use components::{ui::TutorialUI, Actions, Button, Color, EntityLookup, Gatherer,
                  Rect, ResearchedBuffs, SelectedTile, Sprite, Text, Tile, Transform, TutorialStep};
 use entities::{create_build_ui, recursive_delete, tutorial};
 use specs::{Entities, Entity, Join, Read, ReadStorage, System, Write, WriteStorage};
-use std::ops::{Deref};
+use std::ops::Deref;
 use systems::logic;
 
 pub struct TileSelection {

@@ -20,7 +20,7 @@ impl GathererType {
 
     pub fn get_frames(&self) -> Vec<String> {
         match *self {
-            GathererType::Coal => vec!["wheelbarrel.png".to_string()],
+            GathererType::Coal => vec!["mine.png".to_string()],
             GathererType::Oil => vec![
                 "refinery_1.png".to_string(),
                 "refinery_2.png".to_string(),

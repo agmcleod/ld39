@@ -45,8 +45,8 @@ pub fn create<'a, 'b: 'a>(
                 Button::new(
                     "build_coal".to_string(),
                     [
-                        "wheelbarrel_button_1.png".to_string(),
-                        "wheelbarrel_button_2.png".to_string(),
+                        "mine_button_1.png".to_string(),
+                        "mine_button_2.png".to_string(),
                     ],
                 ),
             )
@@ -55,7 +55,7 @@ pub fn create<'a, 'b: 'a>(
             .insert(
                 coal_entity,
                 Sprite {
-                    frame_name: "wheelbarrel_button_1.png".to_string(),
+                    frame_name: "mine_button_1.png".to_string(),
                 },
             )
             .unwrap();

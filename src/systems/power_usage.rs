@@ -1,5 +1,5 @@
-use components::{CityPowerState, Color, DeltaTime, EntityLookup, GatheringRate, PowerBar, ResourceCount,
-                 Resources, StateChange, Text, Transform};
+use components::{CityPowerState, Color, DeltaTime, EntityLookup, GatheringRate, PowerBar,
+                 ResourceCount, Resources, StateChange, Text, Transform};
 use specs::{Join, Read, ReadStorage, System, Write, WriteStorage};
 use state::play_state::PlayState;
 use std::ops::{Deref, DerefMut};
@@ -106,7 +106,11 @@ impl<'b> System<'b> for PowerUsage {
         }
 
         let powering_text = if city_power_state.current_city_count > 1 {
-            format!("Power: {}\n{} cities", total_gathering_rate - power_demands, city_power_state.current_city_count)
+            format!(
+                "Power: {}\n{} cities",
+                total_gathering_rate - power_demands,
+                city_power_state.current_city_count
+            )
         } else {
             format!("Power: {}", total_gathering_rate - power_demands)
         };
