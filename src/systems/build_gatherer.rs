@@ -196,7 +196,7 @@ impl<'a> System<'a> for BuildGatherer {
             }
 
             let gatherer = Gatherer::new(gatherer_type, pollution);
-            let mut anim = AnimationSheet::new(0.5);
+            let mut anim = AnimationSheet::new(0.35);
             anim.add_animation("default".to_string(), gatherer.gatherer_type.get_frames());
             anim.set_current_animation("default".to_string());
             let gatherer_entity = entities.create();
