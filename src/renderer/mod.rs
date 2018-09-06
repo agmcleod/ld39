@@ -7,9 +7,8 @@ pub type DepthFormat = gfx::format::Depth;
 
 pub use self::basic::*;
 
-pub fn get_ortho() -> Matrix4<f32> {
-    let dim = get_dimensions();
-    let mut m = ortho(0.0, dim[0], dim[1], 0.0, 100.0, 0.0);
+pub fn get_ortho(w: f32, h: f32) -> Matrix4<f32> {
+    let mut m = ortho(0.0, w, h, 0.0, 100.0, 0.0);
 
     m.z.z *= -1.0;
     m

@@ -80,11 +80,13 @@ where
         let sinfo =
             texture::SamplerInfo::new(texture::FilterMethod::Scale, texture::WrapMode::Clamp);
 
+        let dim = self::super::get_dimensions();
+
         Basic {
             pso: pso,
             projection: Projection {
                 model: Matrix4::identity().into(),
-                proj: self::super::get_ortho().into(),
+                proj: self::super::get_ortho(dim[0] as f32, dim[1] as f32).into(),
             },
             model: Matrix4::identity(),
             target: (*target).clone(),

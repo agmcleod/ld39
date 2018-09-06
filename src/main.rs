@@ -77,7 +77,8 @@ use std::time;
 use utils::math;
 
 fn setup_world(world: &mut World, window: &glutin::Window) {
-    world.add_resource::<Camera>(Camera(renderer::get_ortho()));
+    let dim = renderer::get_dimensions();
+    world.add_resource::<Camera>(Camera(renderer::get_ortho(dim[0], dim[1])));
     world.add_resource::<StateChange>(StateChange::new());
     world.add_resource::<Input>(Input::new(
         window.hidpi_factor(),
@@ -264,7 +265,9 @@ fn main() {
     let dim = renderer::get_dimensions();
     let builder = glutin::WindowBuilder::new()
         .with_title("ld39".to_string())
-        .with_dimensions(dim[0] as u32, dim[1] as u32);
+        .with_dimensions(dim[0] as u32, dim[1] as u32)
+        .with_min_dimensions(dim[0] as u32, dim[1] as u32)
+        .with_max_dimensions(dim[0] as u32, dim[1] as u32);
     let context = glutin::ContextBuilder::new().with_vsync(true);
 
     let (window, mut device, mut factory, main_color, main_depth) =
@@ -381,7 +384,11 @@ fn main() {
                                 };
                             }
                         }
-                    }
+                    },
+                    WindowEvent::HiDPIFactorChanged(factor) => {
+                        let mut input_res = world.write_resource::<Input>();
+                        input_res.hidpi_factor = factor;
+                    },
                     _ => {}
                 },
                 _ => (),
