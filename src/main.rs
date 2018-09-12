@@ -328,9 +328,6 @@ fn main() {
 
     world.add_resource(settings);
 
-    let window_size = window.get_inner_size().unwrap();
-    basic.set_viewport_rect(window_size, (16, 10));
-
     // let mut frame_time_text = components::Text::new(25.0, 200, 30);
     // let frame_time_transform = components::Transform::visible(20.0, 20.0, 10.0, 200, 30, 0.0, 1.0, 1.0);
     // let frame_time_color = components::Color([1.0, 0.0, 0.0, 1.0]);
@@ -391,14 +388,8 @@ fn main() {
                         input_res.hidpi_factor = factor;
                     },
                     WindowEvent::Resized(w, h) => {
-                        let factor = world.read_resource::<Input>().hidpi_factor as u32;
-                        println!("size: {} {} - dpi: {}", w , h, factor);
-                        window.resize(w * factor, h * factor);
+                        window.resize(w, h);
                         gfx_window_glutin::update_views(&window, &mut target.color, &mut target.depth);
-                        basic.set_viewport_rect((w, h), (16, 10));
-                        let w = (w / factor) as f32;
-                        let h = (h / factor) as f32;
-                        basic.scale_model(w / dim[0], h / dim[1]);
                     },
                     _ => {}
                 },

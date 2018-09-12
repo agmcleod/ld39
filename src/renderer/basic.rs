@@ -22,7 +22,6 @@ gfx_defines!{
     constant Projection {
         model: [[f32; 4]; 4] = "u_Model",
         proj: [[f32; 4]; 4] = "u_Proj",
-        scale: [[f32; 4]; 4] = "u_Scale",
     }
 
     pipeline pipe {
@@ -49,8 +48,6 @@ pub struct Basic<R: gfx::Resources> {
         gfx::handle::ShaderResourceView<R, [f32; 4]>,
         gfx::handle::Sampler<R>,
     ),
-    scale: Matrix4<f32>,
-    viewport_size: Rect,
 }
 
 impl<R> Basic<R>
@@ -90,13 +87,10 @@ where
             projection: Projection {
                 model: Matrix4::identity().into(),
                 proj: self::super::get_ortho(dim[0] as f32, dim[1] as f32).into(),
-                scale: Matrix4::identity().into(),
             },
             model: Matrix4::identity(),
             target: (*target).clone(),
             color_texture: (texture_view, factory.create_sampler(sinfo)),
-            scale: Matrix4::identity(),
-            viewport_size: Rect{ x: 0, y: 0, w: 0, h: 0 }
         }
     }
 
@@ -203,7 +197,6 @@ where
 
         self.projection.proj = (*camera).0.into();
         self.projection.model = self.model.into();
-        self.projection.scale = self.scale.into();
 
         encoder.update_constant_buffer(&params.projection_cb, &self.projection);
         encoder.draw(&slice, &self.pso, &params);
@@ -284,33 +277,11 @@ where
             .unwrap();
     }
 
-    pub fn scale_model(&mut self, x: f32, y: f32) {
-        self.scale = Matrix4::from_nonuniform_scale(1.0 / x, 1.0 / y, 1.0);
-    }
-
     pub fn transform(&mut self, transform: &components::Transform, undo: bool) {
         let mut transform = Matrix4::from_translation(*transform.get_pos());
         if undo {
             transform = transform.inverse_transform().unwrap();
         }
         self.model = self.model.concat(&transform);
-    }
-
-    pub fn set_viewport_rect(&mut self, screen_size: (u32, u32), target_aspect: (u32, u32)) {
-        let (screen_w, screen_h) = screen_size;
-        let (ax, ay) = target_aspect;
-
-        let width = cmp::min(screen_w, (screen_h * ax) / ay);
-        let height = cmp::min(screen_h, (screen_w * ay) / ax);
-
-        let left = (screen_w - width) / 2;
-        let bottom = (screen_h - height) / 2;
-
-        self.viewport_size = Rect{
-            x: left as u16,
-            y: bottom as u16,
-            w: width as u16,
-            h: height as u16,
-        };
     }
 }

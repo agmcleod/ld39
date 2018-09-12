@@ -10,11 +10,10 @@ out vec4 t_Color;
 uniform b_Projection {
     mat4 u_Model;
     mat4 u_Proj;
-    mat4 u_Scale;
 };
 
 void main() {
     v_Uv = a_Uv;
-    gl_Position = u_Proj * u_Model * u_Scale * vec4(a_Pos, 1.0);
+    gl_Position = u_Proj * u_Model * vec4(a_Pos, 1.0);
     t_Color = a_Color;
 }
