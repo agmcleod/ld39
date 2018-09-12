@@ -175,7 +175,7 @@ fn render_entity<R: gfx::Resources, C: gfx::CommandBuffer<R>, F: gfx::Factory<R>
                 (color_storage.get(*entity), text_storage.get_mut(*entity))
             {
                 if text.text != "" && text.visible {
-                    basic.render_text(encoder, &text, transform, color, glyph_brush);
+                    basic.render_text(encoder, &text, transform, color, glyph_brush, world.read_resource::<Input>().hidpi_factor);
                 }
             }
 
@@ -265,9 +265,7 @@ fn main() {
     let dim = renderer::get_dimensions();
     let builder = glutin::WindowBuilder::new()
         .with_title("ld39".to_string())
-        .with_dimensions(dim[0] as u32, dim[1] as u32)
-        .with_min_dimensions(dim[0] as u32, dim[1] as u32)
-        .with_max_dimensions(dim[0] as u32, dim[1] as u32);
+        .with_dimensions(dim[0] as u32, dim[1] as u32);
     let context = glutin::ContextBuilder::new().with_vsync(true);
 
     let (window, mut device, mut factory, main_color, main_depth) =
@@ -275,14 +273,14 @@ fn main() {
 
     let mut world = World::new();
 
-    let target = renderer::WindowTargets {
+    let mut target = renderer::WindowTargets {
         color: main_color,
         depth: main_depth,
     };
 
     let mut encoder: gfx::Encoder<_, _> = factory.create_command_buffer().into();
     let hidpi_factor = window.hidpi_factor();
-    let mut basic = renderer::Basic::new(&mut factory, &target, hidpi_factor);
+    let mut basic = renderer::Basic::new(&mut factory, &target);
 
     let asset_data = loader::read_text_from_file("resources/assets.json").unwrap();
     let spritesheet: Spritesheet = serde_json::from_str(asset_data.as_ref()).unwrap();
@@ -329,6 +327,9 @@ fn main() {
     }
 
     world.add_resource(settings);
+
+    let window_size = window.get_inner_size().unwrap();
+    basic.set_viewport_rect(window_size, (16, 10));
 
     // let mut frame_time_text = components::Text::new(25.0, 200, 30);
     // let frame_time_transform = components::Transform::visible(20.0, 20.0, 10.0, 200, 30, 0.0, 1.0, 1.0);
@@ -388,6 +389,16 @@ fn main() {
                     WindowEvent::HiDPIFactorChanged(factor) => {
                         let mut input_res = world.write_resource::<Input>();
                         input_res.hidpi_factor = factor;
+                    },
+                    WindowEvent::Resized(w, h) => {
+                        let factor = world.read_resource::<Input>().hidpi_factor as u32;
+                        println!("size: {} {} - dpi: {}", w , h, factor);
+                        window.resize(w * factor, h * factor);
+                        gfx_window_glutin::update_views(&window, &mut target.color, &mut target.depth);
+                        basic.set_viewport_rect((w, h), (16, 10));
+                        let w = (w / factor) as f32;
+                        let h = (h / factor) as f32;
+                        basic.scale_model(w / dim[0], h / dim[1]);
                     },
                     _ => {}
                 },
