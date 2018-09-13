@@ -64,7 +64,7 @@ use components::{upgrade::{LearnProgress, Upgrade},
 
 use gfx::Device;
 use gfx_glyph::{GlyphBrush, GlyphBrushBuilder};
-use glutin::{ElementState, Event, GlContext, MouseButton, VirtualKeyCode, WindowEvent};
+use glutin::{ElementState, Event, GlContext, MouseButton, VirtualKeyCode, WindowEvent, dpi::LogicalSize};
 use renderer::{ColorFormat, DepthFormat};
 use rodio::Source;
 use settings::Settings;
@@ -81,7 +81,7 @@ fn setup_world(world: &mut World, window: &glutin::Window) {
     world.add_resource::<Camera>(Camera(renderer::get_ortho(dim[0], dim[1])));
     world.add_resource::<StateChange>(StateChange::new());
     world.add_resource::<Input>(Input::new(
-        window.hidpi_factor(),
+        window.get_hidpi_factor() as f32,
         vec![VirtualKeyCode::Escape],
     ));
     world.add_resource::<ClickSound>(ClickSound { play: false });
@@ -265,11 +265,11 @@ fn render_node<R: gfx::Resources, C: gfx::CommandBuffer<R>, F: gfx::Factory<R>>(
 }
 
 fn main() {
-    let mut events_loop = winit::EventsLoop::new();
+    let mut events_loop = glutin::EventsLoop::new();
     let dim = renderer::get_dimensions();
     let builder = glutin::WindowBuilder::new()
         .with_title("ld39".to_string())
-        .with_dimensions(dim[0] as u32, dim[1] as u32);
+        .with_dimensions(LogicalSize::new(dim[0] as f64, dim[1] as f64));
     let context = glutin::ContextBuilder::new().with_vsync(true);
 
     let (window, mut device, mut factory, main_color, main_depth) =
@@ -277,13 +277,13 @@ fn main() {
 
     let mut world = World::new();
 
-    let mut target = renderer::WindowTargets {
+    let target = renderer::WindowTargets {
         color: main_color,
         depth: main_depth,
     };
 
     let mut encoder: gfx::Encoder<_, _> = factory.create_command_buffer().into();
-    let hidpi_factor = window.hidpi_factor();
+    let hidpi_factor = window.get_hidpi_factor();
     let mut basic = renderer::Basic::new(&mut factory, target);
 
     let asset_data = loader::read_text_from_file("resources/assets.json").unwrap();
@@ -317,7 +317,7 @@ fn main() {
     let mut conrod_renderer = conrod::backend::gfx::Renderer::new(
         &mut factory,
         &basic.target.color,
-        window.hidpi_factor() as f64,
+        hidpi_factor as f64,
     ).unwrap();
     let image_map = conrod::image::Map::new();
 
@@ -357,12 +357,12 @@ fn main() {
             match event {
                 Event::WindowEvent { event, .. } => match event {
                     WindowEvent::CursorMoved {
-                        position: (x, y), ..
+                        position: pos, ..
                     } => {
                         let mut input_res = world.write_resource::<Input>();
                         let input = input_res.deref_mut();
-                        input.mouse_pos.0 = x as f32 / input.hidpi_factor * scale_to_base_res.0;
-                        input.mouse_pos.1 = y as f32 / input.hidpi_factor * scale_to_base_res.1;
+                        input.mouse_pos.0 = pos.x as f32 * scale_to_base_res.0;
+                        input.mouse_pos.1 = pos.y as f32 * scale_to_base_res.1;
                     }
                     WindowEvent::MouseInput {
                         button: MouseButton::Left,
@@ -376,7 +376,7 @@ fn main() {
                             ElementState::Released => input.mouse_pressed = false,
                         };
                     }
-                    glutin::WindowEvent::Closed => running = false,
+                    glutin::WindowEvent::CloseRequested => running = false,
                     WindowEvent::KeyboardInput { input, .. } => {
                         let input_event = input;
                         let mut input_res = world.write_resource::<Input>();
@@ -390,21 +390,24 @@ fn main() {
                             }
                         }
                     },
-                    WindowEvent::HiDPIFactorChanged(factor) => {
+                    WindowEvent::HiDpiFactorChanged(factor) => {
                         let mut input_res = world.write_resource::<Input>();
-                        input_res.hidpi_factor = factor;
+                        input_res.hidpi_factor = factor as f32;
                     },
-                    WindowEvent::Resized(w, h) => {
-                        window.resize(w, h);
+                    WindowEvent::Resized(size) => {
+                        let input = world.read_resource::<Input>();
+                        let hidpi_factor = input.hidpi_factor;
+                        window.resize(size.to_physical(hidpi_factor as f64));
+
+                        conrod_renderer.on_resize(basic.target.color.clone());
+
                         let target = &mut basic.target;
                         gfx_window_glutin::update_views(&window, &mut target.color, &mut target.depth);
-                        let input = world.read_resource::<Input>();
-                        let w = w as f32;
-                        let h = h as f32;
-                        let hidpi_factor = input.hidpi_factor;
-                        scale_from_base_res = (w / hidpi_factor / dim[0], h / hidpi_factor / dim[1]);
-                        scale_to_base_res = (dim[0] / (w / hidpi_factor), dim[1] / (h / hidpi_factor));
-                        conrod_renderer.on_resize(basic.target.color);
+
+                        let w = size.width as f32;
+                        let h = size.height as f32;
+                        scale_from_base_res = (w / dim[0], h / dim[1]);
+                        scale_to_base_res = (dim[0] / w, dim[1] / h);
                     },
                     _ => {}
                 },
@@ -514,9 +517,11 @@ fn main() {
 
             let ui = state_manager.get_ui_to_render();
             let primitives = ui.draw();
+            conrod_renderer.clear(&mut encoder, [16.0 / 256.0, 14.0 / 256.0, 22.0 / 256.0, 1.0]);
             conrod_renderer.fill(
                 &mut encoder,
-                (dim[0] * hidpi_factor, dim[1] * hidpi_factor),
+                (dim[0] * scale_from_base_res.0 * hidpi_factor as f32, dim[1] * scale_from_base_res.1 * hidpi_factor as f32),
+                hidpi_factor,
                 primitives,
                 &image_map,
             );

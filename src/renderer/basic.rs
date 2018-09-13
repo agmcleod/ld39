@@ -220,7 +220,6 @@ where
         let (vbuf, slice) =
             factory.create_vertex_buffer_with_slice(&buffers.vertices[..], &buffers.indices[..]);
 
-        let dim = self::super::get_dimensions();
         let params = pipe::Data {
             vbuf: vbuf,
             projection_cb: factory.create_constant_buffer(1),
