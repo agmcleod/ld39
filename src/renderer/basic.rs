@@ -4,13 +4,12 @@ extern crate specs;
 
 use cgmath::{Matrix4, SquareMatrix, Transform};
 use components;
-use gfx::{texture, Rect, Scissor};
+use gfx::{texture};
 use gfx::traits::FactoryExt;
 use gfx_glyph::{GlyphBrush, Section};
 use renderer::{ColorFormat, DepthFormat};
 use specs::World;
 use spritesheet::{Frame, Spritesheet};
-use std::cmp;
 
 gfx_defines!{
     vertex Vertex {
@@ -245,6 +244,7 @@ where
         color: &components::Color,
         glyph_brush: &mut GlyphBrush<R, F>,
         hidpi_factor: f32,
+        scale_from_base_res: &(f32, f32),
     ) where
         R: gfx::Resources,
         C: gfx::CommandBuffer<R>,
@@ -252,8 +252,8 @@ where
     {
         let absolute_pos = transform.get_absolute_pos();
         let mut scale = text.scale.clone();
-        scale.x *= hidpi_factor;
-        scale.y *= hidpi_factor;
+        scale.x *= hidpi_factor * scale_from_base_res.0;
+        scale.y *= hidpi_factor * scale_from_base_res.1;
         let section = Section {
             text: text.text.as_ref(),
             scale,
@@ -262,8 +262,8 @@ where
                 text.size.y as f32 * hidpi_factor,
             ),
             screen_position: (
-                absolute_pos.x * hidpi_factor,
-                absolute_pos.y * hidpi_factor,
+                absolute_pos.x * hidpi_factor * scale_from_base_res.0,
+                absolute_pos.y * hidpi_factor * scale_from_base_res.1,
             ),
             color: color.0,
             z: 0.0,

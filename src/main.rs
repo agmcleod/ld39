@@ -128,6 +128,7 @@ fn render_entity<R: gfx::Resources, C: gfx::CommandBuffer<R>, F: gfx::Factory<R>
     text_storage: &mut WriteStorage<Text>,
     rect_storage: &ReadStorage<Rect>,
     shape_storage: &ReadStorage<Shape>,
+    scale_from_base_res: &(f32, f32),
 ) {
     if let Some(transform) = transform_storage.get_mut(*entity) {
         if transform.visible {
@@ -175,7 +176,7 @@ fn render_entity<R: gfx::Resources, C: gfx::CommandBuffer<R>, F: gfx::Factory<R>
                 (color_storage.get(*entity), text_storage.get_mut(*entity))
             {
                 if text.text != "" && text.visible {
-                    basic.render_text(encoder, &text, transform, color, glyph_brush, world.read_resource::<Input>().hidpi_factor);
+                    basic.render_text(encoder, &text, transform, color, glyph_brush, world.read_resource::<Input>().hidpi_factor, scale_from_base_res);
                 }
             }
 
@@ -203,6 +204,7 @@ fn render_node<R: gfx::Resources, C: gfx::CommandBuffer<R>, F: gfx::Factory<R>>(
     rects: &ReadStorage<Rect>,
     shapes: &ReadStorage<Shape>,
     nodes: &mut WriteStorage<Node>,
+    scale_from_base_res: &(f32, f32),
 ) {
     if let Some(transform) = transforms.get(entity) {
         if !transform.visible {
@@ -226,6 +228,7 @@ fn render_node<R: gfx::Resources, C: gfx::CommandBuffer<R>, F: gfx::Factory<R>>(
         texts,
         rects,
         shapes,
+        scale_from_base_res,
     );
 
     let mut entities = Vec::new();
@@ -252,6 +255,7 @@ fn render_node<R: gfx::Resources, C: gfx::CommandBuffer<R>, F: gfx::Factory<R>>(
             rects,
             shapes,
             nodes,
+            scale_from_base_res,
         );
     }
 
@@ -332,6 +336,9 @@ fn main() {
     // let frame_time_transform = components::Transform::visible(20.0, 20.0, 10.0, 200, 30, 0.0, 1.0, 1.0);
     // let frame_time_color = components::Color([1.0, 0.0, 0.0, 1.0]);
 
+    let mut scale_from_base_res = (1.0, 1.0);
+    let mut scale_to_base_res = (1.0, 1.0);
+
     while running {
         let duration = time::Instant::now() - frame_start;
 
@@ -354,8 +361,8 @@ fn main() {
                     } => {
                         let mut input_res = world.write_resource::<Input>();
                         let input = input_res.deref_mut();
-                        input.mouse_pos.0 = x as f32 / input.hidpi_factor;
-                        input.mouse_pos.1 = y as f32 / input.hidpi_factor;
+                        input.mouse_pos.0 = x as f32 / input.hidpi_factor * scale_to_base_res.0;
+                        input.mouse_pos.1 = y as f32 / input.hidpi_factor * scale_to_base_res.1;
                     }
                     WindowEvent::MouseInput {
                         button: MouseButton::Left,
@@ -391,6 +398,13 @@ fn main() {
                         window.resize(w, h);
                         let target = &mut basic.target;
                         gfx_window_glutin::update_views(&window, &mut target.color, &mut target.depth);
+                        let input = world.read_resource::<Input>();
+                        let w = w as f32;
+                        let h = h as f32;
+                        let hidpi_factor = input.hidpi_factor;
+                        scale_from_base_res = (w / hidpi_factor / dim[0], h / hidpi_factor / dim[1]);
+                        scale_to_base_res = (dim[0] / (w / hidpi_factor), dim[1] / (h / hidpi_factor));
+                        conrod_renderer.on_resize(basic.target.color);
                     },
                     _ => {}
                 },
@@ -478,6 +492,7 @@ fn main() {
                     &rects,
                     &shapes,
                     &mut nodes,
+                    &scale_from_base_res,
                 );
             }
         }
