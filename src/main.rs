@@ -280,7 +280,7 @@ fn main() {
 
     let mut encoder: gfx::Encoder<_, _> = factory.create_command_buffer().into();
     let hidpi_factor = window.hidpi_factor();
-    let mut basic = renderer::Basic::new(&mut factory, &target);
+    let mut basic = renderer::Basic::new(&mut factory, target);
 
     let asset_data = loader::read_text_from_file("resources/assets.json").unwrap();
     let spritesheet: Spritesheet = serde_json::from_str(asset_data.as_ref()).unwrap();
@@ -312,7 +312,7 @@ fn main() {
 
     let mut conrod_renderer = conrod::backend::gfx::Renderer::new(
         &mut factory,
-        &target.color,
+        &basic.target.color,
         window.hidpi_factor() as f64,
     ).unwrap();
     let image_map = conrod::image::Map::new();
@@ -389,6 +389,7 @@ fn main() {
                     },
                     WindowEvent::Resized(w, h) => {
                         window.resize(w, h);
+                        let target = &mut basic.target;
                         gfx_window_glutin::update_views(&window, &mut target.color, &mut target.depth);
                     },
                     _ => {}
@@ -413,10 +414,10 @@ fn main() {
         basic.reset_transform();
 
         encoder.clear(
-            &target.color,
+            &basic.target.color,
             [16.0 / 256.0, 14.0 / 256.0, 22.0 / 256.0, 1.0],
         );
-        encoder.clear_depth(&target.depth, 1.0);
+        encoder.clear_depth(&basic.target.depth, 1.0);
 
         {
             let root_node = {

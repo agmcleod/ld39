@@ -43,7 +43,7 @@ pub struct Basic<R: gfx::Resources> {
     pso: gfx::PipelineState<R, pipe::Meta>,
     projection: Projection,
     model: Matrix4<f32>,
-    target: WindowTargets<R>,
+    pub target: WindowTargets<R>,
     color_texture: (
         gfx::handle::ShaderResourceView<R, [f32; 4]>,
         gfx::handle::Sampler<R>,
@@ -54,7 +54,7 @@ impl<R> Basic<R>
 where
     R: gfx::Resources,
 {
-    pub fn new<F>(factory: &mut F, target: &WindowTargets<R>) -> Basic<R>
+    pub fn new<F>(factory: &mut F, target: WindowTargets<R>) -> Basic<R>
     where
         F: gfx::Factory<R>,
     {
@@ -89,7 +89,7 @@ where
                 proj: self::super::get_ortho(dim[0] as f32, dim[1] as f32).into(),
             },
             model: Matrix4::identity(),
-            target: (*target).clone(),
+            target,
             color_texture: (texture_view, factory.create_sampler(sinfo)),
         }
     }
@@ -186,7 +186,6 @@ where
         let index_data: Vec<u32> = vec![0, 1, 2, 2, 3, 0];
         let (vbuf, slice) = factory.create_vertex_buffer_with_slice(&data, &index_data[..]);
 
-        let dim = self::super::get_dimensions();
         let params = pipe::Data {
             vbuf: vbuf,
             projection_cb: factory.create_constant_buffer(1),
