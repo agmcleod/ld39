@@ -393,6 +393,18 @@ fn main() {
                     WindowEvent::HiDpiFactorChanged(factor) => {
                         let mut input_res = world.write_resource::<Input>();
                         input_res.hidpi_factor = factor as f32;
+                        let size = window.get_inner_size().unwrap();
+                        window.resize(size.to_physical(factor as f64));
+
+                        conrod_renderer.on_resize(basic.target.color.clone());
+
+                        let target = &mut basic.target;
+                        gfx_window_glutin::update_views(&window, &mut target.color, &mut target.depth);
+
+                        let w = size.width as f32;
+                        let h = size.height as f32;
+                        scale_from_base_res = (w / dim[0], h / dim[1]);
+                        scale_to_base_res = (dim[0] / w, dim[1] / h);
                     },
                     WindowEvent::Resized(size) => {
                         let input = world.read_resource::<Input>();
