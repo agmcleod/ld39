@@ -77,63 +77,63 @@ impl<'b> System<'b> for PowerUsage {
 
         if reset_frame_counter {
             self.frame_count = 0.0;
-        }
 
-        let lookup = entity_lookup_storage.deref();
+            let lookup = entity_lookup_storage.deref();
 
-        let power_gain_entity = lookup.entities.get(&"power_gain_text".to_string()).unwrap();
-        let gathering_rate = gathering_rate_storage.deref();
+            let power_gain_entity = lookup.entities.get(&"power_gain_text".to_string()).unwrap();
+            let gathering_rate = gathering_rate_storage.deref();
 
-        // technically singular, so we could maybe make this a resource
-        // or at least lookup via entity
-        let power_demands = (&power_bar_storage)
-            .join()
-            .fold(0, |sum, power_bar| sum + power_bar.power_per_tick)
-            / POWER_FACTOR;
+            // technically singular, so we could maybe make this a resource
+            // or at least lookup via entity
+            let power_demands = (&power_bar_storage)
+                .join()
+                .fold(0, |sum, power_bar| sum + power_bar.power_per_tick)
+                / POWER_FACTOR;
 
-        let total_gathering_rate = logic::get_total_gathering_rate(&gathering_rate);
+            let total_gathering_rate = logic::get_total_gathering_rate(&gathering_rate);
 
-        if total_gathering_rate - power_demands > 0 {
-            city_power_state.current_city_count += 1;
-            for power_bar in (&mut power_bar_storage).join() {
-                let mut per_tick = power_bar.power_per_tick;
-                // each city is more demanding
-                for n in 0..city_power_state.current_city_count {
-                    per_tick += power_bar.power_per_tick + 5 * n as i32;
+            if total_gathering_rate - power_demands > 0 {
+                city_power_state.current_city_count += 1;
+                for power_bar in (&mut power_bar_storage).join() {
+                    let mut per_tick = power_bar.power_per_tick;
+                    // each city is more demanding
+                    for n in 0..city_power_state.current_city_count {
+                        per_tick += 15 * ((n as i32) + 1);
+                    }
+                    power_bar.power_per_tick = per_tick;
                 }
-                power_bar.power_per_tick = per_tick;
             }
-        }
 
-        let powering_text = if city_power_state.current_city_count > 1 {
-            format!(
-                "Power: {}\n{} cities",
-                total_gathering_rate - power_demands,
-                city_power_state.current_city_count
-            )
-        } else {
-            format!("Power: {}", total_gathering_rate - power_demands)
-        };
+            let powering_text = if city_power_state.current_city_count > 1 {
+                format!(
+                    "Power: {}\n{} cities",
+                    total_gathering_rate - power_demands,
+                    city_power_state.current_city_count
+                )
+            } else {
+                format!("Power: {}", total_gathering_rate - power_demands)
+            };
 
-        text_storage.get_mut(*power_gain_entity).unwrap().text = powering_text;
+            text_storage.get_mut(*power_gain_entity).unwrap().text = powering_text;
 
-        color_storage
-            .insert(
-                *power_gain_entity,
-                Color(if total_gathering_rate >= power_demands {
-                    [0.0, 0.6, 0.0, 1.0]
-                } else {
-                    [0.6, 0.0, 0.0, 1.0]
-                }),
-            )
-            .unwrap();
+            color_storage
+                .insert(
+                    *power_gain_entity,
+                    Color(if total_gathering_rate >= power_demands {
+                        [0.0, 0.6, 0.0, 1.0]
+                    } else {
+                        [0.6, 0.0, 0.0, 1.0]
+                    }),
+                )
+                .unwrap();
 
-        for (resource_count, text) in (&resource_count_storage, &mut text_storage).join() {
-            let new_text = format!(
-                "{}",
-                resources.get_amount_for_type(&resource_count.resource_type)
-            );
-            text.set_text(new_text);
+            for (resource_count, text) in (&resource_count_storage, &mut text_storage).join() {
+                let new_text = format!(
+                    "{}",
+                    resources.get_amount_for_type(&resource_count.resource_type)
+                );
+                text.set_text(new_text);
+            }
         }
     }
 }
