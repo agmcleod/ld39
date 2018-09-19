@@ -189,7 +189,7 @@ impl<'a> System<'a> for ToggleTechTree {
         if !researched_buffs_storage
             .deref()
             .0
-            .contains(&Buff::ResourceTrading)
+            .contains(&Buff::ResourceTrading(0))
         {
             // hard cost check. needs to change if i alter cost in tech tree
             if wallet_storage.deref().money >= 50 {

@@ -63,12 +63,12 @@ impl<'a> System<'a> for Pollution {
             if amount > 0 {
                 if gatherer.gatherer_type == GathererType::Coal {
                     coal_pollution += amount;
-                    if researched_buffs.0.contains(&Buff::ConveyerBelts) {
+                    if researched_buffs.0.contains(&Buff::ConveyerBelts(0)) {
                         coal_pollution += 1;
                     }
                 } else if gatherer.gatherer_type == GathererType::Oil {
                     oil_pollution += amount;
-                    if researched_buffs.0.contains(&Buff::AutomatedRefiners) {
+                    if researched_buffs.0.contains(&Buff::AutomatedRefiners(0)) {
                         oil_pollution += 1;
                     }
                 } else if gatherer.gatherer_type == GathererType::Hydro {

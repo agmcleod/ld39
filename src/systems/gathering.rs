@@ -74,31 +74,31 @@ impl<'a> System<'a> for Gathering {
             for (entity, gatherer) in (&*entities, &mut gatherer_storage).join() {
                 let mut amount = self.get_resource_gain(&gatherer.gatherer_type);
                 if gatherer.has_adjancent_of_same_type
-                    && researched_buffs.0.contains(&Buff::ResourceTrading)
+                    && researched_buffs.0.contains(&Buff::ResourceTrading(0))
                 {
                     amount += 1;
                 }
 
                 if gatherer.gatherer_type == GathererType::Coal {
-                    if researched_buffs.0.contains(&Buff::ConveyerBelts) {
+                    if researched_buffs.0.contains(&Buff::ConveyerBelts(0)) {
                         amount += 1;
                     }
-                    if researched_buffs.0.contains(&Buff::RoboticLoaders) {
+                    if researched_buffs.0.contains(&Buff::RoboticLoaders(0)) {
                         amount += 1;
                     }
                 } else if gatherer.gatherer_type == GathererType::Oil {
-                    if researched_buffs.0.contains(&Buff::AutomatedRefiners) {
+                    if researched_buffs.0.contains(&Buff::AutomatedRefiners(0)) {
                         amount += 1;
                     }
-                    if researched_buffs.0.contains(&Buff::Purifier) {
+                    if researched_buffs.0.contains(&Buff::Purifier(0)) {
                         amount += 1;
                     }
                 } else if gatherer.gatherer_type == GathererType::Hydro {
-                    if researched_buffs.0.contains(&Buff::ReinforcedTurbines) {
+                    if researched_buffs.0.contains(&Buff::ReinforcedTurbines(0)) {
                         amount += 2;
                     }
                 } else if gatherer.gatherer_type == GathererType::Solar {
-                    if researched_buffs.0.contains(&Buff::ImprovePanelTech) {
+                    if researched_buffs.0.contains(&Buff::ImprovePanelTech(0)) {
                         amount += 2;
                     }
                 }

@@ -8,7 +8,9 @@
   "description": "Coal Mining:\nUnlocks ability to mine coal",
   "frame_name": "coalnode.png",
   "children": [{
-    "buff": "ResourceTrading",
+    "buff": {
+      "ResourceTrading": 0
+    },
     "time_to_research": 10.0,
     "cost": 50,
     "status": "Researchable",
@@ -17,7 +19,9 @@
     "description": "Resource Trading:\n+1 unit gained for having the same gatherer type as a neighbour",
     "frame_name": "resourcetrading.png"
   }, {
-    "buff": "ConveyerBelts",
+    "buff": {
+      "ConveyerBelts": 0
+    },
     "time_to_research": 10.0,
     "cost": 50,
     "status": "Researchable",
@@ -26,7 +30,9 @@
     "description": "Conveyer Belts:\n+1 coal gain rate & +1 more pollution per gatherer.",
     "frame_name": "conveyerbelts.png",
     "children": [{
-      "buff": "RoboticLoaders",
+      "buff": {
+        "RoboticLoaders": 0
+      },
       "time_to_research": 10.0,
       "cost": 120,
       "status": "Locked",
@@ -64,7 +70,9 @@
       "description": "Fudge The Numbers:\n20% pollution reduction for oil",
       "frame_name": "fudgethenumbers.png"
     }, {
-      "buff": "AutomatedRefiners",
+      "buff": {
+        "AutomatedRefiners": 0
+      },
       "time_to_research": 10.0,
       "cost": 120,
       "status": "Locked",
@@ -73,7 +81,9 @@
       "description": "Automatic Refiners:\n+1 oil gain rate, +1 more pollution.",
       "frame_name": "automatedrefiners.png"
     }, {
-      "buff": "Purifier",
+      "buff": {
+        "Purifier": 0
+      },
       "time_to_research": 10.0,
       "cost": 100,
       "status": "Locked",
@@ -100,7 +110,9 @@
         "description": "Salmon Cannon:\n20% pollution reduction",
         "frame_name": "salmoncannon.png"
       }, {
-        "buff": "ReinforcedTurbines",
+        "buff": {
+          "ReinforcedTurbines": 0
+        },
         "time_to_research": 10.0,
         "cost": 600,
         "status": "Locked",
@@ -134,11 +146,13 @@
           "status": "Locked",
           "x": 0.65,
           "y_tier": 6,
-          "description": "Sell Panels to Consumers:\n$10 every minute",
+          "description": "Sell Panels to Consumers:\n$50 every minute",
           "frame_name": "sellpanels.png"
         }]
       }, {
-        "buff": "ImprovePanelTech",
+        "buff": {
+          "ImprovePanelTech": 0
+        },
         "time_to_research": 10.0,
         "cost": 300,
         "status": "Locked",

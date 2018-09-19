@@ -227,6 +227,22 @@ impl<'a> System<'a> for TechTree {
                 {
                     let text_y = (tooltip_size.1 - 30) as f32;
                     let tooltip_node = node_storage.get_mut(tooltip_entity).unwrap();
+
+                    if let Some(level) = upgrade.buff.get_level() {
+                        let text = create_text::create(
+                            &mut text_storage_type,
+                            format!("lvl {}", level + 1),
+                            20.0,
+                            80.0,
+                            text_y,
+                            0.0,
+                            120,
+                            20,
+                            Color([0.8, 0.8, 0.8, 1.0]),
+                        );
+                        tooltip_node.add(text);
+                    }
+
                     if upgrade.status == Status::Researched {
                         let text = create_text::create(
                             &mut text_storage_type,
@@ -254,24 +270,18 @@ impl<'a> System<'a> for TechTree {
                         );
                         tooltip_node.add(text);
 
-                        let time_left = if upgrade.status == Status::Learning {
-                            upgrade.time_to_research - upgrade.current_research_progress
-                        } else {
-                            upgrade.time_to_research
-                        };
-
-                        let text = create_text::create(
-                            &mut text_storage_type,
-                            format!("{} sec", time_left),
-                            20.0,
-                            100.0,
-                            text_y,
-                            0.0,
-                            70,
-                            20,
-                            Color([1.0, 1.0, 0.0, 1.0]),
-                        );
-                        tooltip_node.add(text);
+                        // let text = create_text::create(
+                        //     &mut text_storage_type,
+                        //     format!("{} sec", upgrade.time_to_research),
+                        //     20.0,
+                        //     110.0,
+                        //     text_y,
+                        //     0.0,
+                        //     70,
+                        //     20,
+                        //     Color([1.0, 1.0, 0.0, 1.0]),
+                        // );
+                        // tooltip_node.add(text);
                     }
                 }
 
@@ -284,7 +294,7 @@ impl<'a> System<'a> for TechTree {
                     .get_mut(mouse_over_tech_tree_node_entity)
                     .unwrap();
                 if upgrade.status == Status::Researchable && wallet.spend(upgrade.cost) {
-                    if upgrade.buff == Buff::ResourceTrading {
+                    if upgrade.buff == Buff::ResourceTrading(0) {
                         tutorial::next_step(
                             &entities,
                             &mut actions_storage,

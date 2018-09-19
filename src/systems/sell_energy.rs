@@ -161,7 +161,7 @@ impl<'a> System<'a> for SellEnergy {
             if self.minute_ticker >= 1.0 {
                 self.minute_ticker = 0.0;
                 self.add_money(
-                    10,
+                    50,
                     &mut wallet_storage,
                     &mut wallet_ui_storage,
                     &mut text_storage,

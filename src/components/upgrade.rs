@@ -9,24 +9,102 @@ pub enum Status {
     Researched,
 }
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Copy, Clone, Debug, Eq, Hash, Serialize, Deserialize)]
 pub enum Buff {
     Coal,
     Oil,
     Solar,
-    ResourceTrading,
-    ConveyerBelts,
-    RoboticLoaders,
+    ResourceTrading(u32),
+    ConveyerBelts(u32),
+    RoboticLoaders(u32),
     PollutionFilters,
     FudgeTheNumbers,
-    AutomatedRefiners,
-    Purifier,
+    AutomatedRefiners(u32),
+    Purifier(u32),
     Hydro,
     SalmonCannon,
-    ReinforcedTurbines,
+    ReinforcedTurbines(u32),
     PurchaseSolarCellCompany,
-    ImprovePanelTech,
+    ImprovePanelTech(u32),
     SellPanelsToConsumers,
+}
+
+impl Buff {
+    pub fn get_level(&self) -> Option<u32> {
+        match *self {
+            Buff::ResourceTrading(n) => Some(n),
+            Buff::ConveyerBelts(n) => Some(n),
+            Buff::RoboticLoaders(n) => Some(n),
+            Buff::AutomatedRefiners(n) => Some(n),
+            Buff::Purifier(n) => Some(n),
+            Buff::ReinforcedTurbines(n) => Some(n),
+            Buff::ImprovePanelTech(n) => Some(n),
+            _ => None,
+        }
+    }
+
+    pub fn has_levels(&self) -> bool {
+        match *self {
+            Buff::ResourceTrading(_) |
+            Buff::ConveyerBelts(_) |
+            Buff::RoboticLoaders(_) |
+            Buff::AutomatedRefiners(_) |
+            Buff::Purifier(_) |
+            Buff::ReinforcedTurbines(_) |
+            Buff::ImprovePanelTech(_) => true,
+            _ => false,
+        }
+    }
+}
+
+impl PartialEq for Buff {
+    fn eq(&self, other: &Self) -> bool {
+        match *self {
+            Buff::ResourceTrading(_) => {
+                match *other {
+                    Buff::ResourceTrading(_) => true,
+                    _ => false,
+                }
+            },
+            Buff::ConveyerBelts(_) => {
+                match *other {
+                    Buff::ConveyerBelts(_) => true,
+                    _ => false,
+                }
+            },
+            Buff::RoboticLoaders(_) => {
+                match *other {
+                    Buff::RoboticLoaders(_) => true,
+                    _ => false,
+                }
+            },
+            Buff::AutomatedRefiners(_) => {
+                match *other {
+                    Buff::AutomatedRefiners(_) => true,
+                    _ => false,
+                }
+            },
+            Buff::Purifier(_) => {
+                match *other {
+                    Buff::Purifier(_) => true,
+                    _ => false,
+                }
+            },
+            Buff::ReinforcedTurbines(_) => {
+                match *other {
+                    Buff::ReinforcedTurbines(_) => true,
+                    _ => false,
+                }
+            },
+            Buff::ImprovePanelTech(_) => {
+                match *other {
+                    Buff::ImprovePanelTech(_) => true,
+                    _ => false,
+                }
+            },
+            _ => *self == *other,
+        }
+    }
 }
 
 #[derive(Serialize, Deserialize)]
