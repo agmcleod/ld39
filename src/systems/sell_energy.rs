@@ -1,6 +1,6 @@
 use components::ui::WalletUI;
 use components::{ui::TutorialUI, upgrade::Buff, Actions, Button, ClickSound, DeltaTime, Input,
-                 Node, PowerBar, ResearchedBuffs, ResourceType, Resources, Text, Transform,
+                 Node, PowerBar, ResearchedBuffs, ResourceCount, ResourceType, Resources, Text, Transform,
                  TutorialStep, Wallet};
 use entities::tutorial;
 use specs::{Entities, Join, Read, ReadStorage, System, Write, WriteStorage};
@@ -43,6 +43,7 @@ impl<'a> System<'a> for SellEnergy {
         WriteStorage<'a, PowerBar>,
         Read<'a, ResearchedBuffs>,
         Write<'a, Resources>,
+        ReadStorage<'a, ResourceCount>,
         WriteStorage<'a, Text>,
         WriteStorage<'a, Transform>,
         Write<'a, TutorialStep>,
@@ -63,6 +64,7 @@ impl<'a> System<'a> for SellEnergy {
             mut power_bar_storage,
             researched_buffs_storage,
             mut resources_storage,
+            resource_count_storage,
             mut text_storage,
             mut transform_storage,
             mut tutorial_step_storage,
@@ -126,6 +128,14 @@ impl<'a> System<'a> for SellEnergy {
                         break;
                     }
                 }
+            }
+
+            for (resource_count, text) in (&resource_count_storage, &mut text_storage).join() {
+                let new_text = format!(
+                    "{}",
+                    resources.get_amount_for_type(&resource_count.resource_type)
+                );
+                text.set_text(new_text);
             }
 
             self.add_money(

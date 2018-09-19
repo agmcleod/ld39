@@ -451,7 +451,7 @@ impl<'a> State for PlayState<'a> {
             // coal text
             let entity = create_text::create(
                 &mut text_storages,
-                "".to_string(),
+                "0".to_string(),
                 32.0,
                 80.0,
                 158.0,
@@ -473,7 +473,7 @@ impl<'a> State for PlayState<'a> {
             // oil text
             let entity = create_text::create(
                 &mut text_storages,
-                "".to_string(),
+                "0".to_string(),
                 32.0,
                 80.0,
                 204.0,
@@ -495,7 +495,7 @@ impl<'a> State for PlayState<'a> {
             // solar text
             let entity = create_text::create(
                 &mut text_storages,
-                "".to_string(),
+                "0".to_string(),
                 32.0,
                 80.0,
                 250.0,
@@ -516,7 +516,7 @@ impl<'a> State for PlayState<'a> {
 
             let water_text = create_text::create(
                 &mut text_storages,
-                format!("{}", Wallet::start_amount()),
+                "0".to_string(),
                 32.0,
                 80.0,
                 296.0,
@@ -553,14 +553,14 @@ impl<'a> State for PlayState<'a> {
             // power gain text
             let entity = create_text::create(
                 &mut text_storages,
-                "Power: ".to_string(),
+                "Power: -40".to_string(),
                 24.0,
                 30.0,
                 70.0,
                 0.0,
                 160,
                 64,
-                Color([0.0, 0.6, 0.0, 1.0]),
+                Color([0.6, 0.0, 0.0, 1.0]),
             );
 
             lookup
