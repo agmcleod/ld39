@@ -66,7 +66,6 @@ fn build_entity_nodes(
     let y = node["y_tier"].as_u64().unwrap() as f32 * Y_INCREMENT + SIZE_F;
     let description = node["description"].as_str().unwrap().to_string();
     let upgrade: Upgrade = serde_json::from_value(node.clone()).unwrap();
-    let cost = upgrade.cost;
     let status = upgrade.status.clone();
     let entity = world
         .create_entity()
@@ -78,7 +77,7 @@ fn build_entity_nodes(
         .with(Sprite {
             frame_name: format!("techtree/{}", node["frame_name"].as_str().unwrap()),
         })
-        .with(ui::TechTreeButton::new(description, cost))
+        .with(ui::TechTreeButton::new(description))
         .build();
 
     if let Some(last_position) = last_upgrade.position {

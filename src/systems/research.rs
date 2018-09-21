@@ -21,8 +21,8 @@ impl Research {
         Research {}
     }
 
-    fn research_finished(&self, buff: Buff, researched_buffs: &mut ResearchedBuffs) {
-        researched_buffs.0.insert(buff.clone());
+    fn research_finished(&self, buff: Buff, researched_buffs: &mut ResearchedBuffs, level: u32) {
+        researched_buffs.0.insert(buff.clone(), level);
     }
 
     fn update_progress_ui<'a>(
@@ -108,9 +108,30 @@ impl<'a> System<'a> for Research {
             if upgrade.status == Status::Learning {
                 upgrade.current_research_progress += dt;
                 if upgrade.current_research_progress >= upgrade.time_to_research {
-                    self.research_finished(upgrade.buff, researched_buffs.deref_mut());
-                    upgrade.status = Status::Researched;
-                    upgrade_entities_researched.push(entity);
+
+                    let mut level = 0;
+                    if upgrade.buff.has_levels() {
+                        if let Some(buff_level) = researched_buffs.0.get(&upgrade.buff) {
+                            level = buff_level + 1;
+                        }
+                        if level == 0 {
+                            researched_buffs.0.insert(upgrade.buff, 1);
+                            level = 1;
+                        }
+                        upgrade.current_research_progress = 0.0;
+                        upgrade.cost += upgrade.cost / 10;
+                        upgrade.status = Status::Researchable;
+                    } else {
+                        upgrade.status = Status::Researched;
+                    }
+
+                    self.research_finished(upgrade.buff, researched_buffs.deref_mut(), level);
+
+                    // has no level or first time researched
+                    if level <= 1 {
+                        upgrade_entities_researched.push(entity);
+                    }
+
                     *color = Color(get_color_from_status(&upgrade.status));
                 }
                 researching_upgrades.insert(

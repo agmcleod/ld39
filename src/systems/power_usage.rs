@@ -8,14 +8,14 @@ use systems::{logic, POWER_FACTOR, TICK_RATE};
 
 pub struct PowerUsage {
     instant: Instant,
-    frame_count: f32,
+    power_consumption_timer: f32,
 }
 
 impl PowerUsage {
     pub fn new() -> PowerUsage {
         PowerUsage {
             instant: Instant::now(),
-            frame_count: 0.0,
+            power_consumption_timer: 0.0,
         }
     }
 }
@@ -51,13 +51,13 @@ impl<'b> System<'b> for PowerUsage {
         ) = data;
         let resources: &mut Resources = resources_storage.deref_mut();
 
-        self.frame_count += 1.0;
         let dt = delta_time_storage.deref().dt;
+        self.power_consumption_timer += dt;
         let mut reset_frame_counter = false;
 
         let city_power_state = city_power_state_storage.deref_mut();
         for (transform, power_bar) in (&mut transform_storage, &mut power_bar_storage).join() {
-            if self.frame_count * dt >= TICK_RATE {
+            if self.power_consumption_timer >= TICK_RATE {
                 reset_frame_counter = true;
                 self.instant = Instant::now();
                 if power_bar.power_left > 0 {
@@ -76,7 +76,7 @@ impl<'b> System<'b> for PowerUsage {
         }
 
         if reset_frame_counter {
-            self.frame_count = 0.0;
+            self.power_consumption_timer = 0.0;
 
             let lookup = entity_lookup_storage.deref();
 

@@ -79,7 +79,7 @@ pub fn create<'a, 'b: 'a>(
         new_entities.push(text);
     }
 
-    if researched_buffs.0.contains(&Buff::Oil) && *selected_tile_type == TileType::Open {
+    if researched_buffs.0.contains_key(&Buff::Oil) && *selected_tile_type == TileType::Open {
         let oil_entity = entities.create();
         transform_storage
             .insert(
@@ -137,7 +137,7 @@ pub fn create<'a, 'b: 'a>(
         new_entities.push(text);
     }
 
-    if researched_buffs.0.contains(&Buff::Solar) && *selected_tile_type == TileType::Open {
+    if researched_buffs.0.contains_key(&Buff::Solar) && *selected_tile_type == TileType::Open {
         let solar_entity = entities.create();
         transform_storage
             .insert(
@@ -168,7 +168,7 @@ pub fn create<'a, 'b: 'a>(
 
         new_entities.push(solar_entity);
         let mut cost = GathererType::Solar.get_build_cost();
-        if researched_buffs.0.contains(&Buff::PurchaseSolarCellCompany) {
+        if researched_buffs.0.contains_key(&Buff::PurchaseSolarCellCompany) {
             cost -= cost * 20 / 100;
         }
         let text = create_text::create(
@@ -190,7 +190,7 @@ pub fn create<'a, 'b: 'a>(
         new_entities.push(text);
     }
 
-    if researched_buffs.0.contains(&Buff::Hydro) && *selected_tile_type == TileType::River {
+    if researched_buffs.0.contains_key(&Buff::Hydro) && *selected_tile_type == TileType::River {
         let hydro_entity = entities.create();
         transform_storage
             .insert(

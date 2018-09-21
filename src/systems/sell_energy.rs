@@ -166,7 +166,7 @@ impl<'a> System<'a> for SellEnergy {
             }
         }
 
-        if researched_buffs.0.contains(&Buff::SellPanelsToConsumers) {
+        if researched_buffs.0.contains_key(&Buff::SellPanelsToConsumers) {
             self.minute_ticker += delta_time_storage.deref().dt;
             if self.minute_ticker >= 1.0 {
                 self.minute_ticker = 0.0;

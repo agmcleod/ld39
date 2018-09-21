@@ -63,13 +63,13 @@ impl<'a> System<'a> for Pollution {
             if amount > 0 {
                 if gatherer.gatherer_type == GathererType::Coal {
                     coal_pollution += amount;
-                    if researched_buffs.0.contains(&Buff::ConveyerBelts(0)) {
-                        coal_pollution += 1;
+                    if let Some(n) = researched_buffs.0.get(&Buff::ConveyerBelts) {
+                        coal_pollution += *n as i32;
                     }
                 } else if gatherer.gatherer_type == GathererType::Oil {
                     oil_pollution += amount;
-                    if researched_buffs.0.contains(&Buff::AutomatedRefiners(0)) {
-                        oil_pollution += 1;
+                    if let Some(n) = researched_buffs.0.get(&Buff::AutomatedRefiners) {
+                        oil_pollution += *n as i32;
                     }
                 } else if gatherer.gatherer_type == GathererType::Hydro {
                     hydro_pollution += amount;
@@ -77,13 +77,13 @@ impl<'a> System<'a> for Pollution {
             }
         }
 
-        if researched_buffs.0.contains(&Buff::PollutionFilters) {
+        if researched_buffs.0.contains_key(&Buff::PollutionFilters) {
             coal_pollution -= coal_pollution * 20 / 100;
         }
-        if researched_buffs.0.contains(&Buff::FudgeTheNumbers) {
+        if researched_buffs.0.contains_key(&Buff::FudgeTheNumbers) {
             oil_pollution -= oil_pollution * 20 / 100;
         }
-        if researched_buffs.0.contains(&Buff::SalmonCannon) {
+        if researched_buffs.0.contains_key(&Buff::SalmonCannon) {
             hydro_pollution -= hydro_pollution * 20 / 100;
         }
 

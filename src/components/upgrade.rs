@@ -9,100 +9,37 @@ pub enum Status {
     Researched,
 }
 
-#[derive(Copy, Clone, Debug, Eq, Hash, Serialize, Deserialize)]
+#[derive(Copy, Clone, Debug, Eq, Hash, PartialEq, Serialize, Deserialize)]
 pub enum Buff {
     Coal,
     Oil,
     Solar,
-    ResourceTrading(u32),
-    ConveyerBelts(u32),
-    RoboticLoaders(u32),
+    ResourceTrading,
+    ConveyerBelts,
+    RoboticLoaders,
     PollutionFilters,
     FudgeTheNumbers,
-    AutomatedRefiners(u32),
-    Purifier(u32),
+    AutomatedRefiners,
+    Purifier,
     Hydro,
     SalmonCannon,
-    ReinforcedTurbines(u32),
+    ReinforcedTurbines,
     PurchaseSolarCellCompany,
-    ImprovePanelTech(u32),
+    ImprovePanelTech,
     SellPanelsToConsumers,
 }
 
 impl Buff {
-    pub fn get_level(&self) -> Option<u32> {
-        match *self {
-            Buff::ResourceTrading(n) => Some(n),
-            Buff::ConveyerBelts(n) => Some(n),
-            Buff::RoboticLoaders(n) => Some(n),
-            Buff::AutomatedRefiners(n) => Some(n),
-            Buff::Purifier(n) => Some(n),
-            Buff::ReinforcedTurbines(n) => Some(n),
-            Buff::ImprovePanelTech(n) => Some(n),
-            _ => None,
-        }
-    }
-
     pub fn has_levels(&self) -> bool {
         match *self {
-            Buff::ResourceTrading(_) |
-            Buff::ConveyerBelts(_) |
-            Buff::RoboticLoaders(_) |
-            Buff::AutomatedRefiners(_) |
-            Buff::Purifier(_) |
-            Buff::ReinforcedTurbines(_) |
-            Buff::ImprovePanelTech(_) => true,
+            Buff::ResourceTrading |
+            Buff::ConveyerBelts |
+            Buff::RoboticLoaders |
+            Buff::AutomatedRefiners |
+            Buff::Purifier |
+            Buff::ReinforcedTurbines |
+            Buff::ImprovePanelTech => true,
             _ => false,
-        }
-    }
-}
-
-impl PartialEq for Buff {
-    fn eq(&self, other: &Self) -> bool {
-        match *self {
-            Buff::ResourceTrading(_) => {
-                match *other {
-                    Buff::ResourceTrading(_) => true,
-                    _ => false,
-                }
-            },
-            Buff::ConveyerBelts(_) => {
-                match *other {
-                    Buff::ConveyerBelts(_) => true,
-                    _ => false,
-                }
-            },
-            Buff::RoboticLoaders(_) => {
-                match *other {
-                    Buff::RoboticLoaders(_) => true,
-                    _ => false,
-                }
-            },
-            Buff::AutomatedRefiners(_) => {
-                match *other {
-                    Buff::AutomatedRefiners(_) => true,
-                    _ => false,
-                }
-            },
-            Buff::Purifier(_) => {
-                match *other {
-                    Buff::Purifier(_) => true,
-                    _ => false,
-                }
-            },
-            Buff::ReinforcedTurbines(_) => {
-                match *other {
-                    Buff::ReinforcedTurbines(_) => true,
-                    _ => false,
-                }
-            },
-            Buff::ImprovePanelTech(_) => {
-                match *other {
-                    Buff::ImprovePanelTech(_) => true,
-                    _ => false,
-                }
-            },
-            _ => *self == *other,
         }
     }
 }

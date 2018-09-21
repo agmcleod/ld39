@@ -92,7 +92,7 @@ impl<'a> System<'a> for BuildGatherer {
         if button_pressed {
             let mut amount = gatherer_type.unwrap().clone().get_build_cost();
             if gatherer_type.unwrap() == GathererType::Solar
-                && researched_buffs.0.contains(&Buff::PurchaseSolarCellCompany)
+                && researched_buffs.0.contains_key(&Buff::PurchaseSolarCellCompany)
             {
                 amount -= amount * 20 / 100;
             }

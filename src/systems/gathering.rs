@@ -1,22 +1,20 @@
-use components::{ui::TutorialUI, upgrade::Buff, Actions, Color, FloatingText, Gatherer,
+use components::{ui::TutorialUI, upgrade::Buff, Actions, Color, DeltaTime, FloatingText, Gatherer,
                  GathererType, GatheringRate, Node, ResearchedBuffs, Resources, Text, Transform,
                  TutorialStep};
 use entities::{create_text, tutorial};
 use specs::{Entities, Join, Read, ReadStorage, System, Write, WriteStorage};
 use std::ops::{Deref, DerefMut};
-use std::time::Instant;
 use storage_types::TextStorage;
 use systems::TICK_RATE;
-use utils::math;
 
 pub struct Gathering {
-    gathering_tick: Instant,
+    gathering_tick: f32,
 }
 
 impl Gathering {
     pub fn new() -> Self {
         Gathering {
-            gathering_tick: Instant::now(),
+            gathering_tick: 0.0,
         }
     }
 
@@ -35,6 +33,7 @@ impl<'a> System<'a> for Gathering {
         Entities<'a>,
         Write<'a, Actions>,
         WriteStorage<'a, Color>,
+        Read<'a, DeltaTime>,
         WriteStorage<'a, FloatingText>,
         WriteStorage<'a, Gatherer>,
         Write<'a, GatheringRate>,
@@ -52,6 +51,7 @@ impl<'a> System<'a> for Gathering {
             entities,
             mut actions_storage,
             mut color_storage,
+            delta_time_storage,
             mut floating_text_storage,
             mut gatherer_storage,
             mut gathering_rate_storage,
@@ -69,37 +69,41 @@ impl<'a> System<'a> for Gathering {
 
         let gathering_rate = gathering_rate_storage.deref_mut();
 
-        if math::get_seconds(&self.gathering_tick.elapsed()) >= TICK_RATE {
+        let dt = delta_time_storage.deref().dt;
+        self.gathering_tick += dt;
+
+        if self.gathering_tick >= TICK_RATE {
             gathering_rate.reset();
             for (entity, gatherer) in (&*entities, &mut gatherer_storage).join() {
                 let mut amount = self.get_resource_gain(&gatherer.gatherer_type);
                 if gatherer.has_adjancent_of_same_type
-                    && researched_buffs.0.contains(&Buff::ResourceTrading(0))
+                    && researched_buffs.0.contains_key(&Buff::ResourceTrading)
                 {
-                    amount += 1;
+                    let level = researched_buffs.0.get(&Buff::ResourceTrading).unwrap();
+                    amount += *level as i32;
                 }
 
                 if gatherer.gatherer_type == GathererType::Coal {
-                    if researched_buffs.0.contains(&Buff::ConveyerBelts(0)) {
-                        amount += 1;
+                    if let Some(n) = researched_buffs.0.get(&Buff::ConveyerBelts) {
+                        amount += *n as i32;
                     }
-                    if researched_buffs.0.contains(&Buff::RoboticLoaders(0)) {
-                        amount += 1;
+                    if let Some(n) = researched_buffs.0.get(&Buff::RoboticLoaders) {
+                        amount += *n as i32;
                     }
                 } else if gatherer.gatherer_type == GathererType::Oil {
-                    if researched_buffs.0.contains(&Buff::AutomatedRefiners(0)) {
-                        amount += 1;
+                    if let Some(n) = researched_buffs.0.get(&Buff::AutomatedRefiners) {
+                        amount += *n as i32;
                     }
-                    if researched_buffs.0.contains(&Buff::Purifier(0)) {
-                        amount += 1;
+                    if let Some(n) = researched_buffs.0.get(&Buff::Purifier) {
+                        amount += *n as i32;
                     }
                 } else if gatherer.gatherer_type == GathererType::Hydro {
-                    if researched_buffs.0.contains(&Buff::ReinforcedTurbines(0)) {
-                        amount += 2;
+                    if let Some(n) = researched_buffs.0.get(&Buff::ReinforcedTurbines) {
+                        amount += *n as i32 * 2;
                     }
                 } else if gatherer.gatherer_type == GathererType::Solar {
-                    if researched_buffs.0.contains(&Buff::ImprovePanelTech(0)) {
-                        amount += 2;
+                    if let Some(n) = researched_buffs.0.get(&Buff::ImprovePanelTech) {
+                        amount += *n as i32 * 2;
                     }
                 }
 
@@ -129,7 +133,7 @@ impl<'a> System<'a> for Gathering {
                     .unwrap();
                 entity_node.add(floating_text);
             }
-            self.gathering_tick = Instant::now();
+            self.gathering_tick = 0.0;
 
             resources.increase_resource_for_gatherer_type(&GathererType::Coal, gathering_rate.coal);
             resources.increase_resource_for_gatherer_type(&GathererType::Oil, gathering_rate.oil);

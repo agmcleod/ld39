@@ -3,12 +3,11 @@ use conrod::{widget, Colorable, Labelable, Positionable, Sizeable, Ui, UiBuilder
 use loader;
 use specs::{Dispatcher, DispatcherBuilder, World};
 use state::State;
-use std::collections::HashSet;
+use std::collections::{HashMap};
 use std::path::Path;
 
 use components::{ui::{PollutionCount, WalletUI},
                  upgrade,
-                 upgrade::Buff,
                  Button,
                  CityPowerState,
                  Color,
@@ -31,7 +30,8 @@ use components::{ui::{PollutionCount, WalletUI},
                  TileType,
                  Transform,
                  TutorialStep,
-                 Wallet};
+                 Wallet,
+                 upgrade::{Buff}};
 use entities::{create_map, create_power_bar, create_text, tech_tree};
 use rand::{thread_rng, Rng};
 use renderer;
@@ -610,8 +610,8 @@ impl<'a> State for PlayState<'a> {
             .build();
 
         world.add_resource::<tech_tree::TechTreeNode>(tech_tree_node);
-        let mut researched_buffs = ResearchedBuffs(HashSet::new());
-        researched_buffs.0.insert(Buff::Coal);
+        let mut researched_buffs = ResearchedBuffs(HashMap::new());
+        researched_buffs.0.insert(Buff::Coal, 0);
         world.add_resource::<ResearchedBuffs>(researched_buffs);
         world.add_resource::<ResearchingEntities>(ResearchingEntities::new());
 

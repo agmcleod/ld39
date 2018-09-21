@@ -8,9 +8,7 @@
   "description": "Coal Mining:\nUnlocks ability to mine coal",
   "frame_name": "coalnode.png",
   "children": [{
-    "buff": {
-      "ResourceTrading": 0
-    },
+    "buff": "ResourceTrading",
     "time_to_research": 10.0,
     "cost": 50,
     "status": "Researchable",
@@ -19,9 +17,7 @@
     "description": "Resource Trading:\n+1 unit gained for having the same gatherer type as a neighbour",
     "frame_name": "resourcetrading.png"
   }, {
-    "buff": {
-      "ConveyerBelts": 0
-    },
+    "buff": "ConveyerBelts",
     "time_to_research": 10.0,
     "cost": 50,
     "status": "Researchable",
@@ -30,9 +26,7 @@
     "description": "Conveyer Belts:\n+1 coal gain rate & +1 more pollution per gatherer.",
     "frame_name": "conveyerbelts.png",
     "children": [{
-      "buff": {
-        "RoboticLoaders": 0
-      },
+      "buff": "RoboticLoaders",
       "time_to_research": 10.0,
       "cost": 120,
       "status": "Locked",
@@ -70,9 +64,7 @@
       "description": "Fudge The Numbers:\n20% pollution reduction for oil",
       "frame_name": "fudgethenumbers.png"
     }, {
-      "buff": {
-        "AutomatedRefiners": 0
-      },
+      "buff": "AutomatedRefiners",
       "time_to_research": 10.0,
       "cost": 120,
       "status": "Locked",
@@ -81,9 +73,7 @@
       "description": "Automatic Refiners:\n+1 oil gain rate, +1 more pollution.",
       "frame_name": "automatedrefiners.png"
     }, {
-      "buff": {
-        "Purifier": 0
-      },
+      "buff": "Purifier",
       "time_to_research": 10.0,
       "cost": 100,
       "status": "Locked",
@@ -110,9 +100,7 @@
         "description": "Salmon Cannon:\n20% pollution reduction",
         "frame_name": "salmoncannon.png"
       }, {
-        "buff": {
-          "ReinforcedTurbines": 0
-        },
+        "buff": "ReinforcedTurbines",
         "time_to_research": 10.0,
         "cost": 600,
         "status": "Locked",
@@ -150,9 +138,7 @@
           "frame_name": "sellpanels.png"
         }]
       }, {
-        "buff": {
-          "ImprovePanelTech": 0
-        },
+        "buff": "ImprovePanelTech",
         "time_to_research": 10.0,
         "cost": 300,
         "status": "Locked",

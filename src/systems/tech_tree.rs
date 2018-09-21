@@ -8,6 +8,7 @@ use components::{ui::{TutorialUI, WalletUI},
                  Node,
                  Rect,
                  ResearchingEntities,
+                 ResearchedBuffs,
                  Sprite,
                  Text,
                  Transform,
@@ -104,6 +105,7 @@ impl<'a> System<'a> for TechTree {
         WriteStorage<'a, LearnProgress>,
         WriteStorage<'a, Node>,
         WriteStorage<'a, Rect>,
+        Write<'a, ResearchedBuffs>,
         Write<'a, ResearchingEntities>,
         WriteStorage<'a, Sprite>,
         ReadStorage<'a, ui::TechTreeButton>,
@@ -126,6 +128,7 @@ impl<'a> System<'a> for TechTree {
             mut learn_progress_storage,
             mut node_storage,
             mut rect_storage,
+            researched_buffs_storage,
             mut researching_entities_storage,
             mut sprite_storage,
             tech_tree_node_storage,
@@ -228,10 +231,16 @@ impl<'a> System<'a> for TechTree {
                     let text_y = (tooltip_size.1 - 30) as f32;
                     let tooltip_node = node_storage.get_mut(tooltip_entity).unwrap();
 
-                    if let Some(level) = upgrade.buff.get_level() {
+                    if upgrade.buff.has_levels() {
+                        let level = if let Some(level) = researched_buffs_storage.0.get(&upgrade.buff) {
+                            level + 1
+                        } else {
+                            1
+                        };
+
                         let text = create_text::create(
                             &mut text_storage_type,
-                            format!("lvl {}", level + 1),
+                            format!("lvl {}", level),
                             20.0,
                             80.0,
                             text_y,
@@ -259,7 +268,7 @@ impl<'a> System<'a> for TechTree {
                     } else {
                         let text = create_text::create(
                             &mut text_storage_type,
-                            format!("${}", tech_tree_node_ui.cost),
+                            format!("${}", upgrade.cost),
                             20.0,
                             5.0,
                             text_y,
@@ -294,7 +303,7 @@ impl<'a> System<'a> for TechTree {
                     .get_mut(mouse_over_tech_tree_node_entity)
                     .unwrap();
                 if upgrade.status == Status::Researchable && wallet.spend(upgrade.cost) {
-                    if upgrade.buff == Buff::ResourceTrading(0) {
+                    if upgrade.buff == Buff::ResourceTrading {
                         tutorial::next_step(
                             &entities,
                             &mut actions_storage,

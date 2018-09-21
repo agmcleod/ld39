@@ -1,5 +1,5 @@
 use entities::tech_tree::Buff;
-use std::collections::HashSet;
+use std::collections::HashMap;
 
 #[derive(Default)]
-pub struct ResearchedBuffs(pub HashSet<Buff>);
+pub struct ResearchedBuffs(pub HashMap<Buff, u32>);
