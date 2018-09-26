@@ -400,11 +400,6 @@ fn main() {
 
                         let target = &mut basic.target;
                         gfx_window_glutin::update_views(&window, &mut target.color, &mut target.depth);
-
-                        let w = size.width as f32;
-                        let h = size.height as f32;
-                        scale_from_base_res = (w / dim[0], h / dim[1]);
-                        scale_to_base_res = (dim[0] / w, dim[1] / h);
                     },
                     WindowEvent::Resized(size) => {
                         let input = world.read_resource::<Input>();

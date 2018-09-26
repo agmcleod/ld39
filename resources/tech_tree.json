@@ -23,7 +23,7 @@
     "status": "Researchable",
     "x": 0.20,
     "y_tier": 1,
-    "description": "Conveyer Belts:\n+1 coal gain rate & +1 more pollution per gatherer.",
+    "description": "Conveyer Belts:\n+2 coal gain rate & +1 more pollution per gatherer.",
     "frame_name": "conveyerbelts.png",
     "children": [{
       "buff": "RoboticLoaders",
@@ -32,12 +32,12 @@
       "status": "Locked",
       "x": 0.20,
       "y_tier": 2,
-      "description": "Robotic Loaders:\n+1 coal gain rate",
+      "description": "Robotic Loaders:\n+2 coal gain rate",
       "frame_name": "roboticloaders.png",
       "children": [{
         "buff": "PollutionFilters",
         "time_to_research": 10.0,
-        "cost": 180,
+        "cost": 300,
         "status": "Locked",
         "x": 0.1,
         "y_tier": 3,
@@ -66,20 +66,20 @@
     }, {
       "buff": "AutomatedRefiners",
       "time_to_research": 10.0,
-      "cost": 120,
+      "cost": 90,
       "status": "Locked",
       "x": 0.65,
       "y_tier": 2,
-      "description": "Automatic Refiners:\n+1 oil gain rate, +1 more pollution.",
+      "description": "Automatic Refiners:\n+2 oil gain rate, +2 more pollution.",
       "frame_name": "automatedrefiners.png"
     }, {
       "buff": "Purifier",
       "time_to_research": 10.0,
-      "cost": 100,
+      "cost": 130,
       "status": "Locked",
       "x": 0.85,
       "y_tier": 2,
-      "description": "Oil Purifier:\n+1 oil gain rate",
+      "description": "Oil Purifier:\n+2 oil gain rate",
       "frame_name": "purifier.png"
     }, {
       "buff": "Hydro",

@@ -107,6 +107,7 @@ impl<'a> System<'a> for Research {
         {
             if upgrade.status == Status::Learning {
                 upgrade.current_research_progress += dt;
+                let current_research_progress = upgrade.current_research_progress;
                 if upgrade.current_research_progress >= upgrade.time_to_research {
 
                     let mut level = 0;
@@ -136,7 +137,7 @@ impl<'a> System<'a> for Research {
                 }
                 researching_upgrades.insert(
                     upgrade.buff,
-                    (upgrade.current_research_progress, upgrade.time_to_research),
+                    (current_research_progress, upgrade.time_to_research),
                 );
             }
         }

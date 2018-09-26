@@ -69,7 +69,7 @@ impl<'a> System<'a> for Pollution {
                 } else if gatherer.gatherer_type == GathererType::Oil {
                     oil_pollution += amount;
                     if let Some(n) = researched_buffs.0.get(&Buff::AutomatedRefiners) {
-                        oil_pollution += *n as i32;
+                        oil_pollution += 2 * *n as i32;
                     }
                 } else if gatherer.gatherer_type == GathererType::Hydro {
                     hydro_pollution += amount;

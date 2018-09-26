@@ -85,17 +85,17 @@ impl<'a> System<'a> for Gathering {
 
                 if gatherer.gatherer_type == GathererType::Coal {
                     if let Some(n) = researched_buffs.0.get(&Buff::ConveyerBelts) {
-                        amount += *n as i32;
+                        amount += 2 * *n as i32;
                     }
                     if let Some(n) = researched_buffs.0.get(&Buff::RoboticLoaders) {
-                        amount += *n as i32;
+                        amount += 2 * *n as i32;
                     }
                 } else if gatherer.gatherer_type == GathererType::Oil {
                     if let Some(n) = researched_buffs.0.get(&Buff::AutomatedRefiners) {
-                        amount += *n as i32;
+                        amount += 2 * *n as i32;
                     }
                     if let Some(n) = researched_buffs.0.get(&Buff::Purifier) {
-                        amount += *n as i32;
+                        amount += 2 * *n as i32;
                     }
                 } else if gatherer.gatherer_type == GathererType::Hydro {
                     if let Some(n) = researched_buffs.0.get(&Buff::ReinforcedTurbines) {
