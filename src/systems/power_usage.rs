@@ -53,12 +53,12 @@ impl<'b> System<'b> for PowerUsage {
 
         let dt = delta_time_storage.deref().dt;
         self.power_consumption_timer += dt;
-        let mut reset_frame_counter = false;
+        let mut power_consumed = false;
 
         let city_power_state = city_power_state_storage.deref_mut();
         for (transform, power_bar) in (&mut transform_storage, &mut power_bar_storage).join() {
             if self.power_consumption_timer >= TICK_RATE {
-                reset_frame_counter = true;
+                power_consumed = true;
                 self.instant = Instant::now();
                 if power_bar.power_left > 0 {
                     power_bar.power_left -= power_bar.power_per_tick;
@@ -75,12 +75,11 @@ impl<'b> System<'b> for PowerUsage {
             }
         }
 
-        if reset_frame_counter {
+        if power_consumed {
             self.power_consumption_timer = 0.0;
 
             let lookup = entity_lookup_storage.deref();
 
-            let power_gain_entity = lookup.entities.get(&"power_gain_text".to_string()).unwrap();
             let gathering_rate = gathering_rate_storage.deref();
 
             // technically singular, so we could maybe make this a resource
@@ -92,17 +91,17 @@ impl<'b> System<'b> for PowerUsage {
 
             let total_gathering_rate = logic::get_total_gathering_rate(&gathering_rate);
 
-            if total_gathering_rate - power_demands > 0 {
-                city_power_state.current_city_count += 1;
-                for power_bar in (&mut power_bar_storage).join() {
-                    let mut per_tick = power_bar.power_per_tick;
-                    // each city is more demanding
-                    for n in 0..city_power_state.current_city_count {
-                        per_tick += 15 * ((n as i32) + 1);
-                    }
-                    power_bar.power_per_tick = per_tick;
-                }
-            }
+            // if total_gathering_rate - power_demands > 0 {
+            //     city_power_state.current_city_count += 1;
+            //     for power_bar in (&mut power_bar_storage).join() {
+            //         let mut per_tick = power_bar.power_per_tick;
+            //         // each city is more demanding
+            //         for n in 0..city_power_state.current_city_count {
+            //             per_tick += 15 * ((n as i32) + 1);
+            //         }
+            //         power_bar.power_per_tick = per_tick;
+            //     }
+            // }
 
             let powering_text = if city_power_state.current_city_count > 1 {
                 format!(
@@ -114,6 +113,7 @@ impl<'b> System<'b> for PowerUsage {
                 format!("Power: {}", total_gathering_rate - power_demands)
             };
 
+            let power_gain_entity = lookup.entities.get(&"power_gain_text".to_string()).unwrap();
             text_storage.get_mut(*power_gain_entity).unwrap().text = powering_text;
 
             color_storage

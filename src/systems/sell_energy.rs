@@ -1,19 +1,20 @@
 use components::ui::WalletUI;
-use components::{ui::TutorialUI, upgrade::Buff, Actions, Button, ClickSound, DeltaTime, Input,
+use components::{ui::TutorialUI, upgrade::Buff, Actions, DeltaTime,
                  Node, PowerBar, ResearchedBuffs, ResourceCount, ResourceType, Resources, Text, Transform,
                  TutorialStep, Wallet};
 use entities::tutorial;
 use specs::{Entities, Join, Read, ReadStorage, System, Write, WriteStorage};
 use std::ops::{Deref, DerefMut};
-use systems::POWER_FACTOR;
+use systems::{POWER_FACTOR, TICK_RATE};
 
 pub struct SellEnergy {
     minute_ticker: f32,
+    sell_ticker: f32,
 }
 
 impl SellEnergy {
     pub fn new() -> Self {
-        SellEnergy { minute_ticker: 0.0 }
+        SellEnergy { minute_ticker: 0.0, sell_ticker: 0.0 }
     }
 
     fn add_money<'a>(
@@ -35,10 +36,7 @@ impl<'a> System<'a> for SellEnergy {
     type SystemData = (
         Entities<'a>,
         Write<'a, Actions>,
-        WriteStorage<'a, Button>,
-        Write<'a, ClickSound>,
         Read<'a, DeltaTime>,
-        Read<'a, Input>,
         WriteStorage<'a, Node>,
         WriteStorage<'a, PowerBar>,
         Read<'a, ResearchedBuffs>,
@@ -56,10 +54,7 @@ impl<'a> System<'a> for SellEnergy {
         let (
             entities,
             mut actions_storage,
-            mut button_storage,
-            mut click_sound_storage,
             delta_time_storage,
-            input_storage,
             node_storage,
             mut power_bar_storage,
             researched_buffs_storage,
@@ -73,22 +68,14 @@ impl<'a> System<'a> for SellEnergy {
             mut wallet_ui_storage,
         ) = data;
 
-        let click_sound: &mut ClickSound = click_sound_storage.deref_mut();
-
-        let input: &Input = input_storage.deref();
         let resources: &mut Resources = resources_storage.deref_mut();
-
-        let mut sell_button_clicked = false;
-        for button in (&mut button_storage).join() {
-            if button.name == "power_btn" && button.clicked(&input) {
-                click_sound.play = true;
-                sell_button_clicked = true;
-            }
-        }
 
         let researched_buffs = researched_buffs_storage.deref();
 
-        if sell_button_clicked {
+        self.sell_ticker += delta_time_storage.deref().dt;
+
+        if self.sell_ticker > TICK_RATE {
+            self.sell_ticker = 0.0;
             // divide by power factor, so demand can be met based on resource numbers
             let mut amount_to_power = (&power_bar_storage).join().fold(0, |sum, power_bar| {
                 PowerBar::get_max() - power_bar.power_left + sum

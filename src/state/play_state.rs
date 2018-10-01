@@ -79,7 +79,6 @@ impl<'a> PlayState<'a> {
         let dispatcher = DispatcherBuilder::new()
             .with(systems::AnimationSystem::new(), "animation_system", &[])
             .with(systems::ButtonHover {}, "button_hover", &[])
-            .with(systems::SellEnergy::new(), "sell_energy", &["button_hover"])
             .with(
                 systems::BuildGatherer {},
                 "build_gatherer",
@@ -92,6 +91,7 @@ impl<'a> PlayState<'a> {
             )
             .with(systems::Gathering::new(), "gathering", &[])
             .with(systems::PowerUsage::new(), "power_usage", &["gathering"])
+            .with(systems::SellEnergy::new(), "sell_energy", &["power_usage"])
             .with(
                 systems::ToggleTechTree::new(),
                 "toggle_tech_tree",
