@@ -3,11 +3,12 @@ use conrod::{widget, Colorable, Labelable, Positionable, Sizeable, Ui, UiBuilder
 use loader;
 use specs::{Dispatcher, DispatcherBuilder, World};
 use state::State;
-use std::collections::{HashMap};
+use std::collections::HashMap;
 use std::path::Path;
 
 use components::{ui::{PollutionCount, WalletUI},
                  upgrade,
+                 upgrade::Buff,
                  Button,
                  CityPowerState,
                  Color,
@@ -19,8 +20,6 @@ use components::{ui::{PollutionCount, WalletUI},
                  Rect,
                  ResearchedBuffs,
                  ResearchingEntities,
-                 ResourceCount,
-                 ResourceType,
                  Resources,
                  SelectedTile,
                  Sprite,
@@ -30,8 +29,7 @@ use components::{ui::{PollutionCount, WalletUI},
                  TileType,
                  Transform,
                  TutorialStep,
-                 Wallet,
-                 upgrade::{Buff}};
+                 Wallet};
 use entities::{create_map, create_power_bar, create_text, tech_tree};
 use rand::{thread_rng, Rng};
 use renderer;
@@ -305,58 +303,6 @@ impl<'a> State for PlayState<'a> {
             side_bar_container_node.add(entity);
         }
 
-        // coal sprite
-        let entity = world
-            .create_entity()
-            .with(ResourceCount {
-                resource_type: ResourceType::Coal,
-            })
-            .with(Transform::visible(30.0, 158.0, 0.0, 32, 32, 0.0, 1.0, 1.0))
-            .with(Sprite {
-                frame_name: "coal.png".to_string(),
-            })
-            .build();
-        side_bar_container_node.add(entity);
-
-        // oil sprite
-        let entity = world
-            .create_entity()
-            .with(ResourceCount {
-                resource_type: ResourceType::Oil,
-            })
-            .with(Transform::visible(30.0, 204.0, 0.0, 32, 32, 0.0, 1.0, 1.0))
-            .with(Sprite {
-                frame_name: "oil.png".to_string(),
-            })
-            .build();
-        side_bar_container_node.add(entity);
-
-        // solar sprite
-        let entity = world
-            .create_entity()
-            .with(ResourceCount {
-                resource_type: ResourceType::Solar,
-            })
-            .with(Transform::visible(30.0, 250.0, 0.0, 32, 32, 0.0, 1.0, 1.0))
-            .with(Sprite {
-                frame_name: "sun.png".to_string(),
-            })
-            .build();
-        side_bar_container_node.add(entity);
-
-        // water sprite
-        let entity = world
-            .create_entity()
-            .with(ResourceCount {
-                resource_type: ResourceType::Hydro,
-            })
-            .with(Transform::visible(33.0, 296.0, 0.0, 26, 32, 0.0, 1.0, 1.0))
-            .with(Sprite {
-                frame_name: "water.png".to_string(),
-            })
-            .build();
-        side_bar_container_node.add(entity);
-
         // money sprite
         let entity = world
             .create_entity()
@@ -393,22 +339,28 @@ impl<'a> State for PlayState<'a> {
             .build();
         entities_under_root.push(entity);
 
-        // sell button
+        let mut lookup = EntityLookup::new();
+
+        // add additional city button
         let entity = world
             .create_entity()
             .with(Button::new(
-                "power_btn".to_string(),
+                "power_additional_city".to_string(),
                 [
-                    "power_btn.png".to_string(),
-                    "power_btn_hover.png".to_string(),
+                    "power_additional_city.png".to_string(),
+                    "power_additional_city_hover.png".to_string(),
                 ],
             ))
-            .with(Transform::visible(182.0, 576.0, 0.0, 96, 32, 0.0, 1.0, 1.0))
+            .with(Transform::visible(30.0, 140.0, 0.0, 96, 32, 0.0, 1.0, 1.0))
             .with(Sprite {
-                frame_name: "power_btn.png".to_string(),
+                frame_name: "power_additional_city.png".to_string(),
             })
             .build();
         side_bar_container_node.add(entity);
+
+        lookup
+            .entities
+            .insert("power_additional_city".to_string(), entity);
 
         // tech tree button
         let entity = world
@@ -427,8 +379,6 @@ impl<'a> State for PlayState<'a> {
             .build();
         side_bar_container_node.add(entity);
 
-        let mut lookup = EntityLookup::new();
-
         {
             lookup
                 .entities
@@ -438,7 +388,6 @@ impl<'a> State for PlayState<'a> {
             let mut color_storage = world.write_storage::<Color>();
             let mut transform_storage = world.write_storage::<Transform>();
             let mut text_storage = world.write_storage::<Text>();
-            let mut resource_count_storage = world.write_storage::<ResourceCount>();
             let mut wallet_ui_storage = world.write_storage::<WalletUI>();
 
             let mut text_storages = TextStorage {
@@ -447,93 +396,6 @@ impl<'a> State for PlayState<'a> {
                 text_storage: &mut text_storage,
                 transform_storage: &mut transform_storage,
             };
-
-            // coal text
-            let entity = create_text::create(
-                &mut text_storages,
-                "0".to_string(),
-                32.0,
-                80.0,
-                158.0,
-                0.0,
-                160,
-                32,
-                Color([0.0, 1.0, 0.0, 1.0]),
-            );
-            resource_count_storage
-                .insert(
-                    entity.clone(),
-                    ResourceCount {
-                        resource_type: ResourceType::Coal,
-                    },
-                )
-                .unwrap();
-            side_bar_container_node.add(entity);
-
-            // oil text
-            let entity = create_text::create(
-                &mut text_storages,
-                "0".to_string(),
-                32.0,
-                80.0,
-                204.0,
-                0.0,
-                160,
-                32,
-                Color([0.0, 1.0, 0.0, 1.0]),
-            );
-            resource_count_storage
-                .insert(
-                    entity.clone(),
-                    ResourceCount {
-                        resource_type: ResourceType::Oil,
-                    },
-                )
-                .unwrap();
-            side_bar_container_node.add(entity);
-
-            // solar text
-            let entity = create_text::create(
-                &mut text_storages,
-                "0".to_string(),
-                32.0,
-                80.0,
-                250.0,
-                0.0,
-                160,
-                32,
-                Color([0.0, 1.0, 0.0, 1.0]),
-            );
-            resource_count_storage
-                .insert(
-                    entity.clone(),
-                    ResourceCount {
-                        resource_type: ResourceType::Solar,
-                    },
-                )
-                .unwrap();
-            side_bar_container_node.add(entity);
-
-            let water_text = create_text::create(
-                &mut text_storages,
-                "0".to_string(),
-                32.0,
-                80.0,
-                296.0,
-                0.0,
-                160,
-                32,
-                Color([0.0, 1.0, 0.0, 1.0]),
-            );
-            resource_count_storage
-                .insert(
-                    water_text.clone(),
-                    ResourceCount {
-                        resource_type: ResourceType::Hydro,
-                    },
-                )
-                .unwrap();
-            side_bar_container_node.add(water_text);
 
             // money text
             let entity = create_text::create(
@@ -553,7 +415,7 @@ impl<'a> State for PlayState<'a> {
             // power gain text
             let entity = create_text::create(
                 &mut text_storages,
-                "Power: -40".to_string(),
+                "Power: -40\n1 city".to_string(),
                 24.0,
                 30.0,
                 70.0,

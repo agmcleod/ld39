@@ -1,6 +1,6 @@
-use components::{CityPowerState, Color, DeltaTime, EntityLookup, GatheringRate, PowerBar,
-                 ResourceCount, Resources, StateChange, Text, Transform};
-use specs::{Join, Read, ReadStorage, System, Write, WriteStorage};
+use components::{Button, CityPowerState, Color, DeltaTime, EntityLookup, GatheringRate, Input,
+                 PowerBar, StateChange, Text, Transform};
+use specs::{Join, Read, System, Write, WriteStorage};
 use state::play_state::PlayState;
 use std::ops::{Deref, DerefMut};
 use std::time::Instant;
@@ -20,42 +20,59 @@ impl PowerUsage {
     }
 }
 
-impl<'b> System<'b> for PowerUsage {
+impl<'a> System<'a> for PowerUsage {
     type SystemData = (
-        Write<'b, CityPowerState>,
-        WriteStorage<'b, Color>,
-        Read<'b, DeltaTime>,
-        Read<'b, EntityLookup>,
-        Read<'b, GatheringRate>,
-        WriteStorage<'b, PowerBar>,
-        ReadStorage<'b, ResourceCount>,
-        Write<'b, Resources>,
-        Write<'b, StateChange>,
-        WriteStorage<'b, Text>,
-        WriteStorage<'b, Transform>,
+        WriteStorage<'a, Button>,
+        Write<'a, CityPowerState>,
+        WriteStorage<'a, Color>,
+        Read<'a, DeltaTime>,
+        Read<'a, EntityLookup>,
+        Read<'a, GatheringRate>,
+        Read<'a, Input>,
+        WriteStorage<'a, PowerBar>,
+        Write<'a, StateChange>,
+        WriteStorage<'a, Text>,
+        WriteStorage<'a, Transform>,
     );
 
     fn run(&mut self, data: Self::SystemData) {
         let (
+            mut button_storage,
             mut city_power_state_storage,
             mut color_storage,
             delta_time_storage,
             entity_lookup_storage,
             gathering_rate_storage,
+            input_storage,
             mut power_bar_storage,
-            resource_count_storage,
-            mut resources_storage,
             mut state_change_storage,
             mut text_storage,
             mut transform_storage,
         ) = data;
-        let resources: &mut Resources = resources_storage.deref_mut();
 
         let dt = delta_time_storage.deref().dt;
         self.power_consumption_timer += dt;
         let mut power_consumed = false;
 
+        let lookup = entity_lookup_storage.deref();
+
         let city_power_state = city_power_state_storage.deref_mut();
+
+        let button = button_storage
+            .get_mut(*lookup.get("power_additional_city").unwrap())
+            .unwrap();
+        if button.clicked(&input_storage) {
+            city_power_state.current_city_count += 1;
+            for power_bar in (&mut power_bar_storage).join() {
+                let mut per_tick = power_bar.power_per_tick;
+                // each city is more demanding
+                for n in 0..city_power_state.current_city_count {
+                    per_tick += 15 * ((n as i32) + 1);
+                }
+                power_bar.power_per_tick = per_tick;
+            }
+        }
+
         for (transform, power_bar) in (&mut transform_storage, &mut power_bar_storage).join() {
             if self.power_consumption_timer >= TICK_RATE {
                 power_consumed = true;
@@ -78,8 +95,6 @@ impl<'b> System<'b> for PowerUsage {
         if power_consumed {
             self.power_consumption_timer = 0.0;
 
-            let lookup = entity_lookup_storage.deref();
-
             let gathering_rate = gathering_rate_storage.deref();
 
             // technically singular, so we could maybe make this a resource
@@ -91,18 +106,6 @@ impl<'b> System<'b> for PowerUsage {
 
             let total_gathering_rate = logic::get_total_gathering_rate(&gathering_rate);
 
-            // if total_gathering_rate - power_demands > 0 {
-            //     city_power_state.current_city_count += 1;
-            //     for power_bar in (&mut power_bar_storage).join() {
-            //         let mut per_tick = power_bar.power_per_tick;
-            //         // each city is more demanding
-            //         for n in 0..city_power_state.current_city_count {
-            //             per_tick += 15 * ((n as i32) + 1);
-            //         }
-            //         power_bar.power_per_tick = per_tick;
-            //     }
-            // }
-
             let powering_text = if city_power_state.current_city_count > 1 {
                 format!(
                     "Power: {}\n{} cities",
@@ -110,7 +113,10 @@ impl<'b> System<'b> for PowerUsage {
                     city_power_state.current_city_count
                 )
             } else {
-                format!("Power: {}", total_gathering_rate - power_demands)
+                format!(
+                    "Power: {}\n1 city",
+                    total_gathering_rate - power_demands
+                )
             };
 
             let power_gain_entity = lookup.entities.get(&"power_gain_text".to_string()).unwrap();
@@ -126,14 +132,6 @@ impl<'b> System<'b> for PowerUsage {
                     }),
                 )
                 .unwrap();
-
-            for (resource_count, text) in (&resource_count_storage, &mut text_storage).join() {
-                let new_text = format!(
-                    "{}",
-                    resources.get_amount_for_type(&resource_count.resource_type)
-                );
-                text.set_text(new_text);
-            }
         }
     }
 }

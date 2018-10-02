@@ -7,8 +7,8 @@ use components::{ui::{TutorialUI, WalletUI},
                  Input,
                  Node,
                  Rect,
-                 ResearchingEntities,
                  ResearchedBuffs,
+                 ResearchingEntities,
                  Sprite,
                  Text,
                  Transform,
@@ -232,11 +232,12 @@ impl<'a> System<'a> for TechTree {
                     let tooltip_node = node_storage.get_mut(tooltip_entity).unwrap();
 
                     if upgrade.buff.has_levels() {
-                        let level = if let Some(level) = researched_buffs_storage.0.get(&upgrade.buff) {
-                            level + 1
-                        } else {
-                            1
-                        };
+                        let level =
+                            if let Some(level) = researched_buffs_storage.0.get(&upgrade.buff) {
+                                level + 1
+                            } else {
+                                1
+                            };
 
                         let text = create_text::create(
                             &mut text_storage_type,

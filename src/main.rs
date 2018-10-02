@@ -64,7 +64,8 @@ use components::{upgrade::{LearnProgress, Upgrade},
 
 use gfx::Device;
 use gfx_glyph::{GlyphBrush, GlyphBrushBuilder};
-use glutin::{ElementState, Event, GlContext, MouseButton, VirtualKeyCode, WindowEvent, dpi::LogicalSize};
+use glutin::{dpi::LogicalSize, ElementState, Event, GlContext, MouseButton, VirtualKeyCode,
+             WindowEvent};
 use renderer::{ColorFormat, DepthFormat};
 use rodio::Source;
 use settings::Settings;
@@ -176,7 +177,15 @@ fn render_entity<R: gfx::Resources, C: gfx::CommandBuffer<R>, F: gfx::Factory<R>
                 (color_storage.get(*entity), text_storage.get_mut(*entity))
             {
                 if text.text != "" && text.visible {
-                    basic.render_text(encoder, &text, transform, color, glyph_brush, world.read_resource::<Input>().hidpi_factor, scale_from_base_res);
+                    basic.render_text(
+                        encoder,
+                        &text,
+                        transform,
+                        color,
+                        glyph_brush,
+                        world.read_resource::<Input>().hidpi_factor,
+                        scale_from_base_res,
+                    );
                 }
             }
 
@@ -314,11 +323,9 @@ fn main() {
     let mut running = true;
     let mut frame_start = time::Instant::now();
 
-    let mut conrod_renderer = conrod::backend::gfx::Renderer::new(
-        &mut factory,
-        &basic.target.color,
-        hidpi_factor as f64,
-    ).unwrap();
+    let mut conrod_renderer =
+        conrod::backend::gfx::Renderer::new(&mut factory, &basic.target.color, hidpi_factor as f64)
+            .unwrap();
     let image_map = conrod::image::Map::new();
 
     {
@@ -356,9 +363,7 @@ fn main() {
 
             match event {
                 Event::WindowEvent { event, .. } => match event {
-                    WindowEvent::CursorMoved {
-                        position: pos, ..
-                    } => {
+                    WindowEvent::CursorMoved { position: pos, .. } => {
                         let mut input_res = world.write_resource::<Input>();
                         let input = input_res.deref_mut();
                         input.mouse_pos.0 = pos.x as f32 * scale_to_base_res.0;
@@ -389,7 +394,7 @@ fn main() {
                                 };
                             }
                         }
-                    },
+                    }
                     WindowEvent::HiDpiFactorChanged(factor) => {
                         let mut input_res = world.write_resource::<Input>();
                         input_res.hidpi_factor = factor as f32;
@@ -399,8 +404,12 @@ fn main() {
                         conrod_renderer.on_resize(basic.target.color.clone());
 
                         let target = &mut basic.target;
-                        gfx_window_glutin::update_views(&window, &mut target.color, &mut target.depth);
-                    },
+                        gfx_window_glutin::update_views(
+                            &window,
+                            &mut target.color,
+                            &mut target.depth,
+                        );
+                    }
                     WindowEvent::Resized(size) => {
                         let input = world.read_resource::<Input>();
                         let hidpi_factor = input.hidpi_factor;
@@ -409,13 +418,17 @@ fn main() {
                         conrod_renderer.on_resize(basic.target.color.clone());
 
                         let target = &mut basic.target;
-                        gfx_window_glutin::update_views(&window, &mut target.color, &mut target.depth);
+                        gfx_window_glutin::update_views(
+                            &window,
+                            &mut target.color,
+                            &mut target.depth,
+                        );
 
                         let w = size.width as f32;
                         let h = size.height as f32;
                         scale_from_base_res = (w / dim[0], h / dim[1]);
                         scale_to_base_res = (dim[0] / w, dim[1] / h);
-                    },
+                    }
                     _ => {}
                 },
                 _ => (),
@@ -524,10 +537,16 @@ fn main() {
 
             let ui = state_manager.get_ui_to_render();
             let primitives = ui.draw();
-            conrod_renderer.clear(&mut encoder, [16.0 / 256.0, 14.0 / 256.0, 22.0 / 256.0, 1.0]);
+            conrod_renderer.clear(
+                &mut encoder,
+                [16.0 / 256.0, 14.0 / 256.0, 22.0 / 256.0, 1.0],
+            );
             conrod_renderer.fill(
                 &mut encoder,
-                (dim[0] * scale_from_base_res.0 * hidpi_factor as f32, dim[1] * scale_from_base_res.1 * hidpi_factor as f32),
+                (
+                    dim[0] * scale_from_base_res.0 * hidpi_factor as f32,
+                    dim[1] * scale_from_base_res.1 * hidpi_factor as f32,
+                ),
                 hidpi_factor,
                 primitives,
                 &image_map,

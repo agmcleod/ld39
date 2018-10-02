@@ -32,13 +32,13 @@ pub enum Buff {
 impl Buff {
     pub fn has_levels(&self) -> bool {
         match *self {
-            Buff::ResourceTrading |
-            Buff::ConveyerBelts |
-            Buff::RoboticLoaders |
-            Buff::AutomatedRefiners |
-            Buff::Purifier |
-            Buff::ReinforcedTurbines |
-            Buff::ImprovePanelTech => true,
+            Buff::ResourceTrading
+            | Buff::ConveyerBelts
+            | Buff::RoboticLoaders
+            | Buff::AutomatedRefiners
+            | Buff::Purifier
+            | Buff::ReinforcedTurbines
+            | Buff::ImprovePanelTech => true,
             _ => false,
         }
     }

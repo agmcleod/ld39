@@ -4,7 +4,7 @@ extern crate specs;
 
 use cgmath::{Matrix4, SquareMatrix, Transform};
 use components;
-use gfx::{texture};
+use gfx::texture;
 use gfx::traits::FactoryExt;
 use gfx_glyph::{GlyphBrush, Section};
 use renderer::{ColorFormat, DepthFormat};

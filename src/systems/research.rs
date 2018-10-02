@@ -109,7 +109,6 @@ impl<'a> System<'a> for Research {
                 upgrade.current_research_progress += dt;
                 let current_research_progress = upgrade.current_research_progress;
                 if upgrade.current_research_progress >= upgrade.time_to_research {
-
                     let mut level = 0;
                     if upgrade.buff.has_levels() {
                         if let Some(buff_level) = researched_buffs.0.get(&upgrade.buff) {

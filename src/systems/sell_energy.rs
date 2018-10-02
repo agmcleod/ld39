@@ -1,6 +1,6 @@
 use components::ui::WalletUI;
-use components::{ui::TutorialUI, upgrade::Buff, Actions, DeltaTime,
-                 Node, PowerBar, ResearchedBuffs, ResourceCount, ResourceType, Resources, Text, Transform,
+use components::{ui::TutorialUI, upgrade::Buff, Actions, DeltaTime, Node, PowerBar,
+                 ResearchedBuffs, ResourceCount, ResourceType, Resources, Text, Transform,
                  TutorialStep, Wallet};
 use entities::tutorial;
 use specs::{Entities, Join, Read, ReadStorage, System, Write, WriteStorage};
@@ -14,7 +14,10 @@ pub struct SellEnergy {
 
 impl SellEnergy {
     pub fn new() -> Self {
-        SellEnergy { minute_ticker: 0.0, sell_ticker: 0.0 }
+        SellEnergy {
+            minute_ticker: 0.0,
+            sell_ticker: 0.0,
+        }
     }
 
     fn add_money<'a>(
@@ -153,7 +156,10 @@ impl<'a> System<'a> for SellEnergy {
             }
         }
 
-        if researched_buffs.0.contains_key(&Buff::SellPanelsToConsumers) {
+        if researched_buffs
+            .0
+            .contains_key(&Buff::SellPanelsToConsumers)
+        {
             self.minute_ticker += delta_time_storage.deref().dt;
             if self.minute_ticker >= 1.0 {
                 self.minute_ticker = 0.0;
