@@ -17,14 +17,6 @@
 	"sourceSize": {"w":64,"h":64}
 },
 {
-	"filename": "coal.png",
-	"frame": {"x":466,"y":436,"w":32,"h":32},
-	"rotated": false,
-	"trimmed": false,
-	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
-	"sourceSize": {"w":32,"h":32}
-},
-{
 	"filename": "dollarsign.png",
 	"frame": {"x":234,"y":36,"w":26,"h":34},
 	"rotated": false,
@@ -169,14 +161,6 @@
 	"sourceSize": {"w":64,"h":64}
 },
 {
-	"filename": "oil.png",
-	"frame": {"x":432,"y":436,"w":32,"h":32},
-	"rotated": false,
-	"trimmed": false,
-	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
-	"sourceSize": {"w":32,"h":32}
-},
-{
 	"filename": "plant.png",
 	"frame": {"x":134,"y":234,"w":64,"h":64},
 	"rotated": false,
@@ -257,7 +241,7 @@
 	"sourceSize": {"w":64,"h":64}
 },
 {
-	"filename": "power_btn.png",
+	"filename": "power_additional_city.png",
 	"frame": {"x":296,"y":464,"w":96,"h":32},
 	"rotated": false,
 	"trimmed": false,
@@ -265,7 +249,7 @@
 	"sourceSize": {"w":96,"h":32}
 },
 {
-	"filename": "power_btn_hover.png",
+	"filename": "power_additional_city_hover.png",
 	"frame": {"x":2,"y":478,"w":96,"h":32},
 	"rotated": false,
 	"trimmed": false,
@@ -441,14 +425,6 @@
 	"sourceSize": {"w":96,"h":32}
 },
 {
-	"filename": "sun.png",
-	"frame": {"x":466,"y":402,"w":32,"h":32},
-	"rotated": false,
-	"trimmed": false,
-	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
-	"sourceSize": {"w":32,"h":32}
-},
-{
 	"filename": "swamp.png",
 	"frame": {"x":396,"y":2,"w":64,"h":64},
 	"rotated": false,
@@ -458,14 +434,6 @@
 },
 {
 	"filename": "techtree/automatedrefiners.png",
-	"frame": {"x":432,"y":402,"w":32,"h":32},
-	"rotated": false,
-	"trimmed": false,
-	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
-	"sourceSize": {"w":32,"h":32}
-},
-{
-	"filename": "techtree/coalnode.png",
 	"frame": {"x":200,"y":410,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
@@ -473,7 +441,7 @@
 	"sourceSize": {"w":32,"h":32}
 },
 {
-	"filename": "techtree/conveyerbelts.png",
+	"filename": "techtree/coalnode.png",
 	"frame": {"x":200,"y":376,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
@@ -481,7 +449,7 @@
 	"sourceSize": {"w":32,"h":32}
 },
 {
-	"filename": "techtree/fudgethenumbers.png",
+	"filename": "techtree/conveyerbelts.png",
 	"frame": {"x":200,"y":342,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
@@ -489,7 +457,7 @@
 	"sourceSize": {"w":32,"h":32}
 },
 {
-	"filename": "techtree/hydro.png",
+	"filename": "techtree/fudgethenumbers.png",
 	"frame": {"x":200,"y":308,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
@@ -497,7 +465,7 @@
 	"sourceSize": {"w":32,"h":32}
 },
 {
-	"filename": "techtree/improvedpaneltech.png",
+	"filename": "techtree/hydro.png",
 	"frame": {"x":200,"y":274,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
@@ -505,7 +473,7 @@
 	"sourceSize": {"w":32,"h":32}
 },
 {
-	"filename": "techtree/oilnode.png",
+	"filename": "techtree/improvedpaneltech.png",
 	"frame": {"x":200,"y":240,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
@@ -513,7 +481,7 @@
 	"sourceSize": {"w":32,"h":32}
 },
 {
-	"filename": "techtree/pollutionfilters.png",
+	"filename": "techtree/oilnode.png",
 	"frame": {"x":200,"y":206,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
@@ -521,7 +489,7 @@
 	"sourceSize": {"w":32,"h":32}
 },
 {
-	"filename": "techtree/purchasesolarcellcompany.png",
+	"filename": "techtree/pollutionfilters.png",
 	"frame": {"x":200,"y":172,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
@@ -529,7 +497,7 @@
 	"sourceSize": {"w":32,"h":32}
 },
 {
-	"filename": "techtree/purifier.png",
+	"filename": "techtree/purchasesolarcellcompany.png",
 	"frame": {"x":200,"y":138,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
@@ -537,7 +505,7 @@
 	"sourceSize": {"w":32,"h":32}
 },
 {
-	"filename": "techtree/reinforcedturbines.png",
+	"filename": "techtree/purifier.png",
 	"frame": {"x":460,"y":104,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
@@ -545,7 +513,7 @@
 	"sourceSize": {"w":32,"h":32}
 },
 {
-	"filename": "techtree/resourcetrading.png",
+	"filename": "techtree/reinforcedturbines.png",
 	"frame": {"x":460,"y":70,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
@@ -553,7 +521,7 @@
 	"sourceSize": {"w":32,"h":32}
 },
 {
-	"filename": "techtree/roboticloaders.png",
+	"filename": "techtree/resourcetrading.png",
 	"frame": {"x":200,"y":104,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
@@ -561,7 +529,7 @@
 	"sourceSize": {"w":32,"h":32}
 },
 {
-	"filename": "techtree/salmoncannon.png",
+	"filename": "techtree/roboticloaders.png",
 	"frame": {"x":200,"y":70,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
@@ -569,7 +537,7 @@
 	"sourceSize": {"w":32,"h":32}
 },
 {
-	"filename": "techtree/sellpanels.png",
+	"filename": "techtree/salmoncannon.png",
 	"frame": {"x":200,"y":36,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
@@ -577,8 +545,16 @@
 	"sourceSize": {"w":32,"h":32}
 },
 {
-	"filename": "techtree/solar.png",
+	"filename": "techtree/sellpanels.png",
 	"frame": {"x":462,"y":36,"w":32,"h":32},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
+	"sourceSize": {"w":32,"h":32}
+},
+{
+	"filename": "techtree/solar.png",
+	"frame": {"x":462,"y":2,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
@@ -599,14 +575,6 @@
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":64,"h":64},
 	"sourceSize": {"w":64,"h":64}
-},
-{
-	"filename": "water.png",
-	"frame": {"x":462,"y":2,"w":32,"h":32},
-	"rotated": false,
-	"trimmed": false,
-	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
-	"sourceSize": {"w":32,"h":32}
 }],
 "meta": {
 	"app": "http://www.codeandweb.com/texturepacker ",
@@ -615,6 +583,6 @@
 	"format": "RGBA8888",
 	"size": {"w":512,"h":512},
 	"scale": "1",
-	"smartupdate": "$TexturePacker:SmartUpdate:3da74b3418920cdb686e6a833185e7e4:260c56528294119089cc248f57f12361:a759b6bbc8381ac9c472b28f589ad0d6$"
+	"smartupdate": "$TexturePacker:SmartUpdate:cc57ae1ee645a40e00f3cd48b3e3f9a2:6d62b89536e78aed1b9b0234d5340727:a759b6bbc8381ac9c472b28f589ad0d6$"
 }
 }
