@@ -65,7 +65,7 @@ impl TechTree {
             .insert(
                 progress_entity,
                 Transform::visible(
-                    20.0 + 40.0 * researching_count as f32,
+                    33.0 + 40.0 * researching_count as f32,
                     546.0,
                     0.0,
                     0,
@@ -339,7 +339,7 @@ impl<'a> System<'a> for TechTree {
                     );
                     researching_entities.entities.push(progress_entity);
                     logic::update_text(
-                        format!("{}", wallet.money),
+                        format!("${}", wallet.get_money()),
                         &mut text_storage,
                         &wallet_ui_storage,
                     );

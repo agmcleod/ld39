@@ -13,7 +13,7 @@ impl GathererType {
         match *self {
             GathererType::Coal => 25,
             GathererType::Oil => 35,
-            GathererType::Solar => 90,
+            GathererType::Solar => 120,
             GathererType::Hydro => 70,
         }
     }

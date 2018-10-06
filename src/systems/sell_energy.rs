@@ -1,6 +1,6 @@
 use components::ui::WalletUI;
-use components::{ui::TutorialUI, upgrade::Buff, Actions, DeltaTime, Node, PowerBar,
-                 ResearchedBuffs, ResourceCount, ResourceType, Resources, Text, Transform,
+use components::{ui::TutorialUI, upgrade::Buff, Actions, DeltaTime, EntityLookup, GatheringRate, Node, PowerBar,
+                 ResearchedBuffs, ResourceType, Resources, Text, Transform,
                  TutorialStep, Wallet};
 use entities::tutorial;
 use specs::{Entities, Join, Read, ReadStorage, System, Write, WriteStorage};
@@ -30,7 +30,7 @@ impl SellEnergy {
         let wallet: &mut Wallet = wallet_storage.deref_mut();
         for (_, text) in (wallet_ui_storage, text_storage).join() {
             wallet.add_money(amount);
-            text.set_text(format!("{}", wallet.money));
+            text.set_text(format!("${}", wallet.get_money()));
         }
     }
 }
@@ -40,11 +40,12 @@ impl<'a> System<'a> for SellEnergy {
         Entities<'a>,
         Write<'a, Actions>,
         Read<'a, DeltaTime>,
+        Read<'a, EntityLookup>,
+        Read<'a, GatheringRate>,
         WriteStorage<'a, Node>,
         WriteStorage<'a, PowerBar>,
         Read<'a, ResearchedBuffs>,
         Write<'a, Resources>,
-        ReadStorage<'a, ResourceCount>,
         WriteStorage<'a, Text>,
         WriteStorage<'a, Transform>,
         Write<'a, TutorialStep>,
@@ -58,11 +59,12 @@ impl<'a> System<'a> for SellEnergy {
             entities,
             mut actions_storage,
             delta_time_storage,
+            entity_lookup_storage,
+            gathering_rate_storage,
             node_storage,
             mut power_bar_storage,
             researched_buffs_storage,
             mut resources_storage,
-            resource_count_storage,
             mut text_storage,
             mut transform_storage,
             mut tutorial_step_storage,
@@ -120,12 +122,42 @@ impl<'a> System<'a> for SellEnergy {
                 }
             }
 
-            for (resource_count, text) in (&resource_count_storage, &mut text_storage).join() {
-                let new_text = format!(
-                    "{}",
-                    resources.get_amount_for_type(&resource_count.resource_type)
-                );
-                text.set_text(new_text);
+            if gathering_rate_storage.changed() {
+                let entity = entity_lookup_storage.get("gathering_rate_coal").unwrap();
+                {
+                    let text = text_storage.get_mut(*entity).unwrap();
+                    text.set_text(format!("Coal: {}", gathering_rate_storage.coal));
+                }
+
+                let entity = entity_lookup_storage.get("gathering_rate_oil").unwrap();
+                {
+                    let text = text_storage.get_mut(*entity).unwrap();
+                    text.set_text(format!("Oil: {}", gathering_rate_storage.oil));
+                }
+
+                let entity = entity_lookup_storage.get("gathering_rate_hydro").unwrap();
+                {
+                    let text = text_storage.get_mut(*entity).unwrap();
+                    text.set_text(format!("Hydro: {}", gathering_rate_storage.hydro));
+                }
+
+                let entity = entity_lookup_storage.get("gathering_rate_solar").unwrap();
+                {
+                    let text = text_storage.get_mut(*entity).unwrap();
+                    text.set_text(format!("Solar: {}", gathering_rate_storage.solar));
+                }
+
+                let entity = entity_lookup_storage.get("gathering_rate_power").unwrap();
+                {
+                    let text = text_storage.get_mut(*entity).unwrap();
+                    text.set_text(format!("Power: {}", power_to_spend));
+                }
+
+                let entity = entity_lookup_storage.get("gathering_rate_money").unwrap();
+                {
+                    let text = text_storage.get_mut(*entity).unwrap();
+                    text.set_text(format!("Money: ${}", power_to_spend));
+                }
             }
 
             self.add_money(

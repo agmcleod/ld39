@@ -52,7 +52,6 @@ use components::{upgrade::{LearnProgress, Upgrade},
                  PowerBar,
                  Pulse,
                  Rect,
-                 ResourceCount,
                  SelectedTile,
                  Shape,
                  Sprite,
@@ -100,7 +99,6 @@ fn setup_world(world: &mut World, window: &glutin::Window) {
     world.register::<PowerBar>();
     world.register::<Pulse>();
     world.register::<Rect>();
-    world.register::<ResourceCount>();
     world.register::<SelectedTile>();
     world.register::<Shape>();
     world.register::<Sprite>();

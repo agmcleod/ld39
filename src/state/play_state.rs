@@ -303,21 +303,10 @@ impl<'a> State for PlayState<'a> {
             side_bar_container_node.add(entity);
         }
 
-        // money sprite
-        let entity = world
-            .create_entity()
-            .with(WalletUI {})
-            .with(Transform::visible(33.0, 344.0, 0.0, 26, 32, 0.0, 1.0, 1.0))
-            .with(Sprite {
-                frame_name: "dollarsign.png".to_string(),
-            })
-            .build();
-        side_bar_container_node.add(entity);
-
         // pollution levels
         let entity = world
             .create_entity()
-            .with(Transform::visible(33.0, 390.0, 0.0, 200, 32, 0.0, 1.0, 1.0))
+            .with(Transform::visible(33.0, 470.0, 0.0, 200, 32, 0.0, 1.0, 1.0))
             .with(PollutionCount { count: 0 })
             .with(Text::new_with_text(
                 28.0,
@@ -372,12 +361,14 @@ impl<'a> State for PlayState<'a> {
                     "show_tech_hover.png".to_string(),
                 ],
             ))
-            .with(Transform::visible(43.0, 576.0, 0.0, 96, 32, 0.0, 1.0, 1.0))
+            .with(Transform::visible(112.0, 576.0, 0.0, 96, 32, 0.0, 1.0, 1.0))
             .with(Sprite {
                 frame_name: "show_tech.png".to_string(),
             })
             .build();
         side_bar_container_node.add(entity);
+
+        let mut gathering_rate_container_node = Node::new();
 
         {
             lookup
@@ -400,17 +391,126 @@ impl<'a> State for PlayState<'a> {
             // money text
             let entity = create_text::create(
                 &mut text_storages,
-                format!("{}", Wallet::start_amount()),
+                format!("${}", Wallet::start_amount()),
                 32.0,
-                80.0,
-                344.0,
+                33.0,
+                430.0,
                 0.0,
                 160,
                 32,
-                Color([0.0, 1.0, 0.0, 1.0]),
+                Color([1.0, 1.0, 0.0, 1.0]),
             );
             wallet_ui_storage.insert(entity, WalletUI {}).unwrap();
             side_bar_container_node.add(entity);
+
+            let gathering_rate_label = create_text::create(
+                &mut text_storages,
+                "Gathering Rate".to_string(),
+                22.0,
+                0.0,
+                0.0,
+                0.0,
+                160,
+                32,
+                Color([0.0, 0.6, 0.0, 1.0]),
+            );
+            gathering_rate_container_node.add(gathering_rate_label);
+
+            let coal_rate_label = create_text::create(
+                &mut text_storages,
+                "Coal: 0".to_string(),
+                20.0,
+                0.0,
+                35.0,
+                0.0,
+                160,
+                32,
+                Color([0.6, 0.6, 0.6, 1.0]),
+            );
+            lookup
+                .entities
+                .insert("gathering_rate_coal".to_string(), coal_rate_label.clone());
+            gathering_rate_container_node.add(coal_rate_label);
+
+            let oil_rate_label = create_text::create(
+                &mut text_storages,
+                "Oil: 0".to_string(),
+                20.0,
+                0.0,
+                60.0,
+                0.0,
+                160,
+                32,
+                Color([0.8, 0.8, 0.8, 1.0]),
+            );
+            lookup
+                .entities
+                .insert("gathering_rate_oil".to_string(), oil_rate_label.clone());
+            gathering_rate_container_node.add(oil_rate_label);
+
+            let hydro_rate_label = create_text::create(
+                &mut text_storages,
+                "Hydro: 0".to_string(),
+                20.0,
+                0.0,
+                85.0,
+                0.0,
+                160,
+                32,
+                Color([0.188, 0.57647, 1.0, 1.0]),
+            );
+            lookup
+                .entities
+                .insert("gathering_rate_hydro".to_string(), hydro_rate_label.clone());
+            gathering_rate_container_node.add(hydro_rate_label);
+
+            let solar_rate_label = create_text::create(
+                &mut text_storages,
+                "Solar: 0".to_string(),
+                20.0,
+                0.0,
+                110.0,
+                0.0,
+                160,
+                32,
+                Color([1.0, 1.0, 0.6196, 1.0]),
+            );
+            lookup
+                .entities
+                .insert("gathering_rate_solar".to_string(), solar_rate_label.clone());
+            gathering_rate_container_node.add(solar_rate_label);
+
+            let power_rate_label = create_text::create(
+                &mut text_storages,
+                "Power: 0".to_string(),
+                20.0,
+                0.0,
+                135.0,
+                0.0,
+                160,
+                32,
+                Color([0.0, 0.6, 0.0, 1.0]),
+            );
+            lookup
+                .entities
+                .insert("gathering_rate_power".to_string(), power_rate_label.clone());
+            gathering_rate_container_node.add(power_rate_label);
+
+            let money_rate_label = create_text::create(
+                &mut text_storages,
+                "Money: $0".to_string(),
+                20.0,
+                0.0,
+                160.0,
+                0.0,
+                160,
+                32,
+                Color([1.0, 1.0, 0.0, 1.0]),
+            );
+            lookup
+                .entities
+                .insert("gathering_rate_money".to_string(), money_rate_label.clone());
+            gathering_rate_container_node.add(money_rate_label);
 
             // power gain text
             let entity = create_text::create(
@@ -430,6 +530,13 @@ impl<'a> State for PlayState<'a> {
                 .insert("power_gain_text".to_string(), entity.clone());
             side_bar_container_node.add(entity);
         }
+
+        let gathering_rate_container = world.create_entity()
+            .with(Transform::visible(33.0, 210.0, 0.0, 160, 200, 0.0, 1.0, 1.0))
+            .with(gathering_rate_container_node)
+            .build();
+
+        side_bar_container_node.add(gathering_rate_container);
 
         let side_bar_container = world
             .create_entity()

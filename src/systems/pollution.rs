@@ -1,6 +1,7 @@
 use components::{ui::{PollutionCount, WalletUI},
                  upgrade::Buff,
                  DeltaTime,
+                 EntityLookup,
                  Gatherer,
                  GathererType,
                  GatheringRate,
@@ -24,6 +25,7 @@ impl Pollution {
 impl<'a> System<'a> for Pollution {
     type SystemData = (
         Read<'a, DeltaTime>,
+        Read<'a, EntityLookup>,
         ReadStorage<'a, Gatherer>,
         Read<'a, GatheringRate>,
         WriteStorage<'a, PollutionCount>,
@@ -36,6 +38,7 @@ impl<'a> System<'a> for Pollution {
     fn run(&mut self, data: Self::SystemData) {
         let (
             delta_time_storage,
+            entity_lookup_storage,
             gatherer_storage,
             gathering_rate_storage,
             mut pollution_count_storage,
@@ -93,12 +96,19 @@ impl<'a> System<'a> for Pollution {
             let wallet = wallet_storage.deref_mut();
             let total_gathering_rate =
                 logic::get_total_gathering_rate(&gathering_rate_storage.deref());
-            wallet.money -= (total_gathering_rate as f32 * (pollution as f32 / 100.0)) as i32;
+
+            let tax = (total_gathering_rate as f32 * (pollution as f32 / 100.0)) as i32;
+            wallet.remove_amount(tax);
             logic::update_text(
-                format!("{}", wallet.money),
+                format!("${}", wallet.get_money()),
                 &mut text_storage,
                 &wallet_ui_storage,
             );
+
+            {
+                let text = text_storage.get_mut(*entity_lookup_storage.get("gathering_rate_money").unwrap()).unwrap();
+                text.set_text(format!("Money: {}", wallet.last_credit - tax));
+            }
 
             for (pollution_count, text) in (&mut pollution_count_storage, &mut text_storage).join()
             {

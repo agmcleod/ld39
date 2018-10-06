@@ -112,7 +112,7 @@
     }, {
       "buff": "Solar",
       "time_to_research": 10.0,
-      "cost": 600,
+      "cost": 1500,
       "status": "Locked",
       "x": 0.65,
       "y_tier": 4,

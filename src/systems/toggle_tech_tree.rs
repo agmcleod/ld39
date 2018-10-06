@@ -191,7 +191,7 @@ impl<'a> System<'a> for ToggleTechTree {
             .contains_key(&Buff::ResourceTrading)
         {
             // hard cost check. needs to change if i alter cost in tech tree
-            if wallet_storage.deref().money >= 50 {
+            if wallet_storage.get_money() >= 50 {
                 tutorial::next_step(
                     &entities,
                     &mut actions_storage,
