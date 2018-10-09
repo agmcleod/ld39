@@ -1,11 +1,11 @@
 use components::ui::WalletUI;
-use components::{ui::TutorialUI, upgrade::Buff, Actions, DeltaTime, EntityLookup, GatheringRate, Node, PowerBar,
+use components::{ui::TutorialUI, upgrade::Buff, Actions, DeltaTime, EntityLookup, Gatherer, GathererType, GatheringRate, Node, PowerBar,
                  ResearchedBuffs, ResourceType, Resources, Text, Transform,
                  TutorialStep, Wallet};
 use entities::tutorial;
 use specs::{Entities, Join, Read, ReadStorage, System, Write, WriteStorage};
 use std::ops::{Deref, DerefMut};
-use systems::{POWER_FACTOR, TICK_RATE};
+use systems::{logic, POWER_FACTOR, TICK_RATE};
 
 pub struct SellEnergy {
     minute_ticker: f32,
@@ -19,20 +19,6 @@ impl SellEnergy {
             sell_ticker: 0.0,
         }
     }
-
-    fn add_money<'a>(
-        &mut self,
-        amount: i32,
-        wallet_storage: &mut Write<'a, Wallet>,
-        wallet_ui_storage: &mut WriteStorage<'a, WalletUI>,
-        text_storage: &mut WriteStorage<'a, Text>,
-    ) {
-        let wallet: &mut Wallet = wallet_storage.deref_mut();
-        for (_, text) in (wallet_ui_storage, text_storage).join() {
-            wallet.add_money(amount);
-            text.set_text(format!("${}", wallet.get_money()));
-        }
-    }
 }
 
 impl<'a> System<'a> for SellEnergy {
@@ -41,6 +27,7 @@ impl<'a> System<'a> for SellEnergy {
         Write<'a, Actions>,
         Read<'a, DeltaTime>,
         Read<'a, EntityLookup>,
+        ReadStorage<'a, Gatherer>,
         Read<'a, GatheringRate>,
         WriteStorage<'a, Node>,
         WriteStorage<'a, PowerBar>,
@@ -60,6 +47,7 @@ impl<'a> System<'a> for SellEnergy {
             mut actions_storage,
             delta_time_storage,
             entity_lookup_storage,
+            gatherer_storage,
             gathering_rate_storage,
             node_storage,
             mut power_bar_storage,
@@ -152,21 +140,9 @@ impl<'a> System<'a> for SellEnergy {
                     let text = text_storage.get_mut(*entity).unwrap();
                     text.set_text(format!("Power: {}", power_to_spend));
                 }
-
-                let entity = entity_lookup_storage.get("gathering_rate_money").unwrap();
-                {
-                    let text = text_storage.get_mut(*entity).unwrap();
-                    text.set_text(format!("Money: ${}", power_to_spend));
-                }
             }
 
-            self.add_money(
-                power_to_spend,
-                &mut wallet_storage,
-                &mut wallet_ui_storage,
-                &mut text_storage,
-            );
-
+            let money_from_power = power_to_spend;
             power_to_spend *= POWER_FACTOR;
 
             for (transform, power_bar) in (&mut transform_storage, &mut power_bar_storage).join() {
@@ -186,6 +162,66 @@ impl<'a> System<'a> for SellEnergy {
                     * (power_bar.power_left as f32 / PowerBar::get_max_f32());
                 transform.size.x = width as u16;
             }
+
+            let mut coal_pollution = 0;
+            let mut oil_pollution = 0;
+            let mut hydro_pollution = 0;
+            let researched_buffs = researched_buffs_storage.deref();
+
+            for gatherer in (&gatherer_storage).join() {
+                let mut amount = gatherer.pollution;
+                if amount > 0 {
+                    if gatherer.gatherer_type == GathererType::Coal {
+                        coal_pollution += amount;
+                        if let Some(n) = researched_buffs.0.get(&Buff::ConveyerBelts) {
+                            coal_pollution += *n as i32;
+                        }
+                    } else if gatherer.gatherer_type == GathererType::Oil {
+                        oil_pollution += amount;
+                        if let Some(n) = researched_buffs.0.get(&Buff::AutomatedRefiners) {
+                            oil_pollution += 2 * *n as i32;
+                        }
+                    } else if gatherer.gatherer_type == GathererType::Hydro {
+                        hydro_pollution += amount;
+                    }
+                }
+            }
+
+            if researched_buffs.0.contains_key(&Buff::PollutionFilters) {
+                coal_pollution -= coal_pollution * 20 / 100;
+            }
+            if researched_buffs.0.contains_key(&Buff::FudgeTheNumbers) {
+                oil_pollution -= oil_pollution * 20 / 100;
+            }
+            if researched_buffs.0.contains_key(&Buff::SalmonCannon) {
+                hydro_pollution -= hydro_pollution * 20 / 100;
+            }
+
+            let pollution = coal_pollution + oil_pollution + hydro_pollution;
+
+            if pollution > 0 {
+                let tax = (money_from_power as f32 * (pollution as f32 / 100.0)) as i32;
+                wallet_storage.remove_amount(tax);
+                if gathering_rate_storage.changed() {
+                    let entity = entity_lookup_storage.get("gathering_rate_money").unwrap();
+                    {
+                        let text = text_storage.get_mut(*entity).unwrap();
+                        text.set_text(format!("Money: ${}", money_from_power - tax));
+                    }
+                }
+            } else {
+                let entity = entity_lookup_storage.get("gathering_rate_money").unwrap();
+                {
+                    let text = text_storage.get_mut(*entity).unwrap();
+                    text.set_text(format!("Money: ${}", money_from_power));
+                }
+            }
+
+            logic::update_text_mut(
+                format!("${}", wallet_storage.get_money()),
+                &mut text_storage,
+                &mut wallet_ui_storage,
+            );
         }
 
         if researched_buffs
@@ -195,11 +231,11 @@ impl<'a> System<'a> for SellEnergy {
             self.minute_ticker += delta_time_storage.deref().dt;
             if self.minute_ticker >= 1.0 {
                 self.minute_ticker = 0.0;
-                self.add_money(
-                    50,
-                    &mut wallet_storage,
-                    &mut wallet_ui_storage,
+                wallet_storage.add_money(50);
+                logic::update_text_mut(
+                    format!("${}", wallet_storage.get_money()),
                     &mut text_storage,
+                    &mut wallet_ui_storage,
                 );
             }
         }

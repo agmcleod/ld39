@@ -96,7 +96,6 @@ impl<'a> PlayState<'a> {
                 &["button_hover"],
             )
             .with(systems::Research::new(), "research", &[])
-            .with(systems::Pollution::new(), "pollution", &["gathering"])
             .with(
                 systems::FloatingTextSystem::new(),
                 "floating_text_system",
@@ -113,7 +112,6 @@ impl<'a> PlayState<'a> {
                     "floating_text_system",
                     "toggle_tech_tree",
                     "power_usage",
-                    "pollution",
                     "sell_energy",
                     "tutorial",
                 ],
