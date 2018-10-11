@@ -6,7 +6,7 @@ use state::State;
 use std::collections::HashMap;
 use std::path::Path;
 
-use components::{ui::{PollutionCount, WalletUI},
+use components::{ui::{WalletUI},
                  upgrade,
                  upgrade::Buff,
                  Button,
@@ -301,21 +301,6 @@ impl<'a> State for PlayState<'a> {
             side_bar_container_node.add(entity);
         }
 
-        // pollution levels
-        let entity = world
-            .create_entity()
-            .with(Transform::visible(33.0, 470.0, 0.0, 200, 32, 0.0, 1.0, 1.0))
-            .with(PollutionCount { count: 0 })
-            .with(Text::new_with_text(
-                28.0,
-                280,
-                32,
-                "Pollution tax: 0%".to_string(),
-            ))
-            .with(Color([0.0, 1.0, 0.0, 1.0]))
-            .build();
-        side_bar_container_node.add(entity);
-
         // selected
         let entity = world
             .create_entity()
@@ -389,7 +374,7 @@ impl<'a> State for PlayState<'a> {
             // money text
             let entity = create_text::create(
                 &mut text_storages,
-                format!("${}", Wallet::start_amount()),
+                format!("Wallet: ${}", Wallet::start_amount()),
                 32.0,
                 33.0,
                 430.0,
@@ -496,12 +481,12 @@ impl<'a> State for PlayState<'a> {
 
             let money_rate_label = create_text::create(
                 &mut text_storages,
-                "Money: $0".to_string(),
+                "Income: $0, Tax: $0".to_string(),
                 20.0,
                 0.0,
                 160.0,
                 0.0,
-                160,
+                220,
                 32,
                 Color([1.0, 1.0, 0.0, 1.0]),
             );

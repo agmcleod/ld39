@@ -339,7 +339,7 @@ impl<'a> System<'a> for TechTree {
                     );
                     researching_entities.entities.push(progress_entity);
                     logic::update_text(
-                        format!("${}", wallet.get_money()),
+                        format!("Wallet: ${}", wallet.get_money()),
                         &mut text_storage,
                         &wallet_ui_storage,
                     );

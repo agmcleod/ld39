@@ -143,6 +143,7 @@ impl<'a> System<'a> for SellEnergy {
             }
 
             let money_from_power = power_to_spend;
+            wallet_storage.add_money(money_from_power);
             power_to_spend *= POWER_FACTOR;
 
             for (transform, power_bar) in (&mut transform_storage, &mut power_bar_storage).join() {
@@ -199,26 +200,29 @@ impl<'a> System<'a> for SellEnergy {
 
             let pollution = coal_pollution + oil_pollution + hydro_pollution;
 
-            if pollution > 0 {
+            let tax = if pollution > 0 {
                 let tax = (money_from_power as f32 * (pollution as f32 / 100.0)) as i32;
                 wallet_storage.remove_amount(tax);
-                if gathering_rate_storage.changed() {
-                    let entity = entity_lookup_storage.get("gathering_rate_money").unwrap();
-                    {
-                        let text = text_storage.get_mut(*entity).unwrap();
-                        text.set_text(format!("Money: ${}", money_from_power - tax));
-                    }
-                }
+                tax
             } else {
-                let entity = entity_lookup_storage.get("gathering_rate_money").unwrap();
-                {
-                    let text = text_storage.get_mut(*entity).unwrap();
-                    text.set_text(format!("Money: ${}", money_from_power));
-                }
+                0
+            };
+
+            // this could be potentially optimized by tracking last tax & money amounts in a resource, and check if it changes.
+            // though gfx-glyph cache should do plenty for us
+            let entity = entity_lookup_storage.get("gathering_rate_money").unwrap();
+            {
+                let text = text_storage.get_mut(*entity).unwrap();
+                let sign = if tax > 0 {
+                    "-"
+                } else {
+                    ""
+                };
+                text.set_text(format!("Income: ${}, Tax: {}${}", money_from_power, sign, tax));
             }
 
             logic::update_text_mut(
-                format!("${}", wallet_storage.get_money()),
+                format!("Wallet: ${}", wallet_storage.get_money()),
                 &mut text_storage,
                 &mut wallet_ui_storage,
             );
