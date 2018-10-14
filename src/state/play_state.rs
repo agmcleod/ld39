@@ -375,11 +375,11 @@ impl<'a> State for PlayState<'a> {
             let entity = create_text::create(
                 &mut text_storages,
                 format!("Wallet: ${}", Wallet::start_amount()),
-                32.0,
+                28.0,
                 33.0,
                 430.0,
                 0.0,
-                160,
+                220,
                 32,
                 Color([1.0, 1.0, 0.0, 1.0]),
             );
