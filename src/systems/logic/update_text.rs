@@ -24,4 +24,3 @@ pub fn update_text_mut<'a, C>(
         text.set_text(message.clone());
     }
 }
-

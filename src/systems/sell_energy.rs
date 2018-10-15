@@ -1,7 +1,7 @@
 use components::ui::WalletUI;
-use components::{ui::TutorialUI, upgrade::Buff, Actions, DeltaTime, EntityLookup, Gatherer, GathererType, GatheringRate, Node, PowerBar,
-                 ResearchedBuffs, ResourceType, Resources, Text, Transform,
-                 TutorialStep, Wallet};
+use components::{ui::TutorialUI, upgrade::Buff, Actions, DeltaTime, EntityLookup, Gatherer,
+                 GathererType, GatheringRate, Node, PowerBar, ResearchedBuffs, ResourceType,
+                 Resources, Text, Transform, TutorialStep, Wallet};
 use entities::tutorial;
 use specs::{Entities, Join, Read, ReadStorage, System, Write, WriteStorage};
 use std::ops::{Deref, DerefMut};
@@ -213,12 +213,11 @@ impl<'a> System<'a> for SellEnergy {
             let entity = entity_lookup_storage.get("gathering_rate_money").unwrap();
             {
                 let text = text_storage.get_mut(*entity).unwrap();
-                let sign = if tax > 0 {
-                    "-"
-                } else {
-                    ""
-                };
-                text.set_text(format!("Income: ${}, Tax: {}${}", money_from_power, sign, tax));
+                let sign = if tax > 0 { "-" } else { "" };
+                text.set_text(format!(
+                    "Income: ${}, Tax: {}${}",
+                    money_from_power, sign, tax
+                ));
             }
 
             logic::update_text_mut(

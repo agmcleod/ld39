@@ -37,7 +37,8 @@ impl GatheringRate {
     }
 
     pub fn changed(&self) -> bool {
-        self.old_coal != self.coal || self.old_oil != self.oil || self.old_solar != self.solar || self.old_hydro != self.hydro
+        self.old_coal != self.coal || self.old_oil != self.oil || self.old_solar != self.solar
+            || self.old_hydro != self.hydro
     }
 
     pub fn reset(&mut self) {

@@ -6,30 +6,10 @@ use state::State;
 use std::collections::HashMap;
 use std::path::Path;
 
-use components::{ui::{WalletUI},
-                 upgrade,
-                 upgrade::Buff,
-                 Button,
-                 CityPowerState,
-                 Color,
-                 EntityLookup,
-                 GathererPositions,
-                 GatheringRate,
-                 Node,
-                 PowerBar,
-                 Rect,
-                 ResearchedBuffs,
-                 ResearchingEntities,
-                 Resources,
-                 SelectedTile,
-                 Sprite,
-                 Text,
-                 Tile,
-                 TileNodes,
-                 TileType,
-                 Transform,
-                 TutorialStep,
-                 Wallet};
+use components::{ui::WalletUI, upgrade, upgrade::Buff, Button, CityPowerState, Color,
+                 EntityLookup, GathererPositions, GatheringRate, Node, PowerBar, Rect,
+                 ResearchedBuffs, ResearchingEntities, Resources, SelectedTile, Sprite, Text,
+                 Tile, TileNodes, TileType, Transform, TutorialStep, Wallet};
 use entities::{create_map, create_power_bar, create_text, tech_tree};
 use rand::{thread_rng, Rng};
 use renderer;
@@ -514,8 +494,11 @@ impl<'a> State for PlayState<'a> {
             side_bar_container_node.add(entity);
         }
 
-        let gathering_rate_container = world.create_entity()
-            .with(Transform::visible(33.0, 210.0, 0.0, 160, 200, 0.0, 1.0, 1.0))
+        let gathering_rate_container = world
+            .create_entity()
+            .with(Transform::visible(
+                33.0, 210.0, 0.0, 160, 200, 0.0, 1.0, 1.0,
+            ))
             .with(gathering_rate_container_node)
             .build();
 

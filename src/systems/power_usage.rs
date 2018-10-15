@@ -18,6 +18,51 @@ impl PowerUsage {
             power_consumption_timer: 0.0,
         }
     }
+
+    fn update_power_ui(
+        &self,
+        gathering_rate_storage: &Read<GatheringRate>,
+        power_bar_storage: &WriteStorage<PowerBar>,
+        city_power_state: &CityPowerState,
+        lookup: &EntityLookup,
+        color_storage: &mut WriteStorage<Color>,
+        text_storage: &mut WriteStorage<Text>,
+    ) {
+        let gathering_rate = gathering_rate_storage.deref();
+
+        // technically singular, so we could maybe make this a resource
+        // or at least lookup via entity
+        let power_demands = (&power_bar_storage)
+            .join()
+            .fold(0, |sum, power_bar| sum + power_bar.power_per_tick)
+            / POWER_FACTOR;
+
+        let total_gathering_rate = logic::get_total_gathering_rate(&gathering_rate);
+
+        let powering_text = if city_power_state.current_city_count > 1 {
+            format!(
+                "Power: {}\n{} cities",
+                total_gathering_rate - power_demands,
+                city_power_state.current_city_count
+            )
+        } else {
+            format!("Power: {}\n1 city", total_gathering_rate - power_demands)
+        };
+
+        let power_gain_entity = lookup.entities.get(&"power_gain_text".to_string()).unwrap();
+        text_storage.get_mut(*power_gain_entity).unwrap().text = powering_text;
+
+        color_storage
+            .insert(
+                *power_gain_entity,
+                Color(if total_gathering_rate >= power_demands {
+                    [0.0, 0.6, 0.0, 1.0]
+                } else {
+                    [0.6, 0.0, 0.0, 1.0]
+                }),
+            )
+            .unwrap();
+    }
 }
 
 impl<'a> System<'a> for PowerUsage {
@@ -71,6 +116,15 @@ impl<'a> System<'a> for PowerUsage {
                 }
                 power_bar.power_per_tick = per_tick;
             }
+
+            self.update_power_ui(
+                &gathering_rate_storage,
+                &power_bar_storage,
+                city_power_state,
+                &lookup,
+                &mut color_storage,
+                &mut text_storage,
+            );
         }
 
         for (transform, power_bar) in (&mut transform_storage, &mut power_bar_storage).join() {
@@ -95,43 +149,14 @@ impl<'a> System<'a> for PowerUsage {
         if power_consumed {
             self.power_consumption_timer = 0.0;
 
-            let gathering_rate = gathering_rate_storage.deref();
-
-            // technically singular, so we could maybe make this a resource
-            // or at least lookup via entity
-            let power_demands = (&power_bar_storage)
-                .join()
-                .fold(0, |sum, power_bar| sum + power_bar.power_per_tick)
-                / POWER_FACTOR;
-
-            let total_gathering_rate = logic::get_total_gathering_rate(&gathering_rate);
-
-            let powering_text = if city_power_state.current_city_count > 1 {
-                format!(
-                    "Power: {}\n{} cities",
-                    total_gathering_rate - power_demands,
-                    city_power_state.current_city_count
-                )
-            } else {
-                format!(
-                    "Power: {}\n1 city",
-                    total_gathering_rate - power_demands
-                )
-            };
-
-            let power_gain_entity = lookup.entities.get(&"power_gain_text".to_string()).unwrap();
-            text_storage.get_mut(*power_gain_entity).unwrap().text = powering_text;
-
-            color_storage
-                .insert(
-                    *power_gain_entity,
-                    Color(if total_gathering_rate >= power_demands {
-                        [0.0, 0.6, 0.0, 1.0]
-                    } else {
-                        [0.6, 0.0, 0.0, 1.0]
-                    }),
-                )
-                .unwrap();
+            self.update_power_ui(
+                &gathering_rate_storage,
+                &power_bar_storage,
+                city_power_state,
+                &lookup,
+                &mut color_storage,
+                &mut text_storage,
+            );
         }
     }
 }
