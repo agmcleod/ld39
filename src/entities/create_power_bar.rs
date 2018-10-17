@@ -6,12 +6,11 @@ pub fn create(
     power_bar_storage: &mut PowerBarStorage,
     x: f32,
     y: f32,
-    power_per_tick: i32,
 ) -> Entity {
     let entity = power_bar_storage.entities.create();
     power_bar_storage
         .power_bar_storage
-        .insert(entity, PowerBar::new(power_per_tick))
+        .insert(entity, PowerBar::new())
         .unwrap();
     power_bar_storage
         .transform_storage

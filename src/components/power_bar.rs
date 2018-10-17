@@ -1,6 +1,7 @@
 use specs::{Component, VecStorage};
 
 const MAX_POWER: i32 = 10_000;
+pub const STARTING_TICK: i32 = 40;
 
 pub struct PowerBar {
     pub power_left: i32,
@@ -8,10 +9,10 @@ pub struct PowerBar {
 }
 
 impl PowerBar {
-    pub fn new(power_per_tick: i32) -> PowerBar {
+    pub fn new() -> PowerBar {
         PowerBar {
             power_left: MAX_POWER,
-            power_per_tick,
+            power_per_tick: STARTING_TICK,
         }
     }
 

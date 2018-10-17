@@ -1,5 +1,5 @@
 use components::{Button, CityPowerState, Color, DeltaTime, EntityLookup, GatheringRate, Input,
-                 PowerBar, StateChange, Text, Transform};
+                 PowerBar, StateChange, Text, Transform, STARTING_TICK};
 use specs::{Join, Read, System, Write, WriteStorage};
 use state::play_state::PlayState;
 use std::ops::{Deref, DerefMut};
@@ -109,7 +109,7 @@ impl<'a> System<'a> for PowerUsage {
         if button.clicked(&input_storage) {
             city_power_state.current_city_count += 1;
             for power_bar in (&mut power_bar_storage).join() {
-                let mut per_tick = power_bar.power_per_tick;
+                let mut per_tick = STARTING_TICK;
                 // each city is more demanding
                 for n in 0..city_power_state.current_city_count {
                     per_tick += 15 * ((n as i32) + 1);

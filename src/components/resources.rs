@@ -41,6 +41,8 @@ impl Resources {
     pub fn withdraw_amount_for_type(&mut self, resource_type: ResourceType, amount: i32) -> i32 {
         let rate = resource_type.get_efficiency_rate();
         match resource_type {
+            // the division and then re-multiply is to remove an even amount by efficiency
+            // then the amount is returned, dividing by efficiency rate
             ResourceType::Coal => {
                 let mut amt = cmp::min(self.coal, amount);
                 amt = amt / rate * rate;
@@ -57,13 +59,13 @@ impl Resources {
                 let mut amt = cmp::min(self.solar, amount);
                 amt = amt / rate * rate;
                 self.solar -= amt;
-                amt
+                amt / 2
             }
             ResourceType::Hydro => {
                 let mut amt = cmp::min(self.hydro, amount);
                 amt = amt / rate * rate;
                 self.hydro -= amt;
-                amt
+                amt / 2
             }
         }
     }
