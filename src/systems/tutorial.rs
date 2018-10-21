@@ -145,18 +145,10 @@ impl<'a> System<'a> for Tutorial {
         } else if actions.action_fired(&TutorialStep::CoalGathered.as_string()) {
             details = Some(StepCreationDetails::new(
                 670.0,
-                158.0,
+                235.0,
                 100.0,
-                40.0,
-                "After building the coal mine, you are now collecting coal as a resource.",
-            ));
-        } else if actions.action_fired(&TutorialStep::SellResources.as_string()) {
-            details = Some(StepCreationDetails::new(
-                822.0,
-                576.0,
-                96.0,
-                32.0,
-                "Click the button at the bottom right to sell",
+                30.0,
+                "After building the coal mine, you are now collecting coal as a resource.\nThis is then sold to add power to the city",
             ));
         } else if actions.action_fired(&TutorialStep::ResourcesSold.as_string()) {
             details = Some(StepCreationDetails::new(
@@ -164,11 +156,11 @@ impl<'a> System<'a> for Tutorial {
                 32.0,
                 280.0,
                 360.0,
-                "When you sell, the resources go to the power grid filling up the city power bars. Your money also goes up.\n\nUse money to keep building. Be wary of building next to a tile occupied by a city or by nature."
+                "When you sell, the resources go to the power grid filling up the city's power. Your money also goes up.\n\nUse money to keep building. Be wary of building next to a tile occupied by a city or by nature."
             ));
         } else if actions.action_fired(&TutorialStep::ShowUpgrades.as_string()) {
             details = Some(StepCreationDetails::new(
-                683.0,
+                752.0,
                 576.0,
                 96.0,
                 32.0,
@@ -198,8 +190,8 @@ impl<'a> System<'a> for Tutorial {
                 670.0,
                 32.0,
                 280.0,
-                80.0,
-                "When the power # becomes positive, it means you are producing enough to supply this city. The demand will then increase by adding another city. Produce the most power for the most cities that you can.\n\nBest of luck!"
+                85.0,
+                "When the power # becomes positive, it means you are producing enough to supply this city. Click \"power additional city\" to increase the difficulty. Produce the most power for the most cities that you can.\n\nBest of luck!"
             ));
         }
 

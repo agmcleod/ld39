@@ -6,7 +6,6 @@ pub enum TutorialStep {
     SelectTile,
     BuildCoal(f32, f32),
     CoalGathered,
-    SellResources,
     ResourcesSold,
     ShowUpgrades,
     Upgrade,

@@ -142,17 +142,7 @@ impl<'a> System<'a> for Gathering {
             resources
                 .increase_resource_for_gatherer_type(&GathererType::Hydro, gathering_rate.hydro);
 
-            if resources.coal >= 50 {
-                tutorial::next_step(
-                    &entities,
-                    &mut actions_storage,
-                    &mut tutorial_step_storage,
-                    &tutorial_ui_storage,
-                    &node_storage,
-                    TutorialStep::CoalGathered,
-                    TutorialStep::SellResources,
-                );
-            } else if resources.coal > 0 {
+            if resources.coal > 0 {
                 tutorial::next_step(
                     &entities,
                     &mut actions_storage,

@@ -253,15 +253,17 @@ impl<'a> System<'a> for SellEnergy {
 
             let mut power_to_spend = 0i32;
 
-            tutorial::next_step(
-                &entities,
-                &mut actions_storage,
-                &mut tutorial_step_storage,
-                &tutorial_ui_storage,
-                &node_storage,
-                TutorialStep::SellResources,
-                TutorialStep::ResourcesSold,
-            );
+            if wallet_storage.get_money() > 10 {
+                tutorial::next_step(
+                    &entities,
+                    &mut actions_storage,
+                    &mut tutorial_step_storage,
+                    &tutorial_ui_storage,
+                    &node_storage,
+                    TutorialStep::CoalGathered,
+                    TutorialStep::ResourcesSold,
+                );
+            }
 
             'resources: for r_type in &[
                 ResourceType::Coal,
