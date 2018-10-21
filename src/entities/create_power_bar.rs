@@ -2,11 +2,7 @@ use components::{Color, PowerBar, Rect, Transform};
 use specs::Entity;
 use storage_types::PowerBarStorage;
 
-pub fn create(
-    power_bar_storage: &mut PowerBarStorage,
-    x: f32,
-    y: f32,
-) -> Entity {
+pub fn create(power_bar_storage: &mut PowerBarStorage, x: f32, y: f32) -> Entity {
     let entity = power_bar_storage.entities.create();
     power_bar_storage
         .power_bar_storage

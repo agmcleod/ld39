@@ -68,8 +68,7 @@ impl<'a> PlayState<'a> {
                 &["build_gatherer"],
             )
             .with(systems::Gathering::new(), "gathering", &[])
-            .with(systems::PowerUsage::new(), "power_usage", &["gathering"])
-            .with(systems::SellEnergy::new(), "sell_energy", &["power_usage"])
+            .with(systems::SellEnergy::new(), "sell_energy", &["gathering"])
             .with(
                 systems::ToggleTechTree::new(),
                 "toggle_tech_tree",
@@ -91,7 +90,6 @@ impl<'a> PlayState<'a> {
                     "build_gatherer",
                     "floating_text_system",
                     "toggle_tech_tree",
-                    "power_usage",
                     "sell_energy",
                     "tutorial",
                 ],
@@ -360,7 +358,7 @@ impl<'a> State for PlayState<'a> {
                 430.0,
                 0.0,
                 220,
-                32,
+                70,
                 Color([1.0, 1.0, 0.0, 1.0]),
             );
             wallet_ui_storage.insert(entity, WalletUI {}).unwrap();

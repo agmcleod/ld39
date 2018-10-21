@@ -1,9 +1,11 @@
 use components::ui::WalletUI;
-use components::{ui::TutorialUI, upgrade::Buff, Actions, DeltaTime, EntityLookup, Gatherer,
-                 GathererType, GatheringRate, Node, PowerBar, ResearchedBuffs, ResourceType,
-                 Resources, Text, Transform, TutorialStep, Wallet};
+use components::{ui::TutorialUI, upgrade::Buff, Actions, Button, CityPowerState, Color, DeltaTime,
+                 EntityLookup, Gatherer, GathererType, GatheringRate, Input, Node, PowerBar,
+                 ResearchedBuffs, ResourceType, Resources, StateChange, Text, Transform,
+                 TutorialStep, Wallet, STARTING_TICK};
 use entities::tutorial;
 use specs::{Entities, Join, Read, ReadStorage, System, Write, WriteStorage};
+use state::play_state::PlayState;
 use std::ops::{Deref, DerefMut};
 use systems::{logic, POWER_FACTOR, TICK_RATE};
 
@@ -19,20 +21,165 @@ impl SellEnergy {
             sell_ticker: 0.0,
         }
     }
+
+    fn remove_power_based_on_demand(
+        &self,
+        transform_storage: &mut WriteStorage<Transform>,
+        power_bar_storage: &mut WriteStorage<PowerBar>,
+    ) {
+        for (transform, power_bar) in (transform_storage, power_bar_storage).join() {
+            if power_bar.power_left > 0 {
+                power_bar.power_left -= power_bar.power_per_tick;
+            }
+
+            let width =
+                PowerBar::get_max_width() * (power_bar.power_left as f32 / PowerBar::get_max_f32());
+            transform.size.x = width as u16;
+        }
+    }
+
+    fn sell_power_to_cities(
+        &self,
+        mut power_to_spend: i32,
+        wallet_storage: &mut Write<Wallet>,
+        transform_storage: &mut WriteStorage<Transform>,
+        power_bar_storage: &mut WriteStorage<PowerBar>,
+        state_change_storage: &mut Write<StateChange>,
+    ) -> i32 {
+        let money_from_power = power_to_spend;
+        wallet_storage.add_money(money_from_power);
+        power_to_spend *= POWER_FACTOR;
+
+        for (transform, power_bar) in (transform_storage, power_bar_storage).join() {
+            let amount_to_power = PowerBar::get_max() - power_bar.power_left;
+            power_to_spend -= amount_to_power;
+            if power_to_spend >= 0 {
+                power_bar.add_power(amount_to_power);
+            // we do addition here since the number will be negative
+            } else if amount_to_power + power_to_spend > 0 {
+                // add the larger number of amount to power
+                // (which was subtracted) by the negative value
+                // this will give us the amount left over
+                power_bar.add_power(amount_to_power + power_to_spend);
+            }
+
+            let width =
+                PowerBar::get_max_width() * (power_bar.power_left as f32 / PowerBar::get_max_f32());
+            transform.size.x = width as u16;
+
+            if power_bar.power_left <= 0 {
+                let state_change: &mut StateChange = state_change_storage.deref_mut();
+                state_change.state = PlayState::get_name();
+                state_change.action = "restart".to_string();
+            }
+        }
+
+        money_from_power
+    }
+
+    fn update_gathering_rate_ui(
+        &self,
+        gathering_rate_storage: &Read<GatheringRate>,
+        text_storage: &mut WriteStorage<Text>,
+        entity_lookup_storage: &Read<EntityLookup>,
+        power_to_spend: i32,
+    ) {
+        if gathering_rate_storage.changed() {
+            let entity = entity_lookup_storage.get("gathering_rate_coal").unwrap();
+            {
+                let text = text_storage.get_mut(*entity).unwrap();
+                text.set_text(format!("Coal: {}", gathering_rate_storage.coal));
+            }
+
+            let entity = entity_lookup_storage.get("gathering_rate_oil").unwrap();
+            {
+                let text = text_storage.get_mut(*entity).unwrap();
+                text.set_text(format!("Oil: {}", gathering_rate_storage.oil));
+            }
+
+            let entity = entity_lookup_storage.get("gathering_rate_hydro").unwrap();
+            {
+                let text = text_storage.get_mut(*entity).unwrap();
+                text.set_text(format!("Hydro: {}", gathering_rate_storage.hydro));
+            }
+
+            let entity = entity_lookup_storage.get("gathering_rate_solar").unwrap();
+            {
+                let text = text_storage.get_mut(*entity).unwrap();
+                text.set_text(format!("Solar: {}", gathering_rate_storage.solar));
+            }
+
+            let entity = entity_lookup_storage.get("gathering_rate_power").unwrap();
+            {
+                let text = text_storage.get_mut(*entity).unwrap();
+                text.set_text(format!("Power: {}", power_to_spend));
+            }
+        }
+    }
+
+    fn update_power_ui(
+        &self,
+        gathering_rate_storage: &Read<GatheringRate>,
+        power_bar_storage: &WriteStorage<PowerBar>,
+        city_power_state: &CityPowerState,
+        lookup: &EntityLookup,
+        color_storage: &mut WriteStorage<Color>,
+        text_storage: &mut WriteStorage<Text>,
+    ) {
+        let gathering_rate = gathering_rate_storage.deref();
+
+        // technically singular, so we could maybe make this a resource
+        // or at least lookup via entity
+        let power_demands = (&power_bar_storage)
+            .join()
+            .fold(0, |sum, power_bar| sum + power_bar.power_per_tick)
+            / POWER_FACTOR;
+
+        let total_gathering_rate = logic::get_total_gathering_rate(&gathering_rate);
+
+        let powering_text = if city_power_state.current_city_count > 1 {
+            format!(
+                "Power: {}\n{} cities",
+                total_gathering_rate - power_demands,
+                city_power_state.current_city_count
+            )
+        } else {
+            format!("Power: {}\n1 city", total_gathering_rate - power_demands)
+        };
+
+        let power_gain_entity = lookup.entities.get(&"power_gain_text".to_string()).unwrap();
+        text_storage.get_mut(*power_gain_entity).unwrap().text = powering_text;
+
+        color_storage
+            .insert(
+                *power_gain_entity,
+                Color(if total_gathering_rate >= power_demands {
+                    [0.0, 0.6, 0.0, 1.0]
+                } else {
+                    [0.6, 0.0, 0.0, 1.0]
+                }),
+            )
+            .unwrap();
+    }
 }
 
 impl<'a> System<'a> for SellEnergy {
     type SystemData = (
         Entities<'a>,
         Write<'a, Actions>,
+        WriteStorage<'a, Button>,
+        Write<'a, CityPowerState>,
+        WriteStorage<'a, Color>,
         Read<'a, DeltaTime>,
         Read<'a, EntityLookup>,
         ReadStorage<'a, Gatherer>,
         Read<'a, GatheringRate>,
+        Read<'a, Input>,
         WriteStorage<'a, Node>,
         WriteStorage<'a, PowerBar>,
         Read<'a, ResearchedBuffs>,
         Write<'a, Resources>,
+        Write<'a, StateChange>,
         WriteStorage<'a, Text>,
         WriteStorage<'a, Transform>,
         Write<'a, TutorialStep>,
@@ -45,14 +192,19 @@ impl<'a> System<'a> for SellEnergy {
         let (
             entities,
             mut actions_storage,
+            mut button_storage,
+            mut city_power_state_storage,
+            mut color_storage,
             delta_time_storage,
             entity_lookup_storage,
             gatherer_storage,
             gathering_rate_storage,
+            input_storage,
             node_storage,
             mut power_bar_storage,
             researched_buffs_storage,
             mut resources_storage,
+            mut state_change_storage,
             mut text_storage,
             mut transform_storage,
             mut tutorial_step_storage,
@@ -67,8 +219,33 @@ impl<'a> System<'a> for SellEnergy {
 
         self.sell_ticker += delta_time_storage.deref().dt;
 
+        let button = button_storage
+            .get_mut(*entity_lookup_storage.get("power_additional_city").unwrap())
+            .unwrap();
+        if button.clicked(&input_storage) {
+            city_power_state_storage.current_city_count += 1;
+            for power_bar in (&mut power_bar_storage).join() {
+                let mut per_tick = STARTING_TICK;
+                // each city is more demanding
+                for n in 0..city_power_state_storage.current_city_count {
+                    per_tick += 15 * ((n as i32) + 1);
+                }
+                power_bar.power_per_tick = per_tick;
+            }
+
+            self.update_power_ui(
+                &gathering_rate_storage,
+                &power_bar_storage,
+                &city_power_state_storage,
+                &entity_lookup_storage,
+                &mut color_storage,
+                &mut text_storage,
+            );
+        }
+
         if self.sell_ticker > TICK_RATE {
             self.sell_ticker = 0.0;
+            self.remove_power_based_on_demand(&mut transform_storage, &mut power_bar_storage);
             // divide by power factor, so demand can be met based on resource numbers
             let mut amount_to_power = (&power_bar_storage).join().fold(0, |sum, power_bar| {
                 PowerBar::get_max() - power_bar.power_left + sum
@@ -110,59 +287,20 @@ impl<'a> System<'a> for SellEnergy {
                 }
             }
 
-            if gathering_rate_storage.changed() {
-                let entity = entity_lookup_storage.get("gathering_rate_coal").unwrap();
-                {
-                    let text = text_storage.get_mut(*entity).unwrap();
-                    text.set_text(format!("Coal: {}", gathering_rate_storage.coal));
-                }
+            self.update_gathering_rate_ui(
+                &gathering_rate_storage,
+                &mut text_storage,
+                &entity_lookup_storage,
+                power_to_spend,
+            );
 
-                let entity = entity_lookup_storage.get("gathering_rate_oil").unwrap();
-                {
-                    let text = text_storage.get_mut(*entity).unwrap();
-                    text.set_text(format!("Oil: {}", gathering_rate_storage.oil));
-                }
-
-                let entity = entity_lookup_storage.get("gathering_rate_hydro").unwrap();
-                {
-                    let text = text_storage.get_mut(*entity).unwrap();
-                    text.set_text(format!("Hydro: {}", gathering_rate_storage.hydro));
-                }
-
-                let entity = entity_lookup_storage.get("gathering_rate_solar").unwrap();
-                {
-                    let text = text_storage.get_mut(*entity).unwrap();
-                    text.set_text(format!("Solar: {}", gathering_rate_storage.solar));
-                }
-
-                let entity = entity_lookup_storage.get("gathering_rate_power").unwrap();
-                {
-                    let text = text_storage.get_mut(*entity).unwrap();
-                    text.set_text(format!("Power: {}", power_to_spend));
-                }
-            }
-
-            let money_from_power = power_to_spend;
-            wallet_storage.add_money(money_from_power);
-            power_to_spend *= POWER_FACTOR;
-
-            for (transform, power_bar) in (&mut transform_storage, &mut power_bar_storage).join() {
-                let amount_to_power = PowerBar::get_max() - power_bar.power_left;
-                power_to_spend -= amount_to_power;
-                if power_to_spend >= 0 {
-                    power_bar.add_power(amount_to_power);
-                // we do addition here since the number will be negative
-                } else if amount_to_power + power_to_spend > 0 {
-                    // add the larger number of amount to power
-                    // (which was subtracted) by the negative value
-                    // this will give us the amount left over
-                    power_bar.add_power(amount_to_power + power_to_spend);
-                }
-
-                let width = PowerBar::get_max_width()
-                    * (power_bar.power_left as f32 / PowerBar::get_max_f32());
-                transform.size.x = width as u16;
-            }
+            let money_from_power = self.sell_power_to_cities(
+                power_to_spend,
+                &mut wallet_storage,
+                &mut transform_storage,
+                &mut power_bar_storage,
+                &mut state_change_storage,
+            );
 
             let mut coal_pollution = 0;
             let mut oil_pollution = 0;
@@ -226,6 +364,15 @@ impl<'a> System<'a> for SellEnergy {
                 &mut wallet_ui_storage,
             );
         }
+
+        self.update_power_ui(
+            &gathering_rate_storage,
+            &power_bar_storage,
+            city_power_state_storage.deref(),
+            &entity_lookup_storage,
+            &mut color_storage,
+            &mut text_storage,
+        );
 
         if researched_buffs
             .0
