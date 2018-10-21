@@ -174,7 +174,7 @@ impl<'a> System<'a> for Tutorial {
                 96.0,
                 32.0,
                 32.0,
-                "Research this upgrade to collect more resources when one mine, or other resource collection facilities of the same type are adjacent."
+                "Research this upgrade to collect more resources when one mine, or other resource collection facilities of the same type are adjacent.\nSome upgrades like this one can upgraded to infinite levels."
             ));
         } else if actions.action_fired(&TutorialStep::Resume.as_string()) {
             details = Some(StepCreationDetails::new(
