@@ -1,5 +1,3 @@
-use specs::Entity;
-
 // used to keep track of the entities that we can add new power bar sprites to
 #[derive(Default)]
 pub struct CityPowerState {

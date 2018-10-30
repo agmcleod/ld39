@@ -34,6 +34,16 @@ mod storage_types;
 mod systems;
 mod utils;
 
+use std::ops::DerefMut;
+use std::time;
+
+use gfx::Device;
+use gfx_glyph::{GlyphBrush, GlyphBrushBuilder};
+use glutin::{dpi::LogicalSize, ElementState, Event, GlContext, MouseButton, VirtualKeyCode,
+             WindowEvent};
+use rodio::Source;
+use specs::{Entity, ReadStorage, World, WriteStorage};
+
 use components::ui::{TechTreeButton, TutorialUI, WalletUI};
 use components::{upgrade::{LearnProgress, Upgrade},
                  Actions,
@@ -43,6 +53,7 @@ use components::{upgrade::{LearnProgress, Upgrade},
                  ClickSound,
                  Color,
                  DeltaTime,
+                 EffectedByPollutionTiles,
                  EntityLookup,
                  FloatingText,
                  Gatherer,
@@ -60,20 +71,11 @@ use components::{upgrade::{LearnProgress, Upgrade},
                  Tile,
                  Transform,
                  TutorialStep};
-
-use gfx::Device;
-use gfx_glyph::{GlyphBrush, GlyphBrushBuilder};
-use glutin::{dpi::LogicalSize, ElementState, Event, GlContext, MouseButton, VirtualKeyCode,
-             WindowEvent};
 use renderer::{ColorFormat, DepthFormat};
-use rodio::Source;
 use settings::Settings;
-use specs::{Entity, ReadStorage, World, WriteStorage};
 use spritesheet::Spritesheet;
 use state::play_state::PlayState;
 use state::StateManager;
-use std::ops::DerefMut;
-use std::time;
 use utils::math;
 
 fn setup_world(world: &mut World, window: &glutin::Window) {
@@ -90,6 +92,7 @@ fn setup_world(world: &mut World, window: &glutin::Window) {
     world.register::<AnimationSheet>();
     world.register::<Button>();
     world.register::<Color>();
+    world.register::<EffectedByPollutionTiles>();
     world.register::<FloatingText>();
     world.register::<Gatherer>();
     world.register::<HighlightTile>();

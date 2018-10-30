@@ -1,4 +1,4 @@
-use components::{ui::TutorialUI, Actions, Button, Color, EntityLookup, Gatherer, Input, Node,
+use components::{ui::TutorialUI, Actions, Button, Color, EffectedByPollutionTiles, EntityLookup, Gatherer, Input, Node,
                  Rect, ResearchedBuffs, SelectedTile, Sprite, Text, Tile, Transform, TutorialStep};
 use entities::{create_build_ui, recursive_delete, tutorial};
 use specs::{Entities, Entity, Join, Read, ReadStorage, System, Write, WriteStorage};
@@ -23,6 +23,7 @@ impl<'a> System<'a> for TileSelection {
         Write<'a, Actions>,
         WriteStorage<'a, Button>,
         WriteStorage<'a, Color>,
+        WriteStorage<'a, EffectedByPollutionTiles>,
         Read<'a, EntityLookup>,
         ReadStorage<'a, Gatherer>,
         Read<'a, Input>,
@@ -44,6 +45,7 @@ impl<'a> System<'a> for TileSelection {
             mut actions_storage,
             mut button_storage,
             mut color_storage,
+            mut effected_by_pollution_tiles_storage,
             entity_lookup_storage,
             gatherer_storage,
             input_storage,
@@ -112,6 +114,7 @@ impl<'a> System<'a> for TileSelection {
                     &mut sprite_storage,
                     &mut text_storage,
                     &mut transform_storage,
+                    &mut effected_by_pollution_tiles_storage,
                     &researched_buffs,
                 );
                 self.build_ui_entity = Some(entity);

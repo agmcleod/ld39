@@ -1,7 +1,7 @@
 use components::ui::WalletUI;
-use components::{ui::TutorialUI, upgrade::Buff, AnimationSheet, Button, ClickSound, Color,
+use components::{ui::TutorialUI, upgrade::Buff, AnimationSheet, Button, ClickSound, Color, EffectedByPollutionTiles,
                  EntityLookup, Gatherer, GathererPositions, GathererType, Input, Node,
-                 ResearchedBuffs, SelectedTile, Text, Tile, TileNodes, TileType, Transform,
+                 ResearchedBuffs, SelectedTile, Sprite, Text, Tile, TileNodes, TileType, Transform,
                  TutorialStep, Wallet};
 use entities::tutorial;
 use specs::{Entities, Join, Read, ReadStorage, System, Write, WriteStorage};
@@ -10,6 +10,15 @@ use systems::logic;
 
 pub struct BuildGatherer;
 
+impl BuildGatherer {
+    fn remove_effected_by_pollution_tiles_entities(&self, entities: &Entities, effected_by_pollution_tiles: &mut EffectedByPollutionTiles) {
+        for entity in &effected_by_pollution_tiles.tiles {
+            entities.delete(*entity).unwrap();
+        }
+        effected_by_pollution_tiles.clear();
+    }
+}
+
 impl<'a> System<'a> for BuildGatherer {
     type SystemData = (
         Entities<'a>,
@@ -17,6 +26,7 @@ impl<'a> System<'a> for BuildGatherer {
         WriteStorage<'a, Button>,
         Write<'a, ClickSound>,
         WriteStorage<'a, Color>,
+        WriteStorage<'a, EffectedByPollutionTiles>,
         Read<'a, EntityLookup>,
         WriteStorage<'a, Gatherer>,
         Write<'a, GathererPositions>,
@@ -25,6 +35,7 @@ impl<'a> System<'a> for BuildGatherer {
         Read<'a, TileNodes>,
         Read<'a, ResearchedBuffs>,
         ReadStorage<'a, SelectedTile>,
+        WriteStorage<'a, Sprite>,
         WriteStorage<'a, Text>,
         WriteStorage<'a, Transform>,
         Write<'a, TutorialStep>,
@@ -40,6 +51,7 @@ impl<'a> System<'a> for BuildGatherer {
             mut button_storage,
             mut click_sound_storage,
             mut color_storage,
+            mut effected_by_pollution_tiles_storage,
             entity_lookup_storage,
             mut gatherer_storage,
             mut gatherer_positions_storage,
@@ -48,6 +60,7 @@ impl<'a> System<'a> for BuildGatherer {
             tile_nodes_storage,
             researched_buffs_storage,
             selected_tile_storage,
+            mut sprite_storage,
             mut text_storage,
             mut transform_storage,
             tutorial_step_storage,
@@ -61,9 +74,73 @@ impl<'a> System<'a> for BuildGatherer {
         let wallet: &mut Wallet = wallet_storage.deref_mut();
         let lookup = entity_lookup_storage.deref();
 
+        let mut selected_tile_x = 0.0;
+        let mut selected_tile_y = 0.0;
+
+        for (_, transform) in (&selected_tile_storage, &mut transform_storage).join() {
+            if transform.visible {
+                selected_tile_x = transform.get_pos().x;
+                selected_tile_y = transform.get_pos().y;
+            }
+        }
+
+        let selected_tile_col = (selected_tile_x / Tile::get_size()) as i32;
+        let selected_tile_row = (selected_tile_y / Tile::get_size()) as i32;
+
+        let tile_nodes = tile_nodes_storage.deref();
+
         let mut button_pressed = false;
         let mut gatherer_type = None;
-        for button in (&mut button_storage).join() {
+        for (button, effected_by_pollution_tiles) in (&mut button_storage, &mut effected_by_pollution_tiles_storage).join() {
+            if button.name != "build_solar" {
+                if button.mouse_is_over && !effected_by_pollution_tiles.has_entities() {
+                    for i in -1..2 {
+                        for j in -1..2 {
+                            if button.name == "build_hydro" && (i != 0 || j != 0) {
+                                continue;
+                            } else if button.name != "build_hydro" && i == 0 && j == 0 {
+                                continue;
+                            }
+
+                            if let Some(&(tile_type, _)) = tile_nodes
+                                .nodes
+                                .get(&(selected_tile_col + i, selected_tile_row + j))
+                            {
+                                if tile_type != TileType::Open {
+                                    let entity = entities.create();
+                                    transform_storage.insert(
+                                        entity,
+                                        Transform::visible(
+                                            selected_tile_x + (i as f32) * Tile::get_size(),
+                                            selected_tile_y + (j as f32) * Tile::get_size(),
+                                            4.0,
+                                            64,
+                                            64,
+                                            0.0,
+                                            1.0,
+                                            1.0
+                                        )
+                                    ).unwrap();
+                                    sprite_storage.insert(
+                                        entity,
+                                        Sprite{
+                                            frame_name: "pollution_warning.png".to_string(),
+                                        }
+                                    ).unwrap();
+
+                                    effected_by_pollution_tiles.tiles.push(entity.clone());
+
+                                    let node = logic::get_root(&lookup, &mut nodes_storage);
+                                    node.add(entity);
+                                }
+                            }
+                        }
+                    }
+                } else if !button.mouse_is_over && effected_by_pollution_tiles.has_entities() {
+                    self.remove_effected_by_pollution_tiles_entities(&entities, effected_by_pollution_tiles);
+                }
+            }
+
             if button.name == "build_coal" && button.clicked(&input) {
                 button_pressed = true;
                 gatherer_type = Some(GathererType::Coal);
@@ -86,8 +163,6 @@ impl<'a> System<'a> for BuildGatherer {
         let researched_buffs = researched_buffs_storage.deref();
 
         let mut create = false;
-        let mut selected_tile_x = 0.0;
-        let mut selected_tile_y = 0.0;
         // spend the money, and hide selected tile
         if button_pressed {
             let mut amount = gatherer_type.unwrap().clone().get_build_cost();
@@ -129,11 +204,12 @@ impl<'a> System<'a> for BuildGatherer {
                 &nodes_storage,
                 TutorialStep::ResourcesSold,
             );
-            // create gatherer
-            let tile_nodes = tile_nodes_storage.deref();
-            let selected_tile_col = (selected_tile_x / Tile::get_size()) as i32;
-            let selected_tile_row = (selected_tile_y / Tile::get_size()) as i32;
 
+            for effected_by_pollution_tiles in (&mut effected_by_pollution_tiles_storage).join() {
+                self.remove_effected_by_pollution_tiles_entities(&entities, effected_by_pollution_tiles);
+            }
+
+            // create gatherer
             let gatherer_type = gatherer_type.unwrap();
 
             let mut pollution = 0i32;

@@ -1,4 +1,4 @@
-use components::{Button, Color, GathererType, Node, Rect, ResearchedBuffs, Sprite, Text, TileType,
+use components::{Button, Color, EffectedByPollutionTiles, GathererType, Node, Rect, ResearchedBuffs, Sprite, Text, TileType,
                  Transform};
 use entities::{create_colored_rect, create_text, tech_tree::Buff};
 use renderer;
@@ -27,6 +27,7 @@ pub fn create<'a, 'b: 'a>(
     sprite_storage: &mut WriteStorage<'b, Sprite>,
     text_storage: &mut WriteStorage<'b, Text>,
     transform_storage: &mut WriteStorage<'b, Transform>,
+    effected_by_pollution_tiles_storage: &mut WriteStorage<'b, EffectedByPollutionTiles>,
     researched_buffs: &ResearchedBuffs,
 ) -> Entity {
     let mut new_entities = Vec::new();
@@ -57,6 +58,12 @@ pub fn create<'a, 'b: 'a>(
                 Sprite {
                     frame_name: "mine_button_1.png".to_string(),
                 },
+            )
+            .unwrap();
+        effected_by_pollution_tiles_storage
+            .insert(
+                coal_entity,
+                EffectedByPollutionTiles::new()
             )
             .unwrap();
         new_entities.push(coal_entity);
@@ -116,6 +123,12 @@ pub fn create<'a, 'b: 'a>(
                 },
             )
             .unwrap();
+        effected_by_pollution_tiles_storage
+            .insert(
+                oil_entity,
+                EffectedByPollutionTiles::new()
+            )
+            .unwrap();
 
         new_entities.push(oil_entity);
         let text = create_text::create(
@@ -165,6 +178,13 @@ pub fn create<'a, 'b: 'a>(
                 },
             )
             .unwrap();
+        // technically not needed for solar, but using it here so we can group these buttons
+        effected_by_pollution_tiles_storage
+            .insert(
+                solar_entity,
+                EffectedByPollutionTiles::new()
+            )
+            .unwrap();
 
         new_entities.push(solar_entity);
         let mut cost = GathererType::Solar.get_build_cost();
@@ -201,7 +221,6 @@ pub fn create<'a, 'b: 'a>(
                 Transform::visible(SPACING_F, SPACING_F, 0.0, SIZE, SIZE, 0.0, 1.0, 1.0),
             )
             .unwrap();
-
         button_storage
             .insert(
                 hydro_entity,
@@ -214,13 +233,18 @@ pub fn create<'a, 'b: 'a>(
                 ),
             )
             .unwrap();
-
         sprite_storage
             .insert(
                 hydro_entity,
                 Sprite {
                     frame_name: "hydro_button.png".to_string(),
                 },
+            )
+            .unwrap();
+        effected_by_pollution_tiles_storage
+            .insert(
+                hydro_entity,
+                EffectedByPollutionTiles::new()
             )
             .unwrap();
 

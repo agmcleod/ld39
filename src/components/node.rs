@@ -114,6 +114,7 @@ impl Node {
         transform_storage: &WriteStorage<'a, Transform>,
     ) {
         let mut removed = false;
+        // cleans up nodes for us, so we dont have to do it manually
         self.entities.retain(|e| {
             if world.is_alive(*e) {
                 return true;
