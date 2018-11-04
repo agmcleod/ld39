@@ -284,6 +284,15 @@ fn main() {
     let (window, mut device, mut factory, main_color, main_depth) =
         gfx_window_glutin::init::<ColorFormat, DepthFormat>(builder, context, &events_loop);
 
+    let hidpi_factor = window.get_hidpi_factor();
+
+    // macos mojave hack
+    {
+        events_loop.poll_events(|_| {});
+        let size = window.get_inner_size().unwrap();
+        window.resize(size.to_physical(hidpi_factor));
+    }
+
     let mut world = World::new();
 
     let target = renderer::WindowTargets {
@@ -292,7 +301,7 @@ fn main() {
     };
 
     let mut encoder: gfx::Encoder<_, _> = factory.create_command_buffer().into();
-    let hidpi_factor = window.get_hidpi_factor();
+
     let mut basic = renderer::Basic::new(&mut factory, target);
 
     let asset_data = loader::read_text_from_file("resources/assets.json").unwrap();
