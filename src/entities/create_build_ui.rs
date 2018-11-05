@@ -1,5 +1,5 @@
-use components::{Button, Color, EffectedByPollutionTiles, GathererType, Node, Rect, ResearchedBuffs, Sprite, Text, TileType,
-                 Transform};
+use components::{Button, Color, EffectedByPollutionTiles, GathererType, Node, Rect,
+                 ResearchedBuffs, Sprite, Text, TileType, Transform};
 use entities::{create_colored_rect, create_text, tech_tree::Buff};
 use renderer;
 use specs::{Entities, Entity, WriteStorage};
@@ -61,10 +61,7 @@ pub fn create<'a, 'b: 'a>(
             )
             .unwrap();
         effected_by_pollution_tiles_storage
-            .insert(
-                coal_entity,
-                EffectedByPollutionTiles::new()
-            )
+            .insert(coal_entity, EffectedByPollutionTiles::new())
             .unwrap();
         new_entities.push(coal_entity);
         let text = create_text::create(
@@ -124,10 +121,7 @@ pub fn create<'a, 'b: 'a>(
             )
             .unwrap();
         effected_by_pollution_tiles_storage
-            .insert(
-                oil_entity,
-                EffectedByPollutionTiles::new()
-            )
+            .insert(oil_entity, EffectedByPollutionTiles::new())
             .unwrap();
 
         new_entities.push(oil_entity);
@@ -180,10 +174,7 @@ pub fn create<'a, 'b: 'a>(
             .unwrap();
         // technically not needed for solar, but using it here so we can group these buttons
         effected_by_pollution_tiles_storage
-            .insert(
-                solar_entity,
-                EffectedByPollutionTiles::new()
-            )
+            .insert(solar_entity, EffectedByPollutionTiles::new())
             .unwrap();
 
         new_entities.push(solar_entity);
@@ -242,10 +233,7 @@ pub fn create<'a, 'b: 'a>(
             )
             .unwrap();
         effected_by_pollution_tiles_storage
-            .insert(
-                hydro_entity,
-                EffectedByPollutionTiles::new()
-            )
+            .insert(hydro_entity, EffectedByPollutionTiles::new())
             .unwrap();
 
         new_entities.push(hydro_entity);

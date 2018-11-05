@@ -1,8 +1,8 @@
 use components::ui::WalletUI;
-use components::{ui::TutorialUI, upgrade::Buff, AnimationSheet, Button, ClickSound, Color, EffectedByPollutionTiles,
-                 EntityLookup, Gatherer, GathererPositions, GathererType, Input, Node,
-                 ResearchedBuffs, SelectedTile, Sprite, Text, Tile, TileNodes, TileType, Transform,
-                 TutorialStep, Wallet};
+use components::{ui::TutorialUI, upgrade::Buff, AnimationSheet, Button, ClickSound, Color,
+                 EffectedByPollutionTiles, EntityLookup, Gatherer, GathererPositions,
+                 GathererType, Input, Node, ResearchedBuffs, SelectedTile, Sprite, Text, Tile,
+                 TileNodes, TileType, Transform, TutorialStep, Wallet};
 use entities::tutorial;
 use specs::{Entities, Join, Read, ReadStorage, System, Write, WriteStorage};
 use std::ops::{Deref, DerefMut};
@@ -11,7 +11,11 @@ use systems::logic;
 pub struct BuildGatherer;
 
 impl BuildGatherer {
-    fn remove_effected_by_pollution_tiles_entities(&self, entities: &Entities, effected_by_pollution_tiles: &mut EffectedByPollutionTiles) {
+    fn remove_effected_by_pollution_tiles_entities(
+        &self,
+        entities: &Entities,
+        effected_by_pollution_tiles: &mut EffectedByPollutionTiles,
+    ) {
         for entity in &effected_by_pollution_tiles.tiles {
             entities.delete(*entity).unwrap();
         }
@@ -91,7 +95,11 @@ impl<'a> System<'a> for BuildGatherer {
 
         let mut button_pressed = false;
         let mut gatherer_type = None;
-        for (button, effected_by_pollution_tiles) in (&mut button_storage, &mut effected_by_pollution_tiles_storage).join() {
+        for (button, effected_by_pollution_tiles) in (
+            &mut button_storage,
+            &mut effected_by_pollution_tiles_storage,
+        ).join()
+        {
             if button.name != "build_solar" {
                 if button.mouse_is_over && !effected_by_pollution_tiles.has_entities() {
                     for i in -1..2 {
@@ -108,25 +116,29 @@ impl<'a> System<'a> for BuildGatherer {
                             {
                                 if tile_type != TileType::Open {
                                     let entity = entities.create();
-                                    transform_storage.insert(
-                                        entity,
-                                        Transform::visible(
-                                            selected_tile_x + (i as f32) * Tile::get_size(),
-                                            selected_tile_y + (j as f32) * Tile::get_size(),
-                                            4.0,
-                                            64,
-                                            64,
-                                            0.0,
-                                            1.0,
-                                            1.0
+                                    transform_storage
+                                        .insert(
+                                            entity,
+                                            Transform::visible(
+                                                selected_tile_x + (i as f32) * Tile::get_size(),
+                                                selected_tile_y + (j as f32) * Tile::get_size(),
+                                                4.0,
+                                                64,
+                                                64,
+                                                0.0,
+                                                1.0,
+                                                1.0,
+                                            ),
                                         )
-                                    ).unwrap();
-                                    sprite_storage.insert(
-                                        entity,
-                                        Sprite{
-                                            frame_name: "pollution_warning.png".to_string(),
-                                        }
-                                    ).unwrap();
+                                        .unwrap();
+                                    sprite_storage
+                                        .insert(
+                                            entity,
+                                            Sprite {
+                                                frame_name: "pollution_warning.png".to_string(),
+                                            },
+                                        )
+                                        .unwrap();
 
                                     effected_by_pollution_tiles.tiles.push(entity.clone());
 
@@ -137,7 +149,10 @@ impl<'a> System<'a> for BuildGatherer {
                         }
                     }
                 } else if !button.mouse_is_over && effected_by_pollution_tiles.has_entities() {
-                    self.remove_effected_by_pollution_tiles_entities(&entities, effected_by_pollution_tiles);
+                    self.remove_effected_by_pollution_tiles_entities(
+                        &entities,
+                        effected_by_pollution_tiles,
+                    );
                 }
             }
 
@@ -206,7 +221,10 @@ impl<'a> System<'a> for BuildGatherer {
             );
 
             for effected_by_pollution_tiles in (&mut effected_by_pollution_tiles_storage).join() {
-                self.remove_effected_by_pollution_tiles_entities(&entities, effected_by_pollution_tiles);
+                self.remove_effected_by_pollution_tiles_entities(
+                    &entities,
+                    effected_by_pollution_tiles,
+                );
             }
 
             // create gatherer

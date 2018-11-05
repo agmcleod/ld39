@@ -2,6 +2,8 @@ extern crate cgmath;
 extern crate gfx;
 extern crate specs;
 
+use std::ops::Deref;
+
 use cgmath::{Matrix4, SquareMatrix, Transform};
 use components;
 use gfx::texture;
@@ -77,7 +79,7 @@ where
             .unwrap();
 
         let sinfo =
-            texture::SamplerInfo::new(texture::FilterMethod::Scale, texture::WrapMode::Clamp);
+            texture::SamplerInfo::new(texture::FilterMethod::Mipmap, texture::WrapMode::Clamp);
 
         let dim = self::super::get_dimensions();
 
@@ -93,8 +95,85 @@ where
         }
     }
 
+    fn draw_verticies<F, C>(
+        &mut self,
+        data: Vec<Vertex>,
+        encoder: &mut gfx::Encoder<R, C>,
+        factory: &mut F,
+        transform: &components::Transform,
+        tex: (
+            gfx::handle::ShaderResourceView<R, [f32; 4]>,
+            gfx::handle::Sampler<R>,
+        ),
+        camera: &components::Camera,
+    ) where
+        R: gfx::Resources,
+        C: gfx::CommandBuffer<R>,
+        F: gfx::Factory<R>,
+    {
+        let index_data: Vec<u32> = vec![0, 1, 2, 2, 3, 0];
+        let (vbuf, slice) = factory.create_vertex_buffer_with_slice(&data, &index_data[..]);
+
+        let params = pipe::Data {
+            vbuf: vbuf,
+            projection_cb: factory.create_constant_buffer(1),
+            tex: tex,
+            out: self.target.color.clone(),
+            depth: self.target.depth.clone(),
+        };
+
+        self.projection.proj = (*camera).0.into();
+
+        self.projection.model = self.model
+            .concat(&Matrix4::from_nonuniform_scale(
+                transform.scale.x,
+                transform.scale.y,
+                1.0,
+            ))
+            .into();
+
+        encoder.update_constant_buffer(&params.projection_cb, &self.projection);
+        encoder.draw(&slice, &self.pso, &params);
+    }
+
     pub fn reset_transform(&mut self) {
         self.projection.model = Matrix4::identity().into();
+    }
+
+    pub fn render_single_texture<C, F>(
+        &mut self,
+        encoder: &mut gfx::Encoder<R, C>,
+        world: &World,
+        factory: &mut F,
+        transform: &components::Transform,
+        texture: &gfx::handle::ShaderResourceView<R, [f32; 4]>,
+        color: &components::Color,
+    ) where
+        R: gfx::Resources,
+        C: gfx::CommandBuffer<R>,
+        F: gfx::Factory<R>,
+    {
+        let camera_res = world.read_resource::<components::Camera>();
+        let camera = camera_res.deref();
+        let w = transform.size.x as f32;
+        let h = transform.size.y as f32;
+
+        let tx = 0.0;
+        let ty = 0.0;
+        let tx2 = 1.0;
+        let ty2 = 1.0;
+
+        let tex = (
+            texture.clone(),
+            factory.create_sampler(texture::SamplerInfo::new(
+                texture::FilterMethod::Scale,
+                texture::WrapMode::Clamp,
+            )),
+        );
+
+        let data: Vec<Vertex> = get_quad(color.0, w, h, tx, ty, tx2, ty2);
+
+        self.draw_verticies(data, encoder, factory, transform, tex, &camera);
     }
 
     pub fn render<C, F>(
@@ -112,8 +191,6 @@ where
         C: gfx::CommandBuffer<R>,
         F: gfx::Factory<R>,
     {
-        use std::ops::Deref;
-
         let camera_res = world.read_resource::<components::Camera>();
         let camera = camera_res.deref();
         let w = transform.size.x as f32;
@@ -159,45 +236,9 @@ where
             [1.0; 4]
         };
 
-        let data: Vec<Vertex> = vec![
-            Vertex {
-                pos: [0.0, 0.0, 0.0],
-                uv: [tx, ty],
-                color: color,
-            },
-            Vertex {
-                pos: [w, 0.0, 0.0],
-                uv: [tx2, ty],
-                color: color,
-            },
-            Vertex {
-                pos: [w, h, 0.0],
-                uv: [tx2, ty2],
-                color: color,
-            },
-            Vertex {
-                pos: [0.0, h, 0.0],
-                uv: [tx, ty2],
-                color: color,
-            },
-        ];
+        let data: Vec<Vertex> = get_quad(color, w, h, tx, ty, tx2, ty2);
 
-        let index_data: Vec<u32> = vec![0, 1, 2, 2, 3, 0];
-        let (vbuf, slice) = factory.create_vertex_buffer_with_slice(&data, &index_data[..]);
-
-        let params = pipe::Data {
-            vbuf: vbuf,
-            projection_cb: factory.create_constant_buffer(1),
-            tex: tex,
-            out: self.target.color.clone(),
-            depth: self.target.depth.clone(),
-        };
-
-        self.projection.proj = (*camera).0.into();
-        self.projection.model = self.model.into();
-
-        encoder.update_constant_buffer(&params.projection_cb, &self.projection);
-        encoder.draw(&slice, &self.pso, &params);
+        self.draw_verticies(data, encoder, factory, transform, tex, &camera);
     }
 
     pub fn render_shape<C, F>(
@@ -282,4 +323,29 @@ where
         }
         self.model = self.model.concat(&transform);
     }
+}
+
+fn get_quad(color: [f32; 4], w: f32, h: f32, tx: f32, ty: f32, tx2: f32, ty2: f32) -> Vec<Vertex> {
+    vec![
+        Vertex {
+            pos: [0.0, 0.0, 0.0],
+            uv: [tx, ty],
+            color: color,
+        },
+        Vertex {
+            pos: [w, 0.0, 0.0],
+            uv: [tx2, ty],
+            color: color,
+        },
+        Vertex {
+            pos: [w, h, 0.0],
+            uv: [tx2, ty2],
+            color: color,
+        },
+        Vertex {
+            pos: [0.0, h, 0.0],
+            uv: [tx, ty2],
+            color: color,
+        },
+    ]
 }

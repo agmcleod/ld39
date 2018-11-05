@@ -34,6 +34,7 @@ mod storage_types;
 mod systems;
 mod utils;
 
+use std::collections::HashMap;
 use std::ops::DerefMut;
 use std::time;
 
@@ -59,6 +60,7 @@ use components::{upgrade::{LearnProgress, Upgrade},
                  Gatherer,
                  HighlightTile,
                  Input,
+                 MenuScreen,
                  Node,
                  PowerBar,
                  Pulse,
@@ -68,14 +70,14 @@ use components::{upgrade::{LearnProgress, Upgrade},
                  Sprite,
                  StateChange,
                  Text,
+                 Texture,
                  Tile,
                  Transform,
                  TutorialStep};
 use renderer::{ColorFormat, DepthFormat};
 use settings::Settings;
 use spritesheet::Spritesheet;
-use state::play_state::PlayState;
-use state::StateManager;
+use state::{menu_state::MenuState, play_state::PlayState, StateManager};
 use utils::math;
 
 fn setup_world(world: &mut World, window: &glutin::Window) {
@@ -97,6 +99,7 @@ fn setup_world(world: &mut World, window: &glutin::Window) {
     world.register::<Gatherer>();
     world.register::<HighlightTile>();
     world.register::<LearnProgress>();
+    world.register::<MenuScreen>();
     world.register::<Node>();
     world.register::<PowerBar>();
     world.register::<Pulse>();
@@ -106,6 +109,7 @@ fn setup_world(world: &mut World, window: &glutin::Window) {
     world.register::<Sprite>();
     world.register::<TechTreeButton>();
     world.register::<Text>();
+    world.register::<Texture>();
     world.register::<Tile>();
     world.register::<Transform>();
     world.register::<TutorialUI>();
@@ -120,6 +124,7 @@ fn render_entity<R: gfx::Resources, C: gfx::CommandBuffer<R>, F: gfx::Factory<R>
     factory: &mut F,
     spritesheet: &Spritesheet,
     asset_texture: &gfx::handle::ShaderResourceView<R, [f32; 4]>,
+    texture_map: &HashMap<String, gfx::handle::ShaderResourceView<R, [f32; 4]>>,
     glyph_brush: &mut GlyphBrush<R, F>,
     entity: &Entity,
     sprite_storage: &ReadStorage<Sprite>,
@@ -129,6 +134,7 @@ fn render_entity<R: gfx::Resources, C: gfx::CommandBuffer<R>, F: gfx::Factory<R>
     text_storage: &mut WriteStorage<Text>,
     rect_storage: &ReadStorage<Rect>,
     shape_storage: &ReadStorage<Shape>,
+    texture_storage: &ReadStorage<Texture>,
     scale_from_base_res: &(f32, f32),
 ) {
     if let Some(transform) = transform_storage.get_mut(*entity) {
@@ -144,6 +150,17 @@ fn render_entity<R: gfx::Resources, C: gfx::CommandBuffer<R>, F: gfx::Factory<R>
                     color_storage.get(*entity),
                     Some(asset_texture),
                 );
+            }
+
+            if let Some(texture) = texture_storage.get(*entity) {
+                basic.render_single_texture(
+                    encoder,
+                    world,
+                    factory,
+                    &transform,
+                    texture_map.get(&texture.name).unwrap(),
+                    color_storage.get(*entity).unwrap(),
+                )
             }
 
             if let Some(animation) = animation_storage.get(*entity) {
@@ -204,6 +221,7 @@ fn render_node<R: gfx::Resources, C: gfx::CommandBuffer<R>, F: gfx::Factory<R>>(
     factory: &mut F,
     spritesheet: &Spritesheet,
     asset_texture: &gfx::handle::ShaderResourceView<R, [f32; 4]>,
+    texture_map: &HashMap<String, gfx::handle::ShaderResourceView<R, [f32; 4]>>,
     glyph_brush: &mut GlyphBrush<R, F>,
     sprites: &ReadStorage<Sprite>,
     transforms: &mut WriteStorage<Transform>,
@@ -213,6 +231,7 @@ fn render_node<R: gfx::Resources, C: gfx::CommandBuffer<R>, F: gfx::Factory<R>>(
     rects: &ReadStorage<Rect>,
     shapes: &ReadStorage<Shape>,
     nodes: &mut WriteStorage<Node>,
+    textures: &ReadStorage<Texture>,
     scale_from_base_res: &(f32, f32),
 ) {
     if let Some(transform) = transforms.get(entity) {
@@ -228,6 +247,7 @@ fn render_node<R: gfx::Resources, C: gfx::CommandBuffer<R>, F: gfx::Factory<R>>(
         factory,
         spritesheet,
         asset_texture,
+        texture_map,
         glyph_brush,
         &entity,
         sprites,
@@ -237,6 +257,7 @@ fn render_node<R: gfx::Resources, C: gfx::CommandBuffer<R>, F: gfx::Factory<R>>(
         texts,
         rects,
         shapes,
+        textures,
         scale_from_base_res,
     );
 
@@ -255,6 +276,7 @@ fn render_node<R: gfx::Resources, C: gfx::CommandBuffer<R>, F: gfx::Factory<R>>(
             factory,
             spritesheet,
             asset_texture,
+            texture_map,
             glyph_brush,
             sprites,
             transforms,
@@ -264,6 +286,7 @@ fn render_node<R: gfx::Resources, C: gfx::CommandBuffer<R>, F: gfx::Factory<R>>(
             rects,
             shapes,
             nodes,
+            textures,
             scale_from_base_res,
         );
     }
@@ -306,7 +329,25 @@ fn main() {
 
     let asset_data = loader::read_text_from_file("resources/assets.json").unwrap();
     let spritesheet: Spritesheet = serde_json::from_str(asset_data.as_ref()).unwrap();
-    let asset_texture = loader::gfx_load_texture("resources/assets.png", &mut factory);
+    let (asset_texture, _, _) = loader::gfx_load_texture("resources/assets.png", &mut factory);
+
+    let mut screen_sizes = [(0u16, 0u16); 4];
+    let screen_textures = [
+        loader::gfx_load_texture("resources/startscreens/screenone.png", &mut factory),
+        loader::gfx_load_texture("resources/startscreens/screentwo.png", &mut factory),
+        loader::gfx_load_texture("resources/startscreens/screenthree.png", &mut factory),
+        loader::gfx_load_texture("resources/startscreens/screenfour.png", &mut factory),
+    ];
+
+    let mut texture_map = HashMap::new();
+    texture_map.insert("screenone.png".to_string(), screen_textures[0].0.clone());
+    texture_map.insert("screentwo.png".to_string(), screen_textures[1].0.clone());
+    texture_map.insert("screenthree.png".to_string(), screen_textures[2].0.clone());
+    texture_map.insert("screenfour.png".to_string(), screen_textures[3].0.clone());
+
+    for (i, (_, w, h)) in screen_textures.iter().enumerate() {
+        screen_sizes[i] = (*w, *h);
+    }
 
     let mut glyph_brush =
         GlyphBrushBuilder::using_font_bytes(include_bytes!("../resources/MunroSmall.ttf") as &[u8])
@@ -327,7 +368,11 @@ fn main() {
     let mut state_manager = StateManager::new();
     let play_state = PlayState::new();
     state_manager.add_state(PlayState::get_name(), Box::new(play_state));
-    state_manager.swap_state(PlayState::get_name(), &mut world);
+    state_manager.add_state(
+        MenuState::get_name(),
+        Box::new(MenuState::new(screen_sizes)),
+    );
+    state_manager.swap_state(MenuState::get_name(), &mut world);
 
     let mut running = true;
     let mut frame_start = time::Instant::now();
@@ -362,7 +407,7 @@ fn main() {
 
         events_loop.poll_events(|event| {
             if state_manager.should_render_ui() {
-                let ui = state_manager.get_ui_to_render();
+                let ui = state_manager.get_ui_to_render().unwrap();
                 if let Some(event) =
                     conrod::backend::winit::convert_event(event.clone(), window.window())
                 {
@@ -479,6 +524,7 @@ fn main() {
             let rects = world.read_storage::<Rect>();
             let shapes = world.read_storage::<Shape>();
             let mut nodes = world.write_storage::<Node>();
+            let textures = world.read_storage::<Texture>();
 
             let mut click_sound_storage = world.write_resource::<ClickSound>();
             let click_sound: &mut ClickSound = click_sound_storage.deref_mut();
@@ -515,6 +561,7 @@ fn main() {
                     &mut factory,
                     &spritesheet,
                     &asset_texture,
+                    &texture_map,
                     &mut glyph_brush,
                     &sprites,
                     &mut transforms,
@@ -524,6 +571,7 @@ fn main() {
                     &rects,
                     &shapes,
                     &mut nodes,
+                    &textures,
                     &scale_from_base_res,
                 );
             }
@@ -544,7 +592,7 @@ fn main() {
                 actions.dispatch(action_name);
             }
 
-            let ui = state_manager.get_ui_to_render();
+            let ui = state_manager.get_ui_to_render().unwrap();
             let primitives = ui.draw();
             conrod_renderer.clear(
                 &mut encoder,

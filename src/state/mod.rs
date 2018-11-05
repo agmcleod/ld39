@@ -1,3 +1,4 @@
+pub mod menu_state;
 pub mod play_state;
 
 use settings::Settings;
@@ -11,7 +12,7 @@ pub trait State {
     fn setup(&mut self, world: &mut World);
     fn update(&mut self, &mut World);
     fn handle_custom_change(&mut self, &String, &mut World);
-    fn get_ui_to_render(&mut self) -> &mut Ui;
+    fn get_ui_to_render(&mut self) -> Option<&mut Ui>;
     fn should_render_ui(&self) -> bool;
     fn create_ui_widgets(&mut self, settings: &mut Settings) -> Option<String>;
 }
@@ -68,7 +69,7 @@ impl StateManager {
             .setup(world);
     }
 
-    pub fn get_ui_to_render(&mut self) -> &mut Ui {
+    pub fn get_ui_to_render(&mut self) -> Option<&mut Ui> {
         self.states
             .get_mut(&self.current_state)
             .unwrap()

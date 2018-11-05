@@ -6,7 +6,7 @@ pub struct EffectedByPollutionTiles {
 
 impl EffectedByPollutionTiles {
     pub fn new() -> Self {
-        EffectedByPollutionTiles{
+        EffectedByPollutionTiles {
             tiles: Vec::with_capacity(8),
         }
     }

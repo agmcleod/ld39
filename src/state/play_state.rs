@@ -613,8 +613,8 @@ impl<'a> State for PlayState<'a> {
         }
     }
 
-    fn get_ui_to_render(&mut self) -> &mut Ui {
-        &mut self.ui
+    fn get_ui_to_render(&mut self) -> Option<&mut Ui> {
+        Some(&mut self.ui)
     }
 
     fn create_ui_widgets(&mut self, settings: &mut Settings) -> Option<String> {

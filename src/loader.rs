@@ -14,7 +14,7 @@ use std::path::{Path, PathBuf};
 pub fn gfx_load_texture<F, R>(
     path: &str,
     factory: &mut F,
-) -> gfx::handle::ShaderResourceView<R, [f32; 4]>
+) -> (gfx::handle::ShaderResourceView<R, [f32; 4]>, u16, u16)
 where
     F: gfx::Factory<R>,
     R: gfx::Resources,
@@ -27,7 +27,7 @@ where
     let (_, view) = factory
         .create_texture_immutable_u8::<Rgba8>(kind, Mipmap::Allocated, &[&img])
         .unwrap();
-    view
+    (view, width as u16, height as u16)
 }
 
 pub fn create_sound(sound_file_path: &str) -> Decoder<BufReader<File>> {
