@@ -1,14 +1,8 @@
-use rand::{thread_rng, Rng};
-use specs::{Join, Read, System, WriteStorage};
+use rand::{Rng, thread_rng};
+use specs::{Join, Read, System, Write, WriteStorage};
 
-use components::{Color, DeltaTime, MenuScreen, Transform};
-
-pub const MENU_ANIMATION_OPTIONS: [((f32, f32), (f32, f32)); 4] = [
-    ((0.0, 0.0), (-300.0, -400.0)),
-    ((-450.0, -100.0), (0.0, 0.0)),
-    ((0.0, -300.0), (-200.0, -100.0)),
-    ((-400.0, -350.0), (-100.0, -40.0)),
-];
+use components::{Button, Color, DeltaTime, Input, MenuScreen, StateChange, Transform};
+use state::play_state::PlayState;
 
 const DURATION: f32 = 2.0;
 
@@ -26,17 +20,27 @@ impl MenuAnimation {
 
 impl<'a> System<'a> for MenuAnimation {
     type SystemData = (
+        WriteStorage<'a, Button>,
         WriteStorage<'a, Color>,
         Read<'a, DeltaTime>,
+        Read<'a, Input>,
         WriteStorage<'a, MenuScreen>,
+        Write<'a, StateChange>,
         WriteStorage<'a, Transform>,
     );
 
     fn run(&mut self, data: Self::SystemData) {
-        let (mut color_storage, delta_time_storage, mut menu_screen_storage, mut transform_storage) =
+        let (mut button_storage, mut color_storage, delta_time_storage, input_storage, mut menu_screen_storage, mut state_change_storage, mut transform_storage) =
             data;
 
         let dt = delta_time_storage.dt;
+
+        for button in (&mut button_storage).join() {
+            if button.name == "start" && button.clicked(&input_storage) {
+                state_change_storage.state = PlayState::get_name();
+                state_change_storage.action = "start".to_string();
+            }
+        }
 
         self.animating_tick += dt;
 
@@ -69,21 +73,20 @@ impl<'a> System<'a> for MenuAnimation {
                 let diff = (self.animating_tick - menu_screen.start_time_in_seconds) / DURATION;
                 if diff < 1.0 {
                     color.0[3] = 1.0 - diff;
-                    let start_pos = MENU_ANIMATION_OPTIONS[menu_screen.animation_index].0;
-                    let end_pos = MENU_ANIMATION_OPTIONS[menu_screen.animation_index].1;
+                    let start_pos = menu_screen.start_pos;
+                    let end_pos = menu_screen.end_pos;
 
                     transform.set_pos2(
                         (end_pos.0 - start_pos.0) * diff + start_pos.0,
                         (end_pos.1 - start_pos.1) * diff + start_pos.1,
                     );
-                    println!("{:?}", transform.get_pos());
                 // animation is done, hide it
                 } else if transform.visible {
                     transform.visible = false;
                     // setup for next run
-                    menu_screen.animation_index = rng.gen_range(0, MENU_ANIMATION_OPTIONS.len());
-                    let pos = MENU_ANIMATION_OPTIONS[menu_screen.animation_index].0;
-                    transform.set_pos2(pos.0, pos.1);
+                    menu_screen.start_pos = MenuScreen::get_random_position(&mut rng);
+                    menu_screen.end_pos = MenuScreen::get_random_position(&mut rng);
+                    transform.set_pos2(menu_screen.start_pos.0, menu_screen.start_pos.1);
                 }
             }
         }

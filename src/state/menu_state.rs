@@ -1,7 +1,8 @@
 use conrod::Ui;
+use rand::{thread_rng};
 use specs::{Dispatcher, DispatcherBuilder, World};
 
-use components::{Button, Color, EntityLookup, MenuScreen, Node, Texture, Transform};
+use components::{Button, Color, EntityLookup, MenuScreen, Node, Sprite, Texture, Transform};
 use settings::Settings;
 use state::State;
 use systems;
@@ -32,8 +33,11 @@ impl<'a> MenuState<'a> {
 
 impl<'a> State for MenuState<'a> {
     fn setup(&mut self, world: &mut World) {
-        let menu_screen = MenuScreen::new(0.0);
-        let pos = systems::MENU_ANIMATION_OPTIONS[menu_screen.animation_index].0;
+        let mut rng = thread_rng();
+        let pos = MenuScreen::get_random_position(&mut rng);
+        let end_pos = MenuScreen::get_random_position(&mut rng);
+        let menu_screen = MenuScreen::new(0.0, pos.clone(), end_pos);
+
         let image = world
             .create_entity()
             .with(Transform::visible(
@@ -43,8 +47,8 @@ impl<'a> State for MenuState<'a> {
                 self.screen_sizes[0].0,
                 self.screen_sizes[0].1,
                 0.0,
-                1.5,
-                1.5,
+                2.0,
+                2.0,
             ))
             .with(menu_screen)
             .with(Texture::new("screenone.png"))
@@ -53,8 +57,10 @@ impl<'a> State for MenuState<'a> {
 
         let mut child_entities = vec![image];
 
-        let menu_screen = MenuScreen::new(2.0);
-        let pos = systems::MENU_ANIMATION_OPTIONS[menu_screen.animation_index].0;
+        let pos = MenuScreen::get_random_position(&mut rng);
+        let end_pos = MenuScreen::get_random_position(&mut rng);
+        let menu_screen = MenuScreen::new(2.0, pos.clone(), end_pos);
+
         let image = world
             .create_entity()
             .with(Transform::new(
@@ -64,8 +70,8 @@ impl<'a> State for MenuState<'a> {
                 self.screen_sizes[0].0,
                 self.screen_sizes[0].1,
                 0.0,
-                1.5,
-                1.5,
+                2.0,
+                2.0,
                 false,
             ))
             .with(menu_screen)
@@ -74,8 +80,10 @@ impl<'a> State for MenuState<'a> {
             .build();
         child_entities.push(image);
 
-        let menu_screen = MenuScreen::new(4.0);
-        let pos = systems::MENU_ANIMATION_OPTIONS[menu_screen.animation_index].0;
+        let pos = MenuScreen::get_random_position(&mut rng);
+        let end_pos = MenuScreen::get_random_position(&mut rng);
+        let menu_screen = MenuScreen::new(4.0, pos.clone(), end_pos);
+
         let image = world
             .create_entity()
             .with(Transform::new(
@@ -85,8 +93,8 @@ impl<'a> State for MenuState<'a> {
                 self.screen_sizes[0].0,
                 self.screen_sizes[0].1,
                 0.0,
-                1.5,
-                1.5,
+                2.0,
+                2.0,
                 false,
             ))
             .with(menu_screen)
@@ -95,8 +103,10 @@ impl<'a> State for MenuState<'a> {
             .build();
         child_entities.push(image);
 
-        let menu_screen = MenuScreen::new(6.0);
-        let pos = systems::MENU_ANIMATION_OPTIONS[menu_screen.animation_index].0;
+        let pos = MenuScreen::get_random_position(&mut rng);
+        let end_pos = MenuScreen::get_random_position(&mut rng);
+        let menu_screen = MenuScreen::new(6.0, pos.clone(), end_pos);
+
         let image = world
             .create_entity()
             .with(Transform::new(
@@ -106,8 +116,8 @@ impl<'a> State for MenuState<'a> {
                 self.screen_sizes[0].0,
                 self.screen_sizes[0].1,
                 0.0,
-                1.5,
-                1.5,
+                2.0,
+                2.0,
                 false,
             ))
             .with(menu_screen)
@@ -115,6 +125,39 @@ impl<'a> State for MenuState<'a> {
             .with(Color([1.0, 1.0, 1.0, 1.0]))
             .build();
         child_entities.push(image);
+
+        let entity = world.create_entity()
+            .with(Sprite{ frame_name: "title.png".to_string() })
+            .with(Transform::visible(
+                112.0,
+                50.0,
+                5.0,
+                735,
+                228,
+                0.0,
+                1.0,
+                1.0
+            ))
+            .build();
+
+        child_entities.push(entity);
+
+        let entity = world.create_entity()
+            .with(Sprite{ frame_name: "start.png".to_string() })
+            .with(Button::new("start".to_string(), ["start.png".to_string(), "start_hover.png".to_string()]))
+            .with(Transform::visible(
+                384.0,
+                450.0,
+                5.0,
+                192,
+                50,
+                0.0,
+                1.0,
+                1.0
+            ))
+            .build();
+
+        child_entities.push(entity);
 
         let mut lookup = EntityLookup::new();
 

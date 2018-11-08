@@ -124,20 +124,14 @@ where
 
         self.projection.proj = (*camera).0.into();
 
-        self.projection.model = self.model
-            .concat(&Matrix4::from_nonuniform_scale(
-                transform.scale.x,
-                transform.scale.y,
-                1.0,
-            ))
-            .into();
+        self.projection.model = self.model.into();
 
         encoder.update_constant_buffer(&params.projection_cb, &self.projection);
         encoder.draw(&slice, &self.pso, &params);
     }
 
     pub fn reset_transform(&mut self) {
-        self.projection.model = Matrix4::identity().into();
+        self.model = Matrix4::identity().into();
     }
 
     pub fn render_single_texture<C, F>(
@@ -317,11 +311,20 @@ where
     }
 
     pub fn transform(&mut self, transform: &components::Transform, undo: bool) {
-        let mut transform = Matrix4::from_translation(*transform.get_pos());
+        let mut transform_mat = Matrix4::from_translation(*transform.get_pos());
+        let mut scale = Matrix4::from_nonuniform_scale(
+            transform.scale.x,
+            transform.scale.y,
+            1.0,
+        );
         if undo {
-            transform = transform.inverse_transform().unwrap();
+            transform_mat = transform_mat.inverse_transform().unwrap();
+            scale = scale.inverse_transform().unwrap();
+            self.model = self.model.concat(&scale).concat(&transform_mat);
+        } else {
+            self.model = self.model.concat(&transform_mat).concat(&scale);
         }
-        self.model = self.model.concat(&transform);
+
     }
 }
 

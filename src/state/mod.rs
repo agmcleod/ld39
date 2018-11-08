@@ -44,6 +44,8 @@ impl StateManager {
         if state_change.action != "" && state_change.state != "" {
             if state_change.action == "restart" {
                 self.restart_current_state(world);
+            } else if state_change.action == "start" {
+                self.swap_state(state_change.state.clone(), world);
             } else {
                 self.states
                     .get_mut(&self.current_state)
