@@ -100,7 +100,6 @@ where
         data: Vec<Vertex>,
         encoder: &mut gfx::Encoder<R, C>,
         factory: &mut F,
-        transform: &components::Transform,
         tex: (
             gfx::handle::ShaderResourceView<R, [f32; 4]>,
             gfx::handle::Sampler<R>,
@@ -167,7 +166,7 @@ where
 
         let data: Vec<Vertex> = get_quad(color.0, w, h, tx, ty, tx2, ty2);
 
-        self.draw_verticies(data, encoder, factory, transform, tex, &camera);
+        self.draw_verticies(data, encoder, factory, tex, &camera);
     }
 
     pub fn render<C, F>(
@@ -232,7 +231,7 @@ where
 
         let data: Vec<Vertex> = get_quad(color, w, h, tx, ty, tx2, ty2);
 
-        self.draw_verticies(data, encoder, factory, transform, tex, &camera);
+        self.draw_verticies(data, encoder, factory, tex, &camera);
     }
 
     pub fn render_shape<C, F>(

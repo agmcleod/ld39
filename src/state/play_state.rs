@@ -1,5 +1,5 @@
 use conrod;
-use conrod::{widget, Colorable, Labelable, Positionable, Sizeable, Ui, UiBuilder, Widget};
+use conrod::{widget, Colorable, Labelable, Positionable, Sizeable, Ui, UiBuilder, Widget, position::Relative};
 use loader;
 use specs::{Dispatcher, DispatcherBuilder, World};
 use state::State;
@@ -625,6 +625,8 @@ impl<'a> State for PlayState<'a> {
             .w_h(30.0, 30.0)
             .label("X")
             .label_color(conrod::color::rgb(0.0, 1.0, 0.0))
+            .label_x(Relative::Scalar(1.0))
+            .label_y(Relative::Scalar(2.0))
             .color(conrod::color::rgb(16.0 / 256.0, 14.0 / 256.0, 22.0 / 256.0))
             .set(self.ids.close_button, ui)
             .was_clicked()
@@ -672,6 +674,8 @@ impl<'a> State for PlayState<'a> {
             .color(conrod::color::rgb(0.0, 1.0, 0.0))
             .w_h(35.0, 35.0)
             .label(if settings.mute_music { "X" } else { "" })
+            .label_x(Relative::Scalar(0.0))
+            .label_y(Relative::Scalar(1.0))
             .label_color(conrod::color::rgb(0.0, 0.0, 0.0))
             .set(self.ids.mute_music, ui)
             .last()
@@ -690,6 +694,8 @@ impl<'a> State for PlayState<'a> {
             .color(conrod::color::rgb(0.0, 1.0, 0.0))
             .w_h(35.0, 35.0)
             .label(if settings.mute_sound_effects { "X" } else { "" })
+            .label_x(Relative::Scalar(0.0))
+            .label_y(Relative::Scalar(1.0))
             .label_color(conrod::color::rgb(0.0, 0.0, 0.0))
             .set(self.ids.mute_sound_effects, ui)
             .last()
