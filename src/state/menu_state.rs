@@ -1,15 +1,22 @@
-use conrod::Ui;
+use std::path::Path;
+
+use conrod::{Ui, UiBuilder};
 use rand::{thread_rng};
 use specs::{Dispatcher, DispatcherBuilder, World};
 
-use components::{Button, Color, EntityLookup, MenuScreen, Node, Sprite, Texture, Transform};
-use settings::Settings;
+use components::{Button, Color, CurrentState, EntityLookup, InternalState, MenuScreen, Node, Sprite, Texture, Transform};
+use loader;
+use renderer;
+use settings::{create_ui, Ids, Settings};
 use state::State;
 use systems;
 
 pub struct MenuState<'a> {
     dispatcher: Dispatcher<'a, 'a>,
     screen_sizes: [(u16, u16); 4],
+    state: InternalState,
+    ui: Ui,
+    ids: Ids,
 }
 
 impl<'a> MenuState<'a> {
@@ -17,12 +24,24 @@ impl<'a> MenuState<'a> {
         let dispatcher = DispatcherBuilder::new()
             .with(systems::ButtonHover {}, "button_hover", &[])
             .with(systems::TextAbsoluteCache {}, "text_absolute_cache", &[])
-            .with(systems::MenuAnimation::new(), "menu_animation", &[])
+            .with(systems::MenuAnimation::new(), "menu_animation", &["button_hover"])
+            .with(systems::TogglePause{}, "toggle_pause", &["button_hover"])
             .build();
+
+        let dim = renderer::get_dimensions();
+        let mut ui = UiBuilder::new([dim[0] as f64, dim[1] as f64]).build();
+        ui.fonts
+            .insert_from_file(Path::new(&loader::get_exe_path().join("resources/MunroSmall.ttf")))
+            .unwrap();
+
+        let ids = Ids::new(ui.widget_id_generator());
 
         MenuState {
             dispatcher,
             screen_sizes,
+            state: InternalState::Game,
+            ui,
+            ids
         }
     }
 
@@ -33,6 +52,8 @@ impl<'a> MenuState<'a> {
 
 impl<'a> State for MenuState<'a> {
     fn setup(&mut self, world: &mut World) {
+        world.add_resource(CurrentState(MenuState::get_name()));
+        world.add_resource(InternalState::Game);
         let mut rng = thread_rng();
         let pos = MenuScreen::get_random_position(&mut rng);
         let end_pos = MenuScreen::get_random_position(&mut rng);
@@ -156,7 +177,22 @@ impl<'a> State for MenuState<'a> {
                 1.0
             ))
             .build();
+        child_entities.push(entity);
 
+        let entity = world.create_entity()
+            .with(Sprite{ frame_name: "menu_settings.png".to_string() })
+            .with(Button::new("menu".to_string(), ["menu_settings.png".to_string(), "menu_settings_hover.png".to_string()]))
+            .with(Transform::visible(
+                384.0,
+                520.0,
+                5.0,
+                192,
+                50,
+                0.0,
+                1.0,
+                1.0
+            ))
+            .build();
         child_entities.push(entity);
 
         let mut lookup = EntityLookup::new();
@@ -174,17 +210,25 @@ impl<'a> State for MenuState<'a> {
         self.dispatcher.dispatch(&mut world.res);
     }
 
-    fn handle_custom_change(&mut self, _: &String, _: &mut World) {}
-
-    fn get_ui_to_render(&mut self) -> Option<&mut Ui> {
-        None
+    fn handle_custom_change(&mut self, action: &String, world: &mut World) {
+        if action == "resume" {
+            self.state = InternalState::Game;
+            world.add_resource(InternalState::Game);
+        } else if action == "pause" {
+            self.state = InternalState::Pause;
+            world.add_resource(InternalState::Pause);
+        }
     }
 
-    fn create_ui_widgets(&mut self, _: &mut Settings) -> Option<String> {
-        None
+    fn get_ui_to_render(&mut self) -> Option<&mut Ui> {
+        Some(&mut self.ui)
+    }
+
+    fn create_ui_widgets(&mut self, settings: &mut Settings) -> Option<String> {
+        create_ui(&mut self.ui, &mut self.ids, settings)
     }
 
     fn should_render_ui(&self) -> bool {
-        false
+        self.state == InternalState::Pause
     }
 }

@@ -1,8 +1,7 @@
-use components::{Actions, Button, Color, EntityLookup, Input, Node, Rect, StateChange, Transform};
+use components::{Actions, Button, Color, CurrentState, EntityLookup, Input, InternalState, Node, Rect, StateChange, Transform};
 use entities::create_colored_rect;
 use glutin::VirtualKeyCode;
 use specs::{Entities, Join, Read, System, Write, WriteStorage};
-use state::play_state::{InternalState, PlayState};
 use std::ops::{Deref, DerefMut};
 use systems::logic;
 
@@ -14,6 +13,7 @@ impl<'a> System<'a> for TogglePause {
         Read<'a, Actions>,
         WriteStorage<'a, Button>,
         WriteStorage<'a, Color>,
+        Read<'a, CurrentState>,
         Write<'a, EntityLookup>,
         Read<'a, Input>,
         Read<'a, InternalState>,
@@ -29,6 +29,7 @@ impl<'a> System<'a> for TogglePause {
             actions_storage,
             mut button_storage,
             mut color_storage,
+            current_state_storage,
             mut entity_lookup_storage,
             input,
             internal_state_storage,
@@ -63,7 +64,7 @@ impl<'a> System<'a> for TogglePause {
             }
             lookup.entities.remove("pause_black");
             let state_change: &mut StateChange = state_change_storage.deref_mut();
-            state_change.set(PlayState::get_name(), "resume".to_string());
+            state_change.set(current_state_storage.0.clone(), "resume".to_string());
         }
 
         if transition_to_pause {
@@ -84,7 +85,7 @@ impl<'a> System<'a> for TogglePause {
             let root_node = logic::get_root(&lookup, &mut node_storage);
             root_node.add(entity);
             let state_change: &mut StateChange = state_change_storage.deref_mut();
-            state_change.set(PlayState::get_name(), "pause".to_string());
+            state_change.set(current_state_storage.0.clone(), "pause".to_string());
         }
     }
 }

@@ -1,4 +1,4 @@
-use rand::{Rng, thread_rng};
+use rand::{thread_rng};
 use specs::{Join, Read, System, Write, WriteStorage};
 
 use components::{Button, Color, DeltaTime, Input, MenuScreen, StateChange, Transform};
