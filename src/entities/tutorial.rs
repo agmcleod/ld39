@@ -95,7 +95,7 @@ pub fn next_step(
             recursive_delete(entities, node_storage, &entity);
         }
         let actions = actions_storage.deref_mut();
-        actions.dispatch(next_step.as_string());
+        actions.dispatch(next_step.to_string(), String::new());
         *tutorial_step = next_step;
         true
     } else {

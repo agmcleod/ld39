@@ -2,6 +2,7 @@
 pub enum InternalState {
     Game,
     TechTree,
+    Transition,
     Pause,
 }
 

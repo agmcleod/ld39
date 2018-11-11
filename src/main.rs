@@ -53,10 +53,11 @@ use components::{upgrade::{LearnProgress, Upgrade},
                  Camera,
                  ClickSound,
                  Color,
-                 CurrentState,
                  DeltaTime,
                  EffectedByPollutionTiles,
                  EntityLookup,
+                 Error,
+                 Fade,
                  FloatingText,
                  Gatherer,
                  HighlightTile,
@@ -73,6 +74,7 @@ use components::{upgrade::{LearnProgress, Upgrade},
                  Text,
                  Texture,
                  Tile,
+                 TransitionToState,
                  Transform,
                  TutorialStep};
 use renderer::{ColorFormat, DepthFormat};
@@ -96,6 +98,8 @@ fn setup_world(world: &mut World, window: &glutin::Window) {
     world.register::<Button>();
     world.register::<Color>();
     world.register::<EffectedByPollutionTiles>();
+    world.register::<Error>();
+    world.register::<Fade>();
     world.register::<FloatingText>();
     world.register::<Gatherer>();
     world.register::<HighlightTile>();
@@ -113,6 +117,7 @@ fn setup_world(world: &mut World, window: &glutin::Window) {
     world.register::<Texture>();
     world.register::<Tile>();
     world.register::<Transform>();
+    world.register::<TransitionToState>();
     world.register::<TutorialUI>();
     world.register::<Upgrade>();
     world.register::<WalletUI>();
@@ -386,7 +391,7 @@ fn main() {
     {
         let mut actions = world.write_resource::<Actions>();
         if !settings.completed_tutorial {
-            actions.dispatch(TutorialStep::SelectTile.as_string());
+            actions.dispatch(TutorialStep::SelectTile.as_string(), "".to_string());
             let mut tutorial_step = world.write_resource::<TutorialStep>();
             *tutorial_step = TutorialStep::SelectTile;
         }
@@ -590,7 +595,7 @@ fn main() {
             let mut settings = settings_res.deref_mut();
             if let Some(action_name) = state_manager.create_ui_widgets(&mut settings) {
                 let mut actions = world.write_resource::<Actions>();
-                actions.dispatch(action_name);
+                actions.dispatch(action_name, String::new());
             }
 
             let ui = state_manager.get_ui_to_render().unwrap();

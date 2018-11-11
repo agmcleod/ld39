@@ -71,7 +71,7 @@ impl<'a> System<'a> for TogglePause {
             let entity = create_colored_rect::create(
                 0.0,
                 0.0,
-                10.0,
+                8.0,
                 960,
                 640,
                 [16.0 / 256.0, 14.0 / 256.0, 22.0 / 256.0, 1.0],

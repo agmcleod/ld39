@@ -77,7 +77,7 @@ widget_ids! {
 }
 
 pub fn create_ui(ui: &mut Ui, ids: &mut Ids, settings: &mut Settings) -> Option<String> {
-    use conrod::{color, position, widget, Colorable, Labelable, Positionable, Sizeable, UiBuilder, Widget, position::Relative};
+    use conrod::{color, position, widget, Colorable, Labelable, Positionable, Sizeable, Widget, position::Relative};
 
     let ui = &mut ui.set_widgets();
 

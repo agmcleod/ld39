@@ -1,5 +1,5 @@
 use components::ui::WalletUI;
-use components::{ui::TutorialUI, upgrade::Buff, AnimationSheet, Button, ClickSound, Color,
+use components::{ui::TutorialUI, upgrade::Buff, Actions, AnimationSheet, Button, ClickSound, Color,
                  EffectedByPollutionTiles, EntityLookup, Gatherer, GathererPositions,
                  GathererType, Input, Node, ResearchedBuffs, SelectedTile, Sprite, Text, Tile,
                  TileNodes, TileType, Transform, TutorialStep, Wallet};
@@ -26,6 +26,7 @@ impl BuildGatherer {
 impl<'a> System<'a> for BuildGatherer {
     type SystemData = (
         Entities<'a>,
+        Write<'a, Actions>,
         WriteStorage<'a, AnimationSheet>,
         WriteStorage<'a, Button>,
         Write<'a, ClickSound>,
@@ -51,6 +52,7 @@ impl<'a> System<'a> for BuildGatherer {
     fn run(&mut self, data: Self::SystemData) {
         let (
             entities,
+            mut actions_storage,
             mut animation_sheet_storage,
             mut button_storage,
             mut click_sound_storage,
@@ -189,17 +191,21 @@ impl<'a> System<'a> for BuildGatherer {
                 amount -= amount * 20 / 100;
             }
             for (_, transform) in (&selected_tile_storage, &mut transform_storage).join() {
-                if transform.visible && wallet.spend(amount) {
-                    transform.visible = false;
-                    create = true;
+                if transform.visible {
+                    if wallet.spend(amount) {
+                        transform.visible = false;
+                        create = true;
 
-                    selected_tile_x = transform.get_pos().x;
-                    selected_tile_y = transform.get_pos().y;
-                    logic::update_text(
-                        format!("Wallet: ${}", wallet.get_money()),
-                        &mut text_storage,
-                        &wallet_ui_storage,
-                    );
+                        selected_tile_x = transform.get_pos().x;
+                        selected_tile_y = transform.get_pos().y;
+                        logic::update_text(
+                            format!("Wallet: ${}", wallet.get_money()),
+                            &mut text_storage,
+                            &wallet_ui_storage,
+                        );
+                    } else {
+                        actions_storage.dispatch("display_error".to_string(), "Not enough money to build".to_string());
+                    }
                 }
             }
         }

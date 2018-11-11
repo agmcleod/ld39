@@ -249,6 +249,7 @@ impl<'a> System<'a> for TechTree {
                             120,
                             20,
                             Color([0.8, 0.8, 0.8, 1.0]),
+                            None,
                         );
                         tooltip_node.add(text);
                     }
@@ -264,6 +265,7 @@ impl<'a> System<'a> for TechTree {
                             120,
                             20,
                             Color([0.5, 0.5, 0.5, 1.0]),
+                            None,
                         );
                         tooltip_node.add(text);
                     } else {
@@ -277,6 +279,7 @@ impl<'a> System<'a> for TechTree {
                             70,
                             20,
                             Color([1.0, 1.0, 0.0, 1.0]),
+                            None,
                         );
                         tooltip_node.add(text);
 
@@ -303,46 +306,50 @@ impl<'a> System<'a> for TechTree {
                 let upgrade = upgrade_storage
                     .get_mut(mouse_over_tech_tree_node_entity)
                     .unwrap();
-                if upgrade.status == Status::Researchable && wallet.spend(upgrade.cost) {
-                    if upgrade.buff == Buff::ResourceTrading {
-                        tutorial::next_step(
+                if upgrade.status == Status::Researchable {
+                    if wallet.spend(upgrade.cost) {
+                        if upgrade.buff == Buff::ResourceTrading {
+                            tutorial::next_step(
+                                &entities,
+                                &mut actions_storage,
+                                &mut tutorial_step_storage,
+                                &tutorial_ui_storage,
+                                &node_storage,
+                                TutorialStep::Upgrade,
+                                TutorialStep::Resume,
+                            );
+                        }
+                        upgrade.start_learning();
+                        *color_storage
+                            .get_mut(mouse_over_tech_tree_node_entity)
+                            .unwrap() = Color(get_color_from_status(&upgrade.status));
+                        let researching_entities = researching_entities_storage.deref_mut();
+                        let sprite = (*sprite_storage
+                            .get(mouse_over_tech_tree_node_entity)
+                            .unwrap())
+                            .clone();
+                        let progress_entity = self.build_research_progress_ui(
+                            upgrade.buff,
+                            &lookup,
                             &entities,
-                            &mut actions_storage,
-                            &mut tutorial_step_storage,
-                            &tutorial_ui_storage,
-                            &node_storage,
-                            TutorialStep::Upgrade,
-                            TutorialStep::Resume,
+                            sprite,
+                            &mut color_storage,
+                            &mut learn_progress_storage,
+                            &mut node_storage,
+                            &mut rect_storage,
+                            &mut sprite_storage,
+                            &mut transform_storage,
+                            researching_entities.entities.len(),
                         );
+                        researching_entities.entities.push(progress_entity);
+                        logic::update_text(
+                            format!("Wallet: ${}", wallet.get_money()),
+                            &mut text_storage,
+                            &wallet_ui_storage,
+                        );
+                    } else {
+                        actions_storage.dispatch("display_error".to_string(), "Not enough money to upgrade".to_string());
                     }
-                    upgrade.start_learning();
-                    *color_storage
-                        .get_mut(mouse_over_tech_tree_node_entity)
-                        .unwrap() = Color(get_color_from_status(&upgrade.status));
-                    let researching_entities = researching_entities_storage.deref_mut();
-                    let sprite = (*sprite_storage
-                        .get(mouse_over_tech_tree_node_entity)
-                        .unwrap())
-                        .clone();
-                    let progress_entity = self.build_research_progress_ui(
-                        upgrade.buff,
-                        &lookup,
-                        &entities,
-                        sprite,
-                        &mut color_storage,
-                        &mut learn_progress_storage,
-                        &mut node_storage,
-                        &mut rect_storage,
-                        &mut sprite_storage,
-                        &mut transform_storage,
-                        researching_entities.entities.len(),
-                    );
-                    researching_entities.entities.push(progress_entity);
-                    logic::update_text(
-                        format!("Wallet: ${}", wallet.get_money()),
-                        &mut text_storage,
-                        &wallet_ui_storage,
-                    );
                 }
             }
         } else {

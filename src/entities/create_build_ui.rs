@@ -79,6 +79,7 @@ pub fn create<'a, 'b: 'a>(
             50,
             20,
             Color([0.0, 1.0, 0.0, 1.0]),
+            None,
         );
         new_entities.push(text);
     }
@@ -140,6 +141,7 @@ pub fn create<'a, 'b: 'a>(
             50,
             20,
             Color([0.0, 1.0, 0.0, 1.0]),
+            None,
         );
         new_entities.push(text);
     }
@@ -200,6 +202,7 @@ pub fn create<'a, 'b: 'a>(
             50,
             20,
             Color([0.0, 1.0, 0.0, 1.0]),
+            None,
         );
         new_entities.push(text);
     }
@@ -252,6 +255,7 @@ pub fn create<'a, 'b: 'a>(
             50,
             20,
             Color([0.0, 1.0, 0.0, 1.0]),
+            None,
         );
         new_entities.push(text);
     }

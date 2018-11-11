@@ -26,6 +26,7 @@ impl<'a> MenuState<'a> {
             .with(systems::TextAbsoluteCache {}, "text_absolute_cache", &[])
             .with(systems::MenuAnimation::new(), "menu_animation", &["button_hover"])
             .with(systems::TogglePause{}, "toggle_pause", &["button_hover"])
+            .with(systems::Fade{}, "fade", &[])
             .build();
 
         let dim = renderer::get_dimensions();
@@ -217,6 +218,9 @@ impl<'a> State for MenuState<'a> {
         } else if action == "pause" {
             self.state = InternalState::Pause;
             world.add_resource(InternalState::Pause);
+        } else if action == "transition" {
+            self.state = InternalState::Transition;
+            world.add_resource(InternalState::Transition);
         }
     }
 

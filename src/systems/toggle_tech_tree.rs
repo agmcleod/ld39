@@ -55,7 +55,7 @@ impl ToggleTechTree {
                 let rect = create_colored_rect::create(
                     0.0,
                     0.0,
-                    10.0,
+                    8.0,
                     640,
                     640,
                     [0.0, 0.0, 0.0, 0.8],

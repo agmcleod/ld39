@@ -8,7 +8,7 @@ use cgmath::{Matrix4, SquareMatrix, Transform};
 use components;
 use gfx::texture;
 use gfx::traits::FactoryExt;
-use gfx_glyph::{GlyphBrush, Section};
+use gfx_glyph::{GlyphBrush, Layout, Section};
 use renderer::{ColorFormat, DepthFormat};
 use specs::World;
 use spritesheet::{Frame, Spritesheet};
@@ -300,6 +300,7 @@ where
             ),
             color: color.0,
             z: 0.0,
+            layout: Layout::default().h_align(text.align),
             ..Section::default()
         };
 

@@ -68,6 +68,9 @@ impl<'a> PlayState<'a> {
                     "tutorial",
                 ],
             )
+            .with(
+                systems::Errors{}, "errors", &["build_gatherer"]
+            )
             .build();
 
         let tech_tree_dispatcher = DispatcherBuilder::new()
@@ -84,6 +87,9 @@ impl<'a> PlayState<'a> {
                 systems::TextAbsoluteCache {},
                 "text_absolute_cache",
                 &["tutorial", "tech_tree", "toggle_tech_tree"],
+            )
+            .with(
+                systems::Errors{}, "errors", &["tech_tree"]
             )
             .build();
 
@@ -336,6 +342,7 @@ impl<'a> State for PlayState<'a> {
                 220,
                 70,
                 Color([1.0, 1.0, 0.0, 1.0]),
+                None,
             );
             wallet_ui_storage.insert(entity, WalletUI {}).unwrap();
             side_bar_container_node.add(entity);
@@ -350,6 +357,7 @@ impl<'a> State for PlayState<'a> {
                 160,
                 32,
                 Color([0.0, 0.6, 0.0, 1.0]),
+                None,
             );
             gathering_rate_container_node.add(gathering_rate_label);
 
@@ -363,6 +371,7 @@ impl<'a> State for PlayState<'a> {
                 160,
                 32,
                 Color([0.6, 0.6, 0.6, 1.0]),
+                None,
             );
             lookup
                 .entities
@@ -379,6 +388,7 @@ impl<'a> State for PlayState<'a> {
                 160,
                 32,
                 Color([0.8, 0.8, 0.8, 1.0]),
+                None,
             );
             lookup
                 .entities
@@ -395,6 +405,7 @@ impl<'a> State for PlayState<'a> {
                 160,
                 32,
                 Color([0.188, 0.57647, 1.0, 1.0]),
+                None,
             );
             lookup
                 .entities
@@ -411,6 +422,7 @@ impl<'a> State for PlayState<'a> {
                 160,
                 32,
                 Color([1.0, 1.0, 0.6196, 1.0]),
+                None,
             );
             lookup
                 .entities
@@ -427,6 +439,7 @@ impl<'a> State for PlayState<'a> {
                 160,
                 32,
                 Color([0.0, 0.6, 0.0, 1.0]),
+                None,
             );
             lookup
                 .entities
@@ -443,6 +456,7 @@ impl<'a> State for PlayState<'a> {
                 220,
                 32,
                 Color([1.0, 1.0, 0.0, 1.0]),
+                None,
             );
             lookup
                 .entities
@@ -460,6 +474,7 @@ impl<'a> State for PlayState<'a> {
                 160,
                 64,
                 Color([0.6, 0.0, 0.0, 1.0]),
+                None,
             );
 
             lookup
@@ -570,7 +585,7 @@ impl<'a> State for PlayState<'a> {
 
     fn update(&mut self, world: &mut World) {
         match self.state {
-            InternalState::Game => self.dispatcher.dispatch(&mut world.res),
+            InternalState::Game | InternalState::Transition => self.dispatcher.dispatch(&mut world.res),
             InternalState::TechTree => self.tech_tree_dispatcher.dispatch(&mut world.res),
             InternalState::Pause => self.pause_dispatcher.dispatch(&mut world.res),
         }

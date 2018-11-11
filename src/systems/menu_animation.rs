@@ -1,8 +1,9 @@
 use rand::{thread_rng};
-use specs::{Join, Read, System, Write, WriteStorage};
+use specs::{Entities, Join, Read, System, Write, WriteStorage};
 
-use components::{Button, Color, DeltaTime, Input, MenuScreen, StateChange, Transform};
-use state::play_state::PlayState;
+use components::{Button, Color, DeltaTime, EntityLookup, Fade, FadeMode, Input, InternalState, MenuScreen, Node, Rect, StateChange, Transform, TransitionToState};
+use entities::create_fade;
+use state::{menu_state::MenuState, play_state::PlayState};
 
 const DURATION: f32 = 2.0;
 
@@ -20,25 +21,63 @@ impl MenuAnimation {
 
 impl<'a> System<'a> for MenuAnimation {
     type SystemData = (
+        Entities<'a>,
         WriteStorage<'a, Button>,
         WriteStorage<'a, Color>,
         Read<'a, DeltaTime>,
+        WriteStorage<'a, Fade>,
         Read<'a, Input>,
+        Read<'a, InternalState>,
+        Read<'a, EntityLookup>,
         WriteStorage<'a, MenuScreen>,
+        WriteStorage<'a, Node>,
+        WriteStorage<'a, Rect>,
         Write<'a, StateChange>,
         WriteStorage<'a, Transform>,
+        WriteStorage<'a, TransitionToState>,
     );
 
     fn run(&mut self, data: Self::SystemData) {
-        let (mut button_storage, mut color_storage, delta_time_storage, input_storage, mut menu_screen_storage, mut state_change_storage, mut transform_storage) =
-            data;
+        let (
+            entities,
+            mut button_storage,
+            mut color_storage,
+            delta_time_storage,
+            mut fade_storage,
+            input_storage,
+            internal_state_storage,
+            lookup_storage,
+            mut menu_screen_storage,
+            mut node_storage,
+            mut rect_storage,
+            mut state_change_storage,
+            mut transform_storage,
+            mut transition_to_state_storage,
+        ) = data;
 
         let dt = delta_time_storage.dt;
 
+        if *internal_state_storage != InternalState::Game {
+            return;
+        }
+
         for button in (&mut button_storage).join() {
             if button.name == "start" && button.clicked(&input_storage) {
-                state_change_storage.state = PlayState::get_name();
-                state_change_storage.action = "start".to_string();
+                state_change_storage.state = MenuState::get_name();
+                state_change_storage.action = "transition".to_string();
+                create_fade::create(
+                    &entities,
+                    &mut color_storage,
+                    &mut fade_storage,
+                    &mut node_storage,
+                    &mut rect_storage,
+                    &mut transform_storage,
+                    Some(&mut transition_to_state_storage),
+                    Some(PlayState::get_name()),
+                    &lookup_storage,
+                    FadeMode::In,
+                    1.0,
+                );
             }
         }
 

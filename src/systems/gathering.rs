@@ -127,6 +127,7 @@ impl<'a> System<'a> for Gathering {
                     50,
                     18,
                     Color([0.0, 0.6, 0.0, 1.0]),
+                    None,
                 );
                 floating_text_storage
                     .insert(floating_text.clone(), FloatingText::new())

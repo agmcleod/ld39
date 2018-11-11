@@ -1,4 +1,5 @@
 use components::{Color, Text, Transform};
+use gfx_glyph::HorizontalAlign;
 use specs::Entity;
 use storage_types::TextStorage;
 
@@ -12,8 +13,12 @@ pub fn create(
     w: u16,
     h: u16,
     color: Color,
+    align: Option<HorizontalAlign>,
 ) -> Entity {
-    let text = Text::new_with_text(size, w, h, text);
+    let mut text = Text::new_with_text(size, w, h, text);
+    if let Some(align) = align {
+        text = text.align(align);
+    }
 
     let entity = storages.entities.create();
     storages
