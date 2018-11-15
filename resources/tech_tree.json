@@ -134,7 +134,7 @@
           "status": "Locked",
           "x": 0.65,
           "y_tier": 6,
-          "description": "Sell Panels to Consumers:\n$50 every minute",
+          "description": "Sell Panels to Consumers:\n$5000 every minute",
           "frame_name": "sellpanels.png"
         }]
       }, {

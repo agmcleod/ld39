@@ -383,9 +383,9 @@ impl<'a> System<'a> for SellEnergy {
             self.minute_ticker += delta_time_storage.deref().dt;
             if self.minute_ticker >= 1.0 {
                 self.minute_ticker = 0.0;
-                wallet_storage.add_money(50);
+                wallet_storage.add_money(5000);
                 logic::update_text_mut(
-                    format!("${}", wallet_storage.get_money()),
+                    format!("Wallet ${}", wallet_storage.get_money()),
                     &mut text_storage,
                     &mut wallet_ui_storage,
                 );
