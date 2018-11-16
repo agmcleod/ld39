@@ -4,6 +4,7 @@ pub enum InternalState {
     TechTree,
     Transition,
     Pause,
+    End,
 }
 
 impl Default for InternalState {

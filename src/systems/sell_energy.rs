@@ -1,12 +1,12 @@
-use components::ui::WalletUI;
-use components::{ui::TutorialUI, upgrade::Buff, Actions, Button, CityPowerState, Color, DeltaTime,
-                 EntityLookup, Gatherer, GathererType, GatheringRate, Input, Node, PowerBar,
-                 ResearchedBuffs, ResourceType, Resources, StateChange, Text, Transform,
-                 TutorialStep, Wallet, STARTING_TICK};
-use entities::tutorial;
-use specs::{Entities, Join, Read, ReadStorage, System, Write, WriteStorage};
-use state::play_state::PlayState;
 use std::ops::{Deref, DerefMut};
+
+use specs::{Entities, Join, Read, ReadStorage, System, Write, WriteStorage};
+
+use components::{ui::{TutorialUI, WalletUI}, upgrade::Buff, Actions, Button, CityPowerState, Color, DeltaTime,
+                 EntityLookup, Gatherer, GathererType, GatheringRate, Input, InternalState, Node, PowerBar,
+                 Rect, ResearchedBuffs, ResourceType, Resources, Text, Transform,
+                 TutorialStep, Wallet, STARTING_TICK};
+use entities::{create_colored_rect, tutorial};
 use systems::{logic, POWER_FACTOR, TICK_RATE};
 
 pub struct SellEnergy {
@@ -41,16 +41,23 @@ impl SellEnergy {
     fn sell_power_to_cities(
         &self,
         mut power_to_spend: i32,
+        entities: &Entities,
+        color_storage: &mut WriteStorage<Color>,
+        entity_lookup_storage: &mut Write<EntityLookup>,
+        node_storage: &mut WriteStorage<Node>,
+        rect_storage: &mut WriteStorage<Rect>,
         wallet_storage: &mut Write<Wallet>,
         transform_storage: &mut WriteStorage<Transform>,
         power_bar_storage: &mut WriteStorage<PowerBar>,
-        state_change_storage: &mut Write<StateChange>,
+        internal_state_storage: &mut Write<InternalState>,
     ) -> i32 {
         let money_from_power = power_to_spend;
         wallet_storage.add_money(money_from_power);
         power_to_spend *= POWER_FACTOR;
 
-        for (transform, power_bar) in (transform_storage, power_bar_storage).join() {
+        let mut lost = false;
+
+        for (transform, power_bar) in (&mut *transform_storage, power_bar_storage).join() {
             let amount_to_power = PowerBar::get_max() - power_bar.power_left;
             power_to_spend -= amount_to_power;
             if power_to_spend >= 0 {
@@ -68,10 +75,30 @@ impl SellEnergy {
             transform.size.x = width as u16;
 
             if power_bar.power_left <= 0 {
-                let state_change: &mut StateChange = state_change_storage.deref_mut();
-                state_change.state = PlayState::get_name();
-                state_change.action = "restart".to_string();
+                lost = true;
             }
+        }
+
+        if lost {
+            let internal_state = internal_state_storage.deref_mut();
+            *internal_state = InternalState::End;
+
+            let entity = create_colored_rect::create(
+                0.0,
+                0.0,
+                8.0,
+                960,
+                640,
+                [16.0 / 256.0, 14.0 / 256.0, 22.0 / 256.0, 1.0],
+                entities,
+                transform_storage,
+                color_storage,
+                rect_storage,
+            );
+            let lookup = entity_lookup_storage.deref_mut();
+            lookup.entities.insert("pause_black".to_string(), entity);
+            let root_node = logic::get_root(&lookup, node_storage);
+            root_node.add(entity);
         }
 
         money_from_power
@@ -81,7 +108,7 @@ impl SellEnergy {
         &self,
         gathering_rate_storage: &Read<GatheringRate>,
         text_storage: &mut WriteStorage<Text>,
-        entity_lookup_storage: &Read<EntityLookup>,
+        entity_lookup_storage: &Write<EntityLookup>,
         power_to_spend: i32,
     ) {
         if gathering_rate_storage.changed() {
@@ -171,15 +198,16 @@ impl<'a> System<'a> for SellEnergy {
         Write<'a, CityPowerState>,
         WriteStorage<'a, Color>,
         Read<'a, DeltaTime>,
-        Read<'a, EntityLookup>,
+        Write<'a, EntityLookup>,
         ReadStorage<'a, Gatherer>,
         Read<'a, GatheringRate>,
         Read<'a, Input>,
+        Write<'a, InternalState>,
         WriteStorage<'a, Node>,
         WriteStorage<'a, PowerBar>,
+        WriteStorage<'a, Rect>,
         Read<'a, ResearchedBuffs>,
         Write<'a, Resources>,
-        Write<'a, StateChange>,
         WriteStorage<'a, Text>,
         WriteStorage<'a, Transform>,
         Write<'a, TutorialStep>,
@@ -196,15 +224,16 @@ impl<'a> System<'a> for SellEnergy {
             mut city_power_state_storage,
             mut color_storage,
             delta_time_storage,
-            entity_lookup_storage,
+            mut entity_lookup_storage,
             gatherer_storage,
             gathering_rate_storage,
             input_storage,
-            node_storage,
+            mut internal_state_storage,
+            mut node_storage,
             mut power_bar_storage,
+            mut rect_storage,
             researched_buffs_storage,
             mut resources_storage,
-            mut state_change_storage,
             mut text_storage,
             mut transform_storage,
             mut tutorial_step_storage,
@@ -298,10 +327,15 @@ impl<'a> System<'a> for SellEnergy {
 
             let money_from_power = self.sell_power_to_cities(
                 power_to_spend,
+                &entities,
+                &mut color_storage,
+                &mut entity_lookup_storage,
+                &mut node_storage,
+                &mut rect_storage,
                 &mut wallet_storage,
                 &mut transform_storage,
                 &mut power_bar_storage,
-                &mut state_change_storage,
+                &mut internal_state_storage,
             );
 
             let mut coal_pollution = 0;

@@ -21,6 +21,7 @@ pub struct PlayState<'a> {
     dispatcher: Dispatcher<'a, 'a>,
     tech_tree_dispatcher: Dispatcher<'a, 'a>,
     pause_dispatcher: Dispatcher<'a, 'a>,
+    end_dispatcher: Dispatcher<'a, 'a>,
     state: InternalState,
     ui: Ui,
     ids: Ids,
@@ -99,6 +100,11 @@ impl<'a> PlayState<'a> {
             .with(systems::TogglePause {}, "toggle_pause", &["button_hover"])
             .build();
 
+        let end_dispatcher = DispatcherBuilder::new()
+            .with(systems::ButtonHover {}, "button_hover", &[])
+            .with(systems::TextAbsoluteCache {}, "text_absolute_cache", &[])
+            .build();
+
         let dim = renderer::get_dimensions();
         let mut ui = UiBuilder::new([dim[0] as f64, dim[1] as f64]).build();
         ui.fonts
@@ -111,6 +117,7 @@ impl<'a> PlayState<'a> {
             dispatcher,
             tech_tree_dispatcher,
             pause_dispatcher,
+            end_dispatcher,
             state: InternalState::Game,
             ui,
             ids,
@@ -588,6 +595,7 @@ impl<'a> State for PlayState<'a> {
             InternalState::Game | InternalState::Transition => self.dispatcher.dispatch(&mut world.res),
             InternalState::TechTree => self.tech_tree_dispatcher.dispatch(&mut world.res),
             InternalState::Pause => self.pause_dispatcher.dispatch(&mut world.res),
+            InternalState::End => self.end_dispatcher.dispatch(&mut world.res),
         }
     }
 
