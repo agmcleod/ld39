@@ -1,6 +1,7 @@
 mod animation_system;
 mod build_gatherer;
 mod button_hover;
+mod end_screen;
 mod errors;
 mod fade;
 mod floating_text_system;
@@ -23,6 +24,7 @@ pub const POWER_FACTOR: i32 = 1;
 pub use self::animation_system::*;
 pub use self::build_gatherer::*;
 pub use self::button_hover::*;
+pub use self::end_screen::*;
 pub use self::errors::*;
 pub use self::fade::*;
 pub use self::floating_text_system::*;

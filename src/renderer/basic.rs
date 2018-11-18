@@ -312,11 +312,7 @@ where
 
     pub fn transform(&mut self, transform: &components::Transform, undo: bool) {
         let mut transform_mat = Matrix4::from_translation(*transform.get_pos());
-        let mut scale = Matrix4::from_nonuniform_scale(
-            transform.scale.x,
-            transform.scale.y,
-            1.0,
-        );
+        let mut scale = Matrix4::from_nonuniform_scale(transform.scale.x, transform.scale.y, 1.0);
         if undo {
             transform_mat = transform_mat.inverse_transform().unwrap();
             scale = scale.inverse_transform().unwrap();
@@ -324,7 +320,6 @@ where
         } else {
             self.model = self.model.concat(&transform_mat).concat(&scale);
         }
-
     }
 }
 

@@ -6,9 +6,7 @@ pub struct TransitionToState {
 
 impl TransitionToState {
     pub fn new(state: String) -> Self {
-        TransitionToState{
-            state,
-        }
+        TransitionToState { state }
     }
 }
 

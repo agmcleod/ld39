@@ -14,7 +14,7 @@ pub struct Fade {
 
 impl Fade {
     pub fn new(mode: FadeMode, tick: f32) -> Self {
-        Fade{
+        Fade {
             mode,
             start_tick: tick,
             tick,

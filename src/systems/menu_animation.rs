@@ -1,7 +1,8 @@
-use rand::{thread_rng};
+use rand::thread_rng;
 use specs::{Entities, Join, Read, System, Write, WriteStorage};
 
-use components::{Button, Color, DeltaTime, EntityLookup, Fade, FadeMode, Input, InternalState, MenuScreen, Node, Rect, StateChange, Transform, TransitionToState};
+use components::{Button, Color, DeltaTime, EntityLookup, Fade, FadeMode, Input, InternalState,
+                 MenuScreen, Node, Rect, StateChange, Transform, TransitionToState};
 use entities::create_fade;
 use state::{menu_state::MenuState, play_state::PlayState};
 

@@ -7,9 +7,10 @@ use specs::{Dispatcher, DispatcherBuilder, World};
 use state::State;
 
 use components::{ui::WalletUI, upgrade, upgrade::Buff, Button, CityPowerState, Color,
-                 CurrentState, EntityLookup, GathererPositions, GatheringRate, InternalState, Node, PowerBar, Rect,
-                 ResearchedBuffs, ResearchingEntities, Resources, SelectedTile, Sprite, Text,
-                 Tile, TileNodes, TileType, Transform, TutorialStep, Wallet};
+                 CurrentState, EntityLookup, GathererPositions, GatheringRate, InternalState,
+                 Node, PowerBar, Rect, ResearchedBuffs, ResearchingEntities, Resources,
+                 SelectedTile, Sprite, Text, Tile, TileNodes, TileType, Transform, TutorialStep,
+                 Wallet};
 use entities::{create_map, create_power_bar, create_text, tech_tree};
 use rand::{thread_rng, Rng};
 use renderer;
@@ -69,9 +70,7 @@ impl<'a> PlayState<'a> {
                     "tutorial",
                 ],
             )
-            .with(
-                systems::Errors{}, "errors", &["build_gatherer"]
-            )
+            .with(systems::Errors {}, "errors", &["build_gatherer"])
             .build();
 
         let tech_tree_dispatcher = DispatcherBuilder::new()
@@ -89,9 +88,7 @@ impl<'a> PlayState<'a> {
                 "text_absolute_cache",
                 &["tutorial", "tech_tree", "toggle_tech_tree"],
             )
-            .with(
-                systems::Errors{}, "errors", &["tech_tree"]
-            )
+            .with(systems::Errors {}, "errors", &["tech_tree"])
             .build();
 
         let pause_dispatcher = DispatcherBuilder::new()
@@ -103,6 +100,11 @@ impl<'a> PlayState<'a> {
         let end_dispatcher = DispatcherBuilder::new()
             .with(systems::ButtonHover {}, "button_hover", &[])
             .with(systems::TextAbsoluteCache {}, "text_absolute_cache", &[])
+            .with(
+                systems::EndScreen {},
+                "end_screen",
+                &["button_hover", "text_absolute_cache"],
+            )
             .build();
 
         let dim = renderer::get_dimensions();
@@ -592,7 +594,9 @@ impl<'a> State for PlayState<'a> {
 
     fn update(&mut self, world: &mut World) {
         match self.state {
-            InternalState::Game | InternalState::Transition => self.dispatcher.dispatch(&mut world.res),
+            InternalState::Game | InternalState::Transition => {
+                self.dispatcher.dispatch(&mut world.res)
+            }
             InternalState::TechTree => self.tech_tree_dispatcher.dispatch(&mut world.res),
             InternalState::Pause => self.pause_dispatcher.dispatch(&mut world.res),
             InternalState::End => self.end_dispatcher.dispatch(&mut world.res),
@@ -609,6 +613,9 @@ impl<'a> State for PlayState<'a> {
         } else if action == "pause" {
             self.state = InternalState::Pause;
             world.add_resource(InternalState::Pause);
+        } else if action == "end" {
+            self.state = InternalState::End;
+            world.add_resource(InternalState::End);
         }
     }
 

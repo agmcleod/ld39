@@ -1,6 +1,6 @@
 use components::ui::WalletUI;
-use components::{ui::TutorialUI, upgrade::Buff, Actions, AnimationSheet, Button, ClickSound, Color,
-                 EffectedByPollutionTiles, EntityLookup, Gatherer, GathererPositions,
+use components::{ui::TutorialUI, upgrade::Buff, Actions, AnimationSheet, Button, ClickSound,
+                 Color, EffectedByPollutionTiles, EntityLookup, Gatherer, GathererPositions,
                  GathererType, Input, Node, ResearchedBuffs, SelectedTile, Sprite, Text, Tile,
                  TileNodes, TileType, Transform, TutorialStep, Wallet};
 use entities::tutorial;
@@ -204,7 +204,10 @@ impl<'a> System<'a> for BuildGatherer {
                             &wallet_ui_storage,
                         );
                     } else {
-                        actions_storage.dispatch("display_error".to_string(), "Not enough money to build".to_string());
+                        actions_storage.dispatch(
+                            "display_error".to_string(),
+                            "Not enough money to build".to_string(),
+                        );
                     }
                 }
             }

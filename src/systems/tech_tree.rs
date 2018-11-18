@@ -348,7 +348,10 @@ impl<'a> System<'a> for TechTree {
                             &wallet_ui_storage,
                         );
                     } else {
-                        actions_storage.dispatch("display_error".to_string(), "Not enough money to upgrade".to_string());
+                        actions_storage.dispatch(
+                            "display_error".to_string(),
+                            "Not enough money to upgrade".to_string(),
+                        );
                     }
                 }
             }

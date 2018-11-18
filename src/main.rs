@@ -74,8 +74,8 @@ use components::{upgrade::{LearnProgress, Upgrade},
                  Text,
                  Texture,
                  Tile,
-                 TransitionToState,
                  Transform,
+                 TransitionToState,
                  TutorialStep};
 use renderer::{ColorFormat, DepthFormat};
 use settings::Settings;
@@ -502,11 +502,6 @@ fn main() {
 
         state_manager.update(&mut world);
         world.maintain();
-
-        {
-            let mut actions = world.write_resource::<Actions>();
-            actions.clear();
-        }
 
         basic.reset_transform();
 

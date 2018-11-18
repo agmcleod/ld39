@@ -6,9 +6,7 @@ pub struct Error {
 
 impl Error {
     pub fn new(tick: f32) -> Self {
-        Error{
-            tick,
-        }
+        Error { tick }
     }
 }
 

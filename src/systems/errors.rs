@@ -1,7 +1,7 @@
 use gfx_glyph::HorizontalAlign;
-use specs::{Entities, Join, Read, System, WriteStorage};
+use specs::{Entities, Join, Read, System, Write, WriteStorage};
 
-use components::{Actions, DeltaTime, EntityLookup, Error, Color, Node, Text, Transform};
+use components::{Actions, Color, DeltaTime, EntityLookup, Error, Node, Text, Transform};
 use entities::create_text;
 use renderer::get_dimensions;
 use storage_types::TextStorage;
@@ -12,7 +12,7 @@ pub struct Errors;
 impl<'a> System<'a> for Errors {
     type SystemData = (
         Entities<'a>,
-        Read<'a, Actions>,
+        Write<'a, Actions>,
         WriteStorage<'a, Color>,
         Read<'a, DeltaTime>,
         Read<'a, EntityLookup>,
@@ -25,7 +25,7 @@ impl<'a> System<'a> for Errors {
     fn run(&mut self, data: Self::SystemData) {
         let (
             entities,
-            actions_storage,
+            mut actions_storage,
             mut color_storage,
             delta_time_storage,
             entity_lookup_storage,
@@ -36,8 +36,12 @@ impl<'a> System<'a> for Errors {
         ) = data;
 
         if actions_storage.action_fired("display_error") {
-            let payload = actions_storage.get_payload("display_error").unwrap();
-            let mut text_storage = TextStorage{
+            let payload = actions_storage
+                .get_payload("display_error")
+                .unwrap()
+                .clone();
+            actions_storage.remove("display_error".to_string());
+            let mut text_storage = TextStorage {
                 entities: &entities,
                 color_storage: &mut color_storage,
                 text_storage: &mut text_storage,

@@ -31,7 +31,7 @@ impl Actions {
         self.actions.get(&String::from(name))
     }
 
-    pub fn clear(&mut self) {
-        self.actions.clear();
+    pub fn remove(&mut self, name: String) {
+        self.actions.remove(&name);
     }
 }

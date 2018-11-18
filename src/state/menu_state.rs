@@ -1,10 +1,11 @@
 use std::path::Path;
 
 use conrod::{Ui, UiBuilder};
-use rand::{thread_rng};
+use rand::thread_rng;
 use specs::{Dispatcher, DispatcherBuilder, World};
 
-use components::{Button, Color, CurrentState, EntityLookup, InternalState, MenuScreen, Node, Sprite, Texture, Transform};
+use components::{Button, Color, CurrentState, EntityLookup, InternalState, MenuScreen, Node,
+                 Sprite, Texture, Transform};
 use loader;
 use renderer;
 use settings::{create_ui, Ids, Settings};
@@ -24,9 +25,13 @@ impl<'a> MenuState<'a> {
         let dispatcher = DispatcherBuilder::new()
             .with(systems::ButtonHover {}, "button_hover", &[])
             .with(systems::TextAbsoluteCache {}, "text_absolute_cache", &[])
-            .with(systems::MenuAnimation::new(), "menu_animation", &["button_hover"])
-            .with(systems::TogglePause{}, "toggle_pause", &["button_hover"])
-            .with(systems::Fade{}, "fade", &[])
+            .with(
+                systems::MenuAnimation::new(),
+                "menu_animation",
+                &["button_hover"],
+            )
+            .with(systems::TogglePause {}, "toggle_pause", &["button_hover"])
+            .with(systems::Fade {}, "fade", &[])
             .build();
 
         let dim = renderer::get_dimensions();
@@ -42,7 +47,7 @@ impl<'a> MenuState<'a> {
             screen_sizes,
             state: InternalState::Game,
             ui,
-            ids
+            ids,
         }
     }
 
@@ -148,50 +153,47 @@ impl<'a> State for MenuState<'a> {
             .build();
         child_entities.push(image);
 
-        let entity = world.create_entity()
-            .with(Sprite{ frame_name: "title.png".to_string() })
+        let entity = world
+            .create_entity()
+            .with(Sprite {
+                frame_name: "title.png".to_string(),
+            })
             .with(Transform::visible(
-                112.0,
-                50.0,
-                5.0,
-                735,
-                228,
-                0.0,
-                1.0,
-                1.0
+                112.0, 50.0, 5.0, 735, 228, 0.0, 1.0, 1.0,
             ))
             .build();
 
         child_entities.push(entity);
 
-        let entity = world.create_entity()
-            .with(Sprite{ frame_name: "start.png".to_string() })
-            .with(Button::new("start".to_string(), ["start.png".to_string(), "start_hover.png".to_string()]))
+        let entity = world
+            .create_entity()
+            .with(Sprite {
+                frame_name: "start.png".to_string(),
+            })
+            .with(Button::new(
+                "start".to_string(),
+                ["start.png".to_string(), "start_hover.png".to_string()],
+            ))
             .with(Transform::visible(
-                384.0,
-                450.0,
-                5.0,
-                192,
-                50,
-                0.0,
-                1.0,
-                1.0
+                384.0, 450.0, 5.0, 192, 50, 0.0, 1.0, 1.0,
             ))
             .build();
         child_entities.push(entity);
 
-        let entity = world.create_entity()
-            .with(Sprite{ frame_name: "menu_settings.png".to_string() })
-            .with(Button::new("menu".to_string(), ["menu_settings.png".to_string(), "menu_settings_hover.png".to_string()]))
+        let entity = world
+            .create_entity()
+            .with(Sprite {
+                frame_name: "menu_settings.png".to_string(),
+            })
+            .with(Button::new(
+                "menu".to_string(),
+                [
+                    "menu_settings.png".to_string(),
+                    "menu_settings_hover.png".to_string(),
+                ],
+            ))
             .with(Transform::visible(
-                384.0,
-                520.0,
-                5.0,
-                192,
-                50,
-                0.0,
-                1.0,
-                1.0
+                384.0, 520.0, 5.0, 192, 50, 0.0, 1.0, 1.0,
             ))
             .build();
         child_entities.push(entity);

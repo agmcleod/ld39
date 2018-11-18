@@ -41,7 +41,7 @@ impl Tutorial {
 impl<'a> System<'a> for Tutorial {
     type SystemData = (
         Entities<'a>,
-        Read<'a, Actions>,
+        Write<'a, Actions>,
         WriteStorage<'a, Color>,
         Read<'a, DeltaTime>,
         Read<'a, EntityLookup>,
@@ -60,7 +60,7 @@ impl<'a> System<'a> for Tutorial {
     fn run(&mut self, data: Self::SystemData) {
         let (
             entities,
-            actions_storage,
+            mut actions_storage,
             mut color_storage,
             delta_time_storage,
             entity_lookup_storage,
@@ -78,11 +78,12 @@ impl<'a> System<'a> for Tutorial {
 
         // TOOD: return out from this function if settings has tutorial completed as true
 
-        let actions = actions_storage.deref();
+        let actions = actions_storage.deref_mut();
 
         let mut details = None;
 
         if actions.action_fired(&TutorialStep::SelectTile.as_string()) {
+            actions.remove(TutorialStep::SelectTile.as_string());
             let tile_nodes = tile_nodes_storage.deref();
 
             let mut target_cell = (0.0, 0.0);
@@ -129,6 +130,7 @@ impl<'a> System<'a> for Tutorial {
                 "To start collecting resources, click the glowing tile",
             ));
         } else if actions.action_fired(&TutorialStep::BuildCoal(0.0, 0.0).as_string()) {
+            actions.remove(TutorialStep::BuildCoal(0.0, 0.0).as_string());
             let tutorial_step = tutorial_step_storage.deref();
             match *tutorial_step {
                 TutorialStep::BuildCoal(x, y) => {
@@ -143,6 +145,7 @@ impl<'a> System<'a> for Tutorial {
                 _ => {}
             }
         } else if actions.action_fired(&TutorialStep::CoalGathered.as_string()) {
+            actions.remove(TutorialStep::CoalGathered.as_string());
             details = Some(StepCreationDetails::new(
                 670.0,
                 235.0,
@@ -151,6 +154,7 @@ impl<'a> System<'a> for Tutorial {
                 "After building the coal mine, you are now collecting coal as a resource.\nThis is then sold to add power to the city",
             ));
         } else if actions.action_fired(&TutorialStep::ResourcesSold.as_string()) {
+            actions.remove(TutorialStep::ResourcesSold.as_string());
             details = Some(StepCreationDetails::new(
                 670.0,
                 32.0,
@@ -159,6 +163,7 @@ impl<'a> System<'a> for Tutorial {
                 "When you sell, the resources go to the power grid filling up the city's power. Your money also goes up.\n\nUse money to keep building. Be wary of building next to a tile occupied by a city or by nature."
             ));
         } else if actions.action_fired(&TutorialStep::ShowUpgrades.as_string()) {
+            actions.remove(TutorialStep::ShowUpgrades.as_string());
             details = Some(StepCreationDetails::new(
                 752.0,
                 576.0,
@@ -167,6 +172,7 @@ impl<'a> System<'a> for Tutorial {
                 "Click the button to the bottom right to view available upgrades. Don't worry, this button pauses the game."
             ));
         } else if actions.action_fired(&TutorialStep::Upgrade.as_string()) {
+            actions.remove(TutorialStep::Upgrade.as_string());
             let dimensions = renderer::get_dimensions();
             let width = dimensions[0] - 640.0;
             details = Some(StepCreationDetails::new(
@@ -177,6 +183,7 @@ impl<'a> System<'a> for Tutorial {
                 "Research this upgrade to collect more resources when one mine, or other resource collection facilities of the same type are adjacent.\nSome upgrades like this one can upgraded to infinite levels."
             ));
         } else if actions.action_fired(&TutorialStep::Resume.as_string()) {
+            actions.remove(TutorialStep::Resume.as_string());
             details = Some(StepCreationDetails::new(
                 752.0,
                 576.0,
@@ -185,6 +192,7 @@ impl<'a> System<'a> for Tutorial {
                 "Resume the game to continue playing, and let the upgrade research.",
             ));
         } else if actions.action_fired(&TutorialStep::Objective(0.0).as_string()) {
+            actions.remove(TutorialStep::Objective(0.0).as_string());
             self.hide_last_step_time = 10.0;
             details = Some(StepCreationDetails::new(
                 670.0,
