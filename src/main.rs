@@ -389,11 +389,12 @@ fn main() {
     let image_map = conrod::image::Map::new();
 
     {
-        let mut actions = world.write_resource::<Actions>();
         if !settings.completed_tutorial {
-            actions.dispatch(TutorialStep::SelectTile.as_string(), "".to_string());
-            let mut tutorial_step = world.write_resource::<TutorialStep>();
-            *tutorial_step = TutorialStep::SelectTile;
+            world.add_resource(TutorialStep::SelectTile);
+            {
+                let mut actions = world.write_resource::<Actions>();
+                actions.dispatch(TutorialStep::SelectTile.as_string(), "".to_string());
+            }
         }
     }
 
