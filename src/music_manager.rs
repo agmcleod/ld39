@@ -13,9 +13,9 @@ impl MusicManager {
     pub fn new(audio_endpoint: &Endpoint, volume: f32) -> Self {
         let mut tracks = HashMap::new();
 
-        let title = loader::create_music_sink("resources/ld39.ogg", &audio_endpoint, volume);
         let zen = loader::create_music_sink("resources/zen.ogg", &audio_endpoint, volume);
         let meloncholy = loader::create_music_sink("resources/meloncholy.ogg", &audio_endpoint, volume);
+        let title = loader::create_music_sink("resources/ld39.ogg", &audio_endpoint, volume);
 
         tracks.insert("title".to_string(), title);
         tracks.insert("zen".to_string(), zen);

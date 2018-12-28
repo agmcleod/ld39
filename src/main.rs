@@ -363,8 +363,7 @@ fn main() {
     let audio_endpoint = rodio::default_endpoint().unwrap();
     let click_sound_source = loader::create_sound("resources/click.ogg").buffered();
     let settings = loader::load_settings();
-    let mut music =
-        loader::create_music_sink("resources/ld39.ogg", &audio_endpoint, settings.music_volume);
+    let mut music = music_manager::MusicManager::new(&audio_endpoint, settings.music_volume);
 
     if settings.mute_music {
         music.pause();
