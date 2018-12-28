@@ -26,6 +26,7 @@ extern crate winit;
 mod components;
 mod entities;
 mod loader;
+mod music_manager;
 mod renderer;
 mod settings;
 mod spritesheet;
