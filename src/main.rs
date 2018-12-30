@@ -629,15 +629,16 @@ fn main() {
             copy
         };
 
-        if state_change.state == PlayState::get_name() {
-            if  state_change.action == "restart" {
-                music.play_random_game_track();
-            } else if state_change.action == "start" {
-                music.stop();
-            }
+        if state_change.state == PlayState::get_name() && state_change.action == "start" {
+            music.setup_random_track_sink(&audio_endpoint);
+            music.play_random_game_track();
         }
 
         state_manager.process_state_change(&mut state_change, &mut world);
+
+        if music.empty() {
+            music.play_random_game_track();
+        }
     }
 
     music.stop();

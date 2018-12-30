@@ -1,14 +1,14 @@
 use std::collections::HashMap;
-use std::io::BufReader;
 use std::fs::File;
+use std::io::BufReader;
 
 use rand::{self, Rng};
-use rodio::{Endpoint, Sink, Source, decoder::Decoder};
+use rodio::{decoder::Decoder, Endpoint, Sink, Source};
 
 use loader;
 
 pub struct MusicManager {
-    tracks: HashMap<String, Decoder<BufReader<File>>>,
+    tracks: HashMap<String, String>,
     current_track: String,
     thread_rng: rand::ThreadRng,
     sink: Sink,
@@ -18,18 +18,17 @@ impl MusicManager {
     pub fn new(audio_endpoint: &Endpoint, volume: f32) -> Self {
         let mut tracks = HashMap::new();
 
-        let zen = loader::create_sound("resources/zen.ogg");
-        let meloncholy = loader::create_sound("resources/meloncholy.ogg");
-        let title = loader::create_sound("resources/ld39.ogg");
-
-        tracks.insert("title".to_string(), title);
-        tracks.insert("zen".to_string(), zen);
-        tracks.insert("meloncholy".to_string(), meloncholy);
+        tracks.insert("title".to_string(), "resources/ld39.ogg".to_string());
+        tracks.insert("zen".to_string(), "resources/zen.ogg".to_string());
+        tracks.insert(
+            "meloncholy".to_string(),
+            "resources/meloncholy.ogg".to_string(),
+        );
 
         let mut sink = Sink::new(audio_endpoint);
         sink.set_volume(volume);
 
-        MusicManager{
+        MusicManager {
             tracks,
             current_track: "title".to_string(),
             thread_rng: rand::thread_rng(),
@@ -43,13 +42,16 @@ impl MusicManager {
 
     pub fn queue_track(&mut self, track_name: &str, infinite: bool) {
         self.current_track = track_name.to_string();
-        let source = self.tracks.get(&self.current_track).unwrap();
-        let source = source.to_owned();
+        println!("Set current track {}", self.current_track);
+        let source = loader::create_sound(self.tracks.get(&self.current_track).unwrap());
+        println!("Got the source");
         if infinite {
             self.sink.append(source.repeat_infinite());
         } else {
             self.sink.append(source);
         }
+
+        println!("Empty after appending? {}", self.empty());
     }
 
     pub fn empty(&self) -> bool {
@@ -76,11 +78,18 @@ impl MusicManager {
         self.sink.stop();
     }
 
+    pub fn setup_random_track_sink(&mut self, audio_endpoint: &Endpoint) {
+        self.sink.stop();
+        let volume = self.sink.volume();
+        self.sink = Sink::new(audio_endpoint);
+        self.sink.set_volume(volume);
+    }
+
     pub fn play_random_game_track(&mut self) {
         let track_num: usize = self.thread_rng.gen_range(0, 2);
         if track_num == 0 {
             self.queue_track("zen", false);
-        } else if track_num == 1{
+        } else if track_num == 1 {
             self.queue_track("meloncholy", false);
         }
     }

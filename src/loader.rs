@@ -1,7 +1,7 @@
 extern crate gfx;
 extern crate image;
 use gfx::texture::Mipmap;
-use rodio::{decoder::Decoder, Decoder as SoundDecoder, Endpoint, Sink, Source};
+use rodio::{decoder::Decoder, Decoder as SoundDecoder};
 use serde_json;
 use settings::Settings;
 use std::env;
@@ -33,15 +33,6 @@ where
 pub fn create_sound(sound_file_path: &str) -> Decoder<BufReader<File>> {
     let audio_file = File::open(&Path::new(&get_exe_path().join(sound_file_path))).unwrap();
     SoundDecoder::new(BufReader::new(audio_file)).unwrap()
-}
-
-pub fn create_music_sink(music_path: &str, endpoint: &Endpoint, volume: f32) -> Sink {
-    let mut sink = Sink::new(&endpoint);
-
-    let source = create_sound(music_path);
-    sink.set_volume(volume);
-    sink.append(source.repeat_infinite());
-    sink
 }
 
 pub fn read_text_from_file(path: &str) -> Result<String> {
