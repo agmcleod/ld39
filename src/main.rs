@@ -366,7 +366,7 @@ fn main() {
     let mut music = music_manager::MusicManager::new(&audio_endpoint, settings.music_volume);
 
     if !settings.mute_music {
-        music.play();
+        music.queue_track("title", true);
     }
 
     setup_world(&mut world, &window);
@@ -629,8 +629,12 @@ fn main() {
             copy
         };
 
-        if state_change.state == PlayState::get_name() && (state_change.action == "restart" || state_change.action == "start") {
-            music_manager.play_random_game_track();
+        if state_change.state == PlayState::get_name() {
+            if  state_change.action == "restart" {
+                music.play_random_game_track();
+            } else if state_change.action == "start" {
+                music.stop();
+            }
         }
 
         state_manager.process_state_change(&mut state_change, &mut world);

@@ -38,8 +38,7 @@ pub fn create_sound(sound_file_path: &str) -> Decoder<BufReader<File>> {
 pub fn create_music_sink(music_path: &str, endpoint: &Endpoint, volume: f32) -> Sink {
     let mut sink = Sink::new(&endpoint);
 
-    let music_file = File::open(&Path::new(&get_exe_path().join(music_path))).unwrap();
-    let source = SoundDecoder::new(BufReader::new(music_file)).unwrap();
+    let source = create_sound(music_path);
     sink.set_volume(volume);
     sink.append(source.repeat_infinite());
     sink
