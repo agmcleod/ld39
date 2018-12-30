@@ -2,5 +2,5 @@ target/
 **/*.rs.bk
 EnergyGrid
 EnergyGrid.app
-uploads
+macbuild
 .idea
