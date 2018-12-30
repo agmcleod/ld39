@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 
+use rand::{self, Rng};
 use rodio::{Endpoint, Sink};
 
 use loader;
@@ -7,6 +8,7 @@ use loader;
 pub struct MusicManager {
     tracks: HashMap<String, Sink>,
     current_track: String,
+    thread_rng: rand::ThreadRng,
 }
 
 impl MusicManager {
@@ -21,9 +23,15 @@ impl MusicManager {
         tracks.insert("zen".to_string(), zen);
         tracks.insert("meloncholy".to_string(), meloncholy);
 
+        // prevent from auto playing
+        for (_, track) in &mut tracks {
+            track.pause();
+        }
+
         MusicManager{
             tracks,
-            current_track: "title".to_string()
+            current_track: "title".to_string(),
+            thread_rng: rand::thread_rng(),
         }
     }
 
@@ -57,5 +65,14 @@ impl MusicManager {
 
     pub fn stop(&mut self) {
         self.tracks.get_mut(&self.current_track).unwrap().stop();
+    }
+
+    pub fn play_random_game_track(&mut self) {
+        let track_num: usize = self.thread_rng.gen_range(0, 2);
+        if track_num == 0 {
+            self.switch_track("zen");
+        } else if track_num == 1{
+            self.switch_track("meloncholy");
+        }
     }
 }

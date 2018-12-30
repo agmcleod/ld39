@@ -211,6 +211,7 @@ impl<'a> State for PlayState<'a> {
         world.add_resource(Resources::new());
         world.add_resource(Wallet::new());
         world.add_resource(InternalState::Game);
+        world.add_resource(TutorialStep::SelectTile);
 
         let dimensions = renderer::get_dimensions();
 

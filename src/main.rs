@@ -365,8 +365,8 @@ fn main() {
     let settings = loader::load_settings();
     let mut music = music_manager::MusicManager::new(&audio_endpoint, settings.music_volume);
 
-    if settings.mute_music {
-        music.pause();
+    if !settings.mute_music {
+        music.play();
     }
 
     setup_world(&mut world, &window);
@@ -390,7 +390,6 @@ fn main() {
 
     {
         if !settings.completed_tutorial {
-            world.add_resource(TutorialStep::SelectTile);
             {
                 let mut actions = world.write_resource::<Actions>();
                 actions.dispatch(TutorialStep::SelectTile.as_string(), "".to_string());
@@ -629,6 +628,10 @@ fn main() {
             state_change.reset();
             copy
         };
+
+        if state_change.state == PlayState::get_name() && (state_change.action == "restart" || state_change.action == "start") {
+            music_manager.play_random_game_track();
+        }
 
         state_manager.process_state_change(&mut state_change, &mut world);
     }
