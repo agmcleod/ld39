@@ -30,8 +30,8 @@ cp ../scripts/macos_launch.sh $MACOS_APP_DIR/Contents/MacOS/$MACOS_APP_NAME
 
 echo "Copying Icon"
 mkdir -p $MACOS_APP_DIR/Contents/Resources
-cp ../resources/Info.plist $MACOS_APP_DIR/Contents/
-cp ../resources/logo.icns $MACOS_APP_DIR/Contents/Resources/
+mv ../resources/Info.plist $MACOS_APP_DIR/Contents/
+mv ../resources/logo.icns $MACOS_APP_DIR/Contents/Resources/
 
 echo "Creating dmg"
 mkdir -p $MACOS_APP_NAME

@@ -3,4 +3,5 @@ target/
 EnergyGrid
 EnergyGrid.app
 macbuild
+winbuild
 .idea

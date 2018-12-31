@@ -42,16 +42,12 @@ impl MusicManager {
 
     pub fn queue_track(&mut self, track_name: &str, infinite: bool) {
         self.current_track = track_name.to_string();
-        println!("Set current track {}", self.current_track);
         let source = loader::create_sound(self.tracks.get(&self.current_track).unwrap());
-        println!("Got the source");
         if infinite {
             self.sink.append(source.repeat_infinite());
         } else {
             self.sink.append(source);
         }
-
-        println!("Empty after appending? {}", self.empty());
     }
 
     pub fn empty(&self) -> bool {
