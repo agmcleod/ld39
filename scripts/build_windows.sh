@@ -2,7 +2,7 @@
 
 rm -rf winbuild/
 ./scripts/copy_resources.sh
-cargo build --release
+cargo rustc --release -- -Clink-args="/SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup"
 mkdir -p winbuild
 cp -r resources winbuild/
 cp target/release/ld39.exe winbuild/EnerygGrid.exe
