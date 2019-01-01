@@ -307,7 +307,7 @@ fn main() {
     let mut events_loop = glutin::EventsLoop::new();
     let dim = renderer::get_dimensions();
     let builder = glutin::WindowBuilder::new()
-        .with_title("ld39".to_string())
+        .with_title("Energy Grid".to_string())
         .with_dimensions(LogicalSize::new(dim[0] as f64, dim[1] as f64));
     let context = glutin::ContextBuilder::new().with_vsync(true);
 
