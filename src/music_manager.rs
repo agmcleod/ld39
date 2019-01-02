@@ -1,9 +1,7 @@
 use std::collections::HashMap;
-use std::fs::File;
-use std::io::BufReader;
 
 use rand::{self, Rng};
-use rodio::{decoder::Decoder, Endpoint, Sink, Source};
+use rodio::{Device, Sink, Source};
 
 use loader;
 
@@ -15,7 +13,7 @@ pub struct MusicManager {
 }
 
 impl MusicManager {
-    pub fn new(audio_endpoint: &Endpoint, volume: f32) -> Self {
+    pub fn new(audio_device: &Device, volume: f32) -> Self {
         let mut tracks = HashMap::new();
 
         tracks.insert("title".to_string(), "resources/ld39.ogg".to_string());
@@ -25,7 +23,7 @@ impl MusicManager {
             "resources/meloncholy.ogg".to_string(),
         );
 
-        let mut sink = Sink::new(audio_endpoint);
+        let mut sink = Sink::new(audio_device);
         sink.set_volume(volume);
 
         MusicManager {
@@ -74,10 +72,10 @@ impl MusicManager {
         self.sink.stop();
     }
 
-    pub fn setup_random_track_sink(&mut self, audio_endpoint: &Endpoint) {
+    pub fn setup_random_track_sink(&mut self, audio_device: &Device) {
         self.sink.stop();
         let volume = self.sink.volume();
-        self.sink = Sink::new(audio_endpoint);
+        self.sink = Sink::new(audio_device);
         self.sink.set_volume(volume);
     }
 

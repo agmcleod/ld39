@@ -360,10 +360,10 @@ fn main() {
         GlyphBrushBuilder::using_font_bytes(include_bytes!("../resources/MunroSmall.ttf") as &[u8])
             .build(factory.clone());
 
-    let audio_endpoint = rodio::default_endpoint().unwrap();
+    let audio_device = rodio::default_output_device().unwrap();
     let click_sound_source = loader::create_sound("resources/click.ogg").buffered();
     let settings = loader::load_settings();
-    let mut music = music_manager::MusicManager::new(&audio_endpoint, settings.music_volume);
+    let mut music = music_manager::MusicManager::new(&audio_device, settings.music_volume);
 
     if !settings.mute_music {
         music.queue_track("title", true);
@@ -535,7 +535,7 @@ fn main() {
             let settings = world.read_resource::<Settings>();
             if click_sound.play && !settings.mute_sound_effects {
                 click_sound.play = false;
-                let mut sink = rodio::Sink::new(&audio_endpoint);
+                let mut sink = rodio::Sink::new(&audio_device);
 
                 sink.set_volume(settings.sound_volume);
                 sink.append(click_sound_source.clone());
@@ -633,7 +633,7 @@ fn main() {
         };
 
         if state_change.state == PlayState::get_name() && state_change.action == "start" {
-            music.setup_random_track_sink(&audio_endpoint);
+            music.setup_random_track_sink(&audio_device);
             music.play_random_game_track();
         }
 
