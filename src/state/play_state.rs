@@ -9,7 +9,7 @@ use state::State;
 use components::{ui::WalletUI, upgrade, upgrade::Buff, Button, CityPowerState, Color,
                  CurrentState, EntityLookup, GathererPositions, GatheringRate, InternalState,
                  Node, PowerBar, Rect, ResearchedBuffs, ResearchingEntities, Resources,
-                 SelectedTile, Sprite, Text, Tile, TileNodes, TileType, Transform, TutorialStep,
+                 SelectedTile, Sprite, Text, Tile, TileNodes, TileType, Transform,
                  Wallet};
 use entities::{create_map, create_power_bar, create_text, tech_tree};
 use rand::{thread_rng, Rng};
@@ -211,7 +211,6 @@ impl<'a> State for PlayState<'a> {
         world.add_resource(Resources::new());
         world.add_resource(Wallet::new());
         world.add_resource(InternalState::Game);
-        world.add_resource(TutorialStep::SelectTile);
 
         let dimensions = renderer::get_dimensions();
 

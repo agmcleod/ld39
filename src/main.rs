@@ -391,9 +391,12 @@ fn main() {
     {
         if !settings.completed_tutorial {
             {
+                world.add_resource(TutorialStep::SelectTile);
                 let mut actions = world.write_resource::<Actions>();
                 actions.dispatch(TutorialStep::SelectTile.as_string(), "".to_string());
             }
+        } else {
+            world.add_resource(TutorialStep::default());
         }
     }
 
