@@ -1,8 +1,8 @@
-use components::{Actions, Button, Color, CurrentState, EntityLookup, Input, InternalState, Node,
-                 Rect, StateChange, Transform};
+use components::{Actions, Button, CurrentState, EntityLookup, Input, InternalState, Node,
+                 StateChange};
 use entities::create_colored_rect;
 use glutin::VirtualKeyCode;
-use specs::{Entities, Join, Read, System, Write, WriteStorage};
+use specs::{Entities, Join, LazyUpdate, Read, System, Write, WriteStorage};
 use std::ops::{Deref, DerefMut};
 use systems::logic;
 
@@ -11,33 +11,29 @@ pub struct TogglePause;
 impl<'a> System<'a> for TogglePause {
     type SystemData = (
         Entities<'a>,
+        Read<'a, LazyUpdate>,
         Write<'a, Actions>,
         WriteStorage<'a, Button>,
-        WriteStorage<'a, Color>,
         Read<'a, CurrentState>,
         Write<'a, EntityLookup>,
         Read<'a, Input>,
         Read<'a, InternalState>,
         WriteStorage<'a, Node>,
-        WriteStorage<'a, Rect>,
         Write<'a, StateChange>,
-        WriteStorage<'a, Transform>,
     );
 
     fn run(&mut self, data: Self::SystemData) {
         let (
             entities,
+            lazy,
             mut actions_storage,
             mut button_storage,
-            mut color_storage,
             current_state_storage,
             mut entity_lookup_storage,
             input,
             internal_state_storage,
             mut node_storage,
-            mut rect_storage,
             mut state_change_storage,
-            mut transform_storage,
         ) = data;
 
         let input: &Input = input.deref();
@@ -78,9 +74,7 @@ impl<'a> System<'a> for TogglePause {
                 640,
                 [16.0 / 256.0, 14.0 / 256.0, 22.0 / 256.0, 1.0],
                 &entities,
-                &mut transform_storage,
-                &mut color_storage,
-                &mut rect_storage,
+                &lazy,
             );
             let lookup: &mut EntityLookup = entity_lookup_storage.deref_mut();
             lookup.entities.insert("pause_black".to_string(), entity);

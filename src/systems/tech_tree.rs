@@ -19,7 +19,7 @@ use entities::{create_text,
                recursive_delete,
                tech_tree::{get_color_from_status, Status, Upgrade},
                tutorial};
-use specs::{Entities, Entity, Join, Read, ReadStorage, System, Write, WriteStorage};
+use specs::{Entities, Entity, Join, LazyUpdate, Read, ReadStorage, System, Write, WriteStorage};
 use std::ops::{Deref, DerefMut};
 use storage_types::*;
 use systems::logic;
@@ -98,6 +98,7 @@ impl TechTree {
 impl<'a> System<'a> for TechTree {
     type SystemData = (
         Entities<'a>,
+        Read<'a, LazyUpdate>,
         Write<'a, Actions>,
         WriteStorage<'a, Color>,
         Read<'a, EntityLookup>,
@@ -121,6 +122,7 @@ impl<'a> System<'a> for TechTree {
     fn run(&mut self, data: Self::SystemData) {
         let (
             entities,
+            lazy,
             mut actions_storage,
             mut color_storage,
             entity_lookup_storage,
@@ -240,7 +242,8 @@ impl<'a> System<'a> for TechTree {
                             };
 
                         let text = create_text::create(
-                            &mut text_storage_type,
+                            &entities,
+                            &lazy,
                             format!("lvl {}", level),
                             20.0,
                             80.0,
@@ -256,7 +259,8 @@ impl<'a> System<'a> for TechTree {
 
                     if upgrade.status == Status::Researched {
                         let text = create_text::create(
-                            &mut text_storage_type,
+                            &entities,
+                            &lazy,
                             "Researched".to_string(),
                             20.0,
                             5.0,
@@ -270,7 +274,8 @@ impl<'a> System<'a> for TechTree {
                         tooltip_node.add(text);
                     } else {
                         let text = create_text::create(
-                            &mut text_storage_type,
+                            &entities,
+                            &lazy,
                             format!("${}", upgrade.cost),
                             20.0,
                             5.0,

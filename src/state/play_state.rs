@@ -3,7 +3,7 @@ use std::path::Path;
 
 use conrod::{Ui, UiBuilder};
 use loader;
-use specs::{Dispatcher, DispatcherBuilder, World};
+use specs::{Dispatcher, DispatcherBuilder, LazyUpdate, Read, World};
 use state::State;
 
 use components::{ui::WalletUI, upgrade, upgrade::Buff, Button, CityPowerState, Color,
@@ -327,21 +327,14 @@ impl<'a> State for PlayState<'a> {
                 .insert("show_button_entity".to_string(), entity);
 
             let entities = world.entities();
-            let mut color_storage = world.write_storage::<Color>();
-            let mut transform_storage = world.write_storage::<Transform>();
-            let mut text_storage = world.write_storage::<Text>();
             let mut wallet_ui_storage = world.write_storage::<WalletUI>();
 
-            let mut text_storages = TextStorage {
-                entities: &entities,
-                color_storage: &mut color_storage,
-                text_storage: &mut text_storage,
-                transform_storage: &mut transform_storage,
-            };
+            let lazy: Read<LazyUpdate> = Read::<LazyUpdate>::from(world.read_resource::<LazyUpdate>());
 
             // money text
             let entity = create_text::create(
-                &mut text_storages,
+                &entities,
+                &lazy,
                 format!("Wallet: ${}", Wallet::start_amount()),
                 28.0,
                 33.0,
@@ -356,7 +349,8 @@ impl<'a> State for PlayState<'a> {
             side_bar_container_node.add(entity);
 
             let gathering_rate_label = create_text::create(
-                &mut text_storages,
+                &entities,
+                &lazy,
                 "Gathering Rate".to_string(),
                 22.0,
                 0.0,
@@ -370,7 +364,8 @@ impl<'a> State for PlayState<'a> {
             gathering_rate_container_node.add(gathering_rate_label);
 
             let coal_rate_label = create_text::create(
-                &mut text_storages,
+                &entities,
+                &lazy,
                 "Coal: 0".to_string(),
                 20.0,
                 0.0,
@@ -387,7 +382,8 @@ impl<'a> State for PlayState<'a> {
             gathering_rate_container_node.add(coal_rate_label);
 
             let oil_rate_label = create_text::create(
-                &mut text_storages,
+                &entities,
+                &lazy,
                 "Oil: 0".to_string(),
                 20.0,
                 0.0,
@@ -404,7 +400,8 @@ impl<'a> State for PlayState<'a> {
             gathering_rate_container_node.add(oil_rate_label);
 
             let hydro_rate_label = create_text::create(
-                &mut text_storages,
+                &entities,
+                &lazy,
                 "Hydro: 0".to_string(),
                 20.0,
                 0.0,
@@ -421,7 +418,8 @@ impl<'a> State for PlayState<'a> {
             gathering_rate_container_node.add(hydro_rate_label);
 
             let solar_rate_label = create_text::create(
-                &mut text_storages,
+                &entities,
+                &lazy,
                 "Solar: 0".to_string(),
                 20.0,
                 0.0,
@@ -438,7 +436,8 @@ impl<'a> State for PlayState<'a> {
             gathering_rate_container_node.add(solar_rate_label);
 
             let power_rate_label = create_text::create(
-                &mut text_storages,
+                &entities,
+                &lazy,
                 "Power: 0".to_string(),
                 20.0,
                 0.0,
@@ -455,7 +454,8 @@ impl<'a> State for PlayState<'a> {
             gathering_rate_container_node.add(power_rate_label);
 
             let money_rate_label = create_text::create(
-                &mut text_storages,
+                &entities,
+                &lazy,
                 "Income: $0, Tax: $0".to_string(),
                 20.0,
                 0.0,
@@ -473,7 +473,8 @@ impl<'a> State for PlayState<'a> {
 
             // power gain text
             let entity = create_text::create(
-                &mut text_storages,
+                &entities,
+                &lazy,
                 "Power: -40\n1 city".to_string(),
                 24.0,
                 30.0,
@@ -485,6 +486,7 @@ impl<'a> State for PlayState<'a> {
                 None,
             );
 
+            println!("Power gain text {:?}", entity);
             lookup
                 .entities
                 .insert("power_gain_text".to_string(), entity.clone());

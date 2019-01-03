@@ -2,9 +2,8 @@ use components::{ui::TutorialUI, upgrade::Buff, Actions, Color, DeltaTime, Float
                  GathererType, GatheringRate, Node, ResearchedBuffs, Resources, Text, Transform,
                  TutorialStep};
 use entities::{create_text, tutorial};
-use specs::{Entities, Join, Read, ReadStorage, System, Write, WriteStorage};
+use specs::{Entities, Join, LazyUpdate, Read, ReadStorage, System, Write, WriteStorage};
 use std::ops::{Deref, DerefMut};
-use storage_types::TextStorage;
 use systems::TICK_RATE;
 
 pub struct Gathering {
@@ -31,6 +30,7 @@ impl Gathering {
 impl<'a> System<'a> for Gathering {
     type SystemData = (
         Entities<'a>,
+        Read<'a, LazyUpdate>,
         Write<'a, Actions>,
         WriteStorage<'a, Color>,
         Read<'a, DeltaTime>,
@@ -49,6 +49,7 @@ impl<'a> System<'a> for Gathering {
     fn run(&mut self, data: Self::SystemData) {
         let (
             entities,
+            lazy,
             mut actions_storage,
             mut color_storage,
             delta_time_storage,
@@ -110,15 +111,9 @@ impl<'a> System<'a> for Gathering {
                 gathering_rate.add_to_resource_amount(&gatherer.gatherer_type, amount);
 
                 let mut entity_node = node_storage.get_mut(entity).unwrap();
-                let mut text_storage = TextStorage {
-                    entities: &entities,
-                    color_storage: &mut color_storage,
-                    text_storage: &mut text_storage,
-                    transform_storage: &mut transform_storage,
-                };
-
                 let floating_text = create_text::create(
-                    &mut text_storage,
+                    &entities,
+                    &lazy,
                     format!("{}", amount),
                     22.0,
                     0.0,

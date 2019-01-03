@@ -1,10 +1,9 @@
 use gfx_glyph::HorizontalAlign;
-use specs::{Entities, Join, Read, System, Write, WriteStorage};
+use specs::{Entities, Join, Read, LazyUpdate, System, Write, WriteStorage};
 
 use components::{Actions, Color, DeltaTime, EntityLookup, Error, Node, Text, Transform};
 use entities::create_text;
 use renderer::get_dimensions;
-use storage_types::TextStorage;
 use systems::logic;
 
 pub struct Errors;
@@ -12,6 +11,7 @@ pub struct Errors;
 impl<'a> System<'a> for Errors {
     type SystemData = (
         Entities<'a>,
+        Read<'a, LazyUpdate>,
         Write<'a, Actions>,
         WriteStorage<'a, Color>,
         Read<'a, DeltaTime>,
@@ -25,6 +25,7 @@ impl<'a> System<'a> for Errors {
     fn run(&mut self, data: Self::SystemData) {
         let (
             entities,
+            lazy,
             mut actions_storage,
             mut color_storage,
             delta_time_storage,
@@ -41,16 +42,11 @@ impl<'a> System<'a> for Errors {
                 .unwrap()
                 .clone();
             actions_storage.remove("display_error".to_string());
-            let mut text_storage = TextStorage {
-                entities: &entities,
-                color_storage: &mut color_storage,
-                text_storage: &mut text_storage,
-                transform_storage: &mut transform_storage,
-            };
 
             let dim = get_dimensions();
             let text_entity = create_text::create(
-                &mut text_storage,
+                &entities,
+                &lazy,
                 payload.clone(),
                 28.0,
                 dim[0] / 2.0,

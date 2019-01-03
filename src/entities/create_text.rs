@@ -1,10 +1,10 @@
 use components::{Color, Text, Transform};
 use gfx_glyph::HorizontalAlign;
-use specs::Entity;
-use storage_types::TextStorage;
+use specs::{Entity, Entities, LazyUpdate, Read};
 
 pub fn create(
-    storages: &mut TextStorage,
+    entities: &Entities,
+    lazy: &Read<LazyUpdate>,
     text: String,
     size: f32,
     x: f32,
@@ -20,16 +20,11 @@ pub fn create(
         text = text.align(align);
     }
 
-    let entity = storages.entities.create();
-    storages
-        .transform_storage
-        .insert(
-            entity.clone(),
-            Transform::visible(x, y, z, w, h, 0.0, 1.0, 1.0),
+    lazy.create_entity(entities)
+        .with(
+            Transform::visible(x, y, z, w, h, 0.0, 1.0, 1.0)
         )
-        .unwrap();
-    storages.text_storage.insert(entity.clone(), text).unwrap();
-    storages.color_storage.insert(entity, color).unwrap();
-
-    entity
+        .with(text)
+        .with(color)
+        .build()
 }

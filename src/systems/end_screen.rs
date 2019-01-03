@@ -1,14 +1,13 @@
 use std::ops::{Deref, DerefMut};
 
 use gfx_glyph::HorizontalAlign;
-use specs::{Entities, Join, Read, System, Write, WriteStorage};
+use specs::{Entities, Join, LazyUpdate, Read, System, Write, WriteStorage};
 use state::play_state::PlayState;
 
-use components::{Actions, Button, CityPowerState, Color, EntityLookup, Input, Node, Rect, Sprite,
+use components::{Actions, Button, CityPowerState, Color, EntityLookup, Input, Node, Sprite,
                  StateChange, Text, Transform};
 use entities::{create_colored_rect, create_text};
 use renderer;
-use storage_types::TextStorage;
 use systems::logic;
 
 pub struct EndScreen;
@@ -16,6 +15,7 @@ pub struct EndScreen;
 impl<'a> System<'a> for EndScreen {
     type SystemData = (
         Entities<'a>,
+        Read<'a, LazyUpdate>,
         Write<'a, Actions>,
         WriteStorage<'a, Button>,
         Read<'a, CityPowerState>,
@@ -23,7 +23,6 @@ impl<'a> System<'a> for EndScreen {
         Write<'a, EntityLookup>,
         Read<'a, Input>,
         WriteStorage<'a, Node>,
-        WriteStorage<'a, Rect>,
         WriteStorage<'a, Sprite>,
         Write<'a, StateChange>,
         WriteStorage<'a, Text>,
@@ -33,6 +32,7 @@ impl<'a> System<'a> for EndScreen {
     fn run(&mut self, data: Self::SystemData) {
         let (
             entities,
+            lazy,
             mut actions_storage,
             mut button_storage,
             city_power_state_storage,
@@ -40,7 +40,6 @@ impl<'a> System<'a> for EndScreen {
             mut entity_lookup_storage,
             input_storage,
             mut node_storage,
-            mut rect_storage,
             mut sprite_storage,
             mut state_change_storage,
             mut text_storage,
@@ -60,25 +59,17 @@ impl<'a> System<'a> for EndScreen {
                 640,
                 [0.0, 0.0, 0.0, 0.8],
                 &entities,
-                &mut transform_storage,
-                &mut color_storage,
-                &mut rect_storage,
+                &lazy,
             );
             lookup.entities.insert("pause_black".to_string(), entity);
 
             root_node.add(entity);
 
             {
-                let mut text_storage = TextStorage {
-                    entities: &entities,
-                    color_storage: &mut color_storage,
-                    text_storage: &mut text_storage,
-                    transform_storage: &mut transform_storage,
-                };
-
                 let dim = renderer::get_dimensions();
                 let text = create_text::create(
-                    &mut text_storage,
+                    &entities,
+                    &lazy,
                     format!(
                         "You were able to provide power to {} cities",
                         city_power_state_storage.current_city_count

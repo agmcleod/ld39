@@ -2,7 +2,7 @@ use components::{ui::TutorialUI, Actions, Button, Color, EffectedByPollutionTile
                  Gatherer, Input, Node, Rect, ResearchedBuffs, SelectedTile, Sprite, Text, Tile,
                  Transform, TutorialStep};
 use entities::{create_build_ui, recursive_delete, tutorial};
-use specs::{Entities, Entity, Join, Read, ReadStorage, System, Write, WriteStorage};
+use specs::{Entities, Entity, Join, LazyUpdate, Read, ReadStorage, System, Write, WriteStorage};
 use std::ops::Deref;
 use systems::logic;
 
@@ -21,6 +21,7 @@ impl TileSelection {
 impl<'a> System<'a> for TileSelection {
     type SystemData = (
         Entities<'a>,
+        Read<'a, LazyUpdate>,
         Write<'a, Actions>,
         WriteStorage<'a, Button>,
         WriteStorage<'a, Color>,
@@ -43,6 +44,7 @@ impl<'a> System<'a> for TileSelection {
     fn run(&mut self, data: Self::SystemData) {
         let (
             entities,
+            lazy,
             mut actions_storage,
             mut button_storage,
             mut color_storage,
@@ -103,19 +105,13 @@ impl<'a> System<'a> for TileSelection {
                     self.build_ui_entity = None;
                 }
                 // create build ui
-                let entity = create_build_ui::create(
+                let (entity, x, y) = create_build_ui::create(
                     tile_mouse_x + Tile::get_size(),
                     tile_mouse_y,
                     &tile_type_selected.unwrap(),
                     &entities,
-                    &mut button_storage,
-                    &mut color_storage,
+                    &lazy,
                     &mut node_storage,
-                    &mut rect_storage,
-                    &mut sprite_storage,
-                    &mut text_storage,
-                    &mut transform_storage,
-                    &mut effected_by_pollution_tiles_storage,
                     &researched_buffs,
                 );
                 self.build_ui_entity = Some(entity);
@@ -127,8 +123,6 @@ impl<'a> System<'a> for TileSelection {
                     node.add(entity);
                 }
 
-                let build_entity_pos = transform_storage.get(entity).unwrap().get_pos();
-
                 let changed = tutorial::next_step(
                     &entities,
                     &mut actions_storage,
@@ -136,7 +130,7 @@ impl<'a> System<'a> for TileSelection {
                     &tutorial_ui_storage,
                     &node_storage,
                     TutorialStep::SelectTile,
-                    TutorialStep::BuildCoal(build_entity_pos.x, build_entity_pos.y),
+                    TutorialStep::BuildCoal(x, y),
                 );
 
                 if !changed {
@@ -149,7 +143,7 @@ impl<'a> System<'a> for TileSelection {
                         &tutorial_ui_storage,
                         &node_storage,
                         TutorialStep::BuildCoal(10.0, 10.0),
-                        TutorialStep::BuildCoal(build_entity_pos.x, build_entity_pos.y),
+                        TutorialStep::BuildCoal(x, y),
                     );
                 }
             }

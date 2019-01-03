@@ -59,6 +59,7 @@ impl StateManager {
         self.cleanup_state(world);
         if let Some(current_state) = self.states.get_mut(&self.current_state) {
             current_state.setup(world);
+            world.maintain();
         }
     }
 
@@ -69,6 +70,8 @@ impl StateManager {
             .get_mut(&self.current_state)
             .unwrap()
             .setup(world);
+
+        world.maintain();
     }
 
     pub fn get_ui_to_render(&mut self) -> Option<&mut Ui> {

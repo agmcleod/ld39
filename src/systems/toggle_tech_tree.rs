@@ -1,7 +1,7 @@
-use components::{ui::TutorialUI, upgrade::Buff, Actions, Button, Color, EntityLookup, Input, Node,
-                 Rect, ResearchedBuffs, StateChange, Tile, Transform, TutorialStep, Wallet};
+use components::{ui::TutorialUI, upgrade::Buff, Actions, Button, EntityLookup, Input, Node,
+                 ResearchedBuffs, StateChange, Tile, Transform, TutorialStep, Wallet};
 use entities::{create_colored_rect, tutorial};
-use specs::{Entities, Join, Read, ReadStorage, System, Write, WriteStorage};
+use specs::{Entities, Join, LazyUpdate, Read, ReadStorage, System, Write, WriteStorage};
 use state::play_state::PlayState;
 use std::ops::{Deref, DerefMut};
 use systems::logic;
@@ -18,11 +18,10 @@ impl ToggleTechTree {
         lookup: &mut EntityLookup,
         input: &Input,
         entities: &Entities,
+        lazy: &Read<LazyUpdate>,
         actions_storage: &mut Write<Actions>,
         button_storage: &mut WriteStorage<Button>,
-        color_storage: &mut WriteStorage<Color>,
         node_storage: &mut WriteStorage<Node>,
-        rect_storage: &mut WriteStorage<Rect>,
         transform_storage: &mut WriteStorage<Transform>,
         tutorial_step_storage: &mut Write<TutorialStep>,
         tutorial_ui_storage: &ReadStorage<TutorialUI>,
@@ -60,9 +59,7 @@ impl ToggleTechTree {
                     640,
                     [0.0, 0.0, 0.0, 0.8],
                     entities,
-                    transform_storage,
-                    color_storage,
-                    rect_storage,
+                    lazy,
                 );
                 lookup.entities.insert("pause_black".to_string(), rect);
                 let node = logic::get_root(&lookup, node_storage);
@@ -151,13 +148,12 @@ impl ToggleTechTree {
 impl<'a> System<'a> for ToggleTechTree {
     type SystemData = (
         Entities<'a>,
+        Read<'a, LazyUpdate>,
         Write<'a, Actions>,
         WriteStorage<'a, Button>,
-        WriteStorage<'a, Color>,
         Write<'a, EntityLookup>,
         Read<'a, Input>,
         WriteStorage<'a, Node>,
-        WriteStorage<'a, Rect>,
         Read<'a, ResearchedBuffs>,
         Write<'a, StateChange>,
         ReadStorage<'a, Tile>,
@@ -170,13 +166,12 @@ impl<'a> System<'a> for ToggleTechTree {
     fn run(&mut self, data: Self::SystemData) {
         let (
             entities,
+            lazy,
             mut actions_storage,
             mut button_storage,
-            mut color_storage,
             mut lookup,
             input,
             mut node_storage,
-            mut rect_storage,
             researched_buffs_storage,
             mut state_change_res,
             tile_storage,
@@ -220,11 +215,10 @@ impl<'a> System<'a> for ToggleTechTree {
             &mut lookup,
             &input,
             &entities,
+            &lazy,
             &mut actions_storage,
             &mut button_storage,
-            &mut color_storage,
             &mut node_storage,
-            &mut rect_storage,
             &mut transform_storage,
             &mut tutorial_step_storage,
             &tutorial_ui_storage,
