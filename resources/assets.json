@@ -2,7 +2,7 @@
 
 {
 	"filename": "city.png",
-	"frame": {"x":824,"y":278,"w":64,"h":64},
+	"frame": {"x":920,"y":432,"w":64,"h":64},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":64,"h":64},
@@ -10,7 +10,7 @@
 },
 {
 	"filename": "city2.png",
-	"frame": {"x":728,"y":400,"w":64,"h":64},
+	"frame": {"x":820,"y":410,"w":64,"h":64},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":64,"h":64},
@@ -26,7 +26,7 @@
 },
 {
 	"filename": "hydro.png",
-	"frame": {"x":728,"y":334,"w":64,"h":64},
+	"frame": {"x":920,"y":366,"w":64,"h":64},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":64,"h":64},
@@ -34,7 +34,7 @@
 },
 {
 	"filename": "hydro_button.png",
-	"frame": {"x":662,"y":400,"w":64,"h":64},
+	"frame": {"x":820,"y":344,"w":64,"h":64},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":64,"h":64},
@@ -42,7 +42,7 @@
 },
 {
 	"filename": "hydro_button_2.png",
-	"frame": {"x":662,"y":334,"w":64,"h":64},
+	"frame": {"x":924,"y":300,"w":64,"h":64},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":64,"h":64},
@@ -82,7 +82,7 @@
 },
 {
 	"filename": "mine.png",
-	"frame": {"x":596,"y":402,"w":64,"h":64},
+	"frame": {"x":824,"y":278,"w":64,"h":64},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":64,"h":64},
@@ -90,7 +90,7 @@
 },
 {
 	"filename": "mine_1.png",
-	"frame": {"x":596,"y":336,"w":64,"h":64},
+	"frame": {"x":728,"y":400,"w":64,"h":64},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":64,"h":64},
@@ -98,7 +98,7 @@
 },
 {
 	"filename": "mine_2.png",
-	"frame": {"x":530,"y":402,"w":64,"h":64},
+	"frame": {"x":728,"y":334,"w":64,"h":64},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":64,"h":64},
@@ -106,7 +106,7 @@
 },
 {
 	"filename": "mine_3.png",
-	"frame": {"x":530,"y":336,"w":64,"h":64},
+	"frame": {"x":662,"y":400,"w":64,"h":64},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":64,"h":64},
@@ -114,7 +114,7 @@
 },
 {
 	"filename": "mine_4.png",
-	"frame": {"x":464,"y":402,"w":64,"h":64},
+	"frame": {"x":662,"y":334,"w":64,"h":64},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":64,"h":64},
@@ -122,7 +122,7 @@
 },
 {
 	"filename": "mine_5.png",
-	"frame": {"x":464,"y":336,"w":64,"h":64},
+	"frame": {"x":596,"y":402,"w":64,"h":64},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":64,"h":64},
@@ -130,7 +130,7 @@
 },
 {
 	"filename": "mine_6.png",
-	"frame": {"x":658,"y":232,"w":64,"h":64},
+	"frame": {"x":596,"y":336,"w":64,"h":64},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":64,"h":64},
@@ -138,7 +138,7 @@
 },
 {
 	"filename": "mine_7.png",
-	"frame": {"x":398,"y":432,"w":64,"h":64},
+	"frame": {"x":530,"y":402,"w":64,"h":64},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":64,"h":64},
@@ -146,7 +146,7 @@
 },
 {
 	"filename": "mine_8.png",
-	"frame": {"x":398,"y":366,"w":64,"h":64},
+	"frame": {"x":530,"y":336,"w":64,"h":64},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":64,"h":64},
@@ -154,7 +154,7 @@
 },
 {
 	"filename": "mine_9.png",
-	"frame": {"x":398,"y":232,"w":64,"h":64},
+	"frame": {"x":464,"y":402,"w":64,"h":64},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":64,"h":64},
@@ -162,7 +162,7 @@
 },
 {
 	"filename": "mine_button_1.png",
-	"frame": {"x":398,"y":300,"w":64,"h":64},
+	"frame": {"x":464,"y":336,"w":64,"h":64},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":64,"h":64},
@@ -170,7 +170,7 @@
 },
 {
 	"filename": "mine_button_2.png",
-	"frame": {"x":332,"y":432,"w":64,"h":64},
+	"frame": {"x":658,"y":232,"w":64,"h":64},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":64,"h":64},
@@ -178,7 +178,7 @@
 },
 {
 	"filename": "plant.png",
-	"frame": {"x":332,"y":366,"w":64,"h":64},
+	"frame": {"x":398,"y":432,"w":64,"h":64},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":64,"h":64},
@@ -186,7 +186,7 @@
 },
 {
 	"filename": "plant_button_1.png",
-	"frame": {"x":332,"y":232,"w":64,"h":64},
+	"frame": {"x":398,"y":366,"w":64,"h":64},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":64,"h":64},
@@ -194,6 +194,46 @@
 },
 {
 	"filename": "plant_button_2.png",
+	"frame": {"x":398,"y":232,"w":64,"h":64},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":64,"h":64},
+	"sourceSize": {"w":64,"h":64}
+},
+{
+	"filename": "pollution_grey_01.png",
+	"frame": {"x":398,"y":300,"w":64,"h":64},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":64,"h":64},
+	"sourceSize": {"w":64,"h":64}
+},
+{
+	"filename": "pollution_grey_02.png",
+	"frame": {"x":332,"y":432,"w":64,"h":64},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":64,"h":64},
+	"sourceSize": {"w":64,"h":64}
+},
+{
+	"filename": "pollution_grey_03.png",
+	"frame": {"x":332,"y":366,"w":64,"h":64},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":64,"h":64},
+	"sourceSize": {"w":64,"h":64}
+},
+{
+	"filename": "pollution_grey_04.png",
+	"frame": {"x":332,"y":232,"w":64,"h":64},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":64,"h":64},
+	"sourceSize": {"w":64,"h":64}
+},
+{
+	"filename": "pollution_grey_05.png",
 	"frame": {"x":332,"y":300,"w":64,"h":64},
 	"rotated": false,
 	"trimmed": false,
@@ -201,7 +241,7 @@
 	"sourceSize": {"w":64,"h":64}
 },
 {
-	"filename": "pollution_1.png",
+	"filename": "pollution_grey_06.png",
 	"frame": {"x":266,"y":432,"w":64,"h":64},
 	"rotated": false,
 	"trimmed": false,
@@ -209,7 +249,7 @@
 	"sourceSize": {"w":64,"h":64}
 },
 {
-	"filename": "pollution_2.png",
+	"filename": "pollution_grey_07.png",
 	"frame": {"x":266,"y":366,"w":64,"h":64},
 	"rotated": false,
 	"trimmed": false,
@@ -217,7 +257,7 @@
 	"sourceSize": {"w":64,"h":64}
 },
 {
-	"filename": "pollution_3.png",
+	"filename": "pollution_grey_08.png",
 	"frame": {"x":266,"y":232,"w":64,"h":64},
 	"rotated": false,
 	"trimmed": false,
@@ -225,7 +265,7 @@
 	"sourceSize": {"w":64,"h":64}
 },
 {
-	"filename": "pollution_4.png",
+	"filename": "pollution_grey_09.png",
 	"frame": {"x":266,"y":300,"w":64,"h":64},
 	"rotated": false,
 	"trimmed": false,
@@ -233,7 +273,7 @@
 	"sourceSize": {"w":64,"h":64}
 },
 {
-	"filename": "pollution_5.png",
+	"filename": "pollution_grey_10.png",
 	"frame": {"x":200,"y":432,"w":64,"h":64},
 	"rotated": false,
 	"trimmed": false,
@@ -241,7 +281,7 @@
 	"sourceSize": {"w":64,"h":64}
 },
 {
-	"filename": "pollution_6.png",
+	"filename": "pollution_grey_11.png",
 	"frame": {"x":200,"y":366,"w":64,"h":64},
 	"rotated": false,
 	"trimmed": false,
@@ -249,7 +289,7 @@
 	"sourceSize": {"w":64,"h":64}
 },
 {
-	"filename": "pollution_7.png",
+	"filename": "pollution_grey_12.png",
 	"frame": {"x":200,"y":232,"w":64,"h":64},
 	"rotated": false,
 	"trimmed": false,
@@ -490,7 +530,7 @@
 },
 {
 	"filename": "techtree/automatedrefiners.png",
-	"frame": {"x":862,"y":378,"w":32,"h":32},
+	"frame": {"x":986,"y":470,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
@@ -498,7 +538,7 @@
 },
 {
 	"filename": "techtree/coalnode.png",
-	"frame": {"x":854,"y":446,"w":32,"h":32},
+	"frame": {"x":986,"y":436,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
@@ -506,7 +546,7 @@
 },
 {
 	"filename": "techtree/conveyerbelts.png",
-	"frame": {"x":828,"y":412,"w":32,"h":32},
+	"frame": {"x":986,"y":402,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
@@ -514,7 +554,7 @@
 },
 {
 	"filename": "techtree/fudgethenumbers.png",
-	"frame": {"x":828,"y":378,"w":32,"h":32},
+	"frame": {"x":986,"y":368,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
@@ -522,7 +562,7 @@
 },
 {
 	"filename": "techtree/hydro.png",
-	"frame": {"x":820,"y":446,"w":32,"h":32},
+	"frame": {"x":854,"y":476,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
@@ -530,7 +570,7 @@
 },
 {
 	"filename": "techtree/improvedpaneltech.png",
-	"frame": {"x":794,"y":412,"w":32,"h":32},
+	"frame": {"x":820,"y":476,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
@@ -538,7 +578,7 @@
 },
 {
 	"filename": "techtree/oilnode.png",
-	"frame": {"x":794,"y":378,"w":32,"h":32},
+	"frame": {"x":886,"y":414,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
@@ -546,7 +586,7 @@
 },
 {
 	"filename": "techtree/pollutionfilters.png",
-	"frame": {"x":854,"y":344,"w":32,"h":32},
+	"frame": {"x":886,"y":380,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
@@ -554,7 +594,7 @@
 },
 {
 	"filename": "techtree/purchasesolarcellcompany.png",
-	"frame": {"x":820,"y":344,"w":32,"h":32},
+	"frame": {"x":886,"y":346,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
@@ -562,7 +602,7 @@
 },
 {
 	"filename": "techtree/purifier.png",
-	"frame": {"x":958,"y":300,"w":32,"h":32},
+	"frame": {"x":990,"y":334,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
@@ -570,7 +610,7 @@
 },
 {
 	"filename": "techtree/reinforcedturbines.png",
-	"frame": {"x":890,"y":312,"w":32,"h":32},
+	"frame": {"x":990,"y":300,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
@@ -578,7 +618,7 @@
 },
 {
 	"filename": "techtree/resourcetrading.png",
-	"frame": {"x":924,"y":300,"w":32,"h":32},
+	"frame": {"x":890,"y":312,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
@@ -647,6 +687,6 @@
 	"format": "RGBA8888",
 	"size": {"w":1024,"h":512},
 	"scale": "1",
-	"smartupdate": "$TexturePacker:SmartUpdate:c45f863d618a3fba2e05eb20acf8f5d8:92862534d233819e8126a75f06b1d679:a759b6bbc8381ac9c472b28f589ad0d6$"
+	"smartupdate": "$TexturePacker:SmartUpdate:dd857f861a40952168a6993f290a9d09:bc6e7c842840b3793cb6d582d06f6bbe:a759b6bbc8381ac9c472b28f589ad0d6$"
 }
 }

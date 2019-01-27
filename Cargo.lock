@@ -671,7 +671,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "ld39"
-version = "0.1.0"
+version = "1.1.0"
 dependencies = [
  "cgmath 0.16.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "conrod 0.61.1 (registry+https://github.com/rust-lang/crates.io-index)",

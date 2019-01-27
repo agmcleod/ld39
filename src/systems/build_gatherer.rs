@@ -1,7 +1,7 @@
 use components::ui::WalletUI;
 use components::{ui::TutorialUI, upgrade::Buff, Actions, AnimationSheet, Button, ClickSound,
                  Color, EffectedByPollutionTiles, EntityLookup, Gatherer, GathererPositions,
-                 GathererType, Input, Node, ResearchedBuffs, SelectedTile, Sprite, Text, Tile,
+                 GathererType, Input, Node, PollutedTiles, ResearchedBuffs, SelectedTile, Sprite, Text, Tile,
                  TileNodes, TileType, Transform, TutorialStep, Wallet};
 use entities::tutorial;
 use specs::{Entities, Join, Read, ReadStorage, System, Write, WriteStorage};
@@ -37,6 +37,7 @@ impl<'a> System<'a> for BuildGatherer {
         Write<'a, GathererPositions>,
         Read<'a, Input>,
         WriteStorage<'a, Node>,
+        Write<'a, PollutedTiles>,
         Read<'a, TileNodes>,
         Read<'a, ResearchedBuffs>,
         ReadStorage<'a, SelectedTile>,
@@ -63,6 +64,7 @@ impl<'a> System<'a> for BuildGatherer {
             mut gatherer_positions_storage,
             input_storage,
             mut nodes_storage,
+            mut polluted_tiles_storage,
             tile_nodes_storage,
             researched_buffs_storage,
             selected_tile_storage,
@@ -260,13 +262,22 @@ impl<'a> System<'a> for BuildGatherer {
                             if tile_type != TileType::Open {
                                 pollution += gatherer_type.get_pollution_amount();
 
+                                let selected_tile_x = selected_tile_x + (i as f32) * Tile::get_size();
+                                let selected_tile_y = selected_tile_y + (j as f32) * Tile::get_size();
+
+                                if polluted_tiles_storage.contains(&(selected_tile_x as i32, selected_tile_y as i32)) {
+                                    continue
+                                }
+
+                                polluted_tiles_storage.insert((selected_tile_x as i32, selected_tile_y as i32));
+
                                 let pollution_entity = entities.create();
                                 transform_storage
                                     .insert(
                                         pollution_entity,
                                         Transform::visible(
-                                            selected_tile_x + (i as f32) * Tile::get_size(),
-                                            selected_tile_y + (j as f32) * Tile::get_size(),
+                                            selected_tile_x,
+                                            selected_tile_y,
                                             3.0,
                                             64,
                                             64,
@@ -279,9 +290,9 @@ impl<'a> System<'a> for BuildGatherer {
                                 let mut animation = AnimationSheet::new(0.1);
                                 animation.add_animation(
                                     "default".to_string(),
-                                    [1, 2, 3, 4, 5, 6, 7, 6, 5, 4, 3, 2]
+                                    ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"]
                                         .iter()
-                                        .map(|n| format!("pollution_{}.png", n))
+                                        .map(|n| format!("pollution_grey_{}.png", n))
                                         .collect(),
                                 );
                                 animation.set_current_animation("default".to_string());
