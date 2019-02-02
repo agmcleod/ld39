@@ -46,7 +46,6 @@ impl Settings {
 
     fn save(&self) {
         let text = serde_json::to_string(&self).unwrap();
-        println!("{:?}", get_settings_path());
         fs::write(get_settings_path().to_str().unwrap(), text)
             .expect("Unable to write settings");
     }
