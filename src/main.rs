@@ -1,4 +1,5 @@
 extern crate cgmath;
+extern crate dirs;
 #[macro_use]
 extern crate gfx;
 extern crate gfx_device_gl;

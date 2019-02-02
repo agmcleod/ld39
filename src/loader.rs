@@ -1,15 +1,18 @@
 extern crate gfx;
 extern crate image;
-use gfx::texture::Mipmap;
-use rodio::{decoder::Decoder, Decoder as SoundDecoder};
-use serde_json;
-use settings::Settings;
+
 use std::env;
-use std::fs::File;
+use std::fs::{create_dir, File};
 use std::io::prelude::Read;
 use std::io::BufReader;
 use std::io::Result;
 use std::path::{Path, PathBuf};
+
+use dirs;
+use gfx::texture::Mipmap;
+use rodio::{decoder::Decoder, Decoder as SoundDecoder};
+use serde_json;
+use settings::Settings;
 
 pub fn gfx_load_texture<F, R>(
     path: &str,
@@ -37,6 +40,10 @@ pub fn create_sound(sound_file_path: &str) -> Decoder<BufReader<File>> {
 
 pub fn read_text_from_file(path: &str) -> Result<String> {
     let path = get_exe_path().join(path);
+    read_text_from_path(path)
+}
+
+pub fn read_text_from_path(path: PathBuf) -> Result<String> {
     let mut text = String::new();
     let mut file = try!(File::open(path));
     try!(file.read_to_string(&mut text));
@@ -53,10 +60,36 @@ pub fn get_exe_path() -> PathBuf {
     }
 }
 
+#[cfg(target_os="linux")]
+pub fn get_settings_path() -> PathBuf {
+    if let Some(home_dir) = dirs::home_dir() {
+        if !home_dir.join("EnergyGrid").exists() {
+            create_dir(home_dir.join("EnergyGrid")).unwrap();
+        }
+        home_dir.join("EnergyGrid").join("settings.json")
+    } else {
+        panic!("Could not find $HOME");
+    }
+}
+
+#[cfg(target_os="windows")]
+pub fn get_settings_path() -> PathBuf {
+    get_settings_path_win_mac()
+}
+
+#[cfg(target_os="mac")]
+pub fn get_settings_path() -> PathBuf {
+    get_settings_path_win_mac()
+}
+
+fn get_settings_path_win_mac() -> PathBuf {
+    get_exe_path().join("settings.json")
+}
+
 pub fn load_settings() -> Settings {
-    let file_name = "settings.json";
-    if get_exe_path().join(file_name).exists() {
-        let settings_text = read_text_from_file(file_name).unwrap();
+    let settings_path = get_settings_path();
+    if settings_path.exists() {
+        let settings_text = read_text_from_path(settings_path).unwrap();
         serde_json::from_str(settings_text.as_ref()).unwrap()
     } else {
         Settings::default()

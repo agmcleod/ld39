@@ -1,7 +1,7 @@
 use std::fs;
 
 use conrod::Ui;
-use loader::get_exe_path;
+use loader::get_settings_path;
 use serde_json;
 
 #[derive(Serialize, Deserialize)]
@@ -46,7 +46,8 @@ impl Settings {
 
     fn save(&self) {
         let text = serde_json::to_string(&self).unwrap();
-        fs::write(get_exe_path().join("settings.json").to_str().unwrap(), text)
+        println!("{:?}", get_settings_path());
+        fs::write(get_settings_path().to_str().unwrap(), text)
             .expect("Unable to write settings");
     }
 }
