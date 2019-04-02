@@ -42,43 +42,20 @@ use std::time;
 
 use gfx::Device;
 use gfx_glyph::{GlyphBrush, GlyphBrushBuilder};
-use glutin::{dpi::LogicalSize, ElementState, Event, GlContext, MouseButton, VirtualKeyCode,
-             WindowEvent};
+use glutin::{
+    dpi::LogicalSize, ElementState, Event, GlContext, MouseButton, VirtualKeyCode, WindowEvent,
+};
 use rodio::Source;
 use specs::{Entity, ReadStorage, World, WriteStorage};
 
 use components::ui::{TechTreeButton, TutorialUI, WalletUI};
-use components::{upgrade::{LearnProgress, Upgrade},
-                 Actions,
-                 AnimationSheet,
-                 Button,
-                 Camera,
-                 ClickSound,
-                 Color,
-                 DeltaTime,
-                 EffectedByPollutionTiles,
-                 EntityLookup,
-                 Error,
-                 Fade,
-                 FloatingText,
-                 Gatherer,
-                 HighlightTile,
-                 Input,
-                 MenuScreen,
-                 Node,
-                 PowerBar,
-                 Pulse,
-                 Rect,
-                 SelectedTile,
-                 Shape,
-                 Sprite,
-                 StateChange,
-                 Text,
-                 Texture,
-                 Tile,
-                 Transform,
-                 TransitionToState,
-                 TutorialStep};
+use components::{
+    upgrade::{LearnProgress, Upgrade},
+    Actions, AnimationSheet, Button, Camera, ClickSound, Color, DeltaTime,
+    EffectedByPollutionTiles, EntityLookup, Error, Fade, FloatingText, Gatherer, HighlightTile,
+    Input, MenuScreen, Node, PowerBar, Pulse, Rect, SelectedTile, Shape, Sprite, StateChange, Text,
+    Texture, Tile, Transform, TransitionToState, TutorialStep,
+};
 use renderer::{ColorFormat, DepthFormat};
 use settings::Settings;
 use spritesheet::Spritesheet;

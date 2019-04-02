@@ -22,13 +22,13 @@ where
     F: gfx::Factory<R>,
     R: gfx::Resources,
 {
-    use gfx::format::Rgba8;
+    use gfx::format::Srgba8;
     let path = get_exe_path().join(path);
     let img = image::open(path).unwrap().to_rgba();
     let (width, height) = img.dimensions();
     let kind = gfx::texture::Kind::D2(width as u16, height as u16, gfx::texture::AaMode::Single);
     let (_, view) = factory
-        .create_texture_immutable_u8::<Rgba8>(kind, Mipmap::Allocated, &[&img])
+        .create_texture_immutable_u8::<Srgba8>(kind, Mipmap::Allocated, &[&img])
         .unwrap();
     (view, width as u16, height as u16)
 }
@@ -60,7 +60,7 @@ pub fn get_exe_path() -> PathBuf {
     }
 }
 
-#[cfg(target_os="linux")]
+#[cfg(target_os = "linux")]
 pub fn get_settings_path() -> PathBuf {
     if let Some(home_dir) = dirs::home_dir() {
         if !home_dir.join("EnergyGrid").exists() {
@@ -72,12 +72,12 @@ pub fn get_settings_path() -> PathBuf {
     }
 }
 
-#[cfg(target_os="windows")]
+#[cfg(target_os = "windows")]
 pub fn get_settings_path() -> PathBuf {
     get_settings_path_win_mac()
 }
 
-#[cfg(target_os="mac")]
+#[cfg(target_os = "macos")]
 pub fn get_settings_path() -> PathBuf {
     get_settings_path_win_mac()
 }
